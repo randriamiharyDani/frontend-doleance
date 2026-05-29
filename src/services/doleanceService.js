@@ -1,0 +1,178 @@
+import api from './api';
+
+const doleanceService = {
+  // ========== DOLÉANCES ==========
+  
+  getAll: async (params = {}) => {
+    try {
+      const queryParams = new URLSearchParams();
+      Object.keys(params).forEach(key => {
+        if (params[key]) queryParams.append(key, params[key]);
+      });
+      const response = await api.get(`/doleances?${queryParams.toString()}`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      return { success: false, data: { doleances: [], pagination: { total: 0 } } };
+    }
+  },
+
+  getById: async (id) => {
+    try {
+      const response = await api.get(`/doleances/${id}`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message };
+    }
+  },
+
+  getByReference: async (reference) => {
+    try {
+      const response = await api.get(`/doleances/public/${reference}`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message };
+    }
+  },
+
+  create: async (data) => {
+    try {
+      const response = await api.post('/doleances', data);
+      return { success: true, data: response.data };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message };
+    }
+  },
+
+  updateStatut: async (id, id_statut, commentaire = null) => {
+    try {
+      const response = await api.put(`/doleances/${id}/statut`, { id_statut, commentaire });
+      return { success: true, data: response.data };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message };
+    }
+  },
+
+  addReponse: async (id, message, estInterne = false) => {
+    try {
+      const response = await api.post(`/doleances/${id}/reponses`, { message, est_interne: estInterne });
+      return { success: true, data: response.data };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message };
+    }
+  },
+
+  assigner: async (id, id_utilisateur, commentaire = null) => {
+    try {
+      const response = await api.post(`/doleances/${id}/assigner`, { id_utilisateur, commentaire });
+      return { success: true, data: response.data };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message };
+    }
+  },
+
+  transferer: async (id, id_direction, motif) => {
+    try {
+      const response = await api.post(`/doleances/${id}/transferer`, { id_direction, motif });
+      return { success: true, data: response.data };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message };
+    }
+  },
+
+  addSatisfaction: async (id, note, commentaire = null) => {
+    try {
+      const response = await api.post(`/doleances/${id}/satisfaction`, { note, commentaire });
+      return { success: true, data: response.data };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message };
+    }
+  },
+
+  delete: async (id) => {
+    try {
+      const response = await api.delete(`/doleances/${id}`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message };
+    }
+  },
+
+  // ========== DONNÉES DE RÉFÉRENCE ==========
+
+  getCategories: async () => {
+    try {
+      const response = await api.get('/doleances/categories');
+      return { success: true, data: response.data.data || response.data };
+    } catch (error) {
+      return { success: false, data: [] };
+    }
+  },
+
+  getStatuts: async () => {
+    try {
+      const response = await api.get('/doleances/statuts');
+      return { success: true, data: response.data.data || response.data };
+    } catch (error) {
+      return { success: false, data: [] };
+    }
+  },
+
+  getPriorites: async () => {
+    try {
+      const response = await api.get('/doleances/priorites');
+      return { success: true, data: response.data.data || response.data };
+    } catch (error) {
+      return { success: false, data: [] };
+    }
+  },
+
+  getDirections: async () => {
+    try {
+      const response = await api.get('/doleances/directions');
+      return { success: true, data: response.data.data || response.data };
+    } catch (error) {
+      return { success: false, data: [] };
+    }
+  },
+
+  getQuartiers: async () => {
+    try {
+      const response = await api.get('/doleances/quartiers');
+      return { success: true, data: response.data.data || response.data };
+    } catch (error) {
+      return { success: false, data: [] };
+    }
+  },
+
+  getRoles: async () => {
+    try {
+      const response = await api.get('/doleances/roles');
+      return { success: true, data: response.data.data || response.data };
+    } catch (error) {
+      return { success: false, data: [] };
+    }
+  },
+
+  // ========== EXPORT ==========
+
+  exportDoleances: async (filters = {}, format = 'csv') => {
+    try {
+      const response = await api.post(`/doleances/export/${format}`, filters, {
+        responseType: 'blob'
+      });
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `doleances_export.${format}`);
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+      return { success: true };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message };
+    }
+  }
+};
+
+export default doleanceService;
