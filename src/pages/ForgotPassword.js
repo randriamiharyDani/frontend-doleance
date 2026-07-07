@@ -1,34 +1,81 @@
-import React, { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
-import { EyeIcon, EyeSlashIcon, BuildingOfficeIcon, UserIcon, LockClosedIcon } from '@heroicons/react/24/outline';
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { BuildingOfficeIcon, EnvelopeIcon, ArrowLeftIcon } from '@heroicons/react/24/outline';
+import emailjs from '@emailjs/browser';
 
-function Login() {
+function ForgotPassword() {
   const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const { login } = useAuth();
-  const navigate = useNavigate();
-  
+  const [message, setMessage] = useState({ type: '', text: '' });
+
+  // Récupération des variables d'environnement (préfixées VITE_)
+  const SERVICE_ID = import.meta.env.VITE_EMAILJS_SERVICE_ID;
+  const TEMPLATE_ID = import.meta.env.VITE_EMAILJS_TEMPLATE_ID;
+  const PUBLIC_KEY = import.meta.env.VITE_EMAILJS_PUBLIC_KEY;
+
+  // Vérification unique au montage du composant
+  useEffect(() => {
+    if (!SERVICE_ID || !TEMPLATE_ID || !PUBLIC_KEY) {
+      console.error('❌ Variables EmailJS manquantes dans .env');
+      console.log('SERVICE_ID :', SERVICE_ID);
+      console.log('TEMPLATE_ID :', TEMPLATE_ID);
+      console.log('PUBLIC_KEY :', PUBLIC_KEY);
+    } else {
+      console.log('✅ Variables EmailJS correctement chargées');
+    }
+  }, []);
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
-    
-    const success = await login(email, password);
-    if (success) {
-      navigate('/backoffice/dashboard');
+
+    // Vérification avant d'envoyer
+    if (!SERVICE_ID || !TEMPLATE_ID || !PUBLIC_KEY) {
+      setMessage({
+        type: 'error',
+        text: 'Configuration EmailJS incomplète. Contactez l\'administrateur.',
+      });
+      return;
     }
-    setLoading(false);
+
+    setLoading(true);
+    setMessage({ type: '', text: '' });
+
+    try {
+      const templateParams = {
+        to_email: email,
+        reset_link: `${window.location.origin}/reset-password?email=${encodeURIComponent(email)}`,
+      };
+
+      const response = await emailjs.send(
+        SERVICE_ID,
+        TEMPLATE_ID,
+        templateParams,
+        PUBLIC_KEY
+      );
+
+      console.log('✅ Email envoyé !', response.status, response.text);
+      setMessage({
+        type: 'success',
+        text: 'Un email de réinitialisation a été envoyé à votre adresse.',
+      });
+      setEmail('');
+    } catch (error) {
+      console.error('❌ Erreur EmailJS :', error);
+      setMessage({
+        type: 'error',
+        text: error.text || 'Une erreur est survenue. Vérifiez votre adresse email ou réessayez plus tard.',
+      });
+    } finally {
+      setLoading(false);
+    }
   };
-  
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-sky-50 to-gray-100 p-4">
       <div className="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-md border border-gray-100">
         
-        {/* En-tête avec logo */}
+        {/* En-tête */}
         <div className="text-center mb-6 sm:mb-8">
-          {/* Logo CUA */}
           <div className="flex justify-center mb-4">
             <div className="relative">
               <div className="w-20 h-20 bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
@@ -47,23 +94,18 @@ function Login() {
               </div>
             </div>
           </div>
-          
-          <h1 className="text-2xl font-bold text-gray-800">Commune Urbaine</h1>
-          <p className="text-blue-600 text-sm mt-1">d'Antananarivo</p>
-          <div className="mt-2 inline-block px-3 py-1 bg-blue-50 rounded-full border border-blue-200">
-            <span className="text-xs font-medium text-blue-700">🔐 Espace Agent Municipal</span>
-          </div>
+          <h1 className="text-2xl font-bold text-gray-800">Réinitialisation</h1>
+          <p className="text-gray-500 text-sm mt-1">Entrez votre email professionnel</p>
         </div>
-        
+
         <form onSubmit={handleSubmit}>
-          {/* Champ Email */}
-          <div className="mb-4">
+          <div className="mb-6">
             <label className="block text-gray-700 text-sm font-semibold mb-2">
               Email professionnel
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <UserIcon className="h-5 w-5 text-gray-400" />
+                <EnvelopeIcon className="h-5 w-5 text-gray-400" />
               </div>
               <input
                 type="email"
@@ -76,40 +118,17 @@ function Login() {
               />
             </div>
           </div>
-          
-          {/* Champ Mot de passe */}
-          <div className="mb-6">
-            <label className="block text-gray-700 text-sm font-semibold mb-2">
-              Mot de passe
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <LockClosedIcon className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                type={showPassword ? 'text' : 'password'}
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-10 pr-10 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200 bg-gray-50 hover:bg-white"
-                placeholder="••••••••"
-                required
-                autoComplete="current-password"
-              />
-              <button
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 hover:text-blue-600 transition-colors"
-              >
-                {showPassword ? (
-                  <EyeSlashIcon className="h-5 w-5" />
-                ) : (
-                  <EyeIcon className="h-5 w-5" />
-                )}
-              </button>
+
+          {message.text && (
+            <div className={`mb-4 p-3 rounded-lg text-sm ${
+              message.type === 'success'
+                ? 'bg-green-50 text-green-700 border border-green-200'
+                : 'bg-red-50 text-red-700 border border-red-200'
+            }`}>
+              {message.text}
             </div>
-          </div>
-          
-          {/* Bouton Connexion */}
+          )}
+
           <button
             type="submit"
             disabled={loading}
@@ -121,34 +140,21 @@ function Login() {
                   <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
                   <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                 </svg>
-                Connexion en cours...
+                Envoi en cours...
               </span>
             ) : (
-              'Se connecter'
+              'Envoyer le lien de réinitialisation'
             )}
           </button>
         </form>
-        
-        {/* Liens supplémentaires : récupération et retour */}
-        <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-2">
-          <Link 
-            to="/forgot-password" 
-            className="text-sm text-blue-600 hover:text-blue-800 hover:underline font-medium"
-          >
-            Mot de passe oublié ?
-          </Link>
-          <Link 
-            to="/" 
-            className="text-sm text-gray-500 hover:text-blue-600 transition-colors inline-flex items-center gap-1"
-          >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-            </svg>
-            Retour à l'accueil
+
+        <div className="mt-6 text-center">
+          <Link to="/login" className="text-sm text-gray-500 hover:text-blue-600 transition-colors inline-flex items-center gap-1">
+            <ArrowLeftIcon className="w-4 h-4" />
+            Retour à la connexion
           </Link>
         </div>
-        
-        {/* Footer */}
+
         <div className="mt-6 p-4 bg-gradient-to-r from-blue-50 to-sky-50 rounded-xl border border-blue-100">
           <div className="flex items-center gap-2 text-xs text-gray-500">
             <div className="w-2 h-2 bg-green-400 rounded-full animate-pulse"></div>
@@ -163,4 +169,4 @@ function Login() {
   );
 }
 
-export default Login;
+export default ForgotPassword;

@@ -15,7 +15,13 @@ import {
   XCircleIcon,
   ChatBubbleLeftRightIcon,
   PaperAirplaneIcon,
-  PencilIcon
+  PencilIcon,
+  PhotoIcon,
+  VideoCameraIcon,
+  DocumentDuplicateIcon,
+  PaperClipIcon,
+  ArrowDownTrayIcon,
+  XMarkIcon
 } from '@heroicons/react/24/outline';
 
 function DoleanceDetail() {
@@ -26,9 +32,14 @@ function DoleanceDetail() {
   const [reponse, setReponse] = useState('');
   const [sending, setSending] = useState(false);
   const [showReponseForm, setShowReponseForm] = useState(false);
+  const [piecesJointes, setPiecesJointes] = useState([]);
+  const [loadingPieces, setLoadingPieces] = useState(false);
+  const [showPiecesModal, setShowPiecesModal] = useState(false);
+  const [selectedPiece, setSelectedPiece] = useState(null);
 
   useEffect(() => {
     fetchDoleance();
+    fetchPiecesJointes();
   }, [id]);
 
   const fetchDoleance = async () => {
@@ -47,6 +58,23 @@ function DoleanceDetail() {
       navigate('/backoffice/doleances');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchPiecesJointes = async () => {
+    setLoadingPieces(true);
+    try {
+      const response = await api.get(`/doleances/${id}/pieces-jointes`);
+      if (response.data && response.data.success) {
+        setPiecesJointes(response.data.data || []);
+      } else {
+        setPiecesJointes([]);
+      }
+    } catch (error) {
+      console.warn('Aucune pièce jointe pour cette doléance');
+      setPiecesJointes([]);
+    } finally {
+      setLoadingPieces(false);
     }
   };
 
@@ -83,6 +111,48 @@ function DoleanceDetail() {
     } finally {
       setSending(false);
     }
+  };
+
+  const getFileIcon = (file) => {
+    const extension = file.nom_fichier?.split('.').pop()?.toLowerCase();
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp', 'svg'].includes(extension)) {
+      return <PhotoIcon className="h-6 w-6 text-blue-500" />;
+    }
+    if (['mp4', 'mov', 'avi', 'mkv', 'webm', 'wmv'].includes(extension)) {
+      return <VideoCameraIcon className="h-6 w-6 text-purple-500" />;
+    }
+    if (['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'].includes(extension)) {
+      return <DocumentTextIcon className="h-6 w-6 text-red-500" />;
+    }
+    return <DocumentDuplicateIcon className="h-6 w-6 text-gray-500" />;
+  };
+
+  const getFileTypeLabel = (file) => {
+    const extension = file.nom_fichier?.split('.').pop()?.toLowerCase();
+    const types = {
+      'jpg': 'Image JPEG',
+      'jpeg': 'Image JPEG',
+      'png': 'Image PNG',
+      'gif': 'Image GIF',
+      'webp': 'Image WebP',
+      'bmp': 'Image BMP',
+      'svg': 'Image SVG',
+      'mp4': 'Vidéo MP4',
+      'mov': 'Vidéo MOV',
+      'avi': 'Vidéo AVI',
+      'mkv': 'Vidéo MKV',
+      'webm': 'Vidéo WebM',
+      'wmv': 'Vidéo WMV',
+ 
+    };
+    return types[extension] || 'Fichier inconnu';
+  };
+
+  const formatFileSize = (bytes) => {
+    if (!bytes) return '0 B';
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   };
 
   const getStatusBadge = (statut, couleur) => {
@@ -159,7 +229,7 @@ function DoleanceDetail() {
           <div className="bg-white rounded-lg shadow-md p-6">
             <div className="flex flex-wrap justify-between items-start gap-4 mb-4">
               <div>
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center gap-2 mb-2 flex-wrap">
                   <span className="text-sm font-mono text-gray-500 bg-gray-100 px-2 py-1 rounded">
                     {doleance.reference}
                   </span>
@@ -200,6 +270,68 @@ function DoleanceDetail() {
               <div className="mt-3 pt-3 border-t flex items-center text-gray-500 text-sm">
                 <UserCircleIcon className="h-4 w-4 mr-2" />
                 Assigné à : {doleance.assignee_nom}
+              </div>
+            )}
+          </div>
+
+          {/* Section Pièces jointes */}
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-semibold flex items-center gap-2">
+                <PaperClipIcon className="h-5 w-5" />
+                Pièces jointes
+              </h3>
+              <span className="text-sm text-gray-500">
+                {piecesJointes.length} fichier(s)
+              </span>
+            </div>
+
+            {loadingPieces ? (
+              <div className="flex justify-center py-8">
+                <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+              </div>
+            ) : piecesJointes.length === 0 ? (
+              <div className="text-center py-8 text-gray-500">
+                <DocumentDuplicateIcon className="h-12 w-12 mx-auto mb-2 text-gray-300" />
+                <p>Aucune pièce jointe pour cette doléance</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
+                {piecesJointes.map((file, index) => (
+                  <div 
+                    key={index} 
+                    className="bg-gray-50 rounded-lg border border-gray-200 p-3 text-center hover:shadow-md transition-shadow cursor-pointer"
+                    onClick={() => {
+                      setSelectedPiece(file);
+                      setShowPiecesModal(true);
+                    }}
+                  >
+                    <div className="flex justify-center mb-2">
+                      {getFileIcon(file)}
+                    </div>
+                    <p className="text-xs text-gray-600 truncate" title={file.nom_fichier}>
+                      {file.nom_fichier}
+                    </p>
+                    <p className="text-xs text-gray-400">
+                      {formatFileSize(file.taille)}
+                    </p>
+                    <p className="text-xs text-blue-600 mt-1">
+                      {getFileTypeLabel(file)}
+                    </p>
+                    {file.url && (
+                      <a
+                        href={file.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-xs text-blue-600 hover:text-blue-800 mt-1 inline-flex items-center gap-1"
+                        onClick={(e) => e.stopPropagation()}
+                      >
+                        <ArrowDownTrayIcon className="h-3 w-3" />
+                        Télécharger
+                      </a>
+                    )}
+                  </div>
+                ))}
               </div>
             )}
           </div>
@@ -383,6 +515,94 @@ function DoleanceDetail() {
           )}
         </div>
       </div>
+
+      {/* Modal d'aperçu des pièces jointes */}
+      {showPiecesModal && selectedPiece && (
+        <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b p-4 flex justify-between items-center">
+              <div className="flex items-center gap-3">
+                {getFileIcon(selectedPiece)}
+                <div>
+                  <h3 className="font-semibold text-gray-800">{selectedPiece.nom_fichier}</h3>
+                  <p className="text-sm text-gray-500">
+                    {getFileTypeLabel(selectedPiece)} • {formatFileSize(selectedPiece.taille)}
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowPiecesModal(false)}
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <XMarkIcon className="h-6 w-6" />
+              </button>
+            </div>
+
+            <div className="p-6">
+              {/* Aperçu du fichier */}
+              {selectedPiece.url && (
+                <div className="bg-gray-50 rounded-lg p-4 text-center">
+                  {selectedPiece.nom_fichier?.match(/\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i) ? (
+                    <img 
+                      src={selectedPiece.url} 
+                      alt={selectedPiece.nom_fichier}
+                      className="max-w-full max-h-96 mx-auto object-contain"
+                    />
+                  ) : selectedPiece.nom_fichier?.match(/\.(mp4|mov|avi|mkv|webm)$/i) ? (
+                    <video 
+                      src={selectedPiece.url} 
+                      controls 
+                      className="max-w-full max-h-96 mx-auto"
+                    />
+                  ) : (
+                    <div className="py-12">
+                      <DocumentDuplicateIcon className="h-24 w-24 text-gray-300 mx-auto mb-4" />
+                      <p className="text-gray-500">Aperçu non disponible pour ce type de fichier</p>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Informations du fichier */}
+              <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <p className="text-gray-500">Nom du fichier</p>
+                  <p className="font-medium">{selectedPiece.nom_fichier}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Type</p>
+                  <p className="font-medium">{getFileTypeLabel(selectedPiece)}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Taille</p>
+                  <p className="font-medium">{formatFileSize(selectedPiece.taille)}</p>
+                </div>
+                <div>
+                  <p className="text-gray-500">Téléchargement</p>
+                  <a
+                    href={selectedPiece.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 font-medium inline-flex items-center gap-1"
+                  >
+                    <ArrowDownTrayIcon className="h-4 w-4" />
+                    Télécharger
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <div className="sticky bottom-0 bg-gray-50 border-t p-4 flex justify-end">
+              <button
+                onClick={() => setShowPiecesModal(false)}
+                className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+              >
+                Fermer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

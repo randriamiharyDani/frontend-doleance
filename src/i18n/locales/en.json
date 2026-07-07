@@ -1,0 +1,240 @@
+{
+  "navigation": {
+    "home": "Home",
+    "submitComplaint": "Submit a complaint",
+    "trackComplaint": "Track my complaint",
+    "allComplaints": "All complaints",
+    "settings": "Settings",
+    "login": "Login",
+    "logout": "Logout",
+    "dashboard": "Dashboard",
+    "backoffice": "Back-office",
+    "profile": "Profile",
+    "notifications": "Notifications"
+  },
+  "hero": {
+    "title": "Express your concerns",
+    "subtitle": "Submit a complaint in a few clicks and track its processing in real time",
+    "btnSubmit": "Submit a complaint",
+    "btnTrack": "Track my complaint"
+  },
+  "statistics": {
+    "complaintsHandled": "Complaints handled",
+    "citizensServed": "Citizens served",
+    "satisfactionRate": "Satisfaction rate",
+    "avgResponseTime": "Avg response time",
+    "title": "CUA in numbers",
+    "subtitle": "Our commitment to citizens"
+  },
+  "services": {
+    "title": "Our services",
+    "subtitle": "Solutions adapted to your needs",
+    "service1": {
+      "title": "Easy submission",
+      "description": "Submit your complaint in minutes without creating an account"
+    },
+    "service2": {
+      "title": "Real-time tracking",
+      "description": "Track your complaint progress with your unique reference number"
+    },
+    "service3": {
+      "title": "Fast processing",
+      "description": "Your complaints are processed by competent services"
+    }
+  },
+  "news": {
+    "title": "Latest news",
+    "subtitle": "Stay informed about the latest innovations",
+    "readMore": "Read more",
+    "news1": {
+      "title": "New complaint tracking system",
+      "description": "CUA launches an innovative platform to better respond to citizens' concerns."
+    },
+    "news2": {
+      "title": "Processing time reduction",
+      "description": "Average processing time drops from 72h to 48h thanks to digitization."
+    },
+    "news3": {
+      "title": "Staff training",
+      "description": "Over 200 staff trained to better handle citizens' complaints."
+    }
+  },
+  "contact": {
+    "needHelp": "Need assistance?",
+    "description": "Our team is available to assist you with your process.",
+    "stayConnected": "Stay connected",
+    "socialDescription": "Follow us on social media to stay updated.",
+    "phone": "+261 34 05 123 45",
+    "email": "support@cua.mg",
+    "address": "Commune Urbaine d'Antananarivo, Analakely"
+  },
+  "form": {
+    "yourInfo": "Your information",
+    "lastName": "Last name",
+    "firstName": "First name",
+    "emailOrPhone": "Email or Phone",
+    "address": "Address",
+    "lot": "Lot",
+    "fokontany": "Fokontany",
+    "district": "District",
+    "neighborhood": "Neighborhood",
+    "details": "Complaint details",
+    "title": "Subject / Title",
+    "description": "Detailed description",
+    "exactLocation": "Exact location of the problem",
+    "suggestions": "Suggestions / Desired actions",
+    "category": "Category",
+    "attachments": "Attachments",
+    "attachmentsDescription": "Add photos or videos (max 5 files, 50 MB each)",
+    "chooseFiles": "Choose files",
+    "submit": "Submit my complaint",
+    "copy": "Copy",
+    "track": "Track",
+    "close": "Close",
+    "send": "Send",
+    "seeReferences": "See my references",
+    "required": "Required",
+    "optional": "Optional",
+    "fileFormats": "Supported formats: JPG, PNG, GIF, MP4, MOV"
+  },
+  "messages": {
+    "submissionSuccess": "Complaint submitted successfully!",
+    "yourReference": "Your reference",
+    "keepReference": "Keep this reference carefully. It will allow you to track your complaint.",
+    "referenceCopied": "Reference copied to clipboard!",
+    "referenceSent": "Reference sent via",
+    "pleaseFillRequired": "Please fill in all required fields",
+    "fileTooBig": "exceeds 50 MB",
+    "invalidFileType": "is not an image or video",
+    "maxFilesReached": "Maximum 5 files allowed",
+    "uploading": "Uploading...",
+    "sending": "Sending..."
+  },
+  "status": {
+    "inProgress": "In progress",
+    "resolved": "Resolved",
+    "closed": "Closed",
+    "pending": "Pending",
+    "processing": "Processing",
+    "rejected": "Rejected"
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Customize your experience",
+    "appearance": "Appearance",
+    "appearanceDesc": "Customize the display",
+    "darkMode": "Dark mode",
+    "darkModeDesc": "Enable dark mode to reduce eye strain",
+    "systemTheme": "System theme",
+    "systemThemeDesc": "Use your operating system theme",
+    "language": "Language",
+    "languageDesc": "Choose your preferred language",
+    "currentLanguage": "Current language",
+    "notifications": "Notifications",
+    "notificationsDesc": "Manage your notification preferences",
+    "emailNotifications": "Email notifications",
+    "emailNotificationsDesc": "Receive notifications by email",
+    "smsNotifications": "SMS notifications",
+    "smsNotificationsDesc": "Receive notifications by SMS",
+    "information": "Information",
+    "informationDesc": "About the platform",
+    "version": "Version",
+    "platform": "Platform",
+    "complaintManagement": "Complaint management",
+    "lastUpdate": "Last update",
+    "support": "Support",
+    "supportDesc": "Need help? Contact us"
+  },
+  "tracking": {
+    "title": "Complaint tracking",
+    "subtitle": "Enter your reference number to track your complaint",
+    "reference": "Reference number",
+    "referencePlaceholder": "Ex: CUA-2024-00123",
+    "search": "Search",
+    "notFound": "Complaint not found",
+    "notFoundDesc": "Check your reference number and try again",
+    "details": "Complaint details",
+    "submittedOn": "Submitted on",
+    "lastUpdate": "Last update",
+    "currentStatus": "Current status",
+    "history": "History",
+    "comments": "Comments",
+    "addComment": "Add a comment",
+    "yourComment": "Your comment...",
+    "postComment": "Post"
+  },
+  "allComplaints": {
+    "title": "All complaints",
+    "subtitle": "Browse public complaints from citizens",
+    "search": "Search complaints...",
+    "filter": "Filter",
+    "sortBy": "Sort by",
+    "sortDate": "Latest",
+    "sortOldest": "Oldest",
+    "sortStatus": "Status",
+    "noResults": "No complaints found",
+    "noResultsDesc": "Try changing your search criteria"
+  },
+  "backoffice": {
+    "dashboard": "Dashboard",
+    "totalComplaints": "Total complaints",
+    "pendingComplaints": "Pending complaints",
+    "processingComplaints": "Processing complaints",
+    "resolvedComplaints": "Resolved complaints",
+    "recentComplaints": "Recent complaints",
+    "viewAll": "View all",
+    "assignTo": "Assign to",
+    "changeStatus": "Change status",
+    "addNote": "Add note",
+    "transfer": "Transfer",
+    "directions": "Directions",
+    "users": "Users",
+    "roles": "Roles",
+    "statistics": "Statistics",
+    "settings": "Settings"
+  },
+  "language": {
+    "french": "French",
+    "malagasy": "Malagasy",
+    "english": "English",
+    "language": "Language",
+    "changed": "Language changed to {{language}}"
+  },
+  "notificationsMessages": {
+    "emailEnabled": "Email notifications enabled",
+    "emailDisabled": "Email notifications disabled",
+    "smsEnabled": "SMS notifications enabled",
+    "smsDisabled": "SMS notifications disabled"
+  },
+  "months": {
+    "january": "January",
+    "february": "February",
+    "march": "March",
+    "april": "April",
+    "may": "May",
+    "june": "June",
+    "july": "July",
+    "august": "August",
+    "september": "September",
+    "october": "October",
+    "november": "November",
+    "december": "December"
+  },
+  "errors": {
+    "generic": "An error occurred",
+    "network": "Network error",
+    "server": "Server error",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Forbidden access",
+    "notFound": "Page not found"
+  },
+  "buttons": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "refresh": "Refresh",
+    "export": "Export",
+    "import": "Import"
+  }
+}

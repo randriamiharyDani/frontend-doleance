@@ -2,6 +2,8 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
+import { ThemeProvider } from './contexts/ThemeContext';
+import { LanguageProvider } from './contexts/LanguageContext';
 
 // Pages publiques
 import Accueil from './public/Accueil';
@@ -9,6 +11,8 @@ import DeposerDoleance from './public/DeposerDoleance';
 import SuiviDoleance from './public/SuiviDoleance';
 import ToutesDoleances from './public/ToutesDoleances';
 import Login from './pages/Login';
+import ForgotPassword from './pages/ForgotPassword'; // ← Import ajouté
+import ParametresPublics from './public/ParametresPublics';
 
 // Back-office
 import BackofficeLayout from './backoffice/BackofficeLayout';
@@ -20,8 +24,10 @@ import Roles from './backoffice/Roles';
 import Statistiques from './backoffice/Statistiques';
 import Profile from './backoffice/Profile';
 import Notifications from './backoffice/Notifications';
-import TransfertDoleances from './backoffice/TransfertDoleances';
 import Directions from './backoffice/Directions';
+import DirectionDoleances from './backoffice/DirectionDoleances';
+import Transfert from './backoffice/Transfert';
+import Settings from './backoffice/Settings';
 
 function AppRoutes() {
   return (
@@ -29,10 +35,12 @@ function AppRoutes() {
       {/* Routes publiques */}
       <Route path="/" element={<Accueil />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} /> {/* ← Route ajoutée */}
       <Route path="/deposer-doleance" element={<DeposerDoleance />} />
       <Route path="/suivi-doleance" element={<SuiviDoleance />} />
       <Route path="/suivi-doleance/:reference" element={<SuiviDoleance />} />
       <Route path="/toutes-doleances" element={<ToutesDoleances />} />
+      <Route path="/parametres" element={<ParametresPublics />} />
       
       {/* Routes back-office */}
       <Route path="/backoffice" element={<BackofficeLayout />}>
@@ -45,11 +53,13 @@ function AppRoutes() {
         <Route path="users" element={<Users />} />
         <Route path="roles" element={<Roles />} />
         <Route path="statistiques" element={<Statistiques />} />
-        <Route path="transfert" element={<TransfertDoleances />} />
         <Route path="directions" element={<Directions />} />
+        <Route path="direction/:id_direction" element={<DirectionDoleances />} />
+        <Route path="transfert" element={<Transfert />} />
+        <Route path="settings" element={<Settings />} />
       </Route>
       
-      {/* Redirection */}
+      {/* Redirection 404 */}
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
@@ -58,8 +68,35 @@ function AppRoutes() {
 function App() {
   return (
     <AuthProvider>
-      <AppRoutes />
-      <Toaster position="top-right" />
+      <ThemeProvider>
+        <LanguageProvider>
+          <AppRoutes />
+          <Toaster 
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: '#363636',
+                color: '#fff',
+              },
+              success: {
+                duration: 3000,
+                iconTheme: {
+                  primary: '#10B981',
+                  secondary: '#fff',
+                },
+              },
+              error: {
+                duration: 4000,
+                iconTheme: {
+                  primary: '#EF4444',
+                  secondary: '#fff',
+                },
+              },
+            }}
+          />
+        </LanguageProvider>
+      </ThemeProvider>
     </AuthProvider>
   );
 }

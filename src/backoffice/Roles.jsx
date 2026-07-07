@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
@@ -14,12 +14,28 @@ import {
   UserCircleIcon,
   ChatBubbleLeftRightIcon,
   ArrowPathIcon,
-  CheckBadgeIcon
+  CheckBadgeIcon,
+  HomeIcon,
+  BriefcaseIcon,
+  UserIcon,
+  UsersIcon,
+  StarIcon,
+  MapPinIcon,
+  ClipboardDocumentCheckIcon,
+  EyeIcon,
+  Cog6ToothIcon,
+  DocumentTextIcon,
+  ChartBarIcon,
+  UserPlusIcon,
+  UserMinusIcon
 } from '@heroicons/react/24/outline';
 
 function Roles() {
   const { user } = useAuth();
+  
+  // Tous les useState en premier
   const [roles, setRoles] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editingRole, setEditingRole] = useState(null);
@@ -31,15 +47,20 @@ function Roles() {
     permissions: {}
   });
 
+  // Vérifier si l'utilisateur est super admin
+  const isSuperAdmin = useMemo(() => {
+    return user?.role === 'administrateur_systeme' || user?.nom_role === 'administrateur_systeme';
+  }, [user]);
+
   // Liste des rôles disponibles dans l'organigramme
-  const rolesDefinition = [
+  const rolesDefinition = useMemo(() => [
     { 
       id: 1, 
       nom: 'administrateur_systeme', 
       label: 'Administrateur Système', 
       description: 'Gère tout le système - Création/modification/suppression des utilisateurs et rôles',
       level: 7,
-      icon: '👑'
+      icon: <ShieldCheckIcon className="h-5 w-5" />
     },
     { 
       id: 2, 
@@ -47,7 +68,7 @@ function Roles() {
       label: 'Maire', 
       description: 'Peut répondre aux doléances, valider les décisions importantes',
       level: 6,
-      icon: '🏛️'
+      icon: <BuildingOfficeIcon className="h-5 w-5" />
     },
     { 
       id: 3, 
@@ -55,7 +76,7 @@ function Roles() {
       label: 'Agent Central', 
       description: 'Reçoit toutes les doléances, les transfère aux directions concernées, peut supprimer les doléances unitiles',
       level: 5,
-      icon: '🔄'
+      icon: <ArrowPathIcon className="h-5 w-5" />
     },
     { 
       id: 4, 
@@ -63,7 +84,7 @@ function Roles() {
       label: 'Directeur', 
       description: 'Gère une direction, supervise les chefs de service, peut assigner des doléances',
       level: 4,
-      icon: '📊'
+      icon: <BriefcaseIcon className="h-5 w-5" />
     },
     { 
       id: 5, 
@@ -71,7 +92,7 @@ function Roles() {
       label: 'Chef de Service', 
       description: 'Gère un service au sein d\'une direction, traite les doléances de son service',
       level: 3,
-      icon: '⭐'
+      icon: <StarIcon className="h-5 w-5" />
     },
     { 
       id: 6, 
@@ -79,7 +100,7 @@ function Roles() {
       label: 'Agent', 
       description: 'Traite les doléances qui lui sont assignées, peut répondre aux citoyens',
       level: 2,
-      icon: '👨‍💼'
+      icon: <UserIcon className="h-5 w-5" />
     },
     { 
       id: 7, 
@@ -87,7 +108,7 @@ function Roles() {
       label: 'Secrétaire Général', 
       description: 'Coordination générale entre les directions, supervision des directeurs',
       level: 5,
-      icon: '📋'
+      icon: <ClipboardDocumentCheckIcon className="h-5 w-5" />
     },
     { 
       id: 8, 
@@ -95,7 +116,7 @@ function Roles() {
       label: 'Responsable d\'Arrondissement', 
       description: 'Gère les doléances spécifiques à un arrondissement',
       level: 3,
-      icon: '📍'
+      icon: <MapPinIcon className="h-5 w-5" />
     },
     { 
       id: 9, 
@@ -103,7 +124,7 @@ function Roles() {
       label: 'Agent de Terrain', 
       description: 'Intervient physiquement sur le terrain pour résoudre les problèmes',
       level: 2,
-      icon: '👷'
+      icon: <HomeIcon className="h-5 w-5" />
     },
     { 
       id: 10, 
@@ -111,7 +132,7 @@ function Roles() {
       label: 'Superviseur', 
       description: 'Supervise plusieurs services, valide les traitements',
       level: 3,
-      icon: '🎯'
+      icon: <CheckBadgeIcon className="h-5 w-5" />
     },
     { 
       id: 11, 
@@ -119,14 +140,15 @@ function Roles() {
       label: 'Consultant', 
       description: 'Peut consulter les doléances mais pas les modifier',
       level: 1,
-      icon: '👁️'
+      icon: <EyeIcon className="h-5 w-5" />
     }
-  ];
+  ], []);
 
   // Permissions disponibles par catégorie
-  const availablePermissions = {
+  const availablePermissions = useMemo(() => ({
     doleances: {
       label: 'Doléances',
+      icon: <DocumentTextIcon className="h-4 w-4" />,
       permissions: [
         { key: 'create', label: 'Créer des doléances', roles: ['agent_central', 'agent', 'chef_service', 'directeur'] },
         { key: 'view_all', label: 'Voir toutes les doléances', roles: ['administrateur_systeme', 'maire', 'agent_central', 'directeur', 'chef_service'] },
@@ -142,6 +164,7 @@ function Roles() {
     },
     users: {
       label: 'Utilisateurs',
+      icon: <UsersIcon className="h-4 w-4" />,
       permissions: [
         { key: 'create', label: 'Créer des utilisateurs', roles: ['administrateur_systeme'] },
         { key: 'view', label: 'Voir les utilisateurs', roles: ['administrateur_systeme', 'directeur'] },
@@ -153,6 +176,7 @@ function Roles() {
     },
     profile: {
       label: 'Profil',
+      icon: <UserCircleIcon className="h-4 w-4" />,
       permissions: [
         { key: 'view', label: 'Voir son profil', roles: ['*'] },
         { key: 'edit', label: 'Modifier son profil', roles: ['*'] },
@@ -161,6 +185,7 @@ function Roles() {
     },
     directions: {
       label: 'Directions',
+      icon: <BuildingOfficeIcon className="h-4 w-4" />,
       permissions: [
         { key: 'manage_direction', label: 'Gérer sa direction', roles: ['directeur'] },
         { key: 'manage_service', label: 'Gérer son service', roles: ['chef_service'] },
@@ -169,45 +194,47 @@ function Roles() {
     },
     rapports: {
       label: 'Rapports',
+      icon: <ChartBarIcon className="h-4 w-4" />,
       permissions: [
         { key: 'generate', label: 'Générer des rapports', roles: ['administrateur_systeme', 'maire', 'directeur', 'secretaire_general'] },
         { key: 'export', label: 'Exporter les données', roles: ['administrateur_systeme', 'directeur'] }
       ]
     }
-  };
+  }), []);
 
-  const isSuperAdmin = user?.role === 'administrateur_systeme';
-
-  useEffect(() => {
-    if (!isSuperAdmin) {
-      toast.error('Accès non autorisé. Réservé à l\'administrateur système.');
-      return;
+  // Fonctions avec useCallback
+  const fetchUsers = useCallback(async () => {
+    try {
+      const response = await api.get('/users');
+      if (response.data.success) {
+        setUsers(response.data.data || []);
+      }
+    } catch (error) {
+      console.error('Erreur chargement utilisateurs:', error);
+      setUsers([]);
     }
-    fetchRoles();
-  }, [isSuperAdmin]);
+  }, []);
 
-  const fetchRoles = async () => {
+  const fetchRoles = useCallback(async () => {
     try {
       setLoading(true);
       const response = await api.get('/roles');
       if (response.data.success) {
         setRoles(response.data.data);
       } else {
-        // Si aucun rôle n'existe, créer les rôles par défaut
-        createDefaultRoles();
+        await createDefaultRoles();
       }
     } catch (error) {
       console.error('Erreur chargement rôles:', error);
-      createDefaultRoles();
+      await createDefaultRoles();
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
-  const createDefaultRoles = async () => {
+  const createDefaultRoles = useCallback(async () => {
     try {
       for (const roleDef of rolesDefinition) {
-        // Définir les permissions par défaut pour chaque rôle
         const defaultPermissions = {};
         
         Object.entries(availablePermissions).forEach(([category, data]) => {
@@ -225,13 +252,30 @@ function Roles() {
           permissions: defaultPermissions
         });
       }
-      fetchRoles();
+      await fetchRoles();
     } catch (error) {
       console.error('Erreur création rôles par défaut:', error);
     }
-  };
+  }, [rolesDefinition, availablePermissions, fetchRoles]);
 
-  const handleSubmit = async (e) => {
+  // useEffect pour charger les données au montage
+  useEffect(() => {
+    fetchRoles();
+    fetchUsers();
+  }, [fetchRoles, fetchUsers]);
+
+  // Fonctions de gestion avec useCallback
+  const closeModal = useCallback(() => {
+    setShowModal(false);
+    setEditingRole(null);
+    setFormData({
+      nom_role: '',
+      description: '',
+      permissions: {}
+    });
+  }, []);
+
+  const handleSubmit = useCallback(async (e) => {
     e.preventDefault();
     
     if (!formData.nom_role) {
@@ -246,7 +290,7 @@ function Roles() {
         const response = await api.put(`/roles/${editingRole.id_role}`, formData);
         if (response.data.success) {
           toast.success('Rôle modifié avec succès');
-          fetchRoles();
+          await fetchRoles();
           closeModal();
         } else {
           toast.error(response.data.message || 'Erreur lors de la modification');
@@ -255,7 +299,7 @@ function Roles() {
         const response = await api.post('/roles', formData);
         if (response.data.success) {
           toast.success('Rôle créé avec succès');
-          fetchRoles();
+          await fetchRoles();
           closeModal();
         } else {
           toast.error(response.data.message || 'Erreur lors de la création');
@@ -267,9 +311,9 @@ function Roles() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [formData, editingRole, fetchRoles, closeModal]);
 
-  const confirmDelete = (role) => {
+  const confirmDelete = useCallback((role) => {
     const systemRoles = ['administrateur_systeme', 'maire', 'agent_central', 'directeur', 'chef_service', 'agent', 'secretaire_general'];
     if (systemRoles.includes(role.nom_role)) {
       toast.error('Impossible de supprimer un rôle système essentiel');
@@ -278,16 +322,16 @@ function Roles() {
     
     setRoleToDelete(role);
     setShowDeleteConfirm(true);
-  };
+  }, []);
 
-  const handleDelete = async () => {
+  const handleDelete = useCallback(async () => {
     if (!roleToDelete) return;
     
     try {
       const response = await api.delete(`/roles/${roleToDelete.id_role}`);
       if (response.data.success) {
         toast.success(`Rôle "${roleToDelete.nom_role}" supprimé avec succès`);
-        fetchRoles();
+        await fetchRoles();
       } else {
         toast.error(response.data.message || 'Erreur lors de la suppression');
       }
@@ -298,9 +342,9 @@ function Roles() {
       setShowDeleteConfirm(false);
       setRoleToDelete(null);
     }
-  };
+  }, [roleToDelete, fetchRoles]);
 
-  const handleEdit = (role) => {
+  const handleEdit = useCallback((role) => {
     setEditingRole(role);
     let permissions = {};
     if (role.permissions) {
@@ -321,19 +365,9 @@ function Roles() {
       permissions: permissions
     });
     setShowModal(true);
-  };
+  }, []);
 
-  const closeModal = () => {
-    setShowModal(false);
-    setEditingRole(null);
-    setFormData({
-      nom_role: '',
-      description: '',
-      permissions: {}
-    });
-  };
-
-  const togglePermission = (category, permissionKey) => {
+  const togglePermission = useCallback((category, permissionKey) => {
     setFormData(prev => {
       const currentPermissions = Array.isArray(prev.permissions[category]) ? prev.permissions[category] : [];
       const newPermissions = currentPermissions.includes(permissionKey)
@@ -348,15 +382,15 @@ function Roles() {
         }
       };
     });
-  };
+  }, []);
 
-  const hasPermission = (category, permissionKey) => {
+  const hasPermission = useCallback((category, permissionKey) => {
     const perms = formData.permissions[category];
     return Array.isArray(perms) && perms.includes(permissionKey);
-  };
+  }, [formData.permissions]);
 
-  const getRoleBadge = (roleName) => {
-    const role = rolesDefinition.find(r => r.nom === roleName);
+  // Fonctions utilitaires avec useCallback
+  const getRoleBadge = useCallback((roleName) => {
     const colors = {
       administrateur_systeme: 'bg-purple-100 text-purple-800',
       maire: 'bg-red-100 text-red-800',
@@ -371,19 +405,19 @@ function Roles() {
       consultant: 'bg-slate-100 text-slate-800'
     };
     return colors[roleName] || 'bg-gray-100 text-gray-800';
-  };
+  }, []);
 
-  const getRoleIcon = (roleName) => {
+  const getRoleIcon = useCallback((roleName) => {
     const role = rolesDefinition.find(r => r.nom === roleName);
-    return role?.icon || '🔑';
-  };
+    return role?.icon || <KeyIcon className="h-5 w-5" />;
+  }, [rolesDefinition]);
 
-  const getRoleLabel = (roleName) => {
+  const getRoleLabel = useCallback((roleName) => {
     const role = rolesDefinition.find(r => r.nom === roleName);
     return role?.label || roleName;
-  };
+  }, [rolesDefinition]);
 
-  const renderPermissions = (permissions) => {
+  const renderPermissions = useCallback((permissions) => {
     if (!permissions) return [];
     
     let permsObj = permissions;
@@ -404,15 +438,44 @@ function Roles() {
       }
     }
     return items;
-  };
+  }, []);
 
+  const getRoleStats = useCallback(() => {
+    const stats = {};
+    users.forEach(u => {
+      const role = u.role_nom || u.nom_role;
+      if (role) {
+        stats[role] = (stats[role] || 0) + 1;
+      }
+    });
+    return stats;
+  }, [users]);
+
+  // Calcul des statistiques avec useMemo
+  const roleStats = useMemo(() => getRoleStats(), [getRoleStats]);
+  const totalAgents = useMemo(() => users.filter(u => u.role_nom !== 'citoyen').length, [users]);
+
+  // Rediriger si ce n'est pas le super admin
   if (!isSuperAdmin) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="bg-red-50 border border-red-200 rounded-lg p-8 text-center">
-          <ShieldCheckIcon className="h-16 w-16 text-red-500 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-red-600 mb-2">Accès non autorisé</h2>
-          <p className="text-gray-600">Cette page est réservée à l'administrateur système.</p>
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+        <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-8 text-center">
+          <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <ShieldCheckIcon className="h-10 w-10 text-red-600" />
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-2">Accès non autorisé</h2>
+          <p className="text-gray-600 mb-4">
+            Cette page est réservée à l'administrateur système.
+          </p>
+          <p className="text-sm text-gray-500 mb-6">
+            Vous n'avez pas les permissions nécessaires pour accéder à cette section.
+          </p>
+          <button
+            onClick={() => window.location.href = '/backoffice/dashboard'}
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          >
+            Retour au tableau de bord
+          </button>
         </div>
       </div>
     );
@@ -427,79 +490,85 @@ function Roles() {
   }
 
   return (
-    <div>
-      <div className="flex justify-between items-center mb-6">
+    <div className="p-4 md:p-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-800">Gestion des rôles</h1>
-          <p className="text-gray-600 mt-1">Gérez les rôles et permissions des utilisateurs selon l'organigramme</p>
+          <p className="text-gray-600 text-sm mt-1">Gérez les rôles et permissions des utilisateurs selon l'organigramme</p>
+          <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">
+            <ShieldCheckIcon className="h-3 w-3" />
+            Accès réservé à l'administrateur système
+          </div>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2"
+          className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 text-sm"
         >
-          <PlusIcon className="h-5 w-5" />
-          Nouveau rôle
+          <PlusIcon className="h-4 w-4" />
+          <span className="hidden sm:inline">Nouveau rôle</span>
+          <span className="sm:hidden">Ajouter</span>
         </button>
       </div>
 
       {/* Statistiques */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-lg shadow-md p-4">
-          <UserGroupIcon className="h-8 w-8 text-blue-500 mb-2" />
-          <p className="text-2xl font-bold text-gray-800">{roles.length}</p>
-          <p className="text-sm text-gray-500">Total des rôles</p>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
+        <div className="bg-white rounded-lg shadow p-3">
+          <UserGroupIcon className="h-6 w-6 text-blue-500 mb-1" />
+          <p className="text-xl font-bold text-gray-800">{roles.length}</p>
+          <p className="text-xs text-gray-500">Total des rôles</p>
         </div>
-        <div className="bg-white rounded-lg shadow-md p-4">
-          <ShieldCheckIcon className="h-8 w-8 text-purple-500 mb-2" />
-          <p className="text-2xl font-bold text-gray-800">
+        <div className="bg-white rounded-lg shadow p-3">
+          <ShieldCheckIcon className="h-6 w-6 text-purple-500 mb-1" />
+          <p className="text-xl font-bold text-gray-800">
             {roles.filter(r => r.nom_role === 'administrateur_systeme').length}
           </p>
-          <p className="text-sm text-gray-500">Administrateurs système</p>
+          <p className="text-xs text-gray-500">Administrateurs système</p>
         </div>
-        <div className="bg-white rounded-lg shadow-md p-4">
-          <BuildingOfficeIcon className="h-8 w-8 text-green-500 mb-2" />
-          <p className="text-2xl font-bold text-gray-800">
-            {roles.filter(r => ['directeur', 'chef_service'].includes(r.nom_role)).length}
-          </p>
-          <p className="text-sm text-gray-500">Encadrement</p>
+        <div className="bg-white rounded-lg shadow p-3">
+          <UserIcon className="h-6 w-6 text-blue-500 mb-1" />
+          <p className="text-xl font-bold text-gray-800">{totalAgents}</p>
+          <p className="text-xs text-gray-500">Total des agents</p>
         </div>
-        <div className="bg-white rounded-lg shadow-md p-4">
-          <UserCircleIcon className="h-8 w-8 text-orange-500 mb-2" />
-          <p className="text-2xl font-bold text-gray-800">
-            {roles.filter(r => ['agent', 'agent_terrain'].includes(r.nom_role)).length}
+        <div className="bg-white rounded-lg shadow p-3">
+          <UserPlusIcon className="h-6 w-6 text-green-500 mb-1" />
+          <p className="text-xl font-bold text-gray-800">
+            {users.filter(u => u.actif === 1 && u.role_nom !== 'citoyen').length}
           </p>
-          <p className="text-sm text-gray-500">Agents de terrain</p>
+          <p className="text-xs text-gray-500">Agents actifs</p>
         </div>
       </div>
 
       {/* Liste des rôles */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {roles.map((role) => {
           const roleDef = rolesDefinition.find(r => r.nom === role.nom_role);
           const permissionItems = renderPermissions(role.permissions);
+          const agentCount = roleStats[role.nom_role] || 0;
           
           return (
             <div key={role.id_role} className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
-                      <span className="text-2xl">{getRoleIcon(role.nom_role)}</span>
+              <div className="p-4">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="flex items-center gap-2">
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white">
+                      <div className="text-xl">
+                        {getRoleIcon(role.nom_role)}
+                      </div>
                     </div>
                     <div>
-                      <h3 className="text-lg font-semibold text-gray-800">{getRoleLabel(role.nom_role)}</h3>
+                      <h3 className="text-md font-semibold text-gray-800">{getRoleLabel(role.nom_role)}</h3>
                       <span className={`inline-block px-2 py-0.5 text-xs rounded-full ${getRoleBadge(role.nom_role)}`}>
                         {role.nom_role}
                       </span>
                     </div>
                   </div>
-                  <div className="flex gap-2">
+                  <div className="flex gap-1">
                     <button
                       onClick={() => handleEdit(role)}
                       className="text-blue-600 hover:text-blue-800 p-1"
                       title="Modifier"
                     >
-                      <PencilIcon className="h-5 w-5" />
+                      <PencilIcon className="h-4 w-4" />
                     </button>
                     {!['administrateur_systeme', 'maire', 'agent_central', 'directeur', 'chef_service', 'agent', 'secretaire_general'].includes(role.nom_role) && (
                       <button
@@ -507,30 +576,38 @@ function Roles() {
                         className="text-red-600 hover:text-red-800 p-1"
                         title="Supprimer"
                       >
-                        <TrashIcon className="h-5 w-5" />
+                        <TrashIcon className="h-4 w-4" />
                       </button>
                     )}
                   </div>
                 </div>
                 
-                <p className="text-gray-600 text-sm mb-4">
+                <p className="text-gray-600 text-xs mb-3">
                   {roleDef?.description || role.description || 'Description non définie'}
                 </p>
                 
-                <div className="border-t pt-4">
-                  <p className="text-xs text-gray-500 mb-2">Permissions :</p>
+                {/* Nombre d'agents avec ce rôle */}
+                <div className="flex items-center gap-2 mb-3 text-xs">
+                  <UserIcon className="h-4 w-4 text-gray-400" />
+                  <span className="text-gray-600">
+                    <span className="font-semibold text-gray-800">{agentCount}</span> agent{agentCount > 1 ? 's' : ''} avec ce rôle
+                  </span>
+                </div>
+                
+                <div className="border-t pt-3">
+                  <p className="text-xs text-gray-500 mb-1">Permissions :</p>
                   <div className="flex flex-wrap gap-1">
                     {permissionItems.length > 0 ? (
-                      permissionItems.slice(0, 5).map((item, idx) => (
-                        <span key={idx} className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                      permissionItems.slice(0, 4).map((item, idx) => (
+                        <span key={idx} className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full">
                           {item.permission}
                         </span>
                       ))
                     ) : (
-                      <span className="text-xs text-gray-400">Aucune permission spécifique</span>
+                      <span className="text-xs text-gray-400">Aucune permission</span>
                     )}
-                    {permissionItems.length > 5 && (
-                      <span className="text-xs text-gray-400">+{permissionItems.length - 5}</span>
+                    {permissionItems.length > 4 && (
+                      <span className="text-xs text-gray-400">+{permissionItems.length - 4}</span>
                     )}
                   </div>
                 </div>
@@ -542,26 +619,26 @@ function Roles() {
 
       {/* Modal d'ajout/modification */}
       {showModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-10 mx-auto p-5 border w-full max-w-2xl shadow-lg rounded-lg bg-white mb-10">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">
+        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
+          <div className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white flex justify-between items-center p-4 border-b">
+              <h3 className="text-md font-semibold">
                 {editingRole ? 'Modifier le rôle' : 'Ajouter un rôle'}
               </h3>
               <button onClick={closeModal} className="text-gray-400 hover:text-gray-600">
-                <XMarkIcon className="h-6 w-6" />
+                <XMarkIcon className="h-5 w-5" />
               </button>
             </div>
             
-            <form onSubmit={handleSubmit}>
-              <div className="space-y-4">
+            <form onSubmit={handleSubmit} className="p-4">
+              <div className="space-y-3">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Nom du rôle *</label>
+                  <label className="block text-xs font-medium mb-1">Nom du rôle *</label>
                   <input
                     type="text"
                     value={formData.nom_role}
                     onChange={(e) => setFormData({...formData, nom_role: e.target.value})}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-2 py-1.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="ex: agent_qualifie"
                     required
                     disabled={editingRole && ['administrateur_systeme', 'maire', 'agent_central', 'directeur', 'chef_service', 'agent', 'secretaire_general'].includes(editingRole.nom_role)}
@@ -570,36 +647,28 @@ function Roles() {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium mb-1">Libellé du rôle</label>
-                  <input
-                    type="text"
-                    value={formData.label || ''}
-                    onChange={(e) => setFormData({...formData, label: e.target.value})}
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                    placeholder="ex: Agent Qualifié"
-                  />
-                </div>
-                
-                <div>
-                  <label className="block text-sm font-medium mb-1">Description</label>
+                  <label className="block text-xs font-medium mb-1">Description</label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
-                    rows="3"
-                    className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    rows="2"
+                    className="w-full px-2 py-1.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Description des responsabilités du rôle..."
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium mb-3">Permissions</label>
-                  <div className="space-y-4 max-h-96 overflow-y-auto border rounded-lg p-4">
+                  <label className="block text-xs font-medium mb-2">Permissions</label>
+                  <div className="space-y-3 max-h-80 overflow-y-auto border rounded-lg p-3">
                     {Object.entries(availablePermissions).map(([category, data]) => (
-                      <div key={category} className="border-b pb-3 last:border-0">
-                        <h4 className="font-semibold text-gray-700 mb-2">{data.label}</h4>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                      <div key={category} className="border-b pb-2 last:border-0">
+                        <div className="flex items-center gap-2 mb-1">
+                          <span className="text-gray-500">{data.icon}</span>
+                          <h4 className="font-semibold text-gray-700 text-sm">{data.label}</h4>
+                        </div>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-1">
                           {data.permissions.map((perm) => (
-                            <label key={perm.key} className="flex items-center gap-2 text-sm">
+                            <label key={perm.key} className="flex items-center gap-2 text-xs">
                               <input
                                 type="checkbox"
                                 checked={hasPermission(category, perm.key)}
@@ -616,11 +685,11 @@ function Roles() {
                 </div>
               </div>
               
-              <div className="flex justify-end gap-3 mt-6">
-                <button type="button" onClick={closeModal} className="px-4 py-2 border rounded-lg hover:bg-gray-50">
+              <div className="flex justify-end gap-2 mt-4 pt-3 border-t">
+                <button type="button" onClick={closeModal} className="px-3 py-1.5 text-sm border rounded-lg hover:bg-gray-50">
                   Annuler
                 </button>
-                <button type="submit" className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                <button type="submit" className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">
                   {editingRole ? 'Modifier' : 'Créer'}
                 </button>
               </div>
@@ -632,28 +701,28 @@ function Roles() {
       {/* Modal de confirmation de suppression */}
       {showDeleteConfirm && roleToDelete && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
-          <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+          <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-4">
             <div className="text-center">
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
-                <TrashIcon className="h-6 w-6 text-red-600" />
+              <div className="mx-auto flex items-center justify-center h-10 w-10 rounded-full bg-red-100 mb-3">
+                <TrashIcon className="h-5 w-5 text-red-600" />
               </div>
-              <h3 className="text-lg font-medium text-gray-900 mb-2">Confirmation de suppression</h3>
-              <p className="text-sm text-gray-500 mb-4">
-                Êtes-vous sûr de vouloir supprimer le rôle <span className="font-semibold">{getRoleLabel(roleToDelete.nom_role)}</span> ?
+              <h3 className="text-md font-medium text-gray-900 mb-2">Confirmation</h3>
+              <p className="text-sm text-gray-500 mb-3">
+                Supprimer le rôle <span className="font-semibold">{getRoleLabel(roleToDelete.nom_role)}</span> ?
               </p>
-              <p className="text-xs text-red-500 mb-4">
-                Attention : Les utilisateurs avec ce rôle perdront leurs permissions.
+              <p className="text-xs text-red-500 mb-3">
+                Les utilisateurs avec ce rôle perdront leurs permissions.
               </p>
-              <div className="flex justify-center gap-3">
+              <div className="flex justify-center gap-2">
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                  className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
                 >
                   Annuler
                 </button>
                 <button
                   onClick={handleDelete}
-                  className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
+                  className="px-3 py-1.5 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
                 >
                   Supprimer
                 </button>

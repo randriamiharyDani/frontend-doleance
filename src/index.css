@@ -51,13 +51,13 @@
     @apply w-full mx-auto px-4 sm:px-6 lg:px-8;
   }
   
-  /* Boutons responsives - Version corrigée avec couleurs standard */
+  /* Boutons responsives */
   .btn {
     @apply inline-flex items-center justify-center font-medium rounded-lg transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed;
   }
   
   .btn-primary {
-    @apply btn bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500;
+    @apply btn bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500;
   }
   
   .btn-secondary {
@@ -65,11 +65,11 @@
   }
   
   .btn-danger {
-    @apply btn bg-red-600 text-white hover:bg-red-700 focus:ring-red-500;
+    @apply btn bg-danger-600 text-white hover:bg-danger-700 focus:ring-danger-500;
   }
   
   .btn-success {
-    @apply btn bg-green-600 text-white hover:bg-green-700 focus:ring-green-500;
+    @apply btn bg-success-600 text-white hover:bg-success-700 focus:ring-success-500;
   }
   
   /* Tailles des boutons responsives */
@@ -104,7 +104,7 @@
   
   /* Formulaires responsives */
   .input {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm sm:text-base;
+    @apply w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent text-sm sm:text-base;
   }
   
   .label {
@@ -140,7 +140,7 @@
   
   /* Sidebar responsive */
   .sidebar {
-    @apply fixed inset-y-0 left-0 z-30 w-64 bg-gray-900 transform transition-transform duration-300 ease-in-out lg:translate-x-0;
+    @apply fixed inset-y-0 left-0 z-30 w-64 transform transition-transform duration-300 ease-in-out lg:translate-x-0;
   }
   
   .sidebar-open {
@@ -178,19 +178,19 @@
   }
   
   .badge-success {
-    @apply bg-green-100 text-green-800;
+    @apply bg-success-100 text-success-800;
   }
   
   .badge-warning {
-    @apply bg-yellow-100 text-yellow-800;
+    @apply bg-warning-100 text-warning-800;
   }
   
   .badge-danger {
-    @apply bg-red-100 text-red-800;
+    @apply bg-danger-100 text-danger-800;
   }
   
   .badge-info {
-    @apply bg-blue-100 text-blue-800;
+    @apply bg-info-100 text-info-800;
   }
 }
 
@@ -257,22 +257,36 @@
     -webkit-box-orient: vertical;
     overflow: hidden;
   }
+  
+  /* Animation fade-in */
+  .animate-fade-in {
+    animation: fadeIn 0.8s ease-out;
+  }
+  
+  .animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out;
+  }
 }
 
-/* Animations responsives */
+/* Animations */
 @keyframes fadeIn {
   from {
     opacity: 0;
-    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
   to {
     opacity: 1;
     transform: translateY(0);
   }
-}
-
-.animate-fade-in {
-  animation: fadeIn 0.3s ease-out;
 }
 
 /* Scrollbar personnalisée */
@@ -307,17 +321,180 @@
     @apply shadow-none border;
   }
 }
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+
+/* ========== STYLES POUR LE MODE SOMBRE ========== */
+
+/* Mode sombre - Styles généraux */
+.dark {
+  color-scheme: dark;
 }
 
-.animate-fade-in {
-  animation: fade-in 0.8s ease-out;
+.dark body {
+  background-color: #0f172a;
+}
+
+/* Cartes et conteneurs en mode sombre */
+.dark .bg-white {
+  background-color: #1e293b;
+}
+
+.dark .bg-gray-50,
+.dark .bg-gray-100 {
+  background-color: #0f172a;
+}
+
+.dark .text-gray-800,
+.dark .text-gray-900 {
+  color: #f1f5f9;
+}
+
+.dark .text-gray-600,
+.dark .text-gray-500,
+.dark .text-gray-400 {
+  color: #94a3b8;
+}
+
+.dark .text-gray-700 {
+  color: #cbd5e1;
+}
+
+.dark .border-gray-200,
+.dark .border-gray-300 {
+  border-color: #334155;
+}
+
+/* Couleurs primary en mode sombre */
+.dark .bg-primary-600 {
+  background-color: #3b82f6;
+}
+
+.dark .bg-primary-700 {
+  background-color: #2563eb;
+}
+
+.dark .text-primary-600 {
+  color: #60a5fa;
+}
+
+/* Badges en mode sombre */
+.dark .bg-success-100 {
+  background-color: #064e3b;
+}
+
+.dark .bg-danger-100 {
+  background-color: #7f1d1d;
+}
+
+.dark .bg-warning-100 {
+  background-color: #713f12;
+}
+
+.dark .bg-info-100 {
+  background-color: #1e3a8a;
+}
+
+.dark .text-success-800 {
+  color: #86efac;
+}
+
+.dark .text-danger-800 {
+  color: #fca5a5;
+}
+
+.dark .text-warning-800 {
+  color: #fde047;
+}
+
+.dark .text-info-800 {
+  color: #93c5fd;
+}
+
+/* Inputs en mode sombre */
+.dark input,
+.dark select,
+.dark textarea {
+  background-color: #0f172a;
+  border-color: #334155;
+  color: #f1f5f9;
+}
+
+.dark input:focus,
+.dark select:focus,
+.dark textarea:focus {
+  border-color: #3b82f6;
+  ring-color: #3b82f6;
+}
+
+.dark input::placeholder {
+  color: #64748b;
+}
+
+/* Boutons en mode sombre */
+.dark .btn-primary {
+  background-color: #3b82f6;
+}
+
+.dark .btn-primary:hover {
+  background-color: #2563eb;
+}
+
+.dark .btn-secondary {
+  background-color: #334155;
+  color: #e2e8f0;
+}
+
+.dark .btn-secondary:hover {
+  background-color: #475569;
+}
+
+/* Tableaux en mode sombre */
+.dark .table th {
+  color: #94a3b8;
+}
+
+.dark .table td {
+  color: #cbd5e1;
+}
+
+.dark .hover\:bg-gray-50:hover {
+  background-color: #334155;
+}
+
+/* Ombres en mode sombre */
+.dark .shadow-md,
+.dark .shadow-lg,
+.dark .shadow-xl {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
+/* Navbar et Sidebar en mode sombre */
+.dark .bg-gradient-to-r.from-primary-600,
+.dark .bg-gradient-to-r.to-primary-700 {
+  background-image: linear-gradient(to right, #0f172a, #1e293b);
+}
+
+.dark .bg-primary-800 {
+  background-color: #1e293b;
+}
+
+.dark .border-primary-700 {
+  border-color: #334155;
+}
+
+/* Footer en mode sombre */
+.dark footer.bg-gradient-to-r {
+  background-image: linear-gradient(to right, #0f172a, #1e293b, #0f172a);
+}
+
+.dark .text-primary-200 {
+  color: #94a3b8;
+}
+
+.dark .border-primary-600\/50 {
+  border-color: rgba(59, 130, 246, 0.2);
+}
+
+/* Animations de transition pour le mode sombre */
+* {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
