@@ -31,6 +31,7 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
         { id: 1, titre: 'Nouvelle doléance', message: 'Une nouvelle doléance a été déposée', lu: false, date: new Date() },
         { id: 2, titre: 'Doléance mise à jour', message: 'Le statut de la doléance a changé', lu: true, date: new Date() },
       ];
+      
       setNotifications(mockNotifications);
       setUnreadCount(mockNotifications.filter(n => !n.lu).length);
     } catch (error) {

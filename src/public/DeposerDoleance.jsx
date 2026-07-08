@@ -1010,6 +1010,7 @@ function DeposerDoleance() {
             </div>
 
             {/* Section Pièces jointes */}
+            
             <div className="md:col-span-2">
               <h2 className={`text-xl font-bold mb-4 pb-2 border-b-2 flex items-center gap-2 ${
                 darkMode 
