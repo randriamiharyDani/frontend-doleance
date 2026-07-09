@@ -17,12 +17,11 @@ import {
   ArrowPathIcon,
   ChevronDownIcon,
   ChevronUpIcon,
-  EyeIcon,
-  ArrowRightIcon
+  EyeIcon
 } from '@heroicons/react/24/outline';
 import PublicNavbar from '../components/public/PublicNavbar';
 import PublicFooter from '../components/public/PublicFooter';
-import toast from 'react-hot-toast';
+
 
 function ToutesDoleances() {
   const { t } = useTranslation();
@@ -56,9 +55,8 @@ function ToutesDoleances() {
   const [searchSuggestions, setSearchSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   
-  const [showReferenceModal, setShowReferenceModal] = useState(false);
-  const [referenceInput, setReferenceInput] = useState('');
-  const [selectedDoleanceId, setSelectedDoleanceId] = useState(null);
+  const [showDetailModal, setShowDetailModal] = useState(false);
+  const [selectedDoleance, setSelectedDoleance] = useState(null);
 
   useEffect(() => {
     fetchDoleances();
@@ -267,20 +265,9 @@ function ToutesDoleances() {
     setShowSuggestions(false);
   };
 
-  const openReferenceModal = (doleanceId) => {
-    setSelectedDoleanceId(doleanceId);
-    setReferenceInput('');
-    setShowReferenceModal(true);
-  };
-
-  const handleSubmitReference = () => {
-    if (!referenceInput.trim()) {
-      toast.error(t('allComplaints.enterReference'));
-      return;
-    }
-    navigate(`/suivi-doleance/${referenceInput.trim()}`);
-    setShowReferenceModal(false);
-    setReferenceInput('');
+  const openDetailModal = (doleance) => {
+    setSelectedDoleance(doleance);
+    setShowDetailModal(true);
   };
 
   const getStatusBadge = (statut, couleur) => {
@@ -737,7 +724,7 @@ function ToutesDoleances() {
                       <div className="flex items-center gap-2 flex-shrink-0">
                         {getStatusIcon(doleance.nom_statut)}
                         <button
-                          onClick={() => openReferenceModal(doleance.id_doleance)}
+                          onClick={() => openDetailModal(doleance)}
                           className="text-sm bg-sky-500 hover:bg-sky-600 text-white font-medium px-3 py-1.5 rounded-lg transition-colors inline-flex items-center gap-1"
                         >
                           <EyeIcon className="h-4 w-4" />
@@ -745,6 +732,7 @@ function ToutesDoleances() {
                         </button>
                       </div>
                     </div>
+
                   </div>
                 </div>
               );
@@ -784,78 +772,120 @@ function ToutesDoleances() {
         )}
       </main>
 
-      {/* Modal pour saisir la référence */}
-      {showReferenceModal && (
+      {/* Modal détail doléance */}
+      {showDetailModal && selectedDoleance && (
         <div className={`fixed inset-0 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4 ${
           darkMode ? 'bg-black/80' : 'bg-gray-600/50'
         }`}>
-          <div className={`relative rounded-lg shadow-xl max-w-md w-full transition-colors duration-300 ${
+          <div className={`relative rounded-lg shadow-xl max-w-2xl w-full transition-colors duration-300 ${
             darkMode ? 'bg-gray-800' : 'bg-white'
           }`}>
             <div className={`flex justify-between items-center p-4 border-b ${
               darkMode ? 'border-gray-700' : 'border-gray-200'
             }`}>
               <h3 className={`text-lg font-semibold ${darkMode ? 'text-gray-200' : 'text-gray-900'}`}>
-                {t('allComplaints.enterReferenceTitle')}
+                Détail de la doléance
               </h3>
               <button
-                onClick={() => setShowReferenceModal(false)}
+                onClick={() => setShowDetailModal(false)}
                 className={darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'}
               >
                 <XMarkIcon className="h-6 w-6" />
               </button>
             </div>
-            
+
             <div className="p-6">
-              <p className={`text-sm mb-4 ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
-                {t('allComplaints.enterReferenceDesc')}
-              </p>
-              
-              <div className="mb-4">
-                <label className={`block text-sm font-medium mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                  {t('allComplaints.referenceLabel')}
-                </label>
-                <input
-                  type="text"
-                  value={referenceInput}
-                  onChange={(e) => setReferenceInput(e.target.value.toUpperCase())}
-                  placeholder={t('allComplaints.referencePlaceholder')}
-                  className={`w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-sky-400 font-mono transition-colors ${
-                    darkMode 
-                      ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400' 
-                      : 'bg-white border-gray-300 text-gray-900'
-                  }`}
-                  autoFocus
-                />
-                <p className={`text-xs mt-1 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                  {t('allComplaints.referenceFormat')}
-                </p>
+              {/* Titre */}
+              <h4 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-sky-400' : 'text-sky-800'}`}>
+                {selectedDoleance.titre}
+              </h4>
+
+              {/* Description complète */}
+              {selectedDoleance.description && (
+                <div className={`mb-4 p-3 rounded-lg text-sm whitespace-pre-wrap ${
+                  darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-50 text-gray-600'
+                }`}>
+                  {selectedDoleance.description}
+                </div>
+              )}
+
+              {/* Grille d'informations */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className={`block text-xs font-medium mb-1 ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                    reference
+                  </span>
+                  <span className={`font-mono font-medium ${darkMode ? 'text-sky-400' : 'text-sky-700'}`}>
+                    {selectedDoleance.reference}
+                  </span>
+                </div>
+                <div>
+                  <span className={`block text-xs font-medium mb-1 ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                    {t('allComplaints.category')}
+                  </span>
+                  <span className={darkMode ? 'text-gray-200' : 'text-gray-800'}>
+                    {selectedDoleance.nom_categorie || '-'}
+                  </span>
+                </div>
+                <div>
+                  <span className={`block text-xs font-medium mb-1 ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                    {t('allComplaints.status')}
+                  </span>
+                  <span className={darkMode ? 'text-gray-200' : 'text-gray-800'}>
+                    {selectedDoleance.nom_statut}
+                  </span>
+                </div>
+                <div>
+                  <span className={`block text-xs font-medium mb-1 ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                    {t('allComplaints.priority')}
+                  </span>
+                  <span className={darkMode ? 'text-gray-200' : 'text-gray-800'}>
+                    {selectedDoleance.nom_priorite}
+                  </span>
+                </div>
+                <div>
+                  <span className={`block text-xs font-medium mb-1 ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                    Date de création
+                  </span>
+                  <span className={darkMode ? 'text-gray-200' : 'text-gray-800'}>
+                    {formatDateTime(selectedDoleance.date_creation)}
+                  </span>
+                </div>
+                <div>
+                  <span className={`block text-xs font-medium mb-1 ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                   dernière mise à jour
+                  </span>
+                  <span className={darkMode ? 'text-gray-200' : 'text-gray-800'}>
+                    {formatDateTime(selectedDoleance.date_mise_a_jour)}
+                  </span>
+                </div>
+                {selectedDoleance.nom_direction && (
+                  <div>
+                    <span className={`block text-xs font-medium mb-1 ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
+                     direction
+                    </span>
+                    <span className={darkMode ? 'text-gray-200' : 'text-gray-800'}>
+                      {selectedDoleance.nom_direction}
+                    </span>
+                  </div>
+                )}
               </div>
-              
-              <div className="flex justify-end gap-3 mt-6">
-                <button
-                  onClick={() => setShowReferenceModal(false)}
-                  className={`px-4 py-2 border rounded-lg transition-colors ${
-                    darkMode 
-                      ? 'border-gray-600 text-gray-300 hover:bg-gray-700' 
-                      : 'border-gray-300 text-gray-700 hover:bg-gray-50'
-                  }`}
-                >
-                  {t('allComplaints.cancel')}
-                </button>
-                <button
-                  onClick={handleSubmitReference}
-                  className="px-4 py-2 bg-sky-500 text-white font-semibold rounded-lg hover:bg-sky-600 transition-colors flex items-center gap-2"
-                >
-                  <ArrowRightIcon className="h-4 w-4" />
-                  {t('allComplaints.viewComplaint')}
-                </button>
-              </div>
+            </div>
+
+            <div className={`flex justify-end p-4 border-t ${
+              darkMode ? 'border-gray-700' : 'border-gray-200'
+            }`}>
+              <button
+                onClick={() => setShowDetailModal(false)}
+                className="px-4 py-2 bg-sky-500 text-white font-semibold rounded-lg hover:bg-sky-600 transition-colors"
+              >
+               Fermer
+              </button>
             </div>
           </div>
         </div>
       )}
-      
+
       {/* <PublicFooter /> */}
     </div>
   );
