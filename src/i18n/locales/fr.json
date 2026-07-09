@@ -1,6 +1,5 @@
 {
   "nav": {
-    "home": "Accueil",
     "submit": "Déposer une doléance",
     "all": "Toutes les doléances",
     "track": "Suivre ma doléance",
@@ -18,77 +17,7 @@
     "btnSubmit": "Déposer une doléance",
     "btnTrack": "Suivre ma doléance"
   },
-  "statistics": {
-    "complaintsHandled": "Doléances traitées",
-    "citizensServed": "Citoyens servis",
-    "satisfactionRate": "Taux de satisfaction",
-    "avgResponseTime": "Temps moyen réponse",
-    "title": "La CUA en chiffres",
-    "subtitle": "Notre engagement pour les citoyens"
-  },
-  "steps": {
-    "title": "Comment déposer une doléance ?",
-    "subtitle": "Suivez ces 4 étapes simples pour déposer et suivre votre doléance",
-    "startNow": "Commencer maintenant",
-    "step1": {
-      "title": "Remplir le formulaire",
-      "description": "Remplissez le formulaire en ligne avec vos informations et décrivez votre préoccupation en détail."
-    },
-    "step2": {
-      "title": "Recevoir la référence",
-      "description": "Une référence unique vous sera envoyée par email ou SMS. Conservez-la précieusement."
-    },
-    "step3": {
-      "title": "Suivre en ligne",
-      "description": "Utilisez votre référence pour suivre l'évolution de votre doléance à tout moment."
-    },
-    "step4": {
-      "title": "Recevoir la réponse",
-      "description": "La mairie vous apportera une réponse dans les plus brefs délais."
-    }
-  },
-  "services": {
-    "title": "Nos services",
-    "subtitle": "Des solutions adaptées à vos besoins",
-    "service1": {
-      "title": "Dépôt facile",
-      "description": "Déposez votre doléance en quelques minutes sans création de compte"
-    },
-    "service2": {
-      "title": "Suivi en temps réel",
-      "description": "Suivez l'évolution de votre doléance avec votre numéro unique"
-    },
-    "service3": {
-      "title": "Traitement rapide",
-      "description": "Vos doléances sont traitées par les services compétents"
-    }
-  },
-  "news": {
-    "title": "Actualités",
-    "subtitle": "Restez informés des dernières innovations",
-    "readMore": "Lire la suite",
-    "news1": {
-      "title": "Nouveau système de suivi des doléances",
-      "description": "La CUA lance une plateforme innovante pour mieux répondre aux préoccupations des citoyens."
-    },
-    "news2": {
-      "title": "Réduction du délai de traitement",
-      "description": "Le délai moyen de traitement passe de 72h à 48h grâce à la digitalisation."
-    },
-    "news3": {
-      "title": "Formation des agents",
-      "description": "Plus de 200 agents formés pour mieux traiter les doléances des citoyens."
-    }
-  },
-  "contact": {
-    "needHelp": "Besoin d'assistance ?",
-    "description": "Notre équipe est à votre disposition pour vous accompagner dans vos démarches.",
-    "stayConnected": "Restez connectés",
-    "socialDescription": "Suivez-nous sur les réseaux sociaux pour ne rien manquer.",
-    "phone": "+261 34 05 123 45",
-    "email": "support@cua.mg",
-    "address": "Commune Urbaine d'Antananarivo, Analakely"
-  },
+
   "form": {
     "yourInfo": "Vos informations",
     "lastName": "Nom",
@@ -221,26 +150,18 @@
     "appearance": "Apparence",
     "appearanceDesc": "Personnalisez l'affichage",
     "darkMode": "Mode sombre",
-    "darkModeDesc": "Activer le mode sombre pour réduire la fatigue oculaire",
-    "systemTheme": "Thème système",
-    "systemThemeDesc": "Utiliser le thème de votre système d'exploitation",
+    "darkModeDesc": "Activer le mode sombre",
     "language": "Langue",
     "languageDesc": "Choisissez votre langue préférée",
     "currentLanguage": "Langue actuelle",
     "notifications": "Notifications",
     "notificationsDesc": "Gérez vos préférences de notification",
-    "emailNotifications": "Notifications par email",
-    "emailNotificationsDesc": "Recevoir des notifications par email",
-    "smsNotifications": "Notifications SMS",
-    "smsNotificationsDesc": "Recevoir des notifications par SMS",
-    "information": "Informations",
-    "informationDesc": "À propos de la plateforme",
-    "version": "Version",
-    "platform": "Plateforme",
-    "complaintManagement": "Gestion des doléances",
-    "lastUpdate": "Dernière mise à jour",
-    "support": "Support",
-    "supportDesc": "Besoin d'aide ? Contactez-nous"
+    "notificationsEnable": "Activer les notifications",
+    "notificationsEnableDesc": "Recevoir des alertes sur vos démarches",
+    "notificationsImportant": "Notifications importantes uniquement",
+    "notificationsImportantDesc": "Changements de statut et réponses de la mairie",
+    "notificationsEnabled": "Activées",
+    "notificationsDisabled": "Désactivées"
   },
   "tracking": {
     "title": "Suivi de doléance",

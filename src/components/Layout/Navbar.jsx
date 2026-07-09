@@ -181,12 +181,12 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
                       Mon profil
                     </Link>
                     <Link
-                      to="/"
+                      to="/deposer-doleance"
                       className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                       onClick={() => setShowUserMenu(false)}
                     >
                       <HomeIcon className="h-4 w-4 mr-3" />
-                      Accueil public
+                      Espace public
                     </Link>
                     <hr className="my-1" />
                     <button

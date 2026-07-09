@@ -129,22 +129,15 @@ function Login() {
           </button>
         </form>
         
-        {/* Liens supplémentaires : récupération et retour */}
-        <div className="mt-6 flex flex-col sm:flex-row justify-between items-center gap-2">
-          <Link 
-            to="/forgot-password" 
-            className="text-sm text-blue-600 hover:text-blue-800 hover:underline font-medium"
-          >
-            Mot de passe oublié ?
-          </Link>
-          <Link 
-            to="/" 
+        <div className="mt-6 text-center">
+          <Link
+            to="/deposer-doleance"
             className="text-sm text-gray-500 hover:text-blue-600 transition-colors inline-flex items-center gap-1"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
             </svg>
-            Retour à l'accueil
+            Retour à l'espace public
           </Link>
         </div>
         

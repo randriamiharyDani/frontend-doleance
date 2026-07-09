@@ -35,11 +35,9 @@ function PublicFooter() {
           <div>
             <h3 className="text-white font-semibold text-lg mb-4">Liens rapides</h3>
             <ul className="space-y-2">
-              <li><Link to="/" className="text-gray-400 hover:text-blue-400 transition-colors text-sm">Accueil</Link></li>
               <li><Link to="/deposer-doleance" className="text-gray-400 hover:text-blue-400 transition-colors text-sm">Déposer une doléance</Link></li>
               <li><Link to="/toutes-doleances" className="text-gray-400 hover:text-blue-400 transition-colors text-sm">Consulter les doléances</Link></li>
               <li><Link to="/suivi-doleance" className="text-gray-400 hover:text-blue-400 transition-colors text-sm">Suivre ma doléance</Link></li>
-              <li><Link to="/faq" className="text-gray-400 hover:text-blue-400 transition-colors text-sm">FAQ</Link></li>
             </ul>
           </div>
 

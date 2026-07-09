@@ -6,13 +6,10 @@ import { ThemeProvider } from './contexts/ThemeContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 
 // Pages publiques
-import Accueil from './public/Accueil';
 import DeposerDoleance from './public/DeposerDoleance';
 import SuiviDoleance from './public/SuiviDoleance';
 import ToutesDoleances from './public/ToutesDoleances';
 import Login from './pages/Login';
-import ForgotPassword from './pages/ForgotPassword'; // ← Import ajouté
-import ParametresPublics from './public/ParametresPublics';
 
 // Back-office
 import BackofficeLayout from './backoffice/BackofficeLayout';
@@ -33,14 +30,12 @@ function AppRoutes() {
   return (
     <Routes>
       {/* Routes publiques */}
-      <Route path="/" element={<Accueil />} />
+      <Route path="/" element={<Navigate to="/deposer-doleance" replace />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/forgot-password" element={<ForgotPassword />} /> {/* ← Route ajoutée */}
       <Route path="/deposer-doleance" element={<DeposerDoleance />} />
       <Route path="/suivi-doleance" element={<SuiviDoleance />} />
       <Route path="/suivi-doleance/:reference" element={<SuiviDoleance />} />
       <Route path="/toutes-doleances" element={<ToutesDoleances />} />
-      <Route path="/parametres" element={<ParametresPublics />} />
       
       {/* Routes back-office */}
       <Route path="/backoffice" element={<BackofficeLayout />}>
@@ -60,7 +55,7 @@ function AppRoutes() {
       </Route>
       
       {/* Redirection 404 */}
-      <Route path="*" element={<Navigate to="/" replace />} />
+      <Route path="*" element={<Navigate to="/deposer-doleance" replace />} />
     </Routes>
   );
 }

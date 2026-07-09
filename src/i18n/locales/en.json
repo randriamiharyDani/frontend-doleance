@@ -1,6 +1,5 @@
 {
   "navigation": {
-    "home": "Home",
     "submitComplaint": "Submit a complaint",
     "trackComplaint": "Track my complaint",
     "allComplaints": "All complaints",
@@ -18,56 +17,7 @@
     "btnSubmit": "Submit a complaint",
     "btnTrack": "Track my complaint"
   },
-  "statistics": {
-    "complaintsHandled": "Complaints handled",
-    "citizensServed": "Citizens served",
-    "satisfactionRate": "Satisfaction rate",
-    "avgResponseTime": "Avg response time",
-    "title": "CUA in numbers",
-    "subtitle": "Our commitment to citizens"
-  },
-  "services": {
-    "title": "Our services",
-    "subtitle": "Solutions adapted to your needs",
-    "service1": {
-      "title": "Easy submission",
-      "description": "Submit your complaint in minutes without creating an account"
-    },
-    "service2": {
-      "title": "Real-time tracking",
-      "description": "Track your complaint progress with your unique reference number"
-    },
-    "service3": {
-      "title": "Fast processing",
-      "description": "Your complaints are processed by competent services"
-    }
-  },
-  "news": {
-    "title": "Latest news",
-    "subtitle": "Stay informed about the latest innovations",
-    "readMore": "Read more",
-    "news1": {
-      "title": "New complaint tracking system",
-      "description": "CUA launches an innovative platform to better respond to citizens' concerns."
-    },
-    "news2": {
-      "title": "Processing time reduction",
-      "description": "Average processing time drops from 72h to 48h thanks to digitization."
-    },
-    "news3": {
-      "title": "Staff training",
-      "description": "Over 200 staff trained to better handle citizens' complaints."
-    }
-  },
-  "contact": {
-    "needHelp": "Need assistance?",
-    "description": "Our team is available to assist you with your process.",
-    "stayConnected": "Stay connected",
-    "socialDescription": "Follow us on social media to stay updated.",
-    "phone": "+261 34 05 123 45",
-    "email": "support@cua.mg",
-    "address": "Commune Urbaine d'Antananarivo, Analakely"
-  },
+
   "form": {
     "yourInfo": "Your information",
     "lastName": "Last name",
@@ -124,26 +74,18 @@
     "appearance": "Appearance",
     "appearanceDesc": "Customize the display",
     "darkMode": "Dark mode",
-    "darkModeDesc": "Enable dark mode to reduce eye strain",
-    "systemTheme": "System theme",
-    "systemThemeDesc": "Use your operating system theme",
+    "darkModeDesc": "Enable dark mode",
     "language": "Language",
     "languageDesc": "Choose your preferred language",
     "currentLanguage": "Current language",
     "notifications": "Notifications",
     "notificationsDesc": "Manage your notification preferences",
-    "emailNotifications": "Email notifications",
-    "emailNotificationsDesc": "Receive notifications by email",
-    "smsNotifications": "SMS notifications",
-    "smsNotificationsDesc": "Receive notifications by SMS",
-    "information": "Information",
-    "informationDesc": "About the platform",
-    "version": "Version",
-    "platform": "Platform",
-    "complaintManagement": "Complaint management",
-    "lastUpdate": "Last update",
-    "support": "Support",
-    "supportDesc": "Need help? Contact us"
+    "notificationsEnable": "Enable notifications",
+    "notificationsEnableDesc": "Receive alerts about your requests",
+    "notificationsImportant": "Important notifications only",
+    "notificationsImportantDesc": "Status changes and municipal responses",
+    "notificationsEnabled": "Enabled",
+    "notificationsDisabled": "Disabled"
   },
   "tracking": {
     "title": "Complaint tracking",

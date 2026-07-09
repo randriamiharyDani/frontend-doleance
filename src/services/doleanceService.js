@@ -88,6 +88,37 @@ const doleanceService = {
     }
   },
 
+  getBackoffice: async (params = {}) => {
+    try {
+      const queryParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, val]) => {
+        if (val) queryParams.append(key, val);
+      });
+      const response = await api.get(`/doleances/backoffice?${queryParams.toString()}`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      return { success: false, data: { doleances: [], pagination: { total: 0, pages: 0 } } };
+    }
+  },
+
+  updatePriorite: async (id, id_priorite) => {
+    try {
+      const response = await api.put(`/doleances/${id}/priorite`, { id_priorite });
+      return { success: true, data: response.data };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message };
+    }
+  },
+
+  getPiecesJointes: async (id) => {
+    try {
+      const response = await api.get(`/doleances/${id}/pieces-jointes`);
+      return { success: true, data: response.data?.data || [] };
+    } catch (error) {
+      return { success: false, data: [] };
+    }
+  },
+
   delete: async (id) => {
     try {
       const response = await api.delete(`/doleances/${id}`);

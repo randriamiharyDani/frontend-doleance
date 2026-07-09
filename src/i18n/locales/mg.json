@@ -1,6 +1,5 @@
 {
   "nav": {
-    "home": "Fandraisana",
     "submit": "Hametraka fitarainana",
     "all": "Fitarainana rehetra",
     "track": "Hanaraka ny fitarainako",
@@ -18,77 +17,7 @@
     "btnSubmit": "Hametraka fitarainana",
     "btnTrack": "Hanaraka ny fitarainako"
   },
-  "statistics": {
-    "complaintsHandled": "Fitarainana voavaha",
-    "citizensServed": "Olom-pirenena voavaly",
-    "satisfactionRate": "Tahan'ny fahafaham-po",
-    "avgResponseTime": "Fotoana valiny antonony",
-    "title": "Ny CUA amin'ny isa",
-    "subtitle": "Ny fanoloran-tenanay ho an'ny olom-pirenena"
-  },
-  "steps": {
-    "title": "Ahoana no hametrahana fitarainana?",
-    "subtitle": "Araho ireto dingana 4 ireto mba hametrahana sy hanarahana ny fitarainanao",
-    "startNow": "Hanomboka izao",
-    "step1": {
-      "title": "Fenoy ny taratasy",
-      "description": "Fenoy ny taratasy an-tserasera miaraka amin'ny fampahalalanao ary hazavao amin'ny antsipiriany ny ahiahinao."
-    },
-    "step2": {
-      "title": "Mahazoa ny laharan-kitokisana",
-      "description": "Laharan-kitokisana miavaka dia halefa aminao amin'ny alalan'ny mailaka na SMS. Tandrovy tsara izany."
-    },
-    "step3": {
-      "title": "Araho an-tserasera",
-      "description": "Ampiasao ny laharan-kitokisanao mba hanarahana ny fivoaran'ny fitarainanao amin'ny fotoana rehetra."
-    },
-    "step4": {
-      "title": "Mahazoa ny valiny",
-      "description": "Ny lapan'ny tanàna dia hanome valiny anao ao anatin'ny fotoana fohy indrindra."
-    }
-  },
-  "services": {
-    "title": "Ny serivisy atolotray",
-    "subtitle": "Vahaolana mifanaraka amin'ny filanao",
-    "service1": {
-      "title": "Fametrahana mora",
-      "description": "Hametraka fitarainana ao anatin'ny minitra vitsy nefa tsy mila mamorona kaonty"
-    },
-    "service2": {
-      "title": "Fanarahana amin'ny fotoana tena izy",
-      "description": "Hanaraka ny fivoaran'ny fitarainanao amin'ny alalan'ny laharan-kitokisanao"
-    },
-    "service3": {
-      "title": "Fikarakarana haingana",
-      "description": "Ny fitarainanao dia karakarain'ny sampan-draharaha mahay"
-    }
-  },
-  "news": {
-    "title": "Vaovao farany",
-    "subtitle": "Mijanòna ho voaray vaovao momba ny fanavaozana farany",
-    "readMore": "Hamaky bebe kokoa",
-    "news1": {
-      "title": "Rafitra fanarahana fitarainana vaovao",
-      "description": "Ny CUA dia manangana sehatra vaovao hamaliana ny ahiahin'ny olom-pirenena."
-    },
-    "news2": {
-      "title": "Fihenan'ny fotoana fikarakarana",
-      "description": "Ny fotoana fikarakarana antonony dia nihena avy amin'ny 72h ho 48h noho ny fanovana nomerika."
-    },
-    "news3": {
-      "title": "Fanofanana mpiasa",
-      "description": "Mpiasa mihoatra ny 200 no nofanaovina hanatsara ny fikarakarana fitarainan'ny olom-pirenena."
-    }
-  },
-  "contact": {
-    "needHelp": "Mila fanampiana?",
-    "description": "Ny ekipanay dia vonona hanampy anao amin'ny dinganao.",
-    "stayConnected": "Mijanòna ifandraisana",
-    "socialDescription": "Araho eto amin'ny tambajotra sosialy izahay mba tsy hanadinoana vaovao.",
-    "phone": "+261 34 05 123 45",
-    "email": "support@cua.mg",
-    "address": "Commune Urbaine d'Antananarivo, Analakely"
-  },
+
   "form": {
     "yourInfo": "Ny momba anao",
     "lastName": "Anarana",
@@ -221,26 +150,18 @@
     "appearance": "Fisehoana",
     "appearanceDesc": "Ampifanaraho ny fisehoana",
     "darkMode": "Fomba maizina",
-    "darkModeDesc": "Ampiasao ny fomba maizina mba hampihenana ny havizanana amin'ny maso",
-    "systemTheme": "Fomba rafitra",
-    "systemThemeDesc": "Ampiasao ny fomba fiasan'ny rafitrao",
+    "darkModeDesc": "Ampiasao ny fomba maizina",
     "language": "Fiteny",
     "languageDesc": "Misafidia ny fiteny tianao",
     "currentLanguage": "Fiteny ampiasaina",
     "notifications": "Fampandrenesana",
     "notificationsDesc": "Amboary ny safidinao momba ny fampandrenesana",
-    "emailNotifications": "Fampandrenesana mailaka",
-    "emailNotificationsDesc": "Mahazo fampandrenesana amin'ny alalan'ny mailaka",
-    "smsNotifications": "Fampandrenesana SMS",
-    "smsNotificationsDesc": "Mahazo fampandrenesana amin'ny alalan'ny SMS",
-    "information": "Fampahalalana",
-    "informationDesc": "Momba ny sehatra",
-    "version": "Dika",
-    "platform": "Sehatra",
-    "complaintManagement": "Fitantanana fitarainana",
-    "lastUpdate": "Fanavaozana farany",
-    "support": "Fanampiana",
-    "supportDesc": "Mila fanampiana? Mifandraisa aminay"
+    "notificationsEnable": "Ampandeho ny fampandrenesana",
+    "notificationsEnableDesc": "Mahazo fampandrenesana momba ny hetsika ataonao",
+    "notificationsImportant": "Fampandrenesana manan-danja ihany",
+    "notificationsImportantDesc": "Fiovan'ny toerana sy valin'ny kaominina",
+    "notificationsEnabled": "Nampandeha",
+    "notificationsDisabled": "Najanona"
   },
   "tracking": {
     "title": "Fanarahana ny fitarainana",
