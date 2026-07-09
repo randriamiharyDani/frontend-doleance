@@ -33,7 +33,7 @@ function PublicNavbar() {
 
   const navigation = [
     { name: t('nav.submit'), href: '/deposer-doleance', icon: DocumentTextIcon },
-    { name: t('nav.all'), href: '/toutes-doleances', icon: ListBulletIcon },
+    // { name: t('nav.all'), href: '/toutes-doleances', icon: ListBulletIcon },
     { name: t('nav.track'), href: '/suivi-doleance', icon: MagnifyingGlassIcon },
   ];
 
@@ -52,7 +52,7 @@ function PublicNavbar() {
           ? 'bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900' 
           : 'bg-gradient-to-r from-sky-700 via-sky-600 to-blue-600'
       }`}>
-        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
+        <div className="max-w-6xl mx-auto px-3 sm:px-4 lg:px-6">
           <div className="flex justify-between h-14 sm:h-16">
             <div className="flex items-center">
               <Link to="/" className="flex items-center space-x-2 sm:space-x-3">
@@ -103,8 +103,8 @@ function PublicNavbar() {
                 onClick={() => setSettingsOpen(true)}
                 className="flex items-center px-3 py-1.5 lg:px-4 lg:py-2 rounded-lg text-xs lg:text-sm font-medium text-white hover:bg-white/20 dark:hover:bg-slate-700 hover:text-yellow-200 transition-all duration-200 whitespace-nowrap"
               >
-                <Cog6ToothIcon className="h-4 w-4 lg:h-5 lg:w-5 mr-1 lg:mr-2" />
-                {t('nav.settings')}
+                <Cog6ToothIcon className="h-4 w-4 lg:h-5 lg:w-5  lg:mr-2" />
+                {/* {t('nav.settings')} */}
               </button>
               
               <button

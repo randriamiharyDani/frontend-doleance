@@ -335,10 +335,8 @@ function ToutesDoleances() {
   ].filter(f => f && f !== '').length;
 
   return (
-    <div className={`min-h-screen flex flex-col transition-colors duration-300 ${
-      darkMode ? 'dark bg-gray-900' : 'bg-gradient-to-b from-blue-50 to-blue-100'
-    }`}>
-      <PublicNavbar />
+    <div className={`min-h-screen flex flex-col transition-colors duration-300 `}>
+      {/* <PublicNavbar /> */}
       
       <main className="flex-1 max-w-7xl mx-auto px-4 py-8 w-full">
         <div className="text-center mb-8">
@@ -858,7 +856,7 @@ function ToutesDoleances() {
         </div>
       )}
       
-      <PublicFooter />
+      {/* <PublicFooter /> */}
     </div>
   );
 }

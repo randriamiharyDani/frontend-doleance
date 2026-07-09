@@ -35,7 +35,7 @@ function AppRoutes() {
       <Route path="/deposer-doleance" element={<DeposerDoleance />} />
       <Route path="/suivi-doleance" element={<SuiviDoleance />} />
       <Route path="/suivi-doleance/:reference" element={<SuiviDoleance />} />
-      <Route path="/toutes-doleances" element={<ToutesDoleances />} />
+      {/* <Route path="/toutes-doleances" element={<ToutesDoleances />} /> */}
       
       {/* Routes back-office */}
       <Route path="/backoffice" element={<BackofficeLayout />}>
