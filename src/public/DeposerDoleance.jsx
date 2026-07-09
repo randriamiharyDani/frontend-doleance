@@ -641,13 +641,13 @@ function DeposerDoleance() {
     }`}>
       <PublicNavbar />
       
-      <main className="flex-1 max-w-4xl mx-auto px-4 py-8 w-full">
+      <main className="flex-1 max-w-6xl mx-auto px-4 py-8 w-full">
         <div className="text-center mb-8 pt-4">
-          <div className={`inline-block p-4 rounded-2xl shadow-xl mb-4 transform hover:scale-105 transition-transform duration-300 ${
+          {/* <div className={`inline-block p-4 rounded-2xl shadow-xl mb-4 transform hover:scale-105 transition-transform duration-300 ${
             darkMode ? 'bg-gray-800' : 'bg-gradient-to-br from-sky-500 to-blue-600'
           }`}>
             <DocumentTextIcon className={`h-14 w-14 ${darkMode ? 'text-sky-400' : 'text-white'}`} />
-          </div>
+          </div> */}
           <h1 className={`text-4xl font-bold mb-2 ${darkMode ? 'text-sky-400' : 'text-sky-800'}`}>
             {t('nav.submit')}
           </h1>

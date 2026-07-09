@@ -201,6 +201,7 @@ function SuiviDoleance() {
                 
                 <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
                   {/* Description détaillée */}
+
                   <div>
                     <h3 className={`font-semibold mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-base ${
                       darkMode ? 'text-sky-400' : 'text-sky-800'
@@ -217,6 +218,8 @@ function SuiviDoleance() {
                       </p>
                     </div>
                   </div>
+
+                  
                   
                   {/* Informations supplémentaires */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
@@ -233,6 +236,7 @@ function SuiviDoleance() {
                           {getCategoryIcon(doleance.categorie)} {doleance.categorie || t('allComplaints.uncategorized')}
                         </p>
                       </div>
+                      
                     </div>
                     
                     {/* Date de création */}
@@ -249,8 +253,45 @@ function SuiviDoleance() {
                         </p>
                       </div>
                     </div>
+
+                    {/* ***************************************************************************************************  */}
+
+
+                       {/* Catégorie 2*/}
+                    <div className={`flex items-start gap-3 p-2 sm:p-3 rounded-lg border-l-4 border-sky-400 ${
+                      darkMode ? 'bg-gray-700' : 'bg-gray-50'
+                    }`}>
+                      <TagIcon className={`h-4 w-4 sm:h-5 sm:w-5 mt-0.5 ${darkMode ? 'text-sky-400' : 'text-sky-500'}`} />
+                      <div>
+                        <p className={`text-xs font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                          {t('form.category')}
+                        </p>
+                        <p className={`font-medium text-sm sm:text-base ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+                          {getCategoryIcon(doleance.categorie)} {doleance.categorie || t('allComplaints.uncategorized')}
+                        </p>
+                      </div>
+                      
+                    </div>
                     
+                    {/* Date de création */}
+                    <div className={`flex items-start gap-3 p-2 sm:p-3 rounded-lg border-l-4 border-sky-400 ${
+                      darkMode ? 'bg-gray-700' : 'bg-gray-50'
+                    }`}>
+                      <CalendarIcon className={`h-4 w-4 sm:h-5 sm:w-5 mt-0.5 ${darkMode ? 'text-sky-400' : 'text-sky-500'}`} />
+                      <div>
+                        <p className={`text-xs font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                          {t('tracking.submittedOn')}
+                        </p>
+                        <p className={`font-medium text-sm sm:text-base ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
+                          {formatDate(doleance.date_creation)}
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* ***************************************************************************************************  */}
                     {/* Lieu */}
+
+
                     {(doleance.lieu_exact || doleance.nom_quartier) && (
                       <div className={`flex items-start gap-3 p-2 sm:p-3 rounded-lg border-l-4 border-sky-400 sm:col-span-2 ${
                         darkMode ? 'bg-gray-700' : 'bg-gray-50'
@@ -269,6 +310,7 @@ function SuiviDoleance() {
                       </div>
                     )}
                   </div>
+                  
                   
                   {/* Suggestions */}
                   {doleance.suggestions && (
