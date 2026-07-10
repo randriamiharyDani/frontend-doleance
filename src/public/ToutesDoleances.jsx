@@ -325,15 +325,24 @@ function ToutesDoleances() {
     <div className={`min-h-screen flex flex-col transition-colors duration-300 `}>
       {/* <PublicNavbar /> */}
       
-      <main className="flex-1 max-w-7xl mx-auto px-4 py-8 w-full">
-        <div className="text-center mb-8">
+      <main className="flex-1 max-w_full mx-auto px-4 w-full">
+        {/* <div className="mb-8">
           <h1 className={`text-3xl font-bold ${darkMode ? 'text-sky-400' : 'text-sky-800'}`}>
             {t('allComplaints.title')}
           </h1>
           <p className={darkMode ? 'text-gray-300 mt-2' : 'text-sky-600 mt-2'}>
             {t('allComplaints.subtitle')}
           </p>
+        </div> */}
+
+        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-3">
+        <div>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800"> {t('allComplaints.title')}</h1>
+          <p className="text-sm sm:text-base text-gray-500 mt-1"> {t('allComplaints.subtitle')}
+          </p>
         </div>
+       
+      </div>
 
         {/* Barre de recherche */}
         <div className={`rounded-lg shadow-md p-4 mb-4 border transition-colors duration-300 ${

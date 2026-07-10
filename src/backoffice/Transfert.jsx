@@ -278,8 +278,8 @@ function Transfert() {
       {/* En-tête */}
       <div className="flex flex-wrap justify-between items-center gap-2 mb-3">
         <div>
-          <h1 className="text-xl font-bold text-gray-800">Transfert de doléances</h1>
-          <p className="text-gray-500 text-sm">Gérer le transfert vers les directions</p>
+          <h1 className=" text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">Transfert de doléances</h1>
+          <p className="text-gray-500 ">Gérer le transfert vers les directions</p>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -302,24 +302,24 @@ function Transfert() {
       {/* Statistiques */}
       <div className="grid grid-cols-5 gap-3 mb-3">
         <div className="bg-white rounded-lg shadow p-3 text-center border-l-4 border-blue-500">
-          <p className="text-xl font-bold text-blue-600">{statsTotals.total}</p>
-          <p className="text-xs text-gray-500">Total</p>
+          <p className="text-2xl font-bold text-blue-600">{statsTotals.total}</p>
+          <p className=" text-gray-500">Total</p>
         </div>
         <div className="bg-white rounded-lg shadow p-3 text-center border-l-4 border-yellow-500">
-          <p className="text-xl font-bold text-yellow-600">{statsTotals.enAttente}</p>
-          <p className="text-xs text-gray-500">En attente</p>
+          <p className="text-2xl font-bold text-yellow-600">{statsTotals.enAttente}</p>
+          <p className=" text-gray-500">En attente</p>
         </div>
         <div className="bg-white rounded-lg shadow p-3 text-center border-l-4 border-blue-500">
-          <p className="text-xl font-bold text-blue-600">{statsTotals.enCours}</p>
-          <p className="text-xs text-gray-500">En cours</p>
+          <p className="text-2xl font-bold text-blue-600">{statsTotals.enCours}</p>
+          <p className=" text-gray-500">En cours</p>
         </div>
         <div className="bg-white rounded-lg shadow p-3 text-center border-l-4 border-purple-500">
-          <p className="text-xl font-bold text-purple-600">{statsTotals.transferees}</p>
-          <p className="text-xs text-gray-500">Transférées</p>
+          <p className="text-2xl font-bold text-purple-600">{statsTotals.transferees}</p>
+          <p className=" text-gray-500">Transférées</p>
         </div>
         <div className="bg-white rounded-lg shadow p-3 text-center border-l-4 border-green-500">
-          <p className="text-xl font-bold text-green-600">{statsTotals.resolues}</p>
-          <p className="text-xs text-gray-500">Résolues</p>
+          <p className="text-2xl font-bold text-green-600">{statsTotals.resolues}</p>
+          <p className=" text-gray-500">Résolues</p>
         </div>
       </div>
 
@@ -328,7 +328,7 @@ function Transfert() {
         <div className="bg-white rounded-lg shadow p-3 mb-3">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Catégorie</label>
+              <label className="block  font-medium text-gray-700 mb-1">Catégorie</label>
               <select
                 value={filters.categorie}
                 onChange={(e) => setFilters(prev => ({ ...prev, categorie: e.target.value }))}
@@ -343,7 +343,7 @@ function Transfert() {
               </select>
             </div>
             <div>
-              <label className="block text-xs font-medium text-gray-700 mb-1">Statut</label>
+              <label className="block  font-medium text-gray-700 mb-1">Statut</label>
               <select
                 value={filters.statut}
                 onChange={(e) => setFilters(prev => ({ ...prev, statut: e.target.value }))}
@@ -358,7 +358,7 @@ function Transfert() {
               </select>
             </div>
             <div className="relative">
-              <label className="block text-xs font-medium text-gray-700 mb-1">Rechercher</label>
+              <label className="block  font-medium text-gray-700 mb-1">Rechercher</label>
               <div className="relative">
                 <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
                 <input
@@ -388,29 +388,29 @@ function Transfert() {
           <table className="min-w-full divide-y divide-gray-200 text-sm">
             <thead className="bg-gray-50">
               <tr>
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Réf.</th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Citoyen</th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Catégorie</th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Titre</th>
-                <th className="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase">Statut</th>
-                <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Direction</th>
-                <th className="px-3 py-2 text-center text-xs font-medium text-gray-500 uppercase">Action</th>
+                <th className="px-3 py-2 text-left  font-medium text-gray-500 uppercase">Réf.</th>
+                <th className="px-3 py-2 text-left  font-medium text-gray-500 uppercase">Citoyen</th>
+                <th className="px-3 py-2 text-left  font-medium text-gray-500 uppercase">Catégorie</th>
+                <th className="px-3 py-2 text-left  font-medium text-gray-500 uppercase">Titre</th>
+                <th className="px-3 py-2 text-center  font-medium text-gray-500 uppercase">Statut</th>
+                <th className="px-3 py-2 text-left  font-medium text-gray-500 uppercase">Direction</th>
+                <th className="px-3 py-2 text-center  font-medium text-gray-500 uppercase">Action</th>
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
               {/* Doléances non transférées (prioritaires) */}
               {doleancesNonTransferees.map((doleance) => (
                 <tr key={doleance.id_doleance} className="hover:bg-gray-50">
-                  <td className="px-3 py-2 whitespace-nowrap text-xs font-mono font-medium text-blue-600">
+                  <td className="px-3 py-2 whitespace-nowrap  font-mono font-medium text-blue-600">
                     {doleance.reference}
                   </td>
-                  <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-500">
+                  <td className="px-3 py-2 whitespace-nowrap  text-gray-500">
                     {doleance.citoyen_nom || '-'}
                   </td>
-                  <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-500">
+                  <td className="px-3 py-2 whitespace-nowrap  text-gray-500">
                     {getCategoryName(doleance.id_categorie)}
                   </td>
-                  <td className="px-3 py-2 text-xs text-gray-700 max-w-[120px] truncate">
+                  <td className="px-3 py-2  text-gray-700 max-w-[120px] truncate">
                     {doleance.titre}
                   </td>
                   <td className="px-3 py-2 whitespace-nowrap text-center">
@@ -418,7 +418,7 @@ function Transfert() {
                       {getStatusText(doleance.nom_statut)}
                     </span>
                   </td>
-                  <td className="px-3 py-2 whitespace-nowrap text-xs text-gray-500">
+                  <td className="px-3 py-2 whitespace-nowrap  text-gray-500">
                     {doleance.nom_direction || '-'}
                   </td>
                   <td className="px-3 py-2 whitespace-nowrap text-center">
