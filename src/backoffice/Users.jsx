@@ -468,26 +468,35 @@ function Users() {
       </div>
 
       {/* Statistiques - Version responsive */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 md:gap-3 mb-4 md:mb-6">
-        <div className="bg-white rounded-lg shadow p-2 md:p-3 border-l-4 border-blue-500">
-          <p className="text-xs text-gray-500">Total agents</p>
-          <p className="text-lg md:text-xl font-bold text-blue-600">{filteredUsers.length}</p>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
+        <div className="bg-white rounded-xl shadow-sm hover:shadow-md border border-gray-100 p-3 md:p-4 transition-all duration-200 hover:-translate-y-0.5 relative overflow-hidden">
+          <span className="absolute left-0 top-0 h-full w-1 bg-blue-500" />
+          <p className="text-xs font-medium text-gray-500">Total agents</p>
+          <p className="text-xl md:text-2xl font-bold text-blue-600 tabular-nums mt-1">
+            {filteredUsers.length}
+          </p>
         </div>
-        <div className="bg-white rounded-lg shadow p-2 md:p-3 border-l-4 border-purple-500">
-          <p className="text-xs text-gray-500">Administrateurs</p>
-          <p className="text-lg md:text-xl font-bold text-purple-600">
+
+        <div className="bg-white rounded-xl shadow-sm hover:shadow-md border border-gray-100 p-3 md:p-4 transition-all duration-200 hover:-translate-y-0.5 relative overflow-hidden">
+          <span className="absolute left-0 top-0 h-full w-1 bg-purple-500" />
+          <p className="text-xs font-medium text-gray-500">Administrateurs</p>
+          <p className="text-xl md:text-2xl font-bold text-purple-600 tabular-nums mt-1">
             {filteredUsers.filter(u => u.role_nom === 'administrateur_systeme' || u.role_nom === 'administrateur').length}
           </p>
         </div>
-        <div className="bg-white rounded-lg shadow p-2 md:p-3 border-l-4 border-green-500">
-          <p className="text-xs text-gray-500">Directeurs</p>
-          <p className="text-lg md:text-xl font-bold text-green-600">
+
+        <div className="bg-white rounded-xl shadow-sm hover:shadow-md border border-gray-100 p-3 md:p-4 transition-all duration-200 hover:-translate-y-0.5 relative overflow-hidden">
+          <span className="absolute left-0 top-0 h-full w-1 bg-green-500" />
+          <p className="text-xs font-medium text-gray-500">Directeurs</p>
+          <p className="text-xl md:text-2xl font-bold text-green-600 tabular-nums mt-1">
             {filteredUsers.filter(u => u.role_nom === 'directeur').length}
           </p>
         </div>
-        <div className="bg-white rounded-lg shadow p-2 md:p-3 border-l-4 border-emerald-500">
-          <p className="text-xs text-gray-500">Agents actifs</p>
-          <p className="text-lg md:text-xl font-bold text-emerald-600">
+
+        <div className="bg-white rounded-xl shadow-sm hover:shadow-md border border-gray-100 p-3 md:p-4 transition-all duration-200 hover:-translate-y-0.5 relative overflow-hidden">
+          <span className="absolute left-0 top-0 h-full w-1 bg-emerald-500" />
+          <p className="text-xs font-medium text-gray-500">Agents actifs</p>
+          <p className="text-xl md:text-2xl font-bold text-emerald-600 tabular-nums mt-1">
             {filteredUsers.filter(u => u.actif === 1).length}
           </p>
         </div>

@@ -433,6 +433,7 @@ function ToutesDoleances() {
         </div>
 
         {/* Filtres avancés */}
+        
         {showAdvancedFilters && (
           <div className={`rounded-lg shadow-md p-4 mb-6 border transition-colors duration-300 ${
             darkMode 
@@ -569,63 +570,62 @@ function ToutesDoleances() {
         )}
 
         {/* Statistiques */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-          <div className={`rounded-lg shadow-md p-4 text-center border-t-4 border-sky-500 transition-colors duration-300 ${
-            darkMode ? 'bg-gray-800' : 'bg-white'
-          }`}>
-            <DocumentTextIcon className="h-8 w-8 text-sky-500 mx-auto mb-2" />
-            <p className={`text-2xl font-bold ${darkMode ? 'text-sky-400' : 'text-sky-800'}`}>
-              {pagination.total}
-            </p>
-            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-              {t('allComplaints.totalComplaints')}
-            </p>
-          </div>
-          <div className={`rounded-lg shadow-md p-4 text-center border-t-4 border-yellow-500 transition-colors duration-300 ${
-            darkMode ? 'bg-gray-800' : 'bg-white'
-          }`}>
-            <ClockIcon className="h-8 w-8 text-yellow-500 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-yellow-600">
-              {doleances.filter(d => d.nom_statut !== 'Résolue' && d.nom_statut !== 'Clôturée').length}
-            </p>
-            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-              {t('allComplaints.inProgress')}
-            </p>
-          </div>
-          <div className={`rounded-lg shadow-md p-4 text-center border-t-4 border-green-500 transition-colors duration-300 ${
-            darkMode ? 'bg-gray-800' : 'bg-white'
-          }`}>
-            <CheckCircleIcon className="h-8 w-8 text-green-500 mx-auto mb-2" />
-            <p className="text-2xl font-bold text-green-600">
-              {doleances.filter(d => d.nom_statut === 'Résolue' || d.nom_statut === 'Clôturée').length}
-            </p>
-            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-              {t('allComplaints.resolved')}
-            </p>
-          </div>
-          <div className={`rounded-lg shadow-md p-4 text-center border-t-4 border-purple-500 transition-colors duration-300 ${
-            darkMode ? 'bg-gray-800' : 'bg-white'
-          }`}>
-            <TagIcon className="h-8 w-8 text-purple-500 mx-auto mb-2" />
-            <p className={`text-2xl font-bold ${darkMode ? 'text-sky-400' : 'text-sky-800'}`}>
-              {statsCount.totalCategories}
-            </p>
-            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-              {t('allComplaints.categories')}
-            </p>
-          </div>
-          <div className={`rounded-lg shadow-md p-4 text-center border-t-4 border-orange-500 transition-colors duration-300 ${
-            darkMode ? 'bg-gray-800' : 'bg-white'
-          }`}>
-            <ChartBarIcon className="h-8 w-8 text-orange-500 mx-auto mb-2" />
-            <p className={`text-2xl font-bold ${darkMode ? 'text-sky-400' : 'text-sky-800'}`}>
-              {statsCount.totalPriorites}
-            </p>
-            <p className={`text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-              {t('allComplaints.levels')}
-            </p>
-          </div>
-        </div>
+        {/* <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
+          {[
+            {
+              icon: DocumentTextIcon,
+              value: pagination.total,
+              label: t('allComplaints.totalComplaints'),
+              color: 'sky',
+            },
+            {
+              icon: ClockIcon,
+              value: doleances.filter(d => d.nom_statut !== 'Résolue' && d.nom_statut !== 'Clôturée').length,
+              label: t('allComplaints.inProgress'),
+              color: 'yellow',
+            },
+            {
+              icon: CheckCircleIcon,
+              value: doleances.filter(d => d.nom_statut === 'Résolue' || d.nom_statut === 'Clôturée').length,
+              label: t('allComplaints.resolved'),
+              color: 'green',
+            },
+            {
+              icon: TagIcon,
+              value: statsCount.totalCategories,
+              label: t('allComplaints.categories'),
+              color: 'purple',
+            },
+            {
+              icon: ChartBarIcon,
+              value: statsCount.totalPriorites,
+              label: t('allComplaints.levels'),
+              color: 'orange',
+            },
+          ].map((stat, index) => {
+            const Icon = stat.icon;
+            return (
+              <div
+                key={index}
+                className={`rounded-xl shadow-sm hover:shadow-md p-4 flex flex-col items-center text-center transition-all duration-300 hover:-translate-y-0.5 ${
+                  darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-100'
+                }`}
+              >
+                <div
+                  className={`h-12 w-12 rounded-full flex items-center justify-center mb-3 bg-${stat.color}-100 dark:bg-${stat.color}-900/30`}
+                >
+                  <Icon className={`h-6 w-6 text-${stat.color}-500`} />
+                </div>
+                <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                  {stat.value}
+                </p>
+                <p className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                  {stat.label}
+                </p>
+              </div>
+            );
+          })}
+        </div>  */}
 
         {/* Liste des doléances */}
         {loading ? (
