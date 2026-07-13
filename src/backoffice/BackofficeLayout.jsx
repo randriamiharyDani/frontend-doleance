@@ -18,6 +18,7 @@ import {
   Cog6ToothIcon
 } from '@heroicons/react/24/outline';
 import Navbar from '../components/backoffice/Navbar';
+import BackofficeSettingsModal from '../components/backoffice/BackofficeSettingsModal';
 
 function BackofficeLayout() {
   const { user } = useAuth();
@@ -26,6 +27,7 @@ function BackofficeLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [openMenus, setOpenMenus] = useState({});
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -71,7 +73,6 @@ function BackofficeLayout() {
       ]
     },
     { name: 'Statistiques', href: '/backoffice/statistiques', icon: ChartBarIcon },
-    { name: 'Paramètres', href: '/backoffice/settings', icon: Cog6ToothIcon },
   ];
 
   // Déterminer les permissions
@@ -240,6 +241,15 @@ function BackofficeLayout() {
               )
             ))}
           </div>
+
+          {/* Paramètres - Modal */}
+          <button
+            onClick={() => { setSettingsOpen(true); if (isMobile) setSidebarOpen(false); }}
+            className={`w-full flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-white/70 hover:bg-[#3182CE]/20 hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline`}
+          >
+            <Cog6ToothIcon className="h-5 w-5 mr-3 flex-shrink-0 text-white/40 group-hover:text-white" />
+            <span className="text-sm font-medium">Paramètres</span>
+          </button>
         </nav>
 
         {/* Footer */}
@@ -275,6 +285,8 @@ function BackofficeLayout() {
           </div>
         </main>
       </div>
+      {/* Settings Modal */}
+      <BackofficeSettingsModal isOpen={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </div>
   );
 }

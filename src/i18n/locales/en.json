@@ -85,7 +85,17 @@
     "notificationsImportant": "Important notifications only",
     "notificationsImportantDesc": "Status changes and municipal responses",
     "notificationsEnabled": "Enabled",
-    "notificationsDisabled": "Disabled"
+    "notificationsDisabled": "Disabled",
+    "changePassword": "Change password",
+    "changePasswordDesc": "Change your password regularly",
+    "currentPassword": "Current password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "changePasswordBtn": "Change",
+    "accountInfo": "Account information",
+    "accountInfoDesc": "Your user account details",
+    "fullName": "Full name",
+    "role": "Role"
   },
   "tracking": {
     "title": "Complaint tracking",

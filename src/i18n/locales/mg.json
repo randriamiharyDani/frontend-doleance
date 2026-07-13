@@ -161,7 +161,17 @@
     "notificationsImportant": "Fampandrenesana manan-danja ihany",
     "notificationsImportantDesc": "Fiovan'ny toerana sy valin'ny kaominina",
     "notificationsEnabled": "Nampandeha",
-    "notificationsDisabled": "Najanona"
+    "notificationsDisabled": "Najanona",
+    "changePassword": "Ovay ny tenimiafina",
+    "changePasswordDesc": "Ovay matetika ny tenimiafina",
+    "currentPassword": "Tenimiafina ankehitriny",
+    "newPassword": "Tenimiafina vaovao",
+    "confirmPassword": "Hamarino ny tenimiafina",
+    "changePasswordBtn": "Ovy",
+    "accountInfo": "Mombamomba ny kaonty",
+    "accountInfoDesc": "Détails de votre compte",
+    "fullName": "Anarana feno",
+    "role": "Toerana"
   },
   "tracking": {
     "title": "Fanarahana ny fitarainana",

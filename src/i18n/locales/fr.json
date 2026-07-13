@@ -161,7 +161,17 @@
     "notificationsImportant": "Notifications importantes uniquement",
     "notificationsImportantDesc": "Changements de statut et réponses de la mairie",
     "notificationsEnabled": "Activées",
-    "notificationsDisabled": "Désactivées"
+    "notificationsDisabled": "Désactivées",
+    "changePassword": "Changer le mot de passe",
+    "changePasswordDesc": "Modifiez votre mot de passe régulièrement",
+    "currentPassword": "Mot de passe actuel",
+    "newPassword": "Nouveau mot de passe",
+    "confirmPassword": "Confirmer le mot de passe",
+    "changePasswordBtn": "Changer",
+    "accountInfo": "Informations du compte",
+    "accountInfoDesc": "Détails de votre compte utilisateur",
+    "fullName": "Nom complet",
+    "role": "Rôle"
   },
   "tracking": {
     "title": "Suivi de doléance",

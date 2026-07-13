@@ -481,7 +481,7 @@ const handleSearchAddress = async (e) => {
           </span>
           Signaler un probleme
         </h1>
-        <p className="text-sm sm:text-base text-gray-500 mt-1 ml-[44px] sm:ml-[52px]">Aidez a ameliorer votre quartier — signalez rapidement tout incident ou dysfonctionnement.</p>
+        <p className="sm:text-base text-gray-500 mt-1 ml-[44px] sm:ml-[52px]">Aidez a ameliorer votre quartier — signalez rapidement tout incident ou dysfonctionnement.</p>
       </div>
 
       <form onSubmit={handleSubmit}>
@@ -595,7 +595,7 @@ const handleSearchAddress = async (e) => {
         </div>
 
         {/* Carte */}
-        <div className="h-64 sm:h-96 rounded-xl overflow-hidden border border-gray-200 relative mb-4">
+        <div className="h-64 sm:h-96 rounded-xl overflow-hidden border border-gray-200 relative z-0 mb-4">
           <MapContainer center={mapPosition} zoom={14} className="h-full w-full" scrollWheelZoom={true}>
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
