@@ -149,8 +149,8 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 className={`
                   relative flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group
                   ${isActive(item.href) 
-                    ? 'bg-[#3182CE]/20 text-white' 
-                    : 'text-white/70 hover:bg-[#3182CE]/20 hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline'
+                    ? 'bg-[#D4AF37] text-white' 
+                    : 'text-white/70 hover:bg-[#D4AF37] hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline'
                   }
                 `}
                 onClick={() => setSidebarOpen(false)}
@@ -171,7 +171,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 <div key={menu.name}>
                   <button
                     onClick={() => toggleMenu(menu.name)}
-                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-white/70 hover:bg-[#3182CE]/20 hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline transition-all duration-200 group"
+                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-white/70 hover:bg-[#D4AF37] hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline transition-all duration-200 group"
                   >
                     <div className="flex items-center">
                       <menu.icon className="h-5 w-5 mr-3 text-white/40 group-hover:text-white" />
@@ -192,8 +192,8 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                           className={`
                             relative flex items-center px-3 py-2 rounded-lg transition-all duration-200
                             ${isActive(subItem.href) 
-                              ? 'bg-[#3182CE]/20 text-white' 
-                              : 'text-white/60 hover:bg-[#3182CE]/20 hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline'
+                              ? 'bg-[#D4AF37] text-white' 
+                              : 'text-white/60 hover:bg-[#D4AF37] hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline'
                             }
                           `}
                           onClick={() => setSidebarOpen(false)}
@@ -236,7 +236,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
               <Link
                 key={item.name}
                 to={item.href}
-                className="flex items-center px-3 py-2 rounded-lg text-white/70 hover:bg-[#3182CE]/20 hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline transition-all duration-200"
+                className="flex items-center px-3 py-2 rounded-lg text-white/70 hover:bg-[#D4AF37] hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline transition-all duration-200"
                 onClick={() => setSidebarOpen(false)}
               >
                 <item.icon className="h-5 w-5 mr-3 text-white/40" />

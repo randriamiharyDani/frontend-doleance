@@ -140,7 +140,7 @@ function BackofficeLayout() {
   {/* Bouton fermeture (mobile) */}
   <button 
     onClick={() => setSidebarOpen(false)} 
-    className="lg:hidden text-white/60 hover:text-white transition-colors p-1 rounded-lg hover:bg-[#3182CE]/20 flex-shrink-0"
+    className="lg:hidden text-white/60 hover:text-white transition-colors p-1 rounded-lg hover:bg-[#D4AF37] flex-shrink-0"
     aria-label="Fermer le menu"
   >
     <XMarkIcon className="h-5 w-5" />
@@ -159,8 +159,8 @@ function BackofficeLayout() {
                 onClick={() => isMobile && setSidebarOpen(false)}
                 className={`relative flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group ${
                   isActive(item.href) 
-                    ? 'bg-[#3182CE]/20 text-white' 
-                    : 'text-white/70 hover:bg-[#3182CE]/20 hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline'
+                    ? 'bg-[#D4AF37] text-white' 
+                    : 'text-white/70 hover:bg-[#D4AF37] hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline'
                 }`}
               >
                 {isActive(item.href) && (
@@ -183,7 +183,7 @@ function BackofficeLayout() {
                   <button
                     onClick={() => toggleMenu(item.name)}
                     className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200 group ${
-                      openMenus[item.name] ? 'text-white' : 'text-white/70 hover:bg-[#3182CE]/20 hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline'
+                      openMenus[item.name] ? 'text-white' : 'text-white/70 hover:bg-[#D4AF37] hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline'
                     }`}
                   >
                     <div className="flex items-center">
@@ -205,8 +205,8 @@ function BackofficeLayout() {
                           onClick={() => isMobile && setSidebarOpen(false)}
                           className={`relative flex items-center px-3 py-2 rounded-lg transition-all duration-200 ${
                             isActive(subItem.href) 
-                              ? 'bg-[#3182CE]/20 text-white' 
-                              : 'text-white/60 hover:bg-[#3182CE]/20 hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline'
+                              ? 'bg-[#D4AF37] text-white' 
+                              : 'text-white/60 hover:bg-[#D4AF37] hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline'
                           }`}
                         >
                           {isActive(subItem.href) && (
@@ -226,8 +226,8 @@ function BackofficeLayout() {
                   onClick={() => isMobile && setSidebarOpen(false)}
                   className={`relative flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group ${
                     isActive(item.href) 
-                      ? 'bg-[#3182CE]/20 text-white' 
-                      : 'text-white/70 hover:bg-[#3182CE]/20 hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline'
+                      ? 'bg-[#D4AF37] text-white' 
+                      : 'text-white/70 hover:bg-[#D4AF37] hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline'
                   }`}
                 >
                   {isActive(item.href) && (
@@ -245,7 +245,7 @@ function BackofficeLayout() {
           {/* Paramètres - Modal */}
           <button
             onClick={() => { setSettingsOpen(true); if (isMobile) setSidebarOpen(false); }}
-            className={`w-full flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-white/70 hover:bg-[#3182CE]/20 hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline`}
+            className={`w-full flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group text-white/70 hover:bg-[#D4AF37] hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline`}
           >
             <Cog6ToothIcon className="h-5 w-5 mr-3 flex-shrink-0 text-white/40 group-hover:text-white" />
             <span className="text-sm font-medium">Paramètres</span>
