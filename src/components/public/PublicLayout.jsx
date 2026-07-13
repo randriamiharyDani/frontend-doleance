@@ -11,6 +11,7 @@ import {
   SunIcon,
   MoonIcon,
   ArrowRightOnRectangleIcon,
+  ShieldCheckIcon,
 } from '@heroicons/react/24/outline';
 import SettingsModal from './SettingsModal';
 import NotificationsDropdown from './NotificationsDropdown';
@@ -52,37 +53,58 @@ function PublicLayout({ children }) {
   };
 
   return (
-    <div className={`min-h-screen transition-colors duration-200 ${
-      darkMode ? 'bg-slate-900' : 'bg-gray-50'
+    <div className={`cua-layout min-h-screen transition-colors duration-200 ${
+      darkMode ? 'bg-slate-900' : 'bg-[#F8FAFC]'
     }`}>
+      <style>{`
+        .cua-layout { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
+        .cua-layout .cua-display { font-family: 'Fraunces', ui-serif, Georgia, serif; }
+        .cua-layout .cua-nav-active {
+          background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 65%, #2E4FA3 100%);
+          box-shadow: 0 8px 20px -6px rgba(15, 23, 42, 0.4);
+        }
+        .cua-layout .cua-icon-btn:hover {
+          color: #D4AF37;
+        }
+        .cua-layout .cua-login-link:hover {
+          color: #D4AF37;
+        }
+        .cua-layout .cua-top-line {
+          background: linear-gradient(90deg, transparent, #D4AF37, transparent);
+        }
+      `}</style>
+
       {/* ===== HEADER ===== */}
       <header className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
         scrolled
           ? darkMode
-            ? 'bg-slate-900/80 backdrop-blur-xl shadow-lg shadow-black/10 border-b border-slate-700/50'
-            : 'bg-white/80 backdrop-blur-xl shadow-lg shadow-black/5 border-b border-gray-200/50'
+            ? 'bg-slate-900/85 backdrop-blur-xl shadow-lg shadow-black/10 border-b border-slate-700/50'
+            : 'bg-white/85 backdrop-blur-xl shadow-lg shadow-[#0F172A]/5 border-b border-slate-200/60'
           : darkMode
             ? 'bg-slate-900/60 backdrop-blur-md border-b border-slate-800/50'
-            : 'bg-white/60 backdrop-blur-md border-b border-gray-100/50'
+            : 'bg-white/60 backdrop-blur-md border-b border-slate-100/60'
       }`}>
+        {/* Liseré doré discret en tête de page */}
+        <div className="cua-top-line h-[2px] w-full opacity-70" />
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Left: Logo + Title */}
             <div className="flex items-center gap-3 flex-shrink-0">
-              <Link to="/deposer-doleance" className="flex items-center">
+              <Link to="/deposer-doleance" className="flex items-center group">
                 <img
                   src="/images/logo_CUA.svg"
                   alt="Logo CUA"
                   className="h-16 w-16 object-contain rounded-xl transition-transform duration-200 group-hover:scale-105"
                 />
                 <div className="hidden sm:block">
-                  <h1 className={`text-2xl font-bold leading-tight transition-colors ${
-                    darkMode ? 'text-white' : 'text-gray-900'
+                  <h1 className={`cua-display text-2xl font-semibold leading-tight transition-colors ${
+                    darkMode ? 'text-white' : 'text-[#0F172A]'
                   }`}>
                     Signalement
                   </h1>
-                  <p className={`text-[12px] font-medium -mt-0.5 ${
-                    darkMode ? 'text-slate-400' : 'text-gray-400'
+                  <p className={`text-[12px] font-medium -mt-0.5 tracking-wide ${
+                    darkMode ? 'text-[#D4AF37]/80' : 'text-[#9A7200]'
                   }`}>
                     Antananarivo, 101
                   </p>
@@ -100,12 +122,10 @@ function PublicLayout({ children }) {
                     to={item.path}
                     className={`relative flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                       active
-                        ? darkMode
-                          ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
-                          : 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                        ? 'cua-nav-active text-white'
                         : darkMode
                           ? 'text-slate-300 hover:text-white hover:bg-white/10'
-                          : 'text-gray-500 hover:text-gray-800 hover:bg-gray-100'
+                          : 'text-slate-500 hover:text-[#0F172A] hover:bg-slate-100'
                     }`}
                   >
                     <item.icon className="h-4 w-4" />
@@ -120,10 +140,10 @@ function PublicLayout({ children }) {
               {/* Dark mode toggle */}
               <button
                 onClick={toggleDarkMode}
-                className={`p-2 rounded-xl transition-all duration-200 ${
+                className={`cua-icon-btn p-2 rounded-xl transition-all duration-200 ${
                   darkMode
-                    ? 'text-slate-300 hover:bg-white/10 hover:text-white'
-                    : 'text-gray-400 hover:bg-gray-100 hover:text-gray-700'
+                    ? 'text-slate-300 hover:bg-white/10'
+                    : 'text-slate-400 hover:bg-slate-100'
                 }`}
                 aria-label="Changer le thème"
               >
@@ -136,10 +156,10 @@ function PublicLayout({ children }) {
               {/* Settings */}
               <button
                 onClick={() => setSettingsOpen(true)}
-                className={`p-2 rounded-xl transition-all duration-200 ${
+                className={`cua-icon-btn p-2 rounded-xl transition-all duration-200 ${
                   darkMode
-                    ? 'text-slate-300 hover:bg-white/10 hover:text-white'
-                    : 'text-gray-400 hover:bg-gray-100 hover:text-gray-700'
+                    ? 'text-slate-300 hover:bg-white/10'
+                    : 'text-slate-400 hover:bg-slate-100'
                 }`}
                 aria-label="Paramètres"
               >
@@ -149,10 +169,10 @@ function PublicLayout({ children }) {
               {/* Login (desktop) */}
               <a
                 href="/login"
-                className={`hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                className={`cua-login-link hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
                   darkMode
-                    ? 'text-slate-300 hover:bg-white/10 hover:text-white'
-                    : 'text-gray-500 hover:bg-gray-100 hover:text-gray-800'
+                    ? 'text-slate-300 hover:bg-white/10'
+                    : 'text-slate-500 hover:bg-slate-100'
                 }`}
               >
                 <ArrowRightOnRectangleIcon className="h-4 w-4" />
@@ -165,7 +185,7 @@ function PublicLayout({ children }) {
                 className={`md:hidden p-2 rounded-xl transition-all duration-200 ${
                   darkMode
                     ? 'text-slate-300 hover:bg-white/10 hover:text-white'
-                    : 'text-gray-500 hover:bg-gray-100 hover:text-gray-700'
+                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
                 }`}
                 aria-label="Menu"
               >
@@ -182,7 +202,7 @@ function PublicLayout({ children }) {
         {/* Mobile menu dropdown */}
         {mobileMenuOpen && (
           <div className={`md:hidden border-t transition-colors duration-200 ${
-            darkMode ? 'bg-slate-900/95 backdrop-blur-xl border-slate-700/50' : 'bg-white/95 backdrop-blur-xl border-gray-100'
+            darkMode ? 'bg-slate-900/95 backdrop-blur-xl border-slate-700/50' : 'bg-white/95 backdrop-blur-xl border-slate-100'
           }`}>
             <div className="px-4 py-3 space-y-1">
               {navItems.map((item) => {
@@ -193,10 +213,10 @@ function PublicLayout({ children }) {
                     to={item.path}
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                       active
-                        ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
+                        ? 'cua-nav-active text-white'
                         : darkMode
                           ? 'text-slate-300 hover:bg-white/10 hover:text-white'
-                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                          : 'text-slate-600 hover:bg-slate-50 hover:text-[#0F172A]'
                     }`}
                   >
                     <item.icon className="h-5 w-5" />
@@ -204,13 +224,13 @@ function PublicLayout({ children }) {
                   </Link>
                 );
               })}
-              <div className={`border-t my-2 ${darkMode ? 'border-slate-700' : 'border-gray-100'}`} />
+              <div className={`border-t my-2 ${darkMode ? 'border-slate-700' : 'border-slate-100'}`} />
               <a
                 href="/login"
                 className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                   darkMode
                     ? 'text-slate-300 hover:bg-white/10 hover:text-white'
-                    : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
+                    : 'text-slate-600 hover:bg-slate-50 hover:text-[#0F172A]'
                 }`}
               >
                 <ArrowRightOnRectangleIcon className="h-5 w-5" />
@@ -223,7 +243,7 @@ function PublicLayout({ children }) {
 
       {/* ===== MAIN CONTENT ===== */}
       <main className={`pt-16 min-h-screen transition-colors duration-200 ${
-        darkMode ? 'bg-slate-900' : 'bg-gray-50'
+        darkMode ? 'bg-slate-900' : 'bg-[#F8FAFC]'
       }`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8 lg:py-10">
           {children}
@@ -231,23 +251,25 @@ function PublicLayout({ children }) {
       </main>
 
       {/* ===== FOOTER ===== */}
-      <footer className={`border-t transition-colors duration-200 ${
-        darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-gray-100'
+      <footer className={`border-t transition-colors duration-200 relative ${
+        darkMode ? 'bg-slate-900 border-slate-800' : 'bg-white border-slate-100'
       }`}>
+        <div className="cua-top-line h-[2px] w-full opacity-50 absolute top-0 left-0" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div className="flex items-center gap-3">
               <img src="/images/logo_CUA.svg" alt="CUA" className="h-8 w-8 object-contain rounded-lg" />
               <div>
-                <p className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
+                <p className={`text-sm font-semibold ${darkMode ? 'text-white' : 'text-[#0F172A]'}`}>
                   Commune Urbaine d'Antananarivo
                 </p>
-                <p className={`text-xs ${darkMode ? 'text-slate-500' : 'text-gray-400'}`}>
+                <p className={`text-xs flex items-center gap-1.5 ${darkMode ? 'text-slate-500' : 'text-slate-400'}`}>
+                  <ShieldCheckIcon className="w-3 h-3 text-[#D4AF37]" />
                   &copy; {new Date().getFullYear()} Tous droits réservés
                 </p>
               </div>
             </div>
-            <p className={`text-xs ${darkMode ? 'text-slate-600' : 'text-gray-300'}`}>
+            <p className={`text-xs ${darkMode ? 'text-slate-600' : 'text-slate-300'}`}>
               Version 2.0
             </p>
           </div>

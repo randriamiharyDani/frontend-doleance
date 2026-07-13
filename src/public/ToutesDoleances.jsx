@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import api from '../services/api';
@@ -19,14 +18,11 @@ import {
   ChevronUpIcon,
   EyeIcon
 } from '@heroicons/react/24/outline';
-import PublicNavbar from '../components/public/PublicNavbar';
-import PublicFooter from '../components/public/PublicFooter';
 
 
 function ToutesDoleances() {
   const { t } = useTranslation();
   const { darkMode } = useTheme();
-  const navigate = useNavigate();
   const [doleances, setDoleances] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -323,17 +319,8 @@ function ToutesDoleances() {
 
   return (
     <div className={`min-h-screen flex flex-col transition-colors duration-300 `}>
-      {/* <PublicNavbar /> */}
       
       <main className="flex-1 max-w_full mx-auto px-4 w-full">
-        {/* <div className="mb-8">
-          <h1 className={`text-3xl font-bold ${darkMode ? 'text-sky-400' : 'text-sky-800'}`}>
-            {t('allComplaints.title')}
-          </h1>
-          <p className={darkMode ? 'text-gray-300 mt-2' : 'text-sky-600 mt-2'}>
-            {t('allComplaints.subtitle')}
-          </p>
-        </div> */}
 
         <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-3">
         <div>
@@ -568,64 +555,6 @@ function ToutesDoleances() {
             </div>
           </div>
         )}
-
-        {/* Statistiques */}
-        {/* <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-6">
-          {[
-            {
-              icon: DocumentTextIcon,
-              value: pagination.total,
-              label: t('allComplaints.totalComplaints'),
-              color: 'sky',
-            },
-            {
-              icon: ClockIcon,
-              value: doleances.filter(d => d.nom_statut !== 'Résolue' && d.nom_statut !== 'Clôturée').length,
-              label: t('allComplaints.inProgress'),
-              color: 'yellow',
-            },
-            {
-              icon: CheckCircleIcon,
-              value: doleances.filter(d => d.nom_statut === 'Résolue' || d.nom_statut === 'Clôturée').length,
-              label: t('allComplaints.resolved'),
-              color: 'green',
-            },
-            {
-              icon: TagIcon,
-              value: statsCount.totalCategories,
-              label: t('allComplaints.categories'),
-              color: 'purple',
-            },
-            {
-              icon: ChartBarIcon,
-              value: statsCount.totalPriorites,
-              label: t('allComplaints.levels'),
-              color: 'orange',
-            },
-          ].map((stat, index) => {
-            const Icon = stat.icon;
-            return (
-              <div
-                key={index}
-                className={`rounded-xl shadow-sm hover:shadow-md p-4 flex flex-col items-center text-center transition-all duration-300 hover:-translate-y-0.5 ${
-                  darkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-100'
-                }`}
-              >
-                <div
-                  className={`h-12 w-12 rounded-full flex items-center justify-center mb-3 bg-${stat.color}-100 dark:bg-${stat.color}-900/30`}
-                >
-                  <Icon className={`h-6 w-6 text-${stat.color}-500`} />
-                </div>
-                <p className={`text-2xl font-bold ${darkMode ? 'text-white' : 'text-gray-800'}`}>
-                  {stat.value}
-                </p>
-                <p className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                  {stat.label}
-                </p>
-              </div>
-            );
-          })}
-        </div>  */}
 
         {/* Liste des doléances */}
         {loading ? (
@@ -921,8 +850,6 @@ function ToutesDoleances() {
           </div>
         </div>
       )}
-
-      {/* <PublicFooter /> */}
     </div>
   );
 }

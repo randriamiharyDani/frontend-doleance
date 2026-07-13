@@ -553,3 +553,83 @@ img {
 * {
   transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
 }
+
+/* login */
+ .cua-login { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
+        .cua-display { font-family: 'Fraunces', ui-serif, Georgia, serif; }
+
+        @keyframes cuaFadeUp {
+          from { opacity: 0; transform: translateY(14px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes cuaFadeIn {
+          from { opacity: 0; }
+          to { opacity: 1; }
+        }
+        @keyframes cuaDrift {
+          0%, 100% { transform: translate(0, 0) scale(1); }
+          50% { transform: translate(-16px, 12px) scale(1.04); }
+        }
+        @keyframes cuaShimmer {
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
+        }
+        @keyframes cuaPulseRing {
+          0% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0.35); }
+          70% { box-shadow: 0 0 0 14px rgba(212, 175, 55, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(212, 175, 55, 0); }
+        }
+        @keyframes cuaShake {
+          10%, 90% { transform: translateX(-1px); }
+          20%, 80% { transform: translateX(2px); }
+          30%, 50%, 70% { transform: translateX(-4px); }
+          40%, 60% { transform: translateX(4px); }
+        }
+
+        .cua-anim-1 { animation: cuaFadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) both; }
+        .cua-anim-2 { animation: cuaFadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both; }
+        .cua-anim-3 { animation: cuaFadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both; }
+        .cua-anim-4 { animation: cuaFadeUp 0.7s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both; }
+        .cua-anim-fade { animation: cuaFadeIn 1s ease-out both; }
+        .cua-orb { animation: cuaDrift 9s ease-in-out infinite; }
+        .cua-orb-slow { animation: cuaDrift 13s ease-in-out infinite reverse; }
+        .cua-shimmer {
+          background: linear-gradient(110deg, #0F172A 40%, #D4AF37 50%, #0F172A 60%);
+          background-size: 200% 100%;
+          animation: cuaShimmer 2.2s linear infinite;
+        }
+        .cua-crest-ring { animation: cuaPulseRing 2.4s ease-out infinite; }
+        .cua-error { animation: cuaShake 0.5s ease-in-out; }
+
+        .cua-input:focus-within {
+          border-color: #D4AF37;
+          box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.14);
+        }
+
+        .cua-btn {
+          background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 55%, #2E4FA3 100%);
+          transition: transform 0.25s ease, box-shadow 0.25s ease, filter 0.25s ease;
+        }
+        .cua-btn:hover:not(:disabled) {
+          filter: brightness(1.08);
+          box-shadow: 0 12px 28px -8px rgba(15, 23, 42, 0.55);
+          transform: translateY(-1px);
+        }
+        .cua-btn:active:not(:disabled) { transform: translateY(0); }
+
+        .cua-card {
+          backdrop-filter: blur(20px);
+          -webkit-backdrop-filter: blur(20px);
+        }
+
+        .cua-seal-pattern {
+          background-image: radial-gradient(circle, rgba(212,175,55,0.5) 1px, transparent 1px);
+          background-size: 22px 22px;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+          .cua-anim-1, .cua-anim-2, .cua-anim-3, .cua-anim-4, .cua-anim-fade,
+          .cua-orb, .cua-orb-slow, .cua-shimmer, .cua-crest-ring, .cua-error {
+            animation: none !important;
+          }
+        }

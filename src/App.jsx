@@ -38,7 +38,7 @@ function AppRoutes() {
       <Route path="/deposer-doleance" element={<PublicLayout><DeposerDoleance /></PublicLayout>} />
       <Route path="/suivi-doleance" element={<PublicLayout><SuiviDoleance /></PublicLayout>} />
       <Route path="/suivi-doleance/:reference" element={<PublicLayout><SuiviDoleance /></PublicLayout>} />
-      {/* <Route path="/toutes-doleances" element={<PublicLayout><ToutesDoleances /></PublicLayout>} /> */}
+      <Route path="/toutes-doleances" element={<PublicLayout><ToutesDoleances /></PublicLayout>} />
       
       {/* Routes back-office */}
       <Route path="/backoffice" element={<BackofficeLayout />}>
