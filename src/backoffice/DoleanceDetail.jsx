@@ -297,41 +297,55 @@ function DoleanceDetail() {
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                {piecesJointes.map((file, index) => (
-                  <div 
-                    key={index} 
-                    className="bg-gray-50 rounded-lg border border-gray-200 p-3 text-center hover:shadow-md transition-shadow cursor-pointer"
-                    onClick={() => {
-                      setSelectedPiece(file);
-                      setShowPiecesModal(true);
-                    }}
-                  >
-                    <div className="flex justify-center mb-2">
-                      {getFileIcon(file)}
+                {piecesJointes.map((file, index) => {
+                  const ext = file.nom_fichier?.split('.').pop()?.toLowerCase();
+                  const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(ext);
+                  return (
+                    <div 
+                      key={index} 
+                      className="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+                    >
+                      {isImage && file.url ? (
+                        <div className="aspect-square cursor-pointer relative group" onClick={() => {
+                          setSelectedPiece(file);
+                          setShowPiecesModal(true);
+                        }}>
+                          <img src={file.url} alt={file.nom_fichier} className="w-full h-full object-cover" loading="lazy" />
+                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                            <PhotoIcon className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="aspect-square flex items-center justify-center bg-gray-50 cursor-pointer" onClick={() => {
+                          setSelectedPiece(file);
+                          setShowPiecesModal(true);
+                        }}>
+                          {getFileIcon(file)}
+                        </div>
+                      )}
+                      <div className="p-2 text-center">
+                        <p className="text-xs text-gray-600 truncate" title={file.nom_fichier}>
+                          {file.nom_fichier}
+                        </p>
+                        <p className="text-xs text-gray-400">
+                          {formatFileSize(file.taille)}
+                        </p>
+                        {file.url && (
+                          <a
+                            href={file.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-xs text-blue-600 hover:text-blue-800 mt-1 inline-flex items-center gap-1"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            <ArrowDownTrayIcon className="h-3 w-3" />
+                            Télécharger
+                          </a>
+                        )}
+                      </div>
                     </div>
-                    <p className="text-xs text-gray-600 truncate" title={file.nom_fichier}>
-                      {file.nom_fichier}
-                    </p>
-                    <p className="text-xs text-gray-400">
-                      {formatFileSize(file.taille)}
-                    </p>
-                    <p className="text-xs text-blue-600 mt-1">
-                      {getFileTypeLabel(file)}
-                    </p>
-                    {file.url && (
-                      <a
-                        href={file.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs text-blue-600 hover:text-blue-800 mt-1 inline-flex items-center gap-1"
-                        onClick={(e) => e.stopPropagation()}
-                      >
-                        <ArrowDownTrayIcon className="h-3 w-3" />
-                        Télécharger
-                      </a>
-                    )}
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             )}
           </div>

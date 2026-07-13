@@ -16,7 +16,8 @@ import {
   ArrowPathIcon,
   ChevronDownIcon,
   ChevronUpIcon,
-  EyeIcon
+  EyeIcon,
+  PhotoIcon
 } from '@heroicons/react/24/outline';
 
 
@@ -53,6 +54,9 @@ function ToutesDoleances() {
   
   const [showDetailModal, setShowDetailModal] = useState(false);
   const [selectedDoleance, setSelectedDoleance] = useState(null);
+  const [modalPieces, setModalPieces] = useState([]);
+  const [loadingPieces, setLoadingPieces] = useState(false);
+  const [lightboxImage, setLightboxImage] = useState(null);
 
   useEffect(() => {
     fetchDoleances();
@@ -261,9 +265,21 @@ function ToutesDoleances() {
     setShowSuggestions(false);
   };
 
-  const openDetailModal = (doleance) => {
+  const openDetailModal = async (doleance) => {
     setSelectedDoleance(doleance);
     setShowDetailModal(true);
+    setModalPieces([]);
+    if (doleance.reference) {
+      setLoadingPieces(true);
+      try {
+        const res = await api.get(`/doleances/public/${doleance.reference}/pieces-jointes`);
+        setModalPieces(res.data?.data || []);
+      } catch (err) {
+        console.error('Erreur chargement pièces jointes:', err);
+      } finally {
+        setLoadingPieces(false);
+      }
+    }
   };
 
   const getStatusBadge = (statut, couleur) => {
@@ -835,6 +851,45 @@ function ToutesDoleances() {
                   </div>
                 )}
               </div>
+
+              {/* Photos / Pièces jointes */}
+              {loadingPieces ? (
+                <div className="mt-4 flex items-center gap-2 text-sm text-gray-500">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-sky-500"></div>
+                  Chargement des photos...
+                </div>
+              ) : modalPieces.length > 0 ? (
+                <div className="mt-4">
+                  <h4 className={`text-sm font-semibold mb-3 flex items-center gap-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
+                    <PhotoIcon className="h-4 w-4" />
+                    Photos du problème ({modalPieces.length})
+                  </h4>
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                    {modalPieces.map((piece, index) => (
+                      <div
+                        key={index}
+                        onClick={() => setLightboxImage(piece.url)}
+                        className={`group relative aspect-square rounded-xl overflow-hidden border-2 cursor-pointer transition-all duration-200 ${
+                          darkMode
+                            ? 'border-gray-600 hover:border-yellow-500'
+                            : 'border-gray-200 hover:border-yellow-500'
+                        }`}
+                      >
+                        <img
+                          src={piece.url}
+                          alt={piece.nom_fichier}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                        <div className="absolute bottom-0 left-0 right-0 px-2 py-1.5 bg-white/90 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                          <p className="text-[10px] font-medium text-gray-700 truncate">{piece.nom_fichier}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ) : null}
             </div>
 
             <div className={`sticky bottom-0 flex justify-end p-4 border-t bg-inherit ${
@@ -847,6 +902,30 @@ function ToutesDoleances() {
                Fermer
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Lightbox image */}
+      {lightboxImage && (
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60] flex items-center justify-center p-4 cursor-pointer"
+          onClick={() => setLightboxImage(null)}
+        >
+          <div className="relative max-w-4xl max-h-[90vh] w-full">
+            <img
+              src={lightboxImage}
+              alt="Aperçu"
+              className="w-full h-full object-contain rounded-xl"
+            />
+            <button
+              onClick={() => setLightboxImage(null)}
+              className="absolute top-3 right-3 w-10 h-10 bg-white/20 hover:bg-white/40 backdrop-blur-sm rounded-full flex items-center justify-center text-white transition-all"
+            >
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
           </div>
         </div>
       )}

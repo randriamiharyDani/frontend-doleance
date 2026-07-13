@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import {
   UserIcon, MapPinIcon, ChatBubbleLeftRightIcon,
   PaperClipIcon, DocumentDuplicateIcon,
@@ -10,6 +10,7 @@ import PriorityBadge from '../../../components/common/PriorityBadge';
 import LoadingSpinner from '../../../components/common/LoadingSpinner';
 
 function DoleanceDetailModal({ isOpen, onClose, doleance, piecesJointes, loadingPieces }) {
+  const [lightboxImage, setLightboxImage] = useState(null);
   if (!doleance) return null;
 
   const formatDateTime = (dateString) => {
@@ -139,17 +140,32 @@ function DoleanceDetailModal({ isOpen, onClose, doleance, piecesJointes, loading
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
             {piecesJointes.map((file, index) => {
+              const ext = file.nom_fichier?.split('.').pop()?.toLowerCase();
+              const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(ext);
               const downloadUrl = file.url || `/api/doleances/${doleance.id_doleance}/pieces-jointes/${file.id_piece || index}`;
               return (
-                <div key={index} className="bg-white rounded-lg border p-3 text-center hover:shadow-md transition-shadow">
-                  <div className="flex justify-center mb-2">{getFileIcon(file)}</div>
-                  <p className="text-xs text-gray-600 truncate font-medium" title={file.nom_fichier}>{file.nom_fichier}</p>
-                  <p className="text-xs text-gray-400 mt-1">{formatFileSize(file.taille)}</p>
-                  <div className="mt-2 flex justify-center">
-                    <a href={downloadUrl} target="_blank" rel="noopener noreferrer"
-                      className="text-xs text-blue-600 hover:text-blue-800 inline-flex items-center gap-1 bg-blue-50 px-2 py-1 rounded hover:bg-blue-100 transition-colors">
-                      <ArrowDownTrayIcon className="h-3 w-3" /> Télécharger
-                    </a>
+                <div key={index} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                  {isImage && file.url ? (
+                    <div className="aspect-square cursor-pointer relative group" onClick={() => setLightboxImage(file.url)}>
+                      <img src={file.url} alt={file.nom_fichier} className="w-full h-full object-cover" loading="lazy" />
+                      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
+                        <PhotoIcon className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="aspect-square flex items-center justify-center bg-gray-50">
+                      {getFileIcon(file)}
+                    </div>
+                  )}
+                  <div className="p-2">
+                    <p className="text-xs text-gray-600 truncate font-medium" title={file.nom_fichier}>{file.nom_fichier}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">{formatFileSize(file.taille)}</p>
+                    <div className="mt-1.5 flex justify-center">
+                      <a href={downloadUrl} target="_blank" rel="noopener noreferrer"
+                        className="text-xs text-blue-600 hover:text-blue-800 inline-flex items-center gap-1 bg-blue-50 px-2 py-1 rounded hover:bg-blue-100 transition-colors">
+                        <ArrowDownTrayIcon className="h-3 w-3" /> Télécharger
+                      </a>
+                    </div>
                   </div>
                 </div>
               );
@@ -157,6 +173,20 @@ function DoleanceDetailModal({ isOpen, onClose, doleance, piecesJointes, loading
           </div>
         )}
       </div>
+
+      {/* Lightbox */}
+      {lightboxImage && (
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[70] flex items-center justify-center p-4 cursor-pointer" onClick={() => setLightboxImage(null)}>
+          <div className="relative max-w-4xl max-h-[90vh] w-full">
+            <img src={lightboxImage} alt="Aperçu" className="w-full h-full object-contain rounded-xl" />
+            <button onClick={() => setLightboxImage(null)} className="absolute top-3 right-3 w-10 h-10 bg-white/20 hover:bg-white/40 backdrop-blur-sm rounded-full flex items-center justify-center text-white transition-all">
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
 
       {doleance.reponses && doleance.reponses.length > 0 && (
         <div className="bg-purple-50 rounded-lg p-4">

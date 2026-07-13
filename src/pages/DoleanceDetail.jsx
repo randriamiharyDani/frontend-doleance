@@ -12,7 +12,8 @@ import {
   ClockIcon,
   BuildingOfficeIcon,
   TagIcon,
-  FlagIcon
+  FlagIcon,
+  PhotoIcon
 } from '@heroicons/react/24/outline';
 
 function DoleanceDetail() {
@@ -24,6 +25,7 @@ function DoleanceDetail() {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [newStatut, setNewStatut] = useState('');
+  const [lightboxImage, setLightboxImage] = useState(null);
   
   useEffect(() => {
     fetchDoleance();
@@ -136,6 +138,36 @@ function DoleanceDetail() {
               <h3 className="font-semibold text-gray-700 mb-2">Description</h3>
               <p className="text-gray-600 whitespace-pre-wrap">{doleance.description}</p>
             </div>
+
+            {/* Photos / Pièces jointes */}
+            {doleance.pieces_jointes && doleance.pieces_jointes.length > 0 && (
+              <div className="border-t pt-4 mt-4">
+                <h3 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                  <PhotoIcon className="h-5 w-5 text-blue-600" />
+                  Photos du problème ({doleance.pieces_jointes.length})
+                </h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                  {doleance.pieces_jointes.map((piece, index) => (
+                    <div
+                      key={index}
+                      onClick={() => setLightboxImage(piece.url)}
+                      className="group relative aspect-square rounded-xl overflow-hidden border-2 border-gray-200 hover:border-blue-500 cursor-pointer transition-all duration-200"
+                    >
+                      <img
+                        src={piece.url}
+                        alt={piece.nom_fichier}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                        loading="lazy"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                      <div className="absolute bottom-0 left-0 right-0 px-2 py-1.5 bg-white/90 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <p className="text-[10px] font-medium text-gray-700 truncate">{piece.nom_fichier}</p>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 pt-4 border-t text-sm">
               <div className="flex items-center text-gray-500">
@@ -298,6 +330,30 @@ function DoleanceDetail() {
           )}
         </div>
       </div>
+
+      {/* Lightbox image */}
+      {lightboxImage && (
+        <div
+          className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 cursor-pointer"
+          onClick={() => setLightboxImage(null)}
+        >
+          <div className="relative max-w-4xl max-h-[90vh] w-full">
+            <img
+              src={lightboxImage}
+              alt="Aperçu"
+              className="w-full h-full object-contain rounded-xl"
+            />
+            <button
+              onClick={() => setLightboxImage(null)}
+              className="absolute top-3 right-3 w-10 h-10 bg-white/20 hover:bg-white/40 backdrop-blur-sm rounded-full flex items-center justify-center text-white transition-all"
+            >
+              <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -104,6 +104,7 @@ function DeposerDoleance() {
   const [showReferenceModal, setShowReferenceModal] = useState(false);
   const [savedReference, setSavedReference] = useState('');
   const [files, setFiles] = useState([]);
+  const [filePreviews, setFilePreviews] = useState([]);
   const [uploadProgress, setUploadProgress] = useState(0);
 
   const [sendingReference, setSendingReference] = useState(false);
@@ -154,6 +155,15 @@ function DeposerDoleance() {
     fetchData();
   }, [t]);
 
+  useEffect(() => {
+    const urls = files.map(file => {
+      if (file.type.startsWith('image/')) return URL.createObjectURL(file);
+      return null;
+    });
+    setFilePreviews(urls);
+    return () => urls.forEach(url => { if (url) URL.revokeObjectURL(url); });
+  }, [files]);
+
   const fetchData = async () => {
     try {
       const [categoriesRes, quartiersRes, assignedRes] = await Promise.all([
@@ -196,8 +206,8 @@ function DeposerDoleance() {
     selectedFiles.forEach(file => {
       if (file.size > maxSize) {
         errors.push(`${file.name} ${t('messages.fileTooBig')}`);
-      } else if (!file.type.startsWith('image/') && !file.type.startsWith('video/')) {
-        errors.push(`${file.name} ${t('messages.invalidFileType')}`);
+      } else if (!file.type.startsWith('image/')) {
+        errors.push(`${file.name} - Seules les images sont acceptées`);
       } else {
         validFiles.push(file);
       }
@@ -235,6 +245,8 @@ function DeposerDoleance() {
     droppedFiles.forEach(file => {
       if (file.size > maxSize) {
         errors.push(`${file.name} ${t('messages.fileTooBig')}`);
+      } else if (!file.type.startsWith('image/')) {
+        errors.push(`${file.name} - Seules les images sont acceptées`);
       } else {
         validFiles.push(file);
       }
@@ -256,15 +268,20 @@ function DeposerDoleance() {
     files.forEach(file => formDataFiles.append('files', file));
     formDataFiles.append('doleance_id', doleanceId);
     try {
-      await api.post('/doleances/upload', formDataFiles, {
-        headers: { 'Content-Type': 'multipart/form-data' },
+      const uploadResponse = await api.post('/doleances/public/upload', formDataFiles, {
+        headers: { 'Content-Type': undefined },
         onUploadProgress: (progressEvent) => {
           setUploadProgress(Math.round((progressEvent.loaded * 100) / progressEvent.total));
         }
       });
+      if (!uploadResponse.data?.success) {
+        throw new Error(uploadResponse.data?.message || 'Upload failed');
+      }
     } catch (error) {
       console.error('Erreur upload:', error);
-      toast.error(t('errors.generic'));
+      const msg = error.response?.data?.message || error.message || t('errors.generic');
+      toast.error(msg);
+      throw error;
     } finally {
       setUploading(false);
       setUploadProgress(0);
@@ -326,7 +343,10 @@ function DeposerDoleance() {
       const reference = response.data.data?.reference || response.data.reference;
       const doleanceId = response.data.data?.id_doleance || response.data.id_doleance;
 
-      if (files.length > 0 && doleanceId) await uploadFiles(doleanceId);
+      let uploadOk = true;
+      if (files.length > 0 && doleanceId) {
+        try { await uploadFiles(doleanceId); } catch { uploadOk = false; }
+      }
 
       setSavedReference(reference);
       const contactInfo = formData.email || formData.telephone;
@@ -357,6 +377,7 @@ function DeposerDoleance() {
         id_quartier: '', lieu_exact: '', suggestions: ''
       });
       setFiles([]);
+      setFilePreviews([]);
       setReferenceSent(false); setEmailSent(false); setSmsSent(false); setSendError(null);
 
     } catch (error) {
@@ -790,31 +811,42 @@ const handleSearchAddress = async (e) => {
               <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
             </svg>
             <p className="text-sm font-bold text-slate-700 mb-1">Glissez-déposez vos photos ici</p>
-            <p className="text-xs text-slate-400">ou cliquez pour parcourir (JPG, PNG, max 10 Mo)</p>
-            <input ref={fileInputRef} type="file" accept="image/*,video/*" multiple onChange={handleFileChange} className="hidden" />
+            <p className="text-xs text-slate-400">ou cliquez pour parcourir (JPG, PNG, WebP, GIF — max 50 Mo)</p>
+            <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/gif,image/webp" multiple onChange={handleFileChange} className="hidden" />
           </div>
 
           {files.length > 0 && (
-            <div className="mt-4 space-y-2">
-              <p className="text-sm font-semibold text-slate-700">{files.length} fichier(s) sélectionné(s)</p>
-              {files.map((file, i) => (
-                <div key={i} className="flex items-center justify-between bg-slate-50 rounded-xl px-4 py-3 border border-slate-100">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <svg className="w-6 h-6 text-slate-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z" />
-                    </svg>
-                    <div className="min-w-0">
-                      <p className="text-sm font-medium text-slate-700 truncate">{file.name}</p>
-                      <p className="text-xs text-slate-400">{formatFileSize(file.size)}</p>
+            <div className="mt-4">
+              <p className="text-sm font-semibold text-slate-700 mb-3">{files.length} photo(s) sélectionnée(s) — aperçu avant envoi</p>
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                {files.map((file, i) => (
+                  <div key={i} className="group relative rounded-xl overflow-hidden border-2 border-slate-100 hover:border-[#D4AF37] transition-all duration-200 bg-slate-50 aspect-square">
+                    {filePreviews[i] ? (
+                      <img src={filePreviews[i]} alt={file.name} className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center">
+                        <svg className="w-8 h-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z" />
+                        </svg>
+                      </div>
+                    )}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+                    <button
+                      type="button"
+                      onClick={() => removeFile(i)}
+                      className="absolute top-2 right-2 w-7 h-7 bg-white/90 hover:bg-rose-500 hover:text-white rounded-full flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-all duration-200"
+                    >
+                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                    <div className="absolute bottom-0 left-0 right-0 px-2 py-1.5 bg-white/90 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <p className="text-[10px] font-medium text-slate-700 truncate">{file.name}</p>
+                      <p className="text-[9px] text-slate-400">{formatFileSize(file.size)}</p>
                     </div>
                   </div>
-                  <button type="button" onClick={() => removeFile(i)} className="text-rose-400 hover:text-rose-600 p-1">
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           )}
 
