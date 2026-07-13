@@ -117,21 +117,22 @@ function BackofficeLayout() {
        {/* Logo */}
 <div className="sticky top-0 z-10 flex items-center gap-3 p-4 border-b border-white/10 bg-opacity-95 backdrop-blur-sm">
   {/* Logo */}
-  <div className="flex-shrink-0">
+  <div className="flex-shrink-0 ">
     <img 
-      src="/logo-cua.png"  // Remplace par le chemin de ton logo
+      src="/images/logo_CUA.svg"  
       alt="Logo CUA" 
-      className="h-10 w-10 object-contain rounded-lg"
+      className="h-20 w-20 object-contain rounded-2xl"
     />
   </div>
   
   {/* Texte */}
   <div className="flex-1 min-w-0">
-    <h1 className="text-white font-bold text-3xl sm:text-lg tracking-tight leading-tight">
+    <h1 className="text-white font-bold text-4xl sm:text-lg tracking-tight leading-tight">
       CUA
     </h1>
-    <p className="text-white/60 text-xl sm:text-sm font-medium truncate">
-      Commune Urbaine d'Antananarivo
+      <p className="text-white/60 text-xl sm:text-sm font-medium">
+      <span className="block">Commune Urbaine</span>
+      <span className="block">d'Antananarivo</span>
     </p>
   </div>
   
@@ -145,24 +146,7 @@ function BackofficeLayout() {
   </button>
 </div>
 
-        {/* Infos utilisateur */}
-        <div className="sticky top-[73px] z-10 p-4 border-b border-white/10 bg-opacity-95 backdrop-blur-sm">
-          <div className="flex items-center">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-md bg-white/10">
-              <span className="text-white text-sm font-medium">
-                {user?.prenom?.charAt(0) || 'U'}{user?.nom?.charAt(0) || '?'}
-              </span>
-            </div>
-            <div className="ml-3 flex-1 min-w-0">
-              <p className="text-sm text-white font-medium truncate">
-                {user?.prenom || 'Utilisateur'} {user?.nom || ''}
-              </p>
-              <p className="text-xs text-white/50 capitalize truncate">
-                {user?.role?.replace(/_/g, ' ') || 'Chargement...'}
-              </p>
-            </div>
-          </div>
-        </div>
+   
 
         {/* Navigation */}
         <nav className="p-3 pb-20">
@@ -259,11 +243,26 @@ function BackofficeLayout() {
         </nav>
 
         {/* Footer */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 text-center border-t border-white/10 bg-opacity-95 backdrop-blur-sm">
-          <p className="text-xs text-white/40">Version 2.0.0 | CUA</p>
-          <p className="text-xs text-white/30 mt-1 hidden sm:block">
-            Plateforme optimisée
-          </p>
+             {/* Infos utilisateur */}
+     <div className="absolute bottom-0 left-0 right-0 z-10 p-4 border-t border-white/10 bg-opacity-95 backdrop-blur-sm">
+          <div className="flex items-center">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-md bg-white/10">
+              <span className="text-white text-sm font-medium">
+                {user?.prenom?.charAt(0) || 'U'}
+                {user?.nom?.charAt(0) || '?'}
+              </span>
+            </div>
+
+            <div className="ml-3 flex-1 min-w-0">
+              <p className="text-sm text-white font-medium truncate">
+                {user?.prenom || 'Utilisateur'} {user?.nom || ''}
+              </p>
+
+              <p className="text-xs text-white/50 capitalize truncate">
+                {user?.role?.replace(/_/g, ' ') || 'Chargement...'}
+              </p>
+            </div>
+          </div>
         </div>
       </aside>
 

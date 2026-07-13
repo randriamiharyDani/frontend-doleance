@@ -75,17 +75,19 @@ function PublicLayout({ children }) {
         <div className={`hidden md:flex items-center gap-3 px-6 py-6 border-b transition-colors duration-200 ${
           darkMode ? 'border-gray-700' : 'border-gray-100'
         }`}>
-          <div className="w-11 h-11 rounded-2xl flex items-center justify-center text-white font-bold text-lg shadow-lg"
-            style={{ background: 'linear-gradient(135deg, #0077FF, #00C853)' }}>
-            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
+          <div className=" rounded-xl flex items-center justify-center text-white font-bold text-lg shadow-lg">
+            <img
+             src="/images/logo_CUA.svg" 
+             alt="Logo CUA" 
+             className="h-20 w-20 object-contain rounded-2xl" />
           </div>
           <div>
-            <h2 className={`text-base font-bold leading-tight transition-colors duration-200 ${
+            <h1 className={`text-2xl font-bold leading-tight transition-colors duration-200 ${
               darkMode ? 'text-white' : 'text-gray-900'
-            }`}>Signalement<br/>Citoyen</h2>
+            }`}>Signalement</h1>
             <span className={`text-xs font-medium transition-colors duration-200 ${
               darkMode ? 'text-gray-400' : 'text-gray-400'
-            }`}>Votre ville, votre voix</span>
+            }`}>Antananarivo, 101</span>
           </div>
         </div>
 
