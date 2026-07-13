@@ -749,6 +749,7 @@ const handleSearchAddress = async (e) => {
         </div>
 
         {/* Photos */}
+      
         <div className="cua-section rounded-2xl p-5 mb-6 cua-anim">
           <div className="flex items-center gap-2 mb-1">
             <svg className="w-5 h-5 text-[#1E3A8A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

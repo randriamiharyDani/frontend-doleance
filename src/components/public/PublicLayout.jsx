@@ -165,36 +165,6 @@ function PublicLayout({ children }) {
               >
                 <Cog6ToothIcon className="h-5 w-5" />
               </button>
-
-              {/* Login (desktop) */}
-              <a
-                href="/login"
-                className={`cua-login-link hidden md:flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
-                  darkMode
-                    ? 'text-slate-300 hover:bg-white/10'
-                    : 'text-slate-500 hover:bg-slate-100'
-                }`}
-              >
-                <ArrowRightOnRectangleIcon className="h-4 w-4" />
-                <span>Connexion</span>
-              </a>
-
-              {/* Mobile menu button */}
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className={`md:hidden p-2 rounded-xl transition-all duration-200 ${
-                  darkMode
-                    ? 'text-slate-300 hover:bg-white/10 hover:text-white'
-                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-700'
-                }`}
-                aria-label="Menu"
-              >
-                {mobileMenuOpen ? (
-                  <XMarkIcon className="h-5 w-5" />
-                ) : (
-                  <Bars3Icon className="h-5 w-5" />
-                )}
-              </button>
             </div>
           </div>
         </div>
@@ -225,17 +195,7 @@ function PublicLayout({ children }) {
                 );
               })}
               <div className={`border-t my-2 ${darkMode ? 'border-slate-700' : 'border-slate-100'}`} />
-              <a
-                href="/login"
-                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
-                  darkMode
-                    ? 'text-slate-300 hover:bg-white/10 hover:text-white'
-                    : 'text-slate-600 hover:bg-slate-50 hover:text-[#0F172A]'
-                }`}
-              >
-                <ArrowRightOnRectangleIcon className="h-5 w-5" />
-                <span>Connexion</span>
-              </a>
+   
             </div>
           </div>
         )}
