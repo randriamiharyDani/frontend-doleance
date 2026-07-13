@@ -18,9 +18,9 @@ function Modal({ isOpen, onClose, title, subtitle, children, footer, size = 'max
             </button>
           </div>
         )}
-        <div className="p-6 space-y-6">{children}</div>
+        <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">{children}</div>
         {footer && (
-          <div className="sticky bottom-0 bg-gray-50 border-t p-4 flex justify-end gap-3">
+          <div className="sticky bottom-0 bg-gray-50 border-t p-3 sm:p-4 flex flex-col-reverse sm:flex-row justify-end gap-2 sm:gap-3">
             {footer}
           </div>
         )}

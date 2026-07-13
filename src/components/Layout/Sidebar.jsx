@@ -114,24 +114,24 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
 
       {/* Sidebar */}
       <aside className={`
-        fixed top-0 left-0 z-30 h-full bg-gradient-to-b from-gray-900 to-gray-800 shadow-xl transition-transform duration-300 ease-in-out
+        fixed top-0 left-0 z-30 h-full bg-gradient-to-b from-[#0B1A33] to-[#1A365D] shadow-xl transition-transform duration-300 ease-in-out
         w-72
         ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
         {/* Logo */}
-        <div className="flex items-center justify-between p-4 border-b border-gray-700">
+        <div className="flex items-center justify-between p-4 border-b border-white/10">
           <div className="flex items-center space-x-2">
             <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center">
               <span className="text-white text-lg font-bold">M</span>
             </div>
             <div>
               <h1 className="text-white font-bold text-lg">Gestion Doléances</h1>
-              <p className="text-gray-400 text-xs">Mairie de la ville</p>
+              <p className="text-white/50 text-xs">Mairie de la ville</p>
             </div>
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden text-gray-400 hover:text-white"
+            className="lg:hidden text-white/60 hover:text-white"
           >
             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
@@ -147,15 +147,18 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 key={item.name}
                 to={item.href}
                 className={`
-                  flex items-center px-3 py-2.5 rounded-lg transition-colors group
+                  relative flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group
                   ${isActive(item.href) 
-                    ? 'bg-blue-600 text-white' 
-                    : 'text-gray-300 hover:bg-gray-700 hover:text-white'
+                    ? 'bg-[#3182CE]/20 text-white' 
+                    : 'text-white/70 hover:bg-[#3182CE]/20 hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline'
                   }
                 `}
                 onClick={() => setSidebarOpen(false)}
               >
-                <item.icon className={`h-5 w-5 mr-3 ${isActive(item.href) ? 'text-white' : 'text-gray-400 group-hover:text-white'}`} />
+                {isActive(item.href) && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 bg-white rounded-r-full" />
+                )}
+                <item.icon className={`h-5 w-5 mr-3 ${isActive(item.href) ? 'text-white' : 'text-white/40 group-hover:text-white'}`} />
                 <span className="text-sm font-medium">{item.name}</span>
               </Link>
             ))}
@@ -168,10 +171,10 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                 <div key={menu.name}>
                   <button
                     onClick={() => toggleMenu(menu.name)}
-                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors group"
+                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-lg text-white/70 hover:bg-[#3182CE]/20 hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline transition-all duration-200 group"
                   >
                     <div className="flex items-center">
-                      <menu.icon className="h-5 w-5 mr-3 text-gray-400 group-hover:text-white" />
+                      <menu.icon className="h-5 w-5 mr-3 text-white/40 group-hover:text-white" />
                       <span className="text-sm font-medium">{menu.name}</span>
                     </div>
                     {isMenuOpen ? (
@@ -187,14 +190,17 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
                           key={subItem.name}
                           to={subItem.href}
                           className={`
-                            flex items-center px-3 py-2 rounded-lg transition-colors
+                            relative flex items-center px-3 py-2 rounded-lg transition-all duration-200
                             ${isActive(subItem.href) 
-                              ? 'bg-blue-600 text-white' 
-                              : 'text-gray-400 hover:bg-gray-700 hover:text-white'
+                              ? 'bg-[#3182CE]/20 text-white' 
+                              : 'text-white/60 hover:bg-[#3182CE]/20 hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline'
                             }
                           `}
                           onClick={() => setSidebarOpen(false)}
                         >
+                          {isActive(subItem.href) && (
+                            <span className="absolute left-0 top-1/2 -translate-y-1/2 h-4 w-1 bg-white rounded-r-full" />
+                          )}
                           <subItem.icon className="h-4 w-4 mr-3" />
                           <span className="text-xs">{subItem.name}</span>
                         </Link>
@@ -208,10 +214,10 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
         </nav>
 
         {/* Footer sidebar avec infos utilisateur */}
-        <div className="border-t border-gray-700 p-4">
+        <div className="border-t border-white/10 p-4">
           <div className="flex items-center mb-4">
             <div className="flex-shrink-0">
-              <div className="w-10 h-10 bg-gray-700 rounded-full flex items-center justify-center">
+              <div className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center">
                 <span className="text-white text-sm font-medium">
                   {user?.prenom?.charAt(0)}{user?.nom?.charAt(0)}
                 </span>
@@ -221,7 +227,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
               <p className="text-sm font-medium text-white">
                 {user?.prenom} {user?.nom}
               </p>
-              <p className="text-xs text-gray-400 capitalize">{user?.role}</p>
+              <p className="text-xs text-white/50 capitalize">{user?.role}</p>
             </div>
           </div>
 
@@ -230,16 +236,16 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
               <Link
                 key={item.name}
                 to={item.href}
-                className="flex items-center px-3 py-2 rounded-lg text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
+                className="flex items-center px-3 py-2 rounded-lg text-white/70 hover:bg-[#3182CE]/20 hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline transition-all duration-200"
                 onClick={() => setSidebarOpen(false)}
               >
-                <item.icon className="h-5 w-5 mr-3 text-gray-400" />
+                <item.icon className="h-5 w-5 mr-3 text-white/40" />
                 <span className="text-sm">{item.name}</span>
               </Link>
             ))}
             <button
               onClick={logout}
-              className="w-full flex items-center px-3 py-2 rounded-lg text-red-400 hover:bg-red-900/50 hover:text-red-300 transition-colors"
+              className="w-full flex items-center px-3 py-2 rounded-lg text-red-400/70 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200"
             >
               <ArrowRightOnRectangleIcon className="h-5 w-5 mr-3" />
               <span className="text-sm">Déconnexion</span>
@@ -247,8 +253,8 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
           </div>
 
           {/* Version */}
-          <div className="mt-4 pt-3 border-t border-gray-700">
-            <p className="text-xs text-gray-500 text-center">
+          <div className="mt-4 pt-3 border-t border-white/10">
+            <p className="text-xs text-white/40 text-center">
               Version 1.0.0<br />
               © 2024 Mairie
             </p>

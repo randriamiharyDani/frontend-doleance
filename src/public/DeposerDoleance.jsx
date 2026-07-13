@@ -1,55 +1,93 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import PublicNavbar from '../components/public/PublicNavbar';
-import PublicFooter from '../components/public/PublicFooter';
-import { 
-  DocumentTextIcon, 
-  ClipboardDocumentIcon, 
-  ListBulletIcon,
-  EyeIcon,
-  XMarkIcon,
-  UserIcon,
-  PhoneIcon,
-  MapPinIcon,
-  TagIcon,
-  PaperAirplaneIcon,
-  BuildingOfficeIcon,
-  ShieldCheckIcon,
-  WrenchScrewdriverIcon,
-  AcademicCapIcon,
-  BoltIcon,
-  HomeModernIcon,
-  TrashIcon,
-  HeartIcon,
-  TruckIcon,
-  GlobeAltIcon,
-  BriefcaseIcon,
-  UsersIcon,
-  TrophyIcon,
-  MusicalNoteIcon,
-  ShoppingBagIcon,
-  ComputerDesktopIcon,
-  QuestionMarkCircleIcon,
-  BanknotesIcon,
-  MegaphoneIcon,
-  CubeIcon,
-  SparklesIcon,
-  FireIcon,
-  PhotoIcon,
-  VideoCameraIcon,
-  DocumentDuplicateIcon,
-  EnvelopeIcon,
-  DevicePhoneMobileIcon,
-  CheckBadgeIcon,
-  ExclamationTriangleIcon
-} from '@heroicons/react/24/outline';
-
-// ⚠️ IMPORTANT: Utiliser le vrai EmailService
+import { MapContainer, TileLayer, Marker, useMapEvents, useMap, Popup } from 'react-leaflet';
+import L from 'leaflet';
+import icon from 'leaflet/dist/images/marker-icon.png';
+import iconShadow from 'leaflet/dist/images/marker-shadow.png';
 import EmailService from '../services/emailService';
+
+const DefaultIcon = L.icon({
+  iconUrl: icon,
+  shadowUrl: iconShadow,
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
+L.Marker.prototype.options.icon = DefaultIcon;
+
+const categories = [
+  { id: 1, label: 'Trou dans la route', icon: 'M13.5 4L5.25 12.25l4.5 4.5L18 8.5', desc: 'Nids-de-poule, fissures, affaissements', gradient: 'from-red-500 to-orange-500' },
+  { id: 2, label: 'Déchets', icon: 'M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16', desc: 'Dépôts sauvages, encombrants', gradient: 'from-emerald-500 to-teal-600' },
+  { id: 3, label: 'Éclairage public', icon: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z', desc: 'Lampadaires défectueux, pannes', gradient: 'from-yellow-400 to-orange-500' },
+  { id: 4, label: 'Espaces verts', icon: 'M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5', desc: 'Parcs, jardins, arbres', gradient: 'from-green-500 to-green-700' },
+  { id: 5, label: 'Circulation', icon: 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4', desc: 'Embouteillages, feux défectueux', gradient: 'from-purple-500 to-indigo-600' },
+  { id: 6, label: 'Autres', icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z', desc: 'Tout autre problème', gradient: 'from-gray-400 to-gray-600' },
+];
+
+function DraggableMarker({ position, setPosition, onPositionChange }) {
+  const markerRef = useRef(null);
+
+  useMapEvents({
+    click(e) {
+      setPosition(e.latlng);
+      if (onPositionChange) onPositionChange(e.latlng);
+    },
+  });
+
+  return (
+    <Marker
+      draggable={true}
+      position={position}
+      ref={markerRef}
+      eventHandlers={{
+        dragend() {
+          const marker = markerRef.current;
+          if (marker) {
+            setPosition(marker.getLatLng());
+            if (onPositionChange) onPositionChange(marker.getLatLng());
+          }
+        },
+      }}
+    />
+  );
+}
+
+function MapView({ center }) {
+  const map = useMap();
+  useEffect(() => {
+    map.setView(center, map.getZoom());
+  }, [center, map]);
+  return null;
+}
+
+function CategoryCard({ cat, selected, onClick }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onClick(cat.id)}
+      className={`flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-5 rounded-xl sm:rounded-2xl text-center cursor-pointer transition-all duration-200 border-2 ${
+        selected
+          ? 'border-[#0077FF] shadow-lg scale-[1.02]'
+          : 'border-transparent hover:border-gray-200 hover:shadow-md'
+      } bg-white shadow-sm hover:-translate-y-1`}
+    >
+      <div className={`w-10 h-10 sm:w-13 sm:h-13 rounded-xl sm:rounded-2xl flex items-center justify-center text-white text-base sm:text-xl bg-gradient-to-br ${cat.gradient} shadow-md`}>
+        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <path strokeLinecap="round" strokeLinejoin="round" d={cat.icon} />
+        </svg>
+      </div>
+      <div>
+        <p className="text-xs sm:text-sm font-bold text-gray-800">{cat.label}</p>
+        <p className="text-[10px] sm:text-[11px] text-gray-400 mt-0.5 hidden sm:block">{cat.desc}</p>
+      </div>
+    </button>
+  );
+}
 
 function DeposerDoleance() {
   const { t } = useTranslation();
@@ -57,199 +95,101 @@ function DeposerDoleance() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
-  const [categories, setCategories] = useState([]);
+  const [categoriesData, setCategoriesData] = useState([]);
   const [quartiers, setQuartiers] = useState([]);
   const [arrondissements, setArrondissements] = useState([]);
   const [showReferenceModal, setShowReferenceModal] = useState(false);
   const [savedReference, setSavedReference] = useState('');
   const [files, setFiles] = useState([]);
   const [uploadProgress, setUploadProgress] = useState(0);
-  const [phoneError, setPhoneError] = useState('');
+
   const [sendingReference, setSendingReference] = useState(false);
   const [referenceSent, setReferenceSent] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [smsSent, setSmsSent] = useState(false);
   const [sendError, setSendError] = useState(null);
-  const [selectedCategoryDescription, setSelectedCategoryDescription] = useState('');
-  
+  const [selectedCategory, setSelectedCategory] = useState(1);
+  const [mapPosition, setMapPosition] = useState([-18.8792, 47.5079]);
+  const [searchAddress, setSearchAddress] = useState('');
+  const [locationName, setLocationName] = useState('');
+  const [assignedDoleances, setAssignedDoleances] = useState([]);
+  const [isLocating, setIsLocating] = useState(false);
+  const [isSearching, setIsSearching] = useState(false);
+  const [suggestions, setSuggestions] = useState([]);
+  const [showSuggestions, setShowSuggestions] = useState(false);
+  const fileInputRef = useRef(null);
+  const searchTimeoutRef = useRef(null);
+  const [dragOver, setDragOver] = useState(false);
+
+  const arrondissementCoords = {
+    'Antananarivo Renivohitra': [-18.9100, 47.5250],
+    'Antananarivo Atsimondrano': [-18.9400, 47.4700],
+    'Antananarivo Avaradrano': [-18.8600, 47.5600],
+    'Antananarivo Atsimo': [-18.9700, 47.5100],
+    'Antananarivo Andrefana': [-18.9000, 47.4400],
+    'Antananarivo Avaratra': [-18.8400, 47.4900],
+  };
+
   const [formData, setFormData] = useState({
     nom_citoyen: '',
     prenom_citoyen: '',
-    contact: '',
+    email: '',
+    telephone: '',
     adresse_citoyen: '',
     lot: '',
     fokontany: '',
     arrondissement: '',
     titre: '',
     description: '',
-    id_categorie: '',
+    id_categorie: '1',
     id_quartier: '',
     lieu_exact: '',
     suggestions: ''
   });
-  
-  // Catégories complètes avec icônes disponibles - avec noms traduits via t()
-  const getCategoriesList = () => {
-    return [
-      { id: 1, nom: t('categories.administration'), description: t('categories.administrationDesc'), icon: <BuildingOfficeIcon className="h-5 w-5" />, color: 'text-sky-500' },
-      { id: 2, nom: t('categories.security'), description: t('categories.securityDesc'), icon: <ShieldCheckIcon className="h-5 w-5" />, color: 'text-red-500' },
-      { id: 3, nom: t('categories.infrastructure'), description: t('categories.infrastructureDesc'), icon: <WrenchScrewdriverIcon className="h-5 w-5" />, color: 'text-gray-500' },
-      { id: 4, nom: t('categories.education'), description: t('categories.educationDesc'), icon: <AcademicCapIcon className="h-5 w-5" />, color: 'text-indigo-400' },
-      { id: 5, nom: t('categories.electricity'), description: t('categories.electricityDesc'), icon: <BoltIcon className="h-5 w-5" />, color: 'text-yellow-500' },
-      { id: 6, nom: t('categories.roads'), description: t('categories.roadsDesc'), icon: <HomeModernIcon className="h-5 w-5" />, color: 'text-teal-500' },
-      { id: 7, nom: t('categories.water'), description: t('categories.waterDesc'), icon: <CubeIcon className="h-5 w-5" />, color: 'text-cyan-500' },
-      { id: 8, nom: t('categories.waste'), description: t('categories.wasteDesc'), icon: <TrashIcon className="h-5 w-5" />, color: 'text-green-500' },
-      { id: 9, nom: t('categories.health'), description: t('categories.healthDesc'), icon: <HeartIcon className="h-5 w-5" />, color: 'text-pink-500' },
-      { id: 10, nom: t('categories.transport'), description: t('categories.transportDesc'), icon: <TruckIcon className="h-5 w-5" />, color: 'text-purple-500' },
-      { id: 11, nom: t('categories.housing'), description: t('categories.housingDesc'), icon: <HomeModernIcon className="h-5 w-5" />, color: 'text-orange-500' },
-      { id: 12, nom: t('categories.environment'), description: t('categories.environmentDesc'), icon: <SparklesIcon className="h-5 w-5" />, color: 'text-emerald-500' },
-      { id: 13, nom: t('categories.employment'), description: t('categories.employmentDesc'), icon: <BriefcaseIcon className="h-5 w-5" />, color: 'text-slate-500' },
-      { id: 14, nom: t('categories.social'), description: t('categories.socialDesc'), icon: <UsersIcon className="h-5 w-5" />, color: 'text-rose-500' },
-      { id: 15, nom: t('categories.youth'), description: t('categories.youthDesc'), icon: <TrophyIcon className="h-5 w-5" />, color: 'text-amber-500' },
-      { id: 16, nom: t('categories.culture'), description: t('categories.cultureDesc'), icon: <MusicalNoteIcon className="h-5 w-5" />, color: 'text-fuchsia-500' },
-      { id: 17, nom: t('categories.agriculture'), description: t('categories.agricultureDesc'), icon: <GlobeAltIcon className="h-5 w-5" />, color: 'text-lime-500' },
-      { id: 18, nom: t('categories.commerce'), description: t('categories.commerceDesc'), icon: <BanknotesIcon className="h-5 w-5" />, color: 'text-amber-600' },
-      { id: 19, nom: t('categories.communication'), description: t('categories.communicationDesc'), icon: <MegaphoneIcon className="h-5 w-5" />, color: 'text-sky-500' },
-      { id: 20, nom: t('categories.emergency'), description: t('categories.emergencyDesc'), icon: <FireIcon className="h-5 w-5" />, color: 'text-red-500' },
-      { id: 21, nom: t('categories.other'), description: t('categories.otherDesc'), icon: <QuestionMarkCircleIcon className="h-5 w-5" />, color: 'text-gray-400' }
-    ];
-  };
 
-  const allCategories = getCategoriesList();
-  
   useEffect(() => {
     fetchData();
   }, [t]);
-  
-  // Mettre à jour la description quand la catégorie change
-  useEffect(() => {
-    if (formData.id_categorie) {
-      const selected = categories.find(cat => 
-        (cat.id_categorie === formData.id_categorie) || 
-        (cat.id === formData.id_categorie)
-      );
-      const categoryName = selected?.nom_categorie || selected?.nom;
-      const description = selected?.description || getCategoriesList().find(c => c.nom === categoryName)?.description || '';
-      setSelectedCategoryDescription(description);
-    } else {
-      setSelectedCategoryDescription('');
-    }
-  }, [formData.id_categorie, categories]);
-  
+
   const fetchData = async () => {
     try {
-      const [categoriesRes, quartiersRes] = await Promise.all([
+      const [categoriesRes, quartiersRes, assignedRes] = await Promise.all([
         api.get('/doleances/categories'),
-        api.get('/doleances/quartiers')
+        api.get('/doleances/quartiers'),
+        api.get('/doleances/public/assigned-locations').catch(() => ({ data: { data: [] } }))
       ]);
-      
-      let existingCategories = categoriesRes.data?.data || categoriesRes.data || [];
-      
-      if (existingCategories.length === 0) {
-        setCategories(getCategoriesList());
-      } else {
-        const existingNames = existingCategories.map(c => c.nom_categorie?.toLowerCase());
-        const allNewCategories = [...existingCategories];
-        
-        for (const cat of getCategoriesList()) {
-          const exists = existingNames.includes(cat.nom.toLowerCase());
-          if (!exists) {
-            allNewCategories.push({
-              id_categorie: `temp_${cat.id}`,
-              nom_categorie: cat.nom,
-              description: cat.description,
-              icon: cat.icon,
-              color: cat.color
-            });
-          }
-        }
-        setCategories(allNewCategories);
-      }
-      
+      setCategoriesData(categoriesRes.data?.data || categoriesRes.data || []);
       setQuartiers(quartiersRes.data?.data || quartiersRes.data || []);
-      
-      // Arrondissements traduits
+      setAssignedDoleances(assignedRes.data?.data || assignedRes.data || []);
       setArrondissements([
-        t('districts.district1'),
-        t('districts.district2'),
-        t('districts.district3'),
-        t('districts.district4'),
-        t('districts.district5'),
-        t('districts.district6')
+        t('districts.district1'), t('districts.district2'), t('districts.district3'),
+        t('districts.district4'), t('districts.district5'), t('districts.district6')
       ]);
-      
     } catch (error) {
-      console.error('Erreur chargement données:', error);
+      console.error('Erreur chargement donnees:', error);
       toast.error(t('errors.generic'));
-      setCategories(getCategoriesList());
     }
   };
-  
+
+  const handleSelectCategory = (id) => {
+    setSelectedCategory(id);
+    setFormData(prev => ({ ...prev, id_categorie: String(id) }));
+  };
+
   const handleChange = (e) => {
     const { name, value } = e.target;
-    
-    // Validation pour le numéro de téléphone
-    if (name === 'contact') {
-      const cleanedValue = value.replace(/\s/g, '');
-      
-      // Vérifier si c'est un numéro de téléphone (commence par un chiffre)
-      const isPhone = /^[0-9+\s\-()]/.test(value);
-      
-      if (isPhone) {
-        // Supprimer tout sauf les chiffres, +, -, espaces, parenthèses
-        const filtered = value.replace(/[^0-9+\s\-()]/g, '');
-        
-        // Compter les chiffres
-        const digitsOnly = filtered.replace(/[^0-9]/g, '');
-        
-        if (digitsOnly.length > 10) {
-          setPhoneError(t('messages.phoneMaxDigits'));
-          // Ne pas mettre à jour la valeur si elle dépasse 10 chiffres
-          return;
-        } else {
-          setPhoneError('');
-        }
-        
-        setFormData({
-          ...formData,
-          [name]: filtered
-        });
-      } else {
-        // Si c'est un email, pas de limite de chiffres
-        setPhoneError('');
-        setFormData({
-          ...formData,
-          [name]: value
-        });
-      }
-    } else {
-      setFormData({
-        ...formData,
-        [name]: value
-      });
+    setFormData(prev => ({ ...prev, [name]: value }));
+    if (name === 'arrondissement' && arrondissementCoords[value]) {
+      setMapPosition(arrondissementCoords[value]);
     }
   };
-  
-  const getContactType = (contact) => {
-    if (!contact) return null;
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    // Vérifier si c'est un numéro de téléphone (8-10 chiffres, avec ou sans espaces, +, -)
-    const phoneRegex = /^[+\s\-()0-9]{8,15}$/;
-    
-    // Nettoyer le contact pour compter les chiffres
-    const digitsOnly = contact.replace(/[^0-9]/g, '');
-    
-    if (emailRegex.test(contact)) return 'email';
-    if (phoneRegex.test(contact) && digitsOnly.length >= 8 && digitsOnly.length <= 10) return 'phone';
-    return 'unknown';
-  };
-  
+
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     const maxSize = 50 * 1024 * 1024;
     const validFiles = [];
     const errors = [];
-    
+
     selectedFiles.forEach(file => {
       if (file.size > maxSize) {
         errors.push(`${file.name} ${t('messages.fileTooBig')}`);
@@ -259,63 +199,66 @@ function DeposerDoleance() {
         validFiles.push(file);
       }
     });
-    
-    if (errors.length > 0) {
-      errors.forEach(err => toast.error(err));
-    }
-    
+
+    if (errors.length > 0) errors.forEach(err => toast.error(err));
     if (validFiles.length + files.length > 5) {
       toast.error(t('messages.maxFilesReached'));
       return;
     }
-    
     setFiles(prev => [...prev, ...validFiles]);
     e.target.value = '';
   };
-  
-  const removeFile = (index) => {
-    setFiles(prev => prev.filter((_, i) => i !== index));
-  };
-  
-  const getFileIcon = (file) => {
-    if (file.type.startsWith('image/')) {
-      return <PhotoIcon className="h-8 w-8 text-sky-500" />;
-    } else if (file.type.startsWith('video/')) {
-      return <VideoCameraIcon className="h-8 w-8 text-purple-500" />;
+
+  const removeFile = (index) => setFiles(prev => prev.filter((_, i) => i !== index));
+
+  const handleDragOver = useCallback((e) => {
+    e.preventDefault();
+    setDragOver(true);
+  }, []);
+
+  const handleDragLeave = useCallback((e) => {
+    e.preventDefault();
+    setDragOver(false);
+  }, []);
+
+  const handleDrop = useCallback((e) => {
+    e.preventDefault();
+    setDragOver(false);
+    const droppedFiles = Array.from(e.dataTransfer.files);
+    const maxSize = 50 * 1024 * 1024;
+    const validFiles = [];
+    const errors = [];
+
+    droppedFiles.forEach(file => {
+      if (file.size > maxSize) {
+        errors.push(`${file.name} ${t('messages.fileTooBig')}`);
+      } else {
+        validFiles.push(file);
+      }
+    });
+
+    if (errors.length > 0) errors.forEach(err => toast.error(err));
+    if (validFiles.length + files.length > 5) {
+      toast.error(t('messages.maxFilesReached'));
+      return;
     }
-    return <DocumentDuplicateIcon className="h-8 w-8 text-gray-500" />;
-  };
-  
-  const formatFileSize = (bytes) => {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
-  };
-  
+    setFiles(prev => [...prev, ...validFiles]);
+  }, [files, t]);
+
   const uploadFiles = async (doleanceId) => {
     if (files.length === 0) return;
-    
     setUploading(true);
     setUploadProgress(0);
-    
     const formDataFiles = new FormData();
-    files.forEach(file => {
-      formDataFiles.append('files', file);
-    });
+    files.forEach(file => formDataFiles.append('files', file));
     formDataFiles.append('doleance_id', doleanceId);
-    
     try {
-      const response = await api.post('/doleances/upload', formDataFiles, {
+      await api.post('/doleances/upload', formDataFiles, {
         headers: { 'Content-Type': 'multipart/form-data' },
         onUploadProgress: (progressEvent) => {
-          const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
-          setUploadProgress(percent);
+          setUploadProgress(Math.round((progressEvent.loaded * 100) / progressEvent.total));
         }
       });
-      
-      if (response.data.success) {
-        toast.success(`${files.length} fichier(s) uploadé(s) avec succès`);
-      }
     } catch (error) {
       console.error('Erreur upload:', error);
       toast.error(t('errors.generic'));
@@ -324,278 +267,95 @@ function DeposerDoleance() {
       setUploadProgress(0);
     }
   };
-  
-  const copyToClipboard = async (text) => {
-    try {
-      await navigator.clipboard.writeText(text);
-      toast.success(t('messages.referenceCopied'));
-    } catch (err) {
-      console.error('Erreur de copie:', err);
-      toast.error(t('errors.generic'));
-    }
-  };
-  
-  // Fonction pour envoyer automatiquement la référence par email
+
   const sendReferenceAuto = async (reference, contact, contactType, nom, prenom, titre) => {
-    if (!contact || !reference) {
-      console.log('❌ Contact ou référence manquant');
-      return;
-    }
-    
-    console.log('📤 Envoi de la référence:', { reference, contact, contactType });
-    
+    if (!contact || !reference) return;
     setSendingReference(true);
     setSendError(null);
     setEmailSent(false);
     setSmsSent(false);
-    
     try {
-      // Utiliser le vrai EmailService
-      const result = await EmailService.sendReference(
-        contact,
-        reference,
-        nom || 'Citoyen',
-        prenom || '',
-        titre || 'Doléance'
-      );
-      
-      console.log('📬 Résultat de l\'envoi:', result);
-      
+      const result = await EmailService.sendReference(contact, reference, nom || 'Citoyen', prenom || '', titre || 'Doleance');
       if (result.success) {
-        if (contactType === 'email') {
-          setEmailSent(true);
-        } else {
-          setSmsSent(true);
-        }
+        if (contactType === 'email') setEmailSent(true);
+        else setSmsSent(true);
         setReferenceSent(true);
-        
-        toast.success(
-          (toastId) => (
-            <div className="flex flex-col gap-1">
-              <div className="font-bold flex items-center gap-2">
-                <CheckBadgeIcon className="h-5 w-5 text-green-500" />
-                ✅ {t('messages.referenceSent')}
-              </div>
-              <div className="text-sm flex items-center gap-1">
-                {contactType === 'email' ? <EnvelopeIcon className="h-4 w-4" /> : <DevicePhoneMobileIcon className="h-4 w-4" />}
-                {contact}
-              </div>
-              <div className="text-xs text-gray-500 mt-1">
-                📋 Référence: {reference}
-              </div>
-            </div>
-          ),
-          { duration: 8000 }
-        );
+        toast.success(`Reference ${reference} envoyee a ${contact}`, { duration: 6000 });
       } else {
         setSendError(result.message);
-        toast.error(
-          (toastId) => (
-            <div className="flex flex-col gap-1">
-              <div className="font-bold flex items-center gap-2 text-red-500">
-                <ExclamationTriangleIcon className="h-5 w-5" />
-                ❌ {t('messages.emailSendError')}
-              </div>
-              <div className="text-xs text-gray-500">
-                {result.message}
-              </div>
-              <div className="text-xs text-gray-400 mt-1">
-                📋 Référence: {reference}
-              </div>
-            </div>
-          ),
-          { duration: 8000 }
-        );
+        toast.error(result.message || t('errors.generic'), { duration: 6000 });
       }
     } catch (error) {
-      console.error('❌ Erreur envoi référence:', error);
+      console.error('Erreur envoi reference:', error);
       setSendError(error.message || 'Erreur inconnue');
-      toast.error(
-        (toastId) => (
-          <div className="flex flex-col gap-1">
-            <div className="font-bold flex items-center gap-2 text-red-500">
-              <ExclamationTriangleIcon className="h-5 w-5" />
-              ❌ {t('messages.emailSendError')}
-            </div>
-            <div className="text-xs text-gray-500">
-              {error.message || t('errors.generic')}
-            </div>
-            <div className="text-xs text-gray-400 mt-1">
-              📋 Référence: {reference}
-            </div>
-          </div>
-        ),
-        { duration: 8000 }
-      );
+      toast.error(t('errors.generic'), { duration: 6000 });
     } finally {
       setSendingReference(false);
     }
   };
-  
-  const getCategoryIcon = (categoryName) => {
-    const cat = getCategoriesList().find(c => c.nom === categoryName);
-    return cat?.icon || <QuestionMarkCircleIcon className="h-5 w-5" />;
-  };
-  
-  const getCategoryColor = (categoryName) => {
-    const cat = getCategoriesList().find(c => c.nom === categoryName);
-    return cat?.color || 'text-gray-400';
-  };
-  
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validation du contact
-    const contactType = getContactType(formData.contact);
-    if (!formData.contact) {
-      toast.error(t('form.emailOrPhone'));
-      return;
+    if (!formData.email && !formData.telephone) { toast.error('Email ou telephone requis'); return; }
+    if (!formData.nom_citoyen || !formData.prenom_citoyen || !formData.titre || !formData.description) {
+      toast.error(t('messages.pleaseFillRequired')); return;
     }
-    
-    if (contactType === 'unknown') {
-      toast.error(t('messages.invalidFormat'));
-      return;
+    if (formData.telephone) {
+      const digitsOnly = formData.telephone.replace(/[^0-9]/g, '');
+      if (digitsOnly.length < 8 || digitsOnly.length > 10) { toast.error(t('messages.phoneLengthError')); return; }
     }
-    
-    if (contactType === 'phone') {
-      const digitsOnly = formData.contact.replace(/[^0-9]/g, '');
-      if (digitsOnly.length < 8 || digitsOnly.length > 10) {
-        toast.error(t('messages.phoneLengthError'));
-        return;
-      }
-    }
-    
-    if (!formData.nom_citoyen || !formData.prenom_citoyen || !formData.titre || !formData.description || !formData.id_categorie) {
-      toast.error(t('messages.pleaseFillRequired'));
-      return;
-    }
-    
+
     setLoading(true);
-    
     try {
-      const adresseComplete = `${formData.adresse_citoyen || ''}${formData.lot ? `, Lot ${formData.lot}` : ''}${formData.fokontany ? `, Fokontany ${formData.fokontany}` : ''}${formData.arrondissement ? `, ${formData.arrondissement}` : ''}`;
-      
       const dataToSend = {
         ...formData,
-        adresse_citoyen: adresseComplete,
-        telephone_citoyen: contactType === 'phone' ? formData.contact.replace(/\s/g, '') : null,
-        email_citoyen: contactType === 'email' ? formData.contact : null,
-        description: `${formData.description}\n\nLieu exact: ${formData.lieu_exact || 'Non précisé'}\nSuggestions: ${formData.suggestions || 'Aucune suggestion'}`
+        contact: formData.email || formData.telephone,
+        adresse_citoyen: formData.adresse_citoyen || null,
+        telephone_citoyen: formData.telephone || null,
+        email_citoyen: formData.email || null,
+        latitude: mapPosition[0],
+        longitude: mapPosition[1],
+        lieu_exact: locationName || formData.lieu_exact || `${mapPosition[0].toFixed(4)}, ${mapPosition[1].toFixed(4)}`,
+        description: `${formData.description}\n\nLocalisation: ${locationName || `${mapPosition[0].toFixed(4)}, ${mapPosition[1].toFixed(4)}`}\nSuggestions: ${formData.suggestions || 'Aucune suggestion'}`
       };
-      
-      if (typeof dataToSend.id_categorie === 'string' && dataToSend.id_categorie.includes('temp_')) {
-        const selectedCategory = categories.find(cat => cat.id_categorie === dataToSend.id_categorie);
-        dataToSend.categorie_nom = selectedCategory?.nom_categorie;
-        delete dataToSend.id_categorie;
-      }
-      
+
       const response = await api.post('/doleances', dataToSend);
       const reference = response.data.data?.reference || response.data.reference;
       const doleanceId = response.data.data?.id_doleance || response.data.id_doleance;
-      
-      if (files.length > 0 && doleanceId) {
-        await uploadFiles(doleanceId);
-      }
-      
+
+      if (files.length > 0 && doleanceId) await uploadFiles(doleanceId);
+
       setSavedReference(reference);
-      
-      // Envoyer automatiquement la référence par email ou SMS
-      if (formData.contact && reference) {
-        await sendReferenceAuto(
-          reference, 
-          formData.contact, 
-          contactType,
-          formData.nom_citoyen,
-          formData.prenom_citoyen,
-          formData.titre
-        );
+      const contactInfo = formData.email || formData.telephone;
+      const contactType = formData.email ? 'email' : 'phone';
+      if (contactInfo && reference) {
+        await sendReferenceAuto(reference, contactInfo, contactType, formData.nom_citoyen, formData.prenom_citoyen, formData.titre);
       }
-      
-      // Notification de succès avec la référence
+
       toast.success(
-        (toastId) => (
-          <div className="flex flex-col gap-2">
-            <div className="font-bold flex items-center gap-2">
-              <CheckBadgeIcon className="h-5 w-5 text-green-500" />
-              ✅ {t('messages.submissionSuccess')}
-            </div>
-            <div className="text-sm">
-              {t('messages.yourReference')} : <span className="font-mono font-bold text-sky-600">{reference}</span>
-            </div>
-            {emailSent && (
-              <div className="text-xs text-green-600 flex items-center gap-1">
-                <EnvelopeIcon className="h-4 w-4" />
-                {t('messages.referenceSentTo')} {formData.contact}
-              </div>
-            )}
-            {smsSent && (
-              <div className="text-xs text-green-600 flex items-center gap-1">
-                <DevicePhoneMobileIcon className="h-4 w-4" />
-                {t('messages.referenceSentTo')} {formData.contact}
-              </div>
-            )}
-            {sendError && !emailSent && !smsSent && (
-              <div className="text-xs text-orange-600 flex items-center gap-1">
-                <ExclamationTriangleIcon className="h-4 w-4" />
-                {t('messages.referenceNotSent')}
-              </div>
-            )}
-            <div className="flex gap-2 mt-1">
-              <button
-                onClick={() => {
-                  copyToClipboard(reference);
-                  toast.dismiss(toastId);
-                }}
-                className="text-xs bg-sky-500 text-white px-2 py-1 rounded hover:bg-sky-600"
-              >
-                {t('form.copy')}
-              </button>
-              <button
-                onClick={() => {
-                  navigate(`/suivi-doleance/${reference}`);
-                  toast.dismiss(toastId);
-                }}
-                className="text-xs bg-sky-500 text-white px-2 py-1 rounded hover:bg-sky-600"
-              >
-                {t('form.track')}
-              </button>
-            </div>
-          </div>
-        ),
-        { duration: 10000 }
+        <div className="flex flex-col gap-1">
+          <p className="font-bold">Signalement envoye avec succes !</p>
+          <p className="text-sm">Reference: <span className="font-mono font-bold text-blue-600">{reference}</span></p>
+        </div>,
+        { duration: 8000 }
       );
-      
+
       setShowReferenceModal(true);
-      
       setTimeout(() => {
         if (showReferenceModal) {
           setShowReferenceModal(false);
           navigate(`/suivi-doleance/${reference}`);
         }
       }, 5000);
-      
+
       setFormData({
-        nom_citoyen: '',
-        prenom_citoyen: '',
-        contact: '',
-        adresse_citoyen: '',
-        lot: '',
-        fokontany: '',
-        arrondissement: '',
-        titre: '',
-        description: '',
-        id_categorie: '',
-        id_quartier: '',
-        lieu_exact: '',
-        suggestions: ''
+        nom_citoyen: '', prenom_citoyen: '', email: '', telephone: '', adresse_citoyen: '', lot: '',
+        fokontany: '', arrondissement: '', titre: '', description: '', id_categorie: '1',
+        id_quartier: '', lieu_exact: '', suggestions: ''
       });
       setFiles([]);
-      setReferenceSent(false);
-      setEmailSent(false);
-      setSmsSent(false);
-      setSendError(null);
-      setSelectedCategoryDescription('');
-      
+      setReferenceSent(false); setEmailSent(false); setSmsSent(false); setSendError(null);
+
     } catch (error) {
       console.error('Erreur:', error);
       toast.error(error.response?.data?.message || t('errors.generic'));
@@ -603,698 +363,607 @@ function DeposerDoleance() {
       setLoading(false);
     }
   };
-  
-  const handleCloseModal = () => {
-    setShowReferenceModal(false);
-    if (savedReference) {
-      navigate(`/suivi-doleance/${savedReference}`);
-    }
-  };
-  
-  const handleCopyAndContinue = () => {
-    copyToClipboard(savedReference);
-  };
-  
-  // Fonction pour renvoyer la référence manuellement
-  const sendReferenceManually = async () => {
-    if (!formData.contact || !savedReference) {
-      toast.error(t('messages.noContactOrReference'));
-      return;
-    }
-    
-    const contactType = getContactType(formData.contact);
-    await sendReferenceAuto(
-      savedReference,
-      formData.contact,
-      contactType,
-      formData.nom_citoyen || 'Citoyen',
-      formData.prenom_citoyen || '',
-      formData.titre || 'Doléance'
-    );
+
+
+  const formatFileSize = (bytes) => {
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   };
 
-  const contactType = getContactType(formData.contact);
+  // Remplit le formulaire à partir d'un résultat Nominatim
+const fillFromNominatim = (data) => {
+  const addr = data.address || {};
+  const quartierNom = addr.suburb || addr.neighbourhood || addr.quarter || '';
+
+  // Essaie de matcher le quartier trouvé avec la liste existante
+  const matchedQuartier = quartiers.find(
+    q => q.nom_quartier.toLowerCase() === quartierNom.toLowerCase()
+  );
+
+  setFormData(prev => ({
+    ...prev,
+    arrondissement: addr.city_district || addr.district || prev.arrondissement,
+    id_quartier: matchedQuartier ? matchedQuartier.id_quartier : prev.id_quartier,
+    fokontany: prev.fokontany, // pas dispo via OSM, reste manuel
+    lieu_exact: data.display_name || prev.lieu_exact,
+  }));
+
+  setSearchAddress(data.display_name || '');
+};
+
+// Bouton "Me localiser"
+const handleLocateMe = () => {
+  if (!navigator.geolocation) return;
+  setIsLocating(true);
+
+  navigator.geolocation.getCurrentPosition(
+    async (pos) => {
+      const { latitude, longitude } = pos.coords;
+      setMapPosition([latitude, longitude]);
+
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`
+        );
+        const data = await res.json();
+        fillFromNominatim(data);
+      } catch (err) {
+        console.error('Erreur reverse geocoding:', err);
+      } finally {
+        setIsLocating(false);
+      }
+    },
+    (err) => {
+      console.error('Erreur géolocalisation:', err);
+      setIsLocating(false);
+    }
+  );
+};
+
+// Recherche avec suggestions (debounce 400ms)
+const handleSearchInputChange = (e) => {
+  const value = e.target.value;
+  setSearchAddress(value);
+
+  if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+
+  if (value.trim().length < 3) {
+    setSuggestions([]);
+    setShowSuggestions(false);
+    return;
+  }
+
+  searchTimeoutRef.current = setTimeout(async () => {
+    setIsSearching(true);
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=5&q=${encodeURIComponent(value)}`
+      );
+      const data = await res.json();
+      setSuggestions(data);
+      setShowSuggestions(true);
+    } catch (err) {
+      console.error('Erreur recherche:', err);
+    } finally {
+      setIsSearching(false);
+    }
+  }, 400);
+};
+
+// Clic sur une suggestion
+const handleSelectSuggestion = (item) => {
+  setMapPosition([parseFloat(item.lat), parseFloat(item.lon)]);
+  fillFromNominatim(item);
+  setSuggestions([]);
+  setShowSuggestions(false);
+};
+
+// Recherche via Entrée / bouton "Chercher" (prend la 1ère suggestion dispo)
+const handleSearchAddress = async (e) => {
+  e.preventDefault();
+  if (suggestions.length > 0) {
+    handleSelectSuggestion(suggestions[0]);
+  }
+};
+
+  const charsCount = formData.description.length;
 
   return (
-    <div className={`min-h-screen flex flex-col transition-colors duration-300 ${
-      darkMode ? 'dark bg-gray-900' : 'bg-gradient-to-b from-blue-50 to-blue-100'
-    }`}>
-      <PublicNavbar />
-      
-      <main className="flex-1 max-w-6xl mx-auto px-4 py-8 w-full">
-        <div className="text-center mb-8 pt-4">
-          {/* <div className={`inline-block p-4 rounded-2xl shadow-xl mb-4 transform hover:scale-105 transition-transform duration-300 ${
-            darkMode ? 'bg-gray-800' : 'bg-gradient-to-br from-sky-500 to-blue-600'
-          }`}>
-            <DocumentTextIcon className={`h-14 w-14 ${darkMode ? 'text-sky-400' : 'text-white'}`} />
-          </div> */}
-          <h1 className={`text-4xl font-bold mb-2 ${darkMode ? 'text-sky-400' : 'text-sky-800'}`}>
-            {t('nav.submit')}
-          </h1>
-          <p className={darkMode ? 'text-gray-300' : 'text-sky-600'}>
-            {t('hero.subtitle')}
-          </p>
-        </div>
-        
-        <form onSubmit={handleSubmit} className={`rounded-2xl shadow-2xl p-6 md:p-8 border-2 transition-colors duration-300 ${
-          darkMode 
-            ? 'bg-gray-800 border-gray-700' 
-            : 'bg-white border-sky-200'
-        }`}>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            
-            {/* Section Vos informations */}
-            <div className="md:col-span-2">
-              <h2 className={`text-xl font-bold mb-4 pb-2 border-b-2 flex items-center gap-2 ${
-                darkMode 
-                  ? 'text-gray-200 border-gray-700' 
-                  : 'text-sky-700 border-sky-200'
-              }`}>
-                <UserIcon className={`h-6 w-6 ${darkMode ? 'text-sky-400' : 'text-sky-500'}`} />
-                {t('form.yourInfo')}
-              </h2>
-            </div>
-            
-            <div>
-              <label className={`block text-sm font-bold mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                {t('form.lastName')} <span className="text-red-500">*</span>
-              </label>
-              <input 
-                type="text" 
-                name="nom_citoyen" 
-                value={formData.nom_citoyen} 
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all ${
-                  darkMode 
-                    ? 'bg-gray-700 border-gray-600 text-white focus:border-sky-400 focus:ring-sky-400/20' 
-                    : 'bg-white border-gray-200 focus:border-sky-400 focus:ring-sky-200'
-                }`}
-                placeholder={t('form.lastName')}
-                required 
-              />
-            </div>
-            
-            <div>
-              <label className={`block text-sm font-bold mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                {t('form.firstName')} <span className="text-red-500">*</span>
-              </label>
-              <input 
-                type="text" 
-                name="prenom_citoyen" 
-                value={formData.prenom_citoyen} 
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all ${
-                  darkMode 
-                    ? 'bg-gray-700 border-gray-600 text-white focus:border-sky-400 focus:ring-sky-400/20' 
-                    : 'bg-white border-gray-200 focus:border-sky-400 focus:ring-sky-200'
-                }`}
-                placeholder={t('form.firstName')}
-                required 
-              />
-            </div>
-            
-            <div className="md:col-span-2">
-              <label className={`block text-sm font-bold mb-2 flex items-center gap-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                <DevicePhoneMobileIcon className={`h-4 w-4 ${darkMode ? 'text-sky-400' : 'text-sky-500'}`} />
-                {t('form.emailOrPhone')} <span className="text-red-500">*</span>
-              </label>
-              <input 
-                type="text" 
-                name="contact" 
-                value={formData.contact} 
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all ${
-                  phoneError 
-                    ? 'border-red-500 focus:border-red-500 focus:ring-red-200' 
-                    : darkMode 
-                      ? 'bg-gray-700 border-gray-600 text-white focus:border-sky-400 focus:ring-sky-400/20' 
-                      : 'bg-white border-gray-200 focus:border-sky-400 focus:ring-sky-200'
-                }`}
-                placeholder="exemple@email.com ou 0341234567"
-                required
-              />
-              {phoneError && (
-                <p className="text-xs text-red-500 mt-1 flex items-center gap-1">
-                  <span>⚠️</span> {phoneError}
-                </p>
-              )}
-              {formData.contact && !phoneError && (
-                <p className={`text-xs mt-1 flex items-center gap-1 ${darkMode ? 'text-gray-400' : ''}`}>
-                  {contactType === 'email' ? (
-                    <span className="text-green-600">📧 {t('messages.emailFormat')}</span>
-                  ) : contactType === 'phone' ? (
-                    <span className="text-sky-600">📱 {t('messages.phoneFormat')} ({formData.contact.replace(/[^0-9]/g, '').length} chiffres)</span>
-                  ) : (
-                    <span className="text-orange-600">⚠️ {t('messages.invalidFormat')}</span>
-                  )}
-                </p>
-              )}
-              <p className={`text-xs mt-1 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                {t('form.emailOrPhone')}
-              </p>
-            </div>
-            
-            <div className="md:col-span-2">
-              <label className={`block text-sm font-bold mb-2 flex items-center gap-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                <MapPinIcon className={`h-4 w-4 ${darkMode ? 'text-sky-400' : 'text-sky-500'}`} />
-                {t('form.address')} <span className="text-red-500">*</span>
-              </label>
-              <input 
-                type="text" 
-                name="adresse_citoyen" 
-                value={formData.adresse_citoyen} 
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all ${
-                  darkMode 
-                    ? 'bg-gray-700 border-gray-600 text-white focus:border-sky-400 focus:ring-sky-400/20' 
-                    : 'bg-white border-gray-200 focus:border-sky-400 focus:ring-sky-200'
-                }`}
-                placeholder="Lot II M... Ankatso"
-                required
-              />
-            </div>
-            
-            <div>
-              <label className={`block text-sm font-bold mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                {t('form.lot')}
-              </label>
-              <input 
-                type="text" 
-                name="lot" 
-                value={formData.lot} 
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all ${
-                  darkMode 
-                    ? 'bg-gray-700 border-gray-600 text-white focus:border-sky-400 focus:ring-sky-400/20' 
-                    : 'bg-white border-gray-200 focus:border-sky-400 focus:ring-sky-200'
-                }`}
-                placeholder="Lot II M 123"
-              />
-            </div>
-            
-            <div>
-              <label className={`block text-sm font-bold mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                {t('form.fokontany')} <span className="text-red-500">*</span>
-              </label>
-              <input 
-                type="text" 
-                name="fokontany" 
-                value={formData.fokontany} 
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all ${
-                  darkMode 
-                    ? 'bg-gray-700 border-gray-600 text-white focus:border-sky-400 focus:ring-sky-400/20' 
-                    : 'bg-white border-gray-200 focus:border-sky-400 focus:ring-sky-200'
-                }`}
-                placeholder="Ex: Ambohidahy, Analakely, Isotry..."
-                required
-              />
-            </div>
-            
-            <div>
-              <label className={`block text-sm font-bold mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                {t('form.district')}
-              </label>
-              <select
-                name="arrondissement"
-                value={formData.arrondissement}
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all ${
-                  darkMode 
-                    ? 'bg-gray-700 border-gray-600 text-white focus:border-sky-400 focus:ring-sky-400/20' 
-                    : 'bg-white border-gray-200 focus:border-sky-400 focus:ring-sky-200'
-                }`}
-              >
-                <option value="">{t('form.selectDistrict')}</option>
-                {arrondissements.map(arr => (
-                  <option key={arr} value={arr}>{arr}</option>
-                ))}
-              </select>
-            </div>
-            
-            {/* Section Détails de la doléance */}
-            <div className="md:col-span-2">
-              <h2 className={`text-xl font-bold mb-4 pb-2 border-b-2 flex items-center gap-2 ${
-                darkMode 
-                  ? 'text-gray-200 border-gray-700' 
-                  : 'text-sky-700 border-sky-200'
-              }`}>
-                <DocumentTextIcon className={`h-6 w-6 ${darkMode ? 'text-sky-400' : 'text-sky-500'}`} />
-                {t('form.details')}
-              </h2>
-            </div>
-            
-            <div className="md:col-span-2">
-              <label className={`block text-sm font-bold mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                {t('form.title')} <span className="text-red-500">*</span>
-              </label>
-              <input 
-                type="text" 
-                name="titre" 
-                value={formData.titre} 
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all ${
-                  darkMode 
-                    ? 'bg-gray-700 border-gray-600 text-white focus:border-sky-400 focus:ring-sky-400/20' 
-                    : 'bg-white border-gray-200 focus:border-sky-400 focus:ring-sky-200'
-                }`}
-                placeholder={t('form.titlePlaceholder')}
-                required 
-              />
-            </div>
-            
-            <div className="md:col-span-2">
-              <label className={`block text-sm font-bold mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                {t('form.description')} <span className="text-red-500">*</span>
-              </label>
-              <textarea 
-                name="description" 
-                value={formData.description} 
-                onChange={handleChange}
-                rows="6" 
-                className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all ${
-                  darkMode 
-                    ? 'bg-gray-700 border-gray-600 text-white focus:border-sky-400 focus:ring-sky-400/20' 
-                    : 'bg-white border-gray-200 focus:border-sky-400 focus:ring-sky-200'
-                }`}
-                placeholder={t('form.descriptionPlaceholder')}
-                required 
-              />
-            </div>
-            
-            <div className="md:col-span-2">
-              <label className={`block text-sm font-bold mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                {t('form.exactLocation')}
-              </label>
-              <input 
-                type="text" 
-                name="lieu_exact" 
-                value={formData.lieu_exact} 
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all ${
-                  darkMode 
-                    ? 'bg-gray-700 border-gray-600 text-white focus:border-sky-400 focus:ring-sky-400/20' 
-                    : 'bg-white border-gray-200 focus:border-sky-400 focus:ring-sky-200'
-                }`}
-                placeholder={t('form.exactLocationPlaceholder')}
-              />
-            </div>
-            
-            <div className="md:col-span-2">
-              <label className={`block text-sm font-bold mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                {t('form.suggestions')}
-              </label>
-              <textarea 
-                name="suggestions" 
-                value={formData.suggestions} 
-                onChange={handleChange}
-                rows="3" 
-                className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all ${
-                  darkMode 
-                    ? 'bg-gray-700 border-gray-600 text-white focus:border-sky-400 focus:ring-sky-400/20' 
-                    : 'bg-white border-gray-200 focus:border-sky-400 focus:ring-sky-200'
-                }`}
-                placeholder={t('form.suggestionsPlaceholder')}
-              />
-            </div>
-            
-            <div>
-              <label className={`block text-sm font-bold mb-2 flex items-center gap-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                <TagIcon className={`h-4 w-4 ${darkMode ? 'text-sky-400' : 'text-sky-500'}`} />
-                {t('form.category')} <span className="text-red-500">*</span>
-              </label>
-              <select 
-                name="id_categorie" 
-                value={formData.id_categorie} 
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all ${
-                  darkMode 
-                    ? 'bg-gray-700 border-gray-600 text-white focus:border-sky-400 focus:ring-sky-400/20' 
-                    : 'bg-white border-gray-200 focus:border-sky-400 focus:ring-sky-200'
-                }`}
-                required
-              >
-                <option value="">{t('form.selectCategory')}</option>
-                {categories.map(cat => {
-                  const categoryName = cat.nom_categorie || cat.nom;
-                  return (
-                    <option key={cat.id_categorie || cat.id} value={cat.id_categorie || cat.id}>
-                      {categoryName}
-                    </option>
-                  );
-                })}
-              </select>
-              {formData.id_categorie && (
-                <div className={`mt-2 p-3 rounded-lg border transition-colors duration-300 ${
-                  darkMode 
-                    ? 'bg-gray-700 border-gray-600' 
-                    : 'bg-blue-50 border-blue-200'
-                }`}>
-                  <div className="flex items-start gap-2">
-                    {(() => {
-                      const selected = categories.find(cat => 
-                        (cat.id_categorie === formData.id_categorie) || 
-                        (cat.id === formData.id_categorie)
-                      );
-                      const categoryName = selected?.nom_categorie || selected?.nom;
-                      const icon = getCategoryIcon(categoryName);
-                      const color = getCategoryColor(categoryName);
-                      return (
-                        <div className={`${color} flex-shrink-0 mt-0.5`}>
-                          {icon}
-                        </div>
-                      );
-                    })()}
-                    <div>
-                      <p className={`text-sm font-medium ${darkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-                        {(() => {
-                          const selected = categories.find(cat => 
-                            (cat.id_categorie === formData.id_categorie) || 
-                            (cat.id === formData.id_categorie)
-                          );
-                          return selected?.nom_categorie || selected?.nom || '';
-                        })()}
-                      </p>
-                      {selectedCategoryDescription && (
-                        <p className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                          {selectedCategoryDescription}
-                        </p>
-                      )}
-                    </div>
-                  </div>
-                </div>
-              )}
-            </div>
-            
-            <div>
-              <label className={`block text-sm font-bold mb-2 ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                {t('form.neighborhood')}
-              </label>
-              <select 
-                name="id_quartier" 
-                value={formData.id_quartier} 
-                onChange={handleChange}
-                className={`w-full px-4 py-2 border-2 rounded-lg focus:outline-none focus:ring-2 transition-all ${
-                  darkMode 
-                    ? 'bg-gray-700 border-gray-600 text-white focus:border-sky-400 focus:ring-sky-400/20' 
-                    : 'bg-white border-gray-200 focus:border-sky-400 focus:ring-sky-200'
-                }`}
-              >
-                <option value="">{t('form.selectNeighborhood')}</option>
-                {quartiers.map(quartier => (
-                  <option key={quartier.id_quartier} value={quartier.id_quartier}>
-                    {quartier.nom_quartier}
-                  </option>
-                ))}
-              </select>
-            </div>
+    <div>
+      {/* Header */}
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 flex items-center gap-2 sm:gap-3">
+          <span className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#0077FF] to-[#0066DD] flex items-center justify-center text-white shadow-md flex-shrink-0">
+            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </span>
+          Signaler un probleme
+        </h1>
+        <p className="text-sm sm:text-base text-gray-500 mt-1 ml-[44px] sm:ml-[52px]">Aidez a ameliorer votre quartier — signalez rapidement tout incident ou dysfonctionnement.</p>
+      </div>
 
-            {/* Section Pièces jointes */}
-            
-            <div className="md:col-span-2">
-              <h2 className={`text-xl font-bold mb-4 pb-2 border-b-2 flex items-center gap-2 ${
-                darkMode 
-                  ? 'text-gray-200 border-gray-700' 
-                  : 'text-sky-700 border-sky-200'
-              }`}>
-                <PhotoIcon className={`h-6 w-6 ${darkMode ? 'text-sky-400' : 'text-sky-500'}`} />
-                {t('form.attachments')}
-              </h2>
-              <p className={`text-sm mb-3 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                {t('form.attachmentsDescription')}
-              </p>
-              
-              <div className={`border-2 border-dashed rounded-lg p-4 text-center transition-colors ${
-                darkMode 
-                  ? 'border-gray-600 hover:bg-gray-700/50' 
-                  : 'border-sky-300 hover:bg-sky-50'
-              }`}>
-                <input
-                  type="file"
-                  accept="image/*,video/*"
-                  multiple
-                  onChange={handleFileChange}
-                  className="hidden"
-                  id="file-upload"
-                />
-                <label
-                  htmlFor="file-upload"
-                  className={`cursor-pointer inline-flex items-center gap-2 px-4 py-2 rounded-lg transition-colors ${
-                    darkMode 
-                      ? 'bg-sky-600 hover:bg-sky-700 text-white' 
-                      : 'bg-sky-500 text-white hover:bg-sky-600'
-                  }`}
-                >
-                  <PhotoIcon className="h-5 w-5" />
-                  {t('form.chooseFiles')}
-                </label>
-                <p className={`text-xs mt-2 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                  {t('form.fileFormats')}
-                </p>
+      <form onSubmit={handleSubmit}>
+        {/* Categories */}
+        <div className="mb-7">
+          <div className="flex items-center gap-2 mb-4">
+            <svg className="w-5 h-5 text-[#0077FF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+            </svg>
+            <h2 className="text-lg font-bold text-gray-800">Categorie du probleme</h2>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
+            {categories.map(cat => (
+              <CategoryCard key={cat.id} cat={cat} selected={selectedCategory === cat.id} onClick={handleSelectCategory} />
+            ))}
+          </div>
+        </div>
+
+        {/* Titre */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <svg className="w-5 h-5 text-[#0077FF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5" />
+            </svg>
+            <h2 className="text-lg font-bold text-gray-800">Titre du probleme</h2>
+          </div>
+          <input
+            type="text"
+            name="titre"
+            value={formData.titre}
+            onChange={handleChange}
+            placeholder="Ex: Nid-de-poule dangereux Rue de la Liberte"
+            className="w-full border-2 border-gray-100 rounded-xl px-5 py-4 text-sm font-medium text-gray-800 outline-none transition-all focus:border-[#0077FF] focus:shadow-md placeholder:text-gray-400"
+            required
+          />
+        </div>
+
+        {/* Map */}
+{/* Localisation & Adresse (fusionné) */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
+        <div className="flex items-center gap-2 mb-4">
+          <svg className="w-5 h-5 text-[#0077FF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          <h2 className="text-lg font-bold text-gray-800">Localisation & Adresse</h2>
+        </div>
+
+        {/* Barre de recherche + Me localiser */}
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-3 relative">
+          <form onSubmit={handleSearchAddress} className="flex-1 flex items-center gap-3 bg-gray-50 rounded-xl px-4 border-2 border-transparent focus-within:border-[#0077FF] focus-within:bg-white transition-all relative order-2 sm:order-1">
+            <svg className="w-4 h-4 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            <input
+              type="text"
+              value={searchAddress}
+              onChange={handleSearchInputChange}
+              onFocus={() => searchAddress.length >= 3 && setShowSuggestions(true)}
+              onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
+              placeholder="Rechercher une adresse, un quartier..."
+              className="flex-1 bg-transparent py-2.5 sm:py-3 text-sm font-medium text-gray-800 outline-none placeholder:text-gray-400 min-w-0"
+            />
+            {isSearching && (
+              <div className="w-4 h-4 border-2 border-gray-300 border-t-[#0077FF] rounded-full animate-spin flex-shrink-0" />
+            )}
+            <button type="submit" className="text-xs font-semibold text-[#0077FF] hover:text-[#0066DD] py-1 px-2 rounded-lg hover:bg-blue-50 transition-all flex-shrink-0">
+              Chercher
+            </button>
+
+            {/* Dropdown de suggestions */}
+            {showSuggestions && suggestions.length > 0 && (
+              <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-lg border border-gray-100 z-[1001] max-h-60 overflow-y-auto">
+                {suggestions.map((item, i) => (
+                  <button
+                    key={i}
+                    type="button"
+                    onClick={() => handleSelectSuggestion(item)}
+                    className="w-full text-left px-4 py-2.5 text-sm text-gray-700 hover:bg-blue-50 transition-colors border-b border-gray-50 last:border-0"
+                  >
+                    {item.display_name}
+                  </button>
+                ))}
               </div>
-              
-              {files.length > 0 && (
-                <div className="mt-4 space-y-2">
-                  <p className={`text-sm font-medium ${darkMode ? 'text-gray-300' : 'text-gray-700'}`}>
-                    {files.length} fichier(s) sélectionné(s)
-                  </p>
-                  <div className="max-h-60 overflow-y-auto space-y-2">
-                    {files.map((file, index) => (
-                      <div className={`flex items-center justify-between p-3 rounded-lg border transition-colors ${
-                        darkMode 
-                          ? 'bg-gray-700 border-gray-600' 
-                          : 'bg-gray-50 border-gray-200'
-                      }`}>
-                        <div className="flex items-center gap-3">
-                          {getFileIcon(file)}
-                          <div>
-                            <p className={`text-sm font-medium truncate max-w-xs ${darkMode ? 'text-gray-200' : 'text-gray-700'}`}>
-                              {file.name}
-                            </p>
-                            <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-400'}`}>
-                              {formatFileSize(file.size)}
-                            </p>
-                          </div>
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => removeFile(index)}
-                          className="text-red-500 hover:text-red-700"
-                        >
-                          <TrashIcon className="h-5 w-5" />
-                        </button>
-                      </div>
-                    ))}
+            )}
+          </form>
+
+          <button
+            type="button"
+            onClick={handleLocateMe}
+            disabled={isLocating}
+            className="flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl text-sm font-bold text-white transition-all hover:scale-[1.02] shadow-md disabled:opacity-60 order-1 sm:order-2"
+            style={{ background: 'linear-gradient(135deg, #0077FF, #0066DD)' }}
+          >
+            {isLocating ? (
+              <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+            ) : (
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            )}
+            <span className="hidden sm:inline">Me localiser</span>
+            <span className="sm:hidden">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </span>
+          </button>
+        </div>
+
+        {/* Carte */}
+        <div className="h-64 sm:h-96 rounded-xl overflow-hidden border border-gray-200 relative mb-4">
+          <MapContainer center={mapPosition} zoom={14} className="h-full w-full" scrollWheelZoom={true}>
+            <TileLayer
+              attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            />
+            <MapView center={mapPosition} />
+            <DraggableMarker
+              position={mapPosition}
+              setPosition={setMapPosition}
+              onPositionChange={(latlng) => {
+                setFormData(prev => ({
+                  ...prev,
+                  lieu_exact: prev.lieu_exact || `${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}`
+                }));
+              }}
+            />
+            {assignedDoleances.filter(d => d.latitude && d.longitude).map(d => (
+              <Marker
+                key={d.id_doleance}
+                position={[parseFloat(d.latitude), parseFloat(d.longitude)]}
+                icon={L.divIcon({
+                  className: 'assigned-marker',
+                  html: '<div style="background:#FF4444;width:12px;height:12px;border-radius:50%;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.4)"></div>',
+                  iconSize: [12, 12],
+                  iconAnchor: [6, 6]
+                })}
+              >
+                <Popup>
+                  <div className="text-xs">
+                    <p className="font-bold">{d.titre}</p>
+                    <p className="text-gray-500">{d.nom_categorie}</p>
+                    <p className="text-gray-400">Ref: {d.reference}</p>
+                    <p className="text-green-600 font-semibold mt-1">Assignee</p>
                   </div>
+                </Popup>
+              </Marker>
+            ))}
+          </MapContainer>
+          <div className="absolute bottom-3 left-3 z-[1000] bg-black/60 backdrop-blur-sm text-white text-xs font-medium px-3 py-1.5 rounded-full">
+            <svg className="w-3 h-3 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+            Cliquez ou déplacez le marqueur pour ajuster
+          </div>
+        </div>
+
+        {/* Champs adresse - modifiables manuellement même après auto-remplissage */}
+        <div className="grid grid-cols-2 gap-4">
+          {/* <div>
+            <label className="block text-xs font-bold text-gray-600 mb-1.5">Arrondissement</label>
+            <select
+              name="arrondissement"
+              value={formData.arrondissement}
+              onChange={handleChange}
+              className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm outline-none transition-all focus:border-[#0077FF] bg-gray-50 focus:bg-white"
+            >
+              <option value="">Sélectionner un arrondissement</option>
+              {arrondissements.map((arr, i) => (
+                <option key={i} value={arr}>{arr}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-600 mb-1.5">Quartier</label>
+            <select
+              name="id_quartier"
+              value={formData.id_quartier}
+              onChange={handleChange}
+              className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm outline-none transition-all focus:border-[#0077FF] bg-gray-50 focus:bg-white"
+            >
+              <option value="">Sélectionner un quartier</option>
+              {quartiers.map(q => (
+                <option key={q.id_quartier} value={q.id_quartier}>{q.nom_quartier}</option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-600 mb-1.5">Fokontany</label>
+            <input
+              type="text"
+              name="fokontany"
+              value={formData.fokontany}
+              onChange={handleChange}
+              placeholder="Nom du fokontany"
+              className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm outline-none transition-all focus:border-[#0077FF] bg-gray-50 focus:bg-white"
+            />
+          </div>
+          <div>
+            <label className="block text-xs font-bold text-gray-600 mb-1.5">Lot / Numéro</label>
+            <input
+              type="text"
+              name="lot"
+              value={formData.lot}
+              onChange={handleChange}
+              placeholder="Ex: LOT IVD 123"
+              className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm outline-none transition-all focus:border-[#0077FF] bg-gray-50 focus:bg-white"
+            />
+          </div> */}
+          <div className="col-span-2">
+            <label className="block text-xs font-bold text-gray-600 mb-1.5">
+              Lieu exact <span className="text-gray-400">(optionnel)</span>
+            </label>
+            <input
+              type="text"
+              name="lieu_exact"
+              value={formData.lieu_exact}
+              onChange={handleChange}
+              placeholder="Entrez ou modifiez le lieu exact"
+              className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm outline-none transition-all focus:border-[#0077FF] bg-gray-50 focus:bg-white"
+            />
+            {assignedDoleances.length > 0 && (
+              <p className="text-xs text-gray-400 mt-1">
+                Les points rouges sur la carte montrent les signalements déjà assignés
+              </p>
+            )}
+          </div>
+        </div>
+      </div>
+
+        {/* Suggestions */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
+          <div className="flex items-center gap-2 mb-1">
+            <svg className="w-5 h-5 text-[#0077FF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+            </svg>
+            <h2 className="text-lg font-bold text-gray-800">Suggestions</h2>
+          </div>
+          <p className="text-sm text-gray-400 mb-4 ml-7">Proposez des idees pour resoudre le probleme (optionnel)</p>
+          <textarea
+            name="suggestions"
+            value={formData.suggestions}
+            onChange={handleChange}
+            rows={3}
+            placeholder="Ex: Il faudrait installer un ralentisseur et refaire le revetement de la route..."
+            className="w-full border-2 border-gray-100 rounded-xl px-5 py-4 text-sm text-gray-800 outline-none resize-y transition-all focus:border-[#0077FF] focus:shadow-md placeholder:text-gray-400"
+          />
+        </div>
+
+        {/* Photos */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
+          <div className="flex items-center gap-2 mb-1">
+            <svg className="w-5 h-5 text-[#0077FF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <h2 className="text-lg font-bold text-gray-800">Ajouter des photos</h2>
+          </div>
+          <p className="text-sm text-gray-400 mb-4 ml-7">Montrez le probleme avec des photos prises sur place (optionnel mais recommande)</p>
+
+          <div className="flex gap-2 sm:gap-3 mb-4 overflow-x-auto pb-2 -mx-5 px-5">
+            {[
+              { label: 'Nid-de-poule', icon: 'M13.5 4L5.25 12.25l4.5 4.5L18 8.5', color: 'from-red-400 to-orange-400' },
+              { label: 'Dechet sauvage', icon: 'M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16', color: 'from-emerald-400 to-teal-500' },
+              { label: 'Lampadaire', icon: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z', color: 'from-yellow-400 to-orange-400' },
+              { label: 'Espace vert', icon: 'M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5', color: 'from-green-400 to-green-600' },
+            ].map((ex, i) => (
+              <div key={i} className="w-24 sm:w-28 h-16 sm:h-20 rounded-xl bg-gray-50 border border-gray-200 flex items-center justify-center flex-shrink-0 relative overflow-hidden">
+                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br ${ex.color} flex items-center justify-center`}>
+                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d={ex.icon} />
+                  </svg>
                 </div>
-              )}
-              
-              {uploading && (
-                <div className="mt-4">
-                  <div className="flex items-center gap-2">
-                    <div className="flex-1 bg-gray-200 rounded-full h-2">
-                      <div 
-                        className="bg-sky-500 h-2 rounded-full transition-all duration-300"
-                        style={{ width: `${uploadProgress}%` }}
-                      ></div>
+                <span className="absolute bottom-0 left-0 right-0 bg-black/50 text-white text-[9px] font-medium text-center py-0.5 sm:py-1">{ex.label}</span>
+              </div>
+            ))}
+          </div>
+
+          <div
+            className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
+              dragOver ? 'border-[#0077FF] bg-blue-50' : 'border-gray-300 hover:border-[#0077FF] hover:bg-gray-50'
+            }`}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onDrop={handleDrop}
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <svg className="w-10 h-10 mx-auto text-[#0077FF] mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+            </svg>
+            <p className="text-sm font-bold text-gray-700 mb-1">Glissez-deposez vos photos ici</p>
+            <p className="text-xs text-gray-400">ou cliquez pour parcourir (JPG, PNG, max 10 Mo)</p>
+            <input ref={fileInputRef} type="file" accept="image/*,video/*" multiple onChange={handleFileChange} className="hidden" />
+          </div>
+
+          {files.length > 0 && (
+            <div className="mt-4 space-y-2">
+              <p className="text-sm font-semibold text-gray-700">{files.length} fichier(s) selectionne(s)</p>
+              {files.map((file, i) => (
+                <div key={i} className="flex items-center justify-between bg-gray-50 rounded-xl px-4 py-3 border border-gray-100">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <svg className="w-6 h-6 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z" />
+                    </svg>
+                    <div className="min-w-0">
+                      <p className="text-sm font-medium text-gray-700 truncate">{file.name}</p>
+                      <p className="text-xs text-gray-400">{formatFileSize(file.size)}</p>
                     </div>
-                    <span className="text-xs text-gray-500">{uploadProgress}%</span>
                   </div>
-                  <p className={`text-xs mt-1 ${darkMode ? 'text-gray-400' : 'text-gray-400'}`}>
-                    {t('messages.uploading')}
-                  </p>
+                  <button type="button" onClick={() => removeFile(i)} className="text-red-400 hover:text-red-600 p-1">
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
                 </div>
-              )}
+              ))}
+            </div>
+          )}
+
+          {uploading && (
+            <div className="mt-4">
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-full bg-gradient-to-r from-[#0077FF] to-[#00C853] rounded-full transition-all duration-300" style={{ width: `${uploadProgress}%` }}></div>
+                </div>
+                <span className="text-xs font-medium text-gray-500">{uploadProgress}%</span>
+              </div>
+              <p className="text-xs text-gray-400 mt-1">Upload en cours...</p>
+            </div>
+          )}
+        </div>
+
+        {/* Description */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
+          <div className="flex items-center gap-2 mb-1">
+            <svg className="w-5 h-5 text-[#0077FF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+            </svg>
+            <h2 className="text-lg font-bold text-gray-800">Description du probleme</h2>
+          </div>
+          <p className="text-sm text-gray-400 mb-4 ml-7">Decrivez le probleme en quelques phrases pour aider les equipes a intervenir</p>
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            rows={5}
+            placeholder="Decrivez le probleme que vous avez constate... Ex: Un nid-de-poule d'environ 30 cm de profondeur sur la chaussee, situe au croisement de la Rue de Rivoli et du Boulevard de Sebastopol. Le trou est dangereux pour les cyclistes et les motards, surtout de nuit."
+            className="w-full border-2 border-gray-100 rounded-xl px-5 py-4 text-sm text-gray-800 outline-none resize-y transition-all focus:border-[#0077FF] focus:shadow-md placeholder:text-gray-400"
+            required
+          />
+          <div className="flex justify-between items-center mt-2">
+            <p className="text-xs text-gray-400">
+              <svg className="w-3.5 h-3.5 inline mr-1 text-[#00C853]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+              Donnees confidentielles
+            </p>
+            <span className="text-xs text-gray-400">{charsCount} / 1000 caracteres</span>
+          </div>
+        </div>
+
+        {/* User Info Section */}
+        <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 mb-6">
+          <div className="flex items-center gap-2 mb-4">
+            <svg className="w-5 h-5 text-[#0077FF]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+            </svg>
+            <h2 className="text-lg font-bold text-gray-800">Vos informations</h2>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
+            <div>
+              <label className="block text-xs font-bold text-gray-600 mb-1.5">Nom <span className="text-red-400">*</span></label>
+              <input type="text" name="nom_citoyen" value={formData.nom_citoyen} onChange={handleChange}
+                className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm outline-none transition-all focus:border-[#0077FF] bg-gray-50 focus:bg-white"
+                placeholder="Votre nom" required />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-600 mb-1.5">Prenom <span className="text-red-400">*</span></label>
+              <input type="text" name="prenom_citoyen" value={formData.prenom_citoyen} onChange={handleChange}
+                className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm outline-none transition-all focus:border-[#0077FF] bg-gray-50 focus:bg-white"
+                placeholder="Votre prenom" required />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-600 mb-1.5">Email <span className="text-red-400">*</span></label>
+              <input type="email" name="email" value={formData.email} onChange={handleChange}
+                className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm outline-none transition-all focus:border-[#0077FF] bg-gray-50 focus:bg-white"
+                placeholder="exemple@email.com" />
+            </div>
+            <div>
+              <label className="block text-xs font-bold text-gray-600 mb-1.5">Telephone <span className="text-red-400">*</span></label>
+              <input type="tel" name="telephone" value={formData.telephone} onChange={handleChange}
+                className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm outline-none transition-all focus:border-[#0077FF] bg-gray-50 focus:bg-white"
+                placeholder="034 12 345 67" />
+            </div>
+            <p className="col-span-1 sm:col-span-2 text-xs text-gray-400 -mt-1 sm:-mt-2">Email ou telephone requis pour recevoir le suivi</p>
+            <div className="col-span-1 sm:col-span-2">
+              <label className="block text-xs font-bold text-gray-600 mb-1.5">Votre adresse</label>
+              <input type="text" name="adresse_citoyen" value={formData.adresse_citoyen} onChange={handleChange}
+                className="w-full border-2 border-gray-100 rounded-xl px-4 py-3 text-sm outline-none transition-all focus:border-[#0077FF] bg-gray-50 focus:bg-white"
+                placeholder="Votre adresse personnelle (optionnelle)" />
             </div>
           </div>
-          
-          <div className="mt-8 flex justify-center">
-            <button 
-              type="submit" 
-              disabled={loading || uploading || !!phoneError}
-              className={`group relative px-8 py-4 font-bold rounded-xl disabled:opacity-50 transition-all duration-300 shadow-lg hover:shadow-xl transform hover:scale-105 flex items-center gap-3 text-lg ${
-                darkMode 
-                  ? 'bg-gradient-to-r from-sky-600 to-blue-700 hover:from-sky-500 hover:to-blue-600 text-white' 
-                  : 'bg-gradient-to-r from-sky-500 to-blue-600 text-white hover:from-sky-400 hover:to-blue-500'
-              }`}
-            >
-              {loading || uploading ? (
-                <span className="flex items-center gap-2">
-                  <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                    <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                  </svg>
-                  {uploading ? t('messages.uploading') : t('messages.sending')}
-                </span>
-              ) : (
-                <>
-                  <PaperAirplaneIcon className="h-6 w-6 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" />
-                  {t('form.submit')}
-                </>
-              )}
-            </button>
-          </div>
-        </form>
-      </main>
-      
-      {/* Modal de confirmation avec statut d'envoi */}
+        </div>
+
+        {/* Submit */}
+        <div className="flex flex-col sm:flex-row items-center justify-end gap-3 sm:gap-4 pt-2 pb-8">
+          <p className="text-xs sm:text-sm text-gray-400 order-2 sm:order-1">
+            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 inline mr-1 text-[#00C853]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            </svg>
+            <span className="hidden sm:inline">Vos informations restent confidentielles</span>
+            <span className="sm:hidden">Informations confidentielles</span>
+          </p>
+          <button
+            type="submit"
+            disabled={loading || uploading}
+            className="flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-10 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-base sm:text-lg font-bold text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 shadow-lg w-full sm:w-auto order-1 sm:order-2"
+            style={{
+              background: 'linear-gradient(135deg, #00C853, #00A844)',
+              boxShadow: '0 8px 30px rgba(0,200,83,0.35)',
+            }}
+            onMouseEnter={(e) => { if (!loading && !uploading) { e.currentTarget.style.transform = 'scale(1.04) translateY(-2px)'; e.currentTarget.style.boxShadow = '0 12px 40px rgba(0,200,83,0.45)'; } }}
+            onMouseLeave={(e) => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 8px 30px rgba(0,200,83,0.35)'; }}
+          >
+            {loading || uploading ? (
+              <span className="flex items-center gap-2">
+                <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                </svg>
+                {uploading ? 'Upload...' : 'Envoi...'}
+              </span>
+            ) : (
+              <>
+                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                </svg>
+                Envoyer mon signalement
+              </>
+            )}
+          </button>
+        </div>
+      </form>
+
+      {/* Reference Modal */}
       {showReferenceModal && (
-        <div className={`fixed inset-0 backdrop-blur-sm z-50 flex items-center justify-center p-4 ${
-          darkMode ? 'bg-black/80' : 'bg-sky-900/80'
-        }`}>
-          <div className={`relative rounded-2xl shadow-xl max-w-md w-full mx-auto p-6 border-2 transition-colors duration-300 ${
-            darkMode 
-              ? 'bg-gray-800 border-gray-700' 
-              : 'bg-white border-sky-300'
-          }`}>
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-auto p-6 border border-gray-100">
             <div className="text-center">
-              <div className={`mx-auto flex items-center justify-center h-16 w-16 rounded-full mb-4 ${
-                darkMode 
-                  ? 'bg-gradient-to-br from-sky-600 to-blue-700' 
-                  : 'bg-gradient-to-br from-sky-500 to-blue-600'
-              }`}>
-                <DocumentTextIcon className="h-8 w-8 text-white" />
+              <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-[#00C853] to-[#009432] flex items-center justify-center mb-4 shadow-lg">
+                <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
               </div>
-              <h3 className={`text-xl font-bold mb-2 ${darkMode ? 'text-white' : 'text-gray-900'}`}>
-                {t('messages.submissionSuccess')}
-              </h3>
-              
-              {/* Statut d'envoi de la référence */}
-              <div className="mb-3">
-                {emailSent && (
-                  <div className={`p-2 rounded-lg border transition-colors ${
-                    darkMode 
-                      ? 'bg-green-900/30 border-green-700' 
-                      : 'bg-green-50 border-green-200'
-                  }`}>
-                    <p className={`text-sm flex items-center justify-center gap-2 ${
-                      darkMode ? 'text-green-400' : 'text-green-700'
-                    }`}>
-                      <CheckBadgeIcon className="h-5 w-5" />
-                      <EnvelopeIcon className="h-4 w-4" />
-                      {t('messages.referenceSentTo')} {formData.contact}
-                    </p>
-                  </div>
-                )}
-                {smsSent && (
-                  <div className={`p-2 rounded-lg border transition-colors ${
-                    darkMode 
-                      ? 'bg-green-900/30 border-green-700' 
-                      : 'bg-green-50 border-green-200'
-                  }`}>
-                    <p className={`text-sm flex items-center justify-center gap-2 ${
-                      darkMode ? 'text-green-400' : 'text-green-700'
-                    }`}>
-                      <CheckBadgeIcon className="h-5 w-5" />
-                      <DevicePhoneMobileIcon className="h-4 w-4" />
-                      {t('messages.referenceSentTo')} {formData.contact}
-                    </p>
-                  </div>
-                )}
-                {sendError && !emailSent && !smsSent && (
-                  <div className={`p-2 rounded-lg border transition-colors ${
-                    darkMode 
-                      ? 'bg-orange-900/30 border-orange-700' 
-                      : 'bg-orange-50 border-orange-200'
-                  }`}>
-                    <p className={`text-sm flex items-center justify-center gap-2 ${
-                      darkMode ? 'text-orange-400' : 'text-orange-700'
-                    }`}>
-                      <ExclamationTriangleIcon className="h-5 w-5" />
-                      {t('messages.referenceNotSent')}
-                    </p>
-                    <p className={`text-xs mt-1 ${darkMode ? 'text-orange-400' : 'text-orange-600'}`}>
-                      {sendError}
-                    </p>
-                  </div>
-                )}
-                {!emailSent && !smsSent && !sendError && sendingReference && (
-                  <div className={`p-2 rounded-lg border transition-colors ${
-                    darkMode 
-                      ? 'bg-blue-900/30 border-blue-700' 
-                      : 'bg-blue-50 border-blue-200'
-                  }`}>
-                    <p className={`text-sm flex items-center justify-center gap-2 ${
-                      darkMode ? 'text-blue-400' : 'text-blue-700'
-                    }`}>
-                      <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      {t('messages.sending')}...
-                    </p>
-                  </div>
-                )}
+              <h3 className="text-xl font-bold text-gray-900 mb-2">Signalement envoye !</h3>
+              <p className="text-sm text-gray-500 mb-4">Votre reference de suivi :</p>
+              <div className="bg-gray-50 rounded-xl px-4 py-3 mb-4 border border-gray-100">
+                <span className="text-2xl font-mono font-bold text-[#0077FF] tracking-wider">{savedReference}</span>
               </div>
-              
-              <p className={`text-sm mb-4 ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                {t('messages.keepReference')}
-              </p>
-              <div className={`rounded-lg p-3 mb-4 border-2 transition-colors ${
-                darkMode 
-                  ? 'bg-gray-700 border-gray-600' 
-                  : 'bg-sky-50 border-sky-200'
-              }`}>
-                <code className={`text-lg font-mono font-bold break-all ${
-                  darkMode ? 'text-sky-400' : 'text-sky-600'
-                }`}>
-                  {savedReference}
-                </code>
-              </div>
-              <p className={`text-xs mb-4 ${darkMode ? 'text-gray-500' : 'text-gray-400'}`}>
-                {t('messages.keepReference')}
-              </p>
-              
-              {/* Bouton Renvoyer si l'envoi a échoué */}
-              {!emailSent && !smsSent && sendError && formData.contact && (
+              <div className="flex gap-3 justify-center">
                 <button
-                  onClick={sendReferenceManually}
-                  disabled={sendingReference}
-                  className="inline-flex justify-center items-center gap-2 px-4 py-2 bg-sky-500 text-white font-semibold rounded-lg hover:bg-sky-600 transition-colors w-full mb-2 disabled:opacity-50"
+                  onClick={() => { navigator.clipboard.writeText(savedReference); toast.success('Reference copiee !'); }}
+                  className="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-xl text-sm font-bold hover:bg-gray-200 transition-all"
                 >
-                  {sendingReference ? (
-                    <>
-                      <svg className="animate-spin h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                      </svg>
-                      {t('messages.sending')}
-                    </>
-                  ) : (
-                    <>
-                      {contactType === 'email' ? (
-                        <EnvelopeIcon className="h-4 w-4" />
-                      ) : (
-                        <DevicePhoneMobileIcon className="h-4 w-4" />
-                      )}
-                      {t('messages.referenceSent')} {contactType === 'email' ? 'email' : 'SMS'}
-                    </>
-                  )}
-                </button>
-              )}
-              
-              <div className="flex flex-col gap-2">
-                <button
-                  onClick={handleCopyAndContinue}
-                  className="inline-flex justify-center items-center gap-2 px-4 py-2 bg-sky-500 text-white font-semibold rounded-lg hover:bg-sky-600 transition-colors"
-                >
-                  <ClipboardDocumentIcon className="h-4 w-4" />
-                  {t('form.copy')}
+                  Copier
                 </button>
                 <button
-                  onClick={handleCloseModal}
-                  className="inline-flex justify-center gap-2 px-4 py-2 bg-gradient-to-r from-sky-500 to-blue-600 text-white font-semibold rounded-lg hover:from-sky-600 hover:to-blue-700 transition-colors"
+                  onClick={() => { setShowReferenceModal(false); navigate(`/suivi-doleance/${savedReference}`); }}
+                  className="px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all"
+                  style={{ background: 'linear-gradient(135deg, #0077FF, #0066DD)' }}
                 >
-                  <EyeIcon className="h-4 w-4" />
-                  {t('form.track')}
+                  Suivre mon signalement
                 </button>
               </div>
             </div>
           </div>
         </div>
       )}
-      
-      <PublicFooter />
     </div>
   );
 }

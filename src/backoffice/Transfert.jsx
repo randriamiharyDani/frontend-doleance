@@ -389,11 +389,11 @@ function Transfert() {
             <thead className="bg-gray-50">
               <tr>
                 <th className="px-3 py-2 text-left  font-medium text-gray-500 uppercase">Réf.</th>
-                <th className="px-3 py-2 text-left  font-medium text-gray-500 uppercase">Citoyen</th>
-                <th className="px-3 py-2 text-left  font-medium text-gray-500 uppercase">Catégorie</th>
+                <th className="px-3 py-2 text-left  font-medium text-gray-500 uppercase hidden sm:table-cell">Citoyen</th>
+                <th className="px-3 py-2 text-left  font-medium text-gray-500 uppercase hidden md:table-cell">Catégorie</th>
                 <th className="px-3 py-2 text-left  font-medium text-gray-500 uppercase">Titre</th>
                 <th className="px-3 py-2 text-center  font-medium text-gray-500 uppercase">Statut</th>
-                <th className="px-3 py-2 text-left  font-medium text-gray-500 uppercase">Direction</th>
+                <th className="px-3 py-2 text-left  font-medium text-gray-500 uppercase hidden lg:table-cell">Direction</th>
                 <th className="px-3 py-2 text-center  font-medium text-gray-500 uppercase">Action</th>
               </tr>
             </thead>
@@ -401,33 +401,36 @@ function Transfert() {
               {/* Doléances non transférées (prioritaires) */}
               {doleancesNonTransferees.map((doleance) => (
                 <tr key={doleance.id_doleance} className="hover:bg-gray-50">
-                  <td className="px-3 py-2 whitespace-nowrap  font-mono font-medium text-blue-600">
+                  <td className="px-3 py-2 whitespace-nowrap font-mono font-medium text-blue-600 text-xs sm:text-sm">
                     {doleance.reference}
                   </td>
-                  <td className="px-3 py-2 whitespace-nowrap  text-gray-500">
+                  <td className="px-3 py-2 whitespace-nowrap text-gray-500 text-xs sm:text-sm hidden sm:table-cell">
                     {doleance.citoyen_nom || '-'}
                   </td>
-                  <td className="px-3 py-2 whitespace-nowrap  text-gray-500">
+                  <td className="px-3 py-2 whitespace-nowrap text-gray-500 text-xs sm:text-sm hidden md:table-cell">
                     {getCategoryName(doleance.id_categorie)}
                   </td>
-                  <td className="px-3 py-2  text-gray-700 max-w-[120px] truncate">
+                  <td className="px-3 py-2 text-gray-700 max-w-[80px] sm:max-w-[120px] truncate text-xs sm:text-sm">
                     {doleance.titre}
                   </td>
                   <td className="px-3 py-2 whitespace-nowrap text-center">
-                    <span className={`px-2 py-0.5 text-[10px] rounded-full ${getStatusBadge(doleance.nom_statut)}`}>
+                    <span className={`px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] rounded-full ${getStatusBadge(doleance.nom_statut)}`}>
                       {getStatusText(doleance.nom_statut)}
                     </span>
                   </td>
-                  <td className="px-3 py-2 whitespace-nowrap  text-gray-500">
+                  <td className="px-3 py-2 whitespace-nowrap text-gray-500 text-xs sm:text-sm hidden lg:table-cell">
                     {doleance.nom_direction || '-'}
                   </td>
                   <td className="px-3 py-2 whitespace-nowrap text-center">
                     <button
                       onClick={() => openTransferModal(doleance)}
-                      className="inline-flex items-center px-2.5 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-[10px]"
+                      className="inline-flex items-center px-2 sm:px-2.5 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-[9px] sm:text-[10px]"
                     >
-                      <PaperAirplaneIcon className="h-3 w-3 mr-1" />
-                      Transférer
+                      <PaperAirplaneIcon className="h-3 w-3 mr-0.5 sm:mr-1" />
+                      <span className="hidden xs:inline">Transférer</span>
+                      <span className="xs:hidden">
+                        <PaperAirplaneIcon className="h-3 w-3" />
+                      </span>
                     </button>
                   </td>
                 </tr>
@@ -443,29 +446,29 @@ function Transfert() {
                   </tr>
                   {doleancesTransferees.map((doleance) => (
                     <tr key={doleance.id_doleance} className="hover:bg-gray-50/50 bg-gray-50/30">
-                      <td className="px-3 py-1.5 whitespace-nowrap text-[10px] font-mono font-medium text-purple-400">
+                      <td className="px-3 py-1.5 whitespace-nowrap text-[9px] sm:text-[10px] font-mono font-medium text-purple-400">
                         {doleance.reference}
                       </td>
-                      <td className="px-3 py-1.5 whitespace-nowrap text-[10px] text-gray-400">
+                      <td className="px-3 py-1.5 whitespace-nowrap text-[9px] sm:text-[10px] text-gray-400 hidden sm:table-cell">
                         {doleance.citoyen_nom || '-'}
                       </td>
-                      <td className="px-3 py-1.5 whitespace-nowrap text-[10px] text-gray-400">
+                      <td className="px-3 py-1.5 whitespace-nowrap text-[9px] sm:text-[10px] text-gray-400 hidden md:table-cell">
                         {getCategoryName(doleance.id_categorie)}
                       </td>
-                      <td className="px-3 py-1.5 text-[10px] text-gray-400 max-w-[100px] truncate">
+                      <td className="px-3 py-1.5 text-[9px] sm:text-[10px] text-gray-400 max-w-[60px] sm:max-w-[100px] truncate">
                         {doleance.titre}
                       </td>
                       <td className="px-3 py-1.5 whitespace-nowrap text-center">
-                        <span className={`px-1.5 py-0.5 text-[9px] rounded-full ${getStatusBadge(doleance.nom_statut)}`}>
+                        <span className={`px-1.5 py-0.5 text-[8px] sm:text-[9px] rounded-full ${getStatusBadge(doleance.nom_statut)}`}>
                           {getStatusText(doleance.nom_statut)}
                         </span>
                       </td>
-                      <td className="px-3 py-1.5 whitespace-nowrap text-[10px] text-gray-400">
+                      <td className="px-3 py-1.5 whitespace-nowrap text-[9px] sm:text-[10px] text-gray-400 hidden lg:table-cell">
                         {doleance.nom_direction || '-'}
                       </td>
                       <td className="px-3 py-1.5 whitespace-nowrap text-center">
-                        <span className="inline-flex items-center px-2 py-0.5 bg-gray-100 text-gray-500 rounded text-[9px]">
-                          <CheckCircleIcon className="h-3 w-3 mr-0.5" />
+                        <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 bg-gray-100 text-gray-500 rounded text-[8px] sm:text-[9px]">
+                          <CheckCircleIcon className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5" />
                           {doleance.nom_statut === 'transferee' ? 'Transférée' : 'Traitée'}
                         </span>
                       </td>

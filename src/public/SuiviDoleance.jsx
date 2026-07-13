@@ -15,8 +15,7 @@ import {
   ArrowPathIcon,
   InformationCircleIcon
 } from '@heroicons/react/24/outline';
-import PublicNavbar from '../components/public/PublicNavbar';
-import PublicFooter from '../components/public/PublicFooter';
+
 
 function SuiviDoleance() {
   const { t } = useTranslation();
@@ -103,12 +102,10 @@ function SuiviDoleance() {
   };
   
   return (
-    <div className={`min-h-screen flex flex-col transition-colors duration-300 ${
-      darkMode ? 'dark bg-gray-900' : 'bg-gradient-to-b from-blue-50 to-blue-100'
+    <div className={`transition-colors duration-300 ${
+      darkMode ? 'dark' : ''
     }`}>
-      <PublicNavbar />
-      
-      <main className="flex-1 max-w-4xl mx-auto px-3 sm:px-4 md:px-6 py-4 sm:py-6 md:py-8 w-full">
+      <div className="max-w-4xl mx-auto w-full">
         <div className="text-center mb-6 sm:mb-8">
           <h1 className={`text-2xl sm:text-3xl md:text-4xl font-bold mb-2 ${
             darkMode ? 'text-sky-400' : 'text-sky-800'
@@ -236,7 +233,6 @@ function SuiviDoleance() {
                           {getCategoryIcon(doleance.categorie)} {doleance.categorie || t('allComplaints.uncategorized')}
                         </p>
                       </div>
-                      
                     </div>
                     
                     {/* Date de création */}
@@ -254,41 +250,6 @@ function SuiviDoleance() {
                       </div>
                     </div>
 
-                    {/* ***************************************************************************************************  */}
-
-
-                       {/* Catégorie 2*/}
-                    <div className={`flex items-start gap-3 p-2 sm:p-3 rounded-lg border-l-4 border-sky-400 ${
-                      darkMode ? 'bg-gray-700' : 'bg-gray-50'
-                    }`}>
-                      <TagIcon className={`h-4 w-4 sm:h-5 sm:w-5 mt-0.5 ${darkMode ? 'text-sky-400' : 'text-sky-500'}`} />
-                      <div>
-                        <p className={`text-xs font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                          {t('form.category')}
-                        </p>
-                        <p className={`font-medium text-sm sm:text-base ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
-                          {getCategoryIcon(doleance.categorie)} {doleance.categorie || t('allComplaints.uncategorized')}
-                        </p>
-                      </div>
-                      
-                    </div>
-                    
-                    {/* Date de création */}
-                    <div className={`flex items-start gap-3 p-2 sm:p-3 rounded-lg border-l-4 border-sky-400 ${
-                      darkMode ? 'bg-gray-700' : 'bg-gray-50'
-                    }`}>
-                      <CalendarIcon className={`h-4 w-4 sm:h-5 sm:w-5 mt-0.5 ${darkMode ? 'text-sky-400' : 'text-sky-500'}`} />
-                      <div>
-                        <p className={`text-xs font-semibold ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                          {t('tracking.submittedOn')}
-                        </p>
-                        <p className={`font-medium text-sm sm:text-base ${darkMode ? 'text-gray-200' : 'text-gray-800'}`}>
-                          {formatDate(doleance.date_creation)}
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* ***************************************************************************************************  */}
                     {/* Lieu */}
 
 
@@ -453,9 +414,7 @@ function SuiviDoleance() {
             )}
           </>
         )}
-      </main>
-      
-      <PublicFooter />
+      </div>
     </div>
   );
 }

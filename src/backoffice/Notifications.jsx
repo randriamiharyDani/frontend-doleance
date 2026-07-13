@@ -148,53 +148,53 @@ function Notifications() {
       </div>
 
       {/* Statistiques */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-lg shadow-md p-4">
-          <div className="flex items-center justify-between">
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
+        <div className="bg-white rounded-lg shadow-md p-3 sm:p-4">
+          <div className="flex items-center justify-between gap-2">
             <div>
-              <p className="text-sm text-gray-500">Total</p>
-              <p className="text-2xl font-bold text-blue-600">{notifications.length}</p>
+              <p className="text-[10px] sm:text-sm text-gray-500">Total</p>
+              <p className="text-lg sm:text-2xl font-bold text-blue-600">{notifications.length}</p>
             </div>
-            <BellIcon className="h-8 w-8 text-blue-500" />
+            <BellIcon className="h-6 w-6 sm:h-8 sm:w-8 text-blue-500 flex-shrink-0" />
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-md p-4">
-          <div className="flex items-center justify-between">
+        <div className="bg-white rounded-lg shadow-md p-3 sm:p-4">
+          <div className="flex items-center justify-between gap-2">
             <div>
-              <p className="text-sm text-gray-500">Non lues</p>
-              <p className="text-2xl font-bold text-yellow-600">{unreadCount}</p>
+              <p className="text-[10px] sm:text-sm text-gray-500">Non lues</p>
+              <p className="text-lg sm:text-2xl font-bold text-yellow-600">{unreadCount}</p>
             </div>
-            <ExclamationTriangleIcon className="h-8 w-8 text-yellow-500" />
+            <ExclamationTriangleIcon className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-500 flex-shrink-0" />
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-md p-4">
-          <div className="flex items-center justify-between">
+        <div className="bg-white rounded-lg shadow-md p-3 sm:p-4">
+          <div className="flex items-center justify-between gap-2">
             <div>
-              <p className="text-sm text-gray-500">Nouvelles doléances</p>
-              <p className="text-2xl font-bold text-green-600">
+              <p className="text-[10px] sm:text-sm text-gray-500">Nouvelles doléances</p>
+              <p className="text-lg sm:text-2xl font-bold text-green-600">
                 {notifications.filter(n => n.type === 'nouvelle_doleance').length}
               </p>
             </div>
-            <DocumentTextIcon className="h-8 w-8 text-green-500" />
+            <DocumentTextIcon className="h-6 w-6 sm:h-8 sm:w-8 text-green-500 flex-shrink-0" />
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-md p-4">
-          <div className="flex items-center justify-between">
+        <div className="bg-white rounded-lg shadow-md p-3 sm:p-4">
+          <div className="flex items-center justify-between gap-2">
             <div>
-              <p className="text-sm text-gray-500">Modifications</p>
-              <p className="text-2xl font-bold text-purple-600">
+              <p className="text-[10px] sm:text-sm text-gray-500">Modifications</p>
+              <p className="text-lg sm:text-2xl font-bold text-purple-600">
                 {notifications.filter(n => n.type === 'modification_utilisateur' || n.type === 'reset_password').length}
               </p>
             </div>
-            <KeyIcon className="h-8 w-8 text-purple-500" />
+            <KeyIcon className="h-6 w-6 sm:h-8 sm:w-8 text-purple-500 flex-shrink-0" />
           </div>
         </div>
       </div>
 
       {/* Liste des notifications */}
       <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200 bg-gray-50">
-          <h2 className="text-lg font-semibold text-gray-800">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gray-50">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-800">
             Historique des notifications
           </h2>
         </div>

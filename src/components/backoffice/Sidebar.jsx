@@ -55,12 +55,10 @@ return (
 
     {/* Sidebar */}
     <aside
-      className={`fixed top-0 left-0 z-30 h-full w-72 shadow-2xl transition-transform duration-300 ease-in-out flex flex-col ${
+      className={`fixed top-0 left-0 z-30 h-full w-72 shadow-2xl transition-transform duration-300 ease-in-out flex flex-col bg-gradient-to-b from-[#0B1A33] to-[#1A365D] ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       }`}
-      style={{
-        background: 'linear-gradient(180deg, #0f172a 0%, #1e293b 50%, #0f172a 100%)',
-      }}
+    
     >
       {/* En-tête */}
       <div className="shrink-0 border-b border-white/5 p-4">
@@ -73,7 +71,7 @@ return (
               <h1 className="text-white font-bold text-base leading-tight truncate">
                 CUA
               </h1>
-              <p className="text-slate-400 text-xs truncate">
+              <p className="text-white/50 text-xs truncate">
                 Gestion des doléances
               </p>
             </div>
@@ -102,7 +100,7 @@ return (
             <p className="text-sm text-white font-medium truncate">
               {user?.prenom} {user?.nom}
             </p>
-            <p className="text-xs text-slate-400 truncate capitalize">
+            <p className="text-xs text-white/50 truncate capitalize">
               {user?.role?.replace(/_/g, ' ') || 'Utilisateur'}
             </p>
           </div>
@@ -121,8 +119,8 @@ return (
               className={`
                 relative flex items-center px-3 py-2.5 rounded-xl transition-all duration-200 group
                 ${active
-                  ? 'bg-blue-600 text-white shadow-lg shadow-blue-600/25'
-                  : 'text-slate-400 hover:text-white hover:bg-white/5'
+                  ? 'bg-[#3182CE]/20 text-white'
+                  : 'text-white/70 hover:bg-[#3182CE]/20 hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline'
                 }
               `}
             >
@@ -131,7 +129,7 @@ return (
               )}
               <item.icon
                 className={`h-5 w-5 mr-3 flex-shrink-0 transition-colors ${
-                  active ? 'text-white' : 'text-slate-500 group-hover:text-white'
+                  active ? 'text-white' : 'text-white/40 group-hover:text-white'
                 }`}
               />
               <span className="text-sm font-medium truncate">{item.name}</span>
@@ -147,9 +145,9 @@ return (
       <div className="shrink-0 p-3 border-t border-white/5">
         <button
           onClick={handleLogout}
-          className="flex items-center w-full px-3 py-2.5 rounded-xl text-slate-400 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 group"
+          className="flex items-center w-full px-3 py-2.5 rounded-xl text-red-400/70 hover:text-red-400 hover:bg-red-500/10 transition-all duration-200 group"
         >
-          <ArrowRightOnRectangleIcon className="h-5 w-5 mr-3 flex-shrink-0 text-slate-500 group-hover:text-red-400 transition-colors" />
+          <ArrowRightOnRectangleIcon className="h-5 w-5 mr-3 flex-shrink-0 text-red-400/50 group-hover:text-red-400 transition-colors" />
           <span className="text-sm font-medium">Déconnexion</span>
         </button>
       </div>

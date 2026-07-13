@@ -110,28 +110,45 @@ function BackofficeLayout() {
         className={`fixed top-0 left-0 z-30 h-full w-64 lg:w-72 shadow-xl transition-transform duration-300 ease-in-out overflow-y-auto ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         } lg:translate-x-0 ${
-          darkMode ? 'bg-slate-900' : 'bg-gradient-to-r from-sky-700 via-sky-600 to-blue-600'
+          darkMode ? 'bg-slate-900' : 'bg-gradient-to-b from-[#0B1A33] to-[#1A365D]'
         }`}
       >
         {/* Logo */}
-        <div className="sticky top-0 z-10 flex items-center justify-between p-4 border-b border-gray-700 bg-opacity-95 backdrop-blur-sm">
-          <div className="flex-1">
-            <h1 className="text-white font-bold text-base sm:text-lg tracking-tight">CUA - Gestion des doléances</h1>
-          
-          </div>
-          <button 
-            onClick={() => setSidebarOpen(false)} 
-            className="lg:hidden text-gray-400 hover:text-white transition-colors p-1 rounded-lg hover:bg-gray-800"
-            aria-label="Fermer le menu"
-          >
-            <XMarkIcon className="h-5 w-5" />
-          </button>
-        </div>
+       {/* Logo */}
+<div className="sticky top-0 z-10 flex items-center gap-3 p-4 border-b border-white/10 bg-opacity-95 backdrop-blur-sm">
+  {/* Logo */}
+  <div className="flex-shrink-0">
+    <img 
+      src="/logo-cua.png"  // Remplace par le chemin de ton logo
+      alt="Logo CUA" 
+      className="h-10 w-10 object-contain rounded-lg"
+    />
+  </div>
+  
+  {/* Texte */}
+  <div className="flex-1 min-w-0">
+    <h1 className="text-white font-bold text-3xl sm:text-lg tracking-tight leading-tight">
+      CUA
+    </h1>
+    <p className="text-white/60 text-xl sm:text-sm font-medium truncate">
+      Commune Urbaine d'Antananarivo
+    </p>
+  </div>
+  
+  {/* Bouton fermeture (mobile) */}
+  <button 
+    onClick={() => setSidebarOpen(false)} 
+    className="lg:hidden text-white/60 hover:text-white transition-colors p-1 rounded-lg hover:bg-[#3182CE]/20 flex-shrink-0"
+    aria-label="Fermer le menu"
+  >
+    <XMarkIcon className="h-5 w-5" />
+  </button>
+</div>
 
         {/* Infos utilisateur */}
-        <div className="sticky top-[73px] z-10 p-4 border-b border-gray-700 bg-opacity-95 backdrop-blur-sm">
+        <div className="sticky top-[73px] z-10 p-4 border-b border-white/10 bg-opacity-95 backdrop-blur-sm">
           <div className="flex items-center">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-md bg-blue-600">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-md bg-white/10">
               <span className="text-white text-sm font-medium">
                 {user?.prenom?.charAt(0) || 'U'}{user?.nom?.charAt(0) || '?'}
               </span>
@@ -140,7 +157,7 @@ function BackofficeLayout() {
               <p className="text-sm text-white font-medium truncate">
                 {user?.prenom || 'Utilisateur'} {user?.nom || ''}
               </p>
-              <p className="text-xs text-gray-400 capitalize truncate">
+              <p className="text-xs text-white/50 capitalize truncate">
                 {user?.role?.replace(/_/g, ' ') || 'Chargement...'}
               </p>
             </div>
@@ -155,21 +172,24 @@ function BackofficeLayout() {
                 key={item.name}
                 to={item.href}
                 onClick={() => isMobile && setSidebarOpen(false)}
-                className={`flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group ${
+                className={`relative flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group ${
                   isActive(item.href) 
-                    ? 'bg-blue-600 text-white shadow-md' 
-                    : 'text-gray-300 hover:bg-gray-800 hover:text-white hover:translate-x-1'
+                    ? 'bg-[#3182CE]/20 text-white' 
+                    : 'text-white/70 hover:bg-[#3182CE]/20 hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline'
                 }`}
               >
+                {isActive(item.href) && (
+                  <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 bg-white rounded-r-full" />
+                )}
                 <item.icon className={`h-5 w-5 mr-3 flex-shrink-0 transition-colors ${
-                  isActive(item.href) ? 'text-white' : 'text-gray-400 group-hover:text-white'
+                  isActive(item.href) ? 'text-white' : 'text-white/40 group-hover:text-white'
                 }`} />
                 <span className="text-sm font-medium">{item.name}</span>
               </Link>
             ))}
           </div>
 
-          <div className="my-4 border-t border-gray-700"></div>
+          <div className="my-4 border-t border-white/10"></div>
 
           <div className="space-y-1">
             {filteredSecondaryNavigation.map((item) => (
@@ -178,12 +198,12 @@ function BackofficeLayout() {
                   <button
                     onClick={() => toggleMenu(item.name)}
                     className={`w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200 group ${
-                      openMenus[item.name] ? 'bg-gray-800 text-white' : 'text-gray-300 hover:bg-gray-800 hover:text-white'
+                      openMenus[item.name] ? 'text-white' : 'text-white/70 hover:bg-[#3182CE]/20 hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline'
                     }`}
                   >
                     <div className="flex items-center">
                       <item.icon className={`h-5 w-5 mr-3 flex-shrink-0 transition-colors ${
-                        openMenus[item.name] ? 'text-white' : 'text-gray-400 group-hover:text-white'
+                        openMenus[item.name] ? 'text-white' : 'text-white/40 group-hover:text-white'
                       }`} />
                       <span className="text-sm font-medium">{item.name}</span>
                     </div>
@@ -192,18 +212,21 @@ function BackofficeLayout() {
                     }`} />
                   </button>
                   {openMenus[item.name] && (
-                    <div className="ml-4 space-y-1 border-l-2 border-gray-700 pl-3">
+                    <div className="ml-4 space-y-1 border-l-2 border-white/10 pl-3">
                       {item.subItems.map((subItem) => (
                         <Link
                           key={subItem.name}
                           to={subItem.href}
                           onClick={() => isMobile && setSidebarOpen(false)}
-                          className={`flex items-center px-3 py-2 rounded-lg transition-all duration-200 ${
+                          className={`relative flex items-center px-3 py-2 rounded-lg transition-all duration-200 ${
                             isActive(subItem.href) 
-                              ? 'bg-blue-600 text-white shadow-md' 
-                              : 'text-gray-400 hover:bg-gray-800 hover:text-white'
+                              ? 'bg-[#3182CE]/20 text-white' 
+                              : 'text-white/60 hover:bg-[#3182CE]/20 hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline'
                           }`}
                         >
+                          {isActive(subItem.href) && (
+                            <span className="absolute left-0 top-1/2 -translate-y-1/2 h-4 w-1 bg-white rounded-r-full" />
+                          )}
                           <subItem.icon className="h-4 w-4 mr-3 flex-shrink-0" />
                           <span className="text-sm">{subItem.name}</span>
                         </Link>
@@ -216,14 +239,17 @@ function BackofficeLayout() {
                   key={item.name}
                   to={item.href}
                   onClick={() => isMobile && setSidebarOpen(false)}
-                  className={`flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group ${
+                  className={`relative flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group ${
                     isActive(item.href) 
-                      ? 'bg-blue-600 text-white shadow-md' 
-                      : 'text-gray-300 hover:bg-gray-800 hover:text-white hover:translate-x-1'
+                      ? 'bg-[#3182CE]/20 text-white' 
+                      : 'text-white/70 hover:bg-[#3182CE]/20 hover:text-white hover:shadow-lg hover:shadow-blue-500/25 hover:underline'
                   }`}
                 >
+                  {isActive(item.href) && (
+                    <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 bg-white rounded-r-full" />
+                  )}
                   <item.icon className={`h-5 w-5 mr-3 flex-shrink-0 transition-colors ${
-                    isActive(item.href) ? 'text-white' : 'text-gray-400 group-hover:text-white'
+                    isActive(item.href) ? 'text-white' : 'text-white/40 group-hover:text-white'
                   }`} />
                   <span className="text-sm font-medium">{item.name}</span>
                 </Link>
@@ -233,9 +259,9 @@ function BackofficeLayout() {
         </nav>
 
         {/* Footer */}
-        <div className="absolute bottom-0 left-0 right-0 p-4 text-center border-t border-gray-700 bg-opacity-95 backdrop-blur-sm">
-          <p className="text-xs text-gray-500">Version 2.0.0 | CUA</p>
-          <p className="text-xs text-gray-600 mt-1 hidden sm:block">
+        <div className="absolute bottom-0 left-0 right-0 p-4 text-center border-t border-white/10 bg-opacity-95 backdrop-blur-sm">
+          <p className="text-xs text-white/40">Version 2.0.0 | CUA</p>
+          <p className="text-xs text-white/30 mt-1 hidden sm:block">
             Plateforme optimisée
           </p>
         </div>

@@ -751,11 +751,11 @@ function ToutesDoleances() {
 
         {/* Pagination */}
         {pagination.pages > 1 && (
-          <div className="flex justify-center gap-2 mt-8">
+          <div className="flex justify-center items-center gap-1 sm:gap-2 mt-6 sm:mt-8">
             <button
               onClick={() => setPagination(prev => ({ ...prev, page: prev.page - 1 }))}
               disabled={pagination.page === 1}
-              className={`px-4 py-2 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed ${
+              className={`px-2 sm:px-4 py-1.5 sm:py-2 text-sm border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${
                 darkMode 
                   ? 'border-gray-600 text-gray-300 hover:bg-gray-700' 
                   : 'border-sky-300 text-sky-700 hover:bg-sky-50'
@@ -763,13 +763,40 @@ function ToutesDoleances() {
             >
               {t('allComplaints.previous')}
             </button>
-            <span className={`px-4 py-2 ${darkMode ? 'text-gray-300' : 'text-sky-700'}`}>
-              {t('allComplaints.page')} {pagination.page} / {pagination.pages}
+
+            {/* Page numbers - show first, last, and surrounding pages */}
+            <div className="hidden sm:flex items-center gap-1">
+              {Array.from({ length: pagination.pages }, (_, i) => i + 1)
+                .filter(p => p === 1 || p === pagination.pages || Math.abs(p - pagination.page) <= 1)
+                .reduce((acc, p, idx, arr) => {
+                  if (idx > 0 && p - arr[idx - 1] > 1) acc.push(<span key={`ellipsis-${p}`} className={`px-2 py-1 text-sm ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>...</span>);
+                  acc.push(
+                    <button
+                      key={p}
+                      onClick={() => setPagination(prev => ({ ...prev, page: p }))}
+                      className={`w-8 h-8 text-sm rounded-lg font-medium transition-colors ${
+                        p === pagination.page
+                          ? 'bg-sky-500 text-white'
+                          : darkMode
+                            ? 'text-gray-300 hover:bg-gray-700'
+                            : 'text-gray-600 hover:bg-sky-50'
+                      }`}
+                    >
+                      {p}
+                    </button>
+                  );
+                  return acc;
+                }, [])}
+            </div>
+
+            <span className={`sm:hidden px-2 py-1 text-sm ${darkMode ? 'text-gray-300' : 'text-sky-700'}`}>
+              {pagination.page} / {pagination.pages}
             </span>
+
             <button
               onClick={() => setPagination(prev => ({ ...prev, page: prev.page + 1 }))}
               disabled={pagination.page === pagination.pages}
-              className={`px-4 py-2 border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed ${
+              className={`px-2 sm:px-4 py-1.5 sm:py-2 text-sm border rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-colors ${
                 darkMode 
                   ? 'border-gray-600 text-gray-300 hover:bg-gray-700' 
                   : 'border-sky-300 text-sky-700 hover:bg-sky-50'
@@ -783,35 +810,35 @@ function ToutesDoleances() {
 
       {/* Modal détail doléance */}
       {showDetailModal && selectedDoleance && (
-        <div className={`fixed inset-0 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4 ${
+        <div className={`fixed inset-0 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-start sm:items-center justify-center p-0 sm:p-4 ${
           darkMode ? 'bg-black/80' : 'bg-gray-600/50'
         }`}>
-          <div className={`relative rounded-lg shadow-xl max-w-2xl w-full transition-colors duration-300 ${
+          <div className={`relative rounded-none sm:rounded-lg shadow-xl max-w-2xl w-full min-h-screen sm:min-h-0 transition-colors duration-300 ${
             darkMode ? 'bg-gray-800' : 'bg-white'
           }`}>
-            <div className={`flex justify-between items-center p-4 border-b ${
+            <div className={`sticky top-0 z-10 flex justify-between items-center p-4 border-b bg-inherit ${
               darkMode ? 'border-gray-700' : 'border-gray-200'
             }`}>
-              <h3 className={`text-lg font-semibold ${darkMode ? 'text-gray-200' : 'text-gray-900'}`}>
+              <h3 className={`text-base sm:text-lg font-semibold ${darkMode ? 'text-gray-200' : 'text-gray-900'}`}>
                 Détail de la doléance
               </h3>
               <button
                 onClick={() => setShowDetailModal(false)}
-                className={darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'}
+                className={darkMode ? 'text-gray-400 hover:text-gray-200 p-1' : 'text-gray-400 hover:text-gray-600 p-1'}
               >
-                <XMarkIcon className="h-6 w-6" />
+                <XMarkIcon className="h-5 w-5 sm:h-6 sm:w-6" />
               </button>
             </div>
 
-            <div className="p-6">
+            <div className="p-4 sm:p-6">
               {/* Titre */}
-              <h4 className={`text-xl font-semibold mb-4 ${darkMode ? 'text-sky-400' : 'text-sky-800'}`}>
+              <h4 className={`text-lg sm:text-xl font-semibold mb-3 sm:mb-4 break-words ${darkMode ? 'text-sky-400' : 'text-sky-800'}`}>
                 {selectedDoleance.titre}
               </h4>
 
               {/* Description complète */}
               {selectedDoleance.description && (
-                <div className={`mb-4 p-3 rounded-lg text-sm whitespace-pre-wrap ${
+                <div className={`mb-4 p-3 rounded-lg text-sm whitespace-pre-wrap break-words ${
                   darkMode ? 'bg-gray-700 text-gray-300' : 'bg-gray-50 text-gray-600'
                 }`}>
                   {selectedDoleance.description}
@@ -819,12 +846,12 @@ function ToutesDoleances() {
               )}
 
               {/* Grille d'informations */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                <div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 text-sm">
+                <div className="col-span-1 sm:col-span-2">
                   <span className={`block text-xs font-medium mb-1 ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-                    reference
+                    Référence
                   </span>
-                  <span className={`font-mono font-medium ${darkMode ? 'text-sky-400' : 'text-sky-700'}`}>
+                  <span className={`font-mono font-medium break-all ${darkMode ? 'text-sky-400' : 'text-sky-700'}`}>
                     {selectedDoleance.reference}
                   </span>
                 </div>
@@ -862,7 +889,7 @@ function ToutesDoleances() {
                 </div>
                 <div>
                   <span className={`block text-xs font-medium mb-1 ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-                   dernière mise à jour
+                   Dernière mise à jour
                   </span>
                   <span className={darkMode ? 'text-gray-200' : 'text-gray-800'}>
                     {formatDateTime(selectedDoleance.date_mise_a_jour)}
@@ -871,7 +898,7 @@ function ToutesDoleances() {
                 {selectedDoleance.nom_direction && (
                   <div>
                     <span className={`block text-xs font-medium mb-1 ${darkMode ? 'text-gray-500' : 'text-gray-500'}`}>
-                     direction
+                     Direction
                     </span>
                     <span className={darkMode ? 'text-gray-200' : 'text-gray-800'}>
                       {selectedDoleance.nom_direction}
@@ -881,12 +908,12 @@ function ToutesDoleances() {
               </div>
             </div>
 
-            <div className={`flex justify-end p-4 border-t ${
+            <div className={`sticky bottom-0 flex justify-end p-4 border-t bg-inherit ${
               darkMode ? 'border-gray-700' : 'border-gray-200'
             }`}>
               <button
                 onClick={() => setShowDetailModal(false)}
-                className="px-4 py-2 bg-sky-500 text-white font-semibold rounded-lg hover:bg-sky-600 transition-colors"
+                className="px-4 py-2 bg-sky-500 text-white font-semibold rounded-lg hover:bg-sky-600 transition-colors w-full sm:w-auto"
               >
                Fermer
               </button>

@@ -133,6 +133,15 @@ export default {
           warning: '#f59e0b',
           danger: '#ef4444',
           info: '#06b6d4',
+        },
+        // Couleurs Signalement Citoyen
+        signalement: {
+          blue: '#0077FF',
+          'blue-dark': '#0066DD',
+          'blue-light': '#E8F4FD',
+          green: '#00C853',
+          'green-dark': '#00A844',
+          'green-light': '#E8F8F0',
         }
       },
       fontFamily: {

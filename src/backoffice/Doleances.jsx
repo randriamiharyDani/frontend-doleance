@@ -15,7 +15,6 @@ import Pagination from '../components/common/Pagination';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import EmptyState from '../components/common/EmptyState';
 import { DocumentTextIcon } from '@heroicons/react/24/outline';
-import ToutesDoleances from '../public/ToutesDoleances';
 
 function Doleances() {
   const { user } = useAuth();
@@ -225,9 +224,9 @@ function Doleances() {
   return (
     <div>
 
-      {/* <DoleanceHeader userRole={userRole} isAdminOrAgentCentral={isAdminOrAgentCentral} /> */}
+      <DoleanceHeader userRole={userRole} isAdminOrAgentCentral={isAdminOrAgentCentral} />
 
-      {/* <DoleanceFilters
+      <DoleanceFilters
         searchTerm={searchTerm} onSearchChange={setSearchTerm}
         onSubmit={handleSearch} onReset={handleReset}
         showFilters={showFilters} onToggleFilters={() => setShowFilters(!showFilters)}
@@ -235,11 +234,9 @@ function Doleances() {
         selectedStatut={selectedStatut} onStatutChange={setSelectedStatut}
         selectedPriorite={selectedPriorite} onPrioriteChange={setSelectedPriorite}
         categories={categories} statuts={statuts} priorites={priorites}
-      /> */}
+      />
 
-      <ToutesDoleances />
-
-      {/* {loading ? (
+      {loading ? (
         <LoadingSpinner text="Chargement des doléances..." />
       ) : doleances.length === 0 ? (
         <EmptyState icon={DocumentTextIcon} title="Aucune doléance" description="Aucune doléance ne correspond à vos critères." />
@@ -266,7 +263,7 @@ function Doleances() {
             />
           ))}
         </div>
-      )} */}
+      )}
 
       <Pagination page={pagination.page} pages={pagination.pages} onPageChange={(p) => setPagination(prev => ({ ...prev, page: p }))} />
 

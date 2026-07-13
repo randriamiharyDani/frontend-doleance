@@ -5,6 +5,9 @@ import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
 import { LanguageProvider } from './contexts/LanguageContext';
 
+// Layout public
+import PublicLayout from './components/public/PublicLayout';
+
 // Pages publiques
 import DeposerDoleance from './public/DeposerDoleance';
 import SuiviDoleance from './public/SuiviDoleance';
@@ -32,10 +35,10 @@ function AppRoutes() {
       {/* Routes publiques */}
       <Route path="/" element={<Navigate to="/deposer-doleance" replace />} />
       <Route path="/login" element={<Login />} />
-      <Route path="/deposer-doleance" element={<DeposerDoleance />} />
-      <Route path="/suivi-doleance" element={<SuiviDoleance />} />
-      <Route path="/suivi-doleance/:reference" element={<SuiviDoleance />} />
-      {/* <Route path="/toutes-doleances" element={<ToutesDoleances />} /> */}
+      <Route path="/deposer-doleance" element={<PublicLayout><DeposerDoleance /></PublicLayout>} />
+      <Route path="/suivi-doleance" element={<PublicLayout><SuiviDoleance /></PublicLayout>} />
+      <Route path="/suivi-doleance/:reference" element={<PublicLayout><SuiviDoleance /></PublicLayout>} />
+      {/* <Route path="/toutes-doleances" element={<PublicLayout><ToutesDoleances /></PublicLayout>} /> */}
       
       {/* Routes back-office */}
       <Route path="/backoffice" element={<BackofficeLayout />}>

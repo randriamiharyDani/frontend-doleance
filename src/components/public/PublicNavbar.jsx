@@ -50,7 +50,7 @@ function PublicNavbar() {
       } ${
         darkMode 
           ? 'bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900' 
-          : 'bg-gradient-to-r from-sky-700 via-sky-600 to-blue-600'
+          : 'bg-gradient-to-b from-[#0B1A33] to-[#1A365D]'
       }`}>
         <div className="max-w-4xl mx-auto px-3 sm:px-4 lg:px-6">
           <div className="flex justify-between h-14 sm:h-16">
