@@ -270,12 +270,12 @@ function Login() {
               </div>
 
               <div className="flex justify-end mb-6">
-                <button
-                  type="button"
+                <Link
+                  to="/forgot-password"
                   className="text-xs font-medium text-[#1E3A8A] hover:text-[#D4AF37] transition-colors"
                 >
                   Mot de passe oublié ?
-                </button>
+                </Link>
               </div>
 
               <button

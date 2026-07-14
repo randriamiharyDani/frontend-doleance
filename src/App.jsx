@@ -13,6 +13,8 @@ import DeposerDoleance from './public/DeposerDoleance';
 import SuiviDoleance from './public/SuiviDoleance';
 import ToutesDoleances from './public/ToutesDoleances';
 import Login from './pages/Login';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 // Back-office
 import BackofficeLayout from './backoffice/BackofficeLayout';
@@ -35,6 +37,8 @@ function AppRoutes() {
       {/* Routes publiques */}
       <Route path="/" element={<Navigate to="/deposer-doleance" replace />} />
       <Route path="/login" element={<Login />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route path="/deposer-doleance" element={<PublicLayout><DeposerDoleance /></PublicLayout>} />
       <Route path="/suivi-doleance" element={<PublicLayout><SuiviDoleance /></PublicLayout>} />
       <Route path="/suivi-doleance/:reference" element={<PublicLayout><SuiviDoleance /></PublicLayout>} />
