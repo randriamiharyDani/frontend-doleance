@@ -16,6 +16,7 @@ import L from "leaflet";
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import EmailService from "../services/emailService";
+import { ShieldCheckIcon } from "@heroicons/react/24/outline";
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -233,7 +234,7 @@ function DeposerDoleance() {
       setCategoriesData(categoriesRes.data?.data || categoriesRes.data || []);
       setQuartiers(quartiersRes.data?.data || quartiersRes.data || []);
       setAssignedDoleances(assignedRes.data?.data || assignedRes.data || []);
-      
+
       // Définir la première catégorie par défaut
       const cats = categoriesRes.data?.data || categoriesRes.data || [];
       if (cats.length > 0 && !selectedCategory) {
@@ -704,7 +705,17 @@ function DeposerDoleance() {
       `}</style>
 
       {/* Header */}
-      <div className="mb-6 sm:mb-8 cua-anim">
+      <div className="mb-6 sm:mb-8 cua-anim flex flex-col">
+        <div className="text-center">
+          <span
+            className={`inline-flex items-center justify-center gap-1.5 text-[11px] uppercase tracking-[0.2em] font-semibold mb-3 ${
+              darkMode ? "text-[#D4AF37]" : "text-[#9A7200]"
+            }`}
+          >
+            <ShieldCheckIcon className="w-3.5 h-3.5" />
+            Commune Urbaine d'Antananarivo
+          </span>
+        </div>
         <h1 className="cua-display text-2xl sm:text-2xl font-semibold text-[#0F172A] flex items-center gap-2 sm:gap-3">
           <span className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#0F172A] to-[#1E3A8A] flex items-center justify-center text-white shadow-md shadow-[#0F172A]/20 flex-shrink-0">
             <svg
