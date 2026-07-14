@@ -1,14 +1,21 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import { useTheme } from '../contexts/ThemeContext';
-import api from '../services/api';
-import toast from 'react-hot-toast';
-import { MapContainer, TileLayer, Marker, useMapEvents, useMap, Popup } from 'react-leaflet';
-import L from 'leaflet';
-import icon from 'leaflet/dist/images/marker-icon.png';
-import iconShadow from 'leaflet/dist/images/marker-shadow.png';
-import EmailService from '../services/emailService';
+import React, { useState, useEffect, useCallback, useRef } from "react";
+import { useNavigate, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { useTheme } from "../contexts/ThemeContext";
+import api from "../services/api";
+import toast from "react-hot-toast";
+import {
+  MapContainer,
+  TileLayer,
+  Marker,
+  useMapEvents,
+  useMap,
+  Popup,
+} from "react-leaflet";
+import L from "leaflet";
+import icon from "leaflet/dist/images/marker-icon.png";
+import iconShadow from "leaflet/dist/images/marker-shadow.png";
+import EmailService from "../services/emailService";
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -23,10 +30,35 @@ L.Marker.prototype.options.icon = DefaultIcon;
 // Palette institutionnelle CUA : navy #0F172A, bleu #1E3A8A, or #D4AF37
 // Chaque catégorie garde une couleur distincte (code couleur fonctionnel),
 // harmonisée en tons plus sourds pour rester cohérente avec l'identité de la commune.
-const [showOthers, setShowOthers] = useState(false);
 
-const firstCategories = categories.slice(0,5);
-const otherCategories = categories.slice(5);
+// Mapping des icônes DB vers des SVG paths
+const iconMap = {
+  road: "M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7",
+  lightbulb:
+    "M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z",
+  trash:
+    "M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16",
+  tree: "M12 21v-6m0 0l-3-3m3 3l3-3M3 7l3.5 3.5M21 7l-3.5 3.5M12 3v3",
+  bus: "M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4",
+  security:
+    "M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z",
+  building:
+    "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4",
+  people:
+    "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z",
+};
+
+// Mapping des couleurs DB vers des gradients Tailwind
+const gradientMap = {
+  "#2196F3": "from-blue-500 to-blue-600",
+  "#FFC107": "from-amber-400 to-[#D4AF37]",
+  "#4CAF50": "from-green-500 to-emerald-600",
+  "#8BC34A": "from-lime-500 to-green-600",
+  "#9C27B0": "from-purple-500 to-violet-600",
+  "#F44336": "from-red-500 to-rose-600",
+  "#795548": "from-amber-700 to-orange-800",
+  "#E91E63": "from-pink-500 to-rose-500",
+};
 
 function DraggableMarker({ position, setPosition, onPositionChange }) {
   const markerRef = useRef(null);
@@ -71,18 +103,30 @@ function CategoryCard({ cat, selected, onClick }) {
       onClick={() => onClick(cat.id)}
       className={`cua-card-tap flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-5 rounded-xl sm:rounded-2xl text-center cursor-pointer transition-all duration-200 border-2 ${
         selected
-          ? 'border-[#D4AF37] shadow-lg shadow-[#D4AF37]/20 scale-[1.02] bg-[#D4AF37]/[0.06]'
-          : 'border-transparent hover:border-slate-200 hover:shadow-md'
+          ? "border-[#D4AF37] shadow-lg shadow-[#D4AF37]/20 scale-[1.02] bg-[#D4AF37]/[0.06]"
+          : "border-transparent hover:border-slate-200 hover:shadow-md"
       } bg-white shadow-sm hover:-translate-y-1`}
     >
-      <div className={`w-10 h-10 sm:w-13 sm:h-13 rounded-xl sm:rounded-2xl flex items-center justify-center text-white text-base sm:text-xl bg-gradient-to-br ${cat.gradient} shadow-md`}>
-        <svg className="w-5 h-5 sm:w-6 sm:h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+      <div
+        className={`w-10 h-10 sm:w-13 sm:h-13 rounded-xl sm:rounded-2xl flex items-center justify-center text-white text-base sm:text-xl bg-gradient-to-br ${cat.gradient} shadow-md`}
+      >
+        <svg
+          className="w-5 h-5 sm:w-6 sm:h-6"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={2}
+        >
           <path strokeLinecap="round" strokeLinejoin="round" d={cat.icon} />
         </svg>
       </div>
       <div>
-        <p className="text-xs sm:text-sm font-bold text-slate-800">{cat.label}</p>
-        <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 hidden sm:block">{cat.desc}</p>
+        <p className="text-xs sm:text-sm font-bold text-slate-800">
+          {cat.label}
+        </p>
+        <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 hidden sm:block">
+          {cat.desc}
+        </p>
       </div>
     </button>
   );
@@ -98,7 +142,7 @@ function DeposerDoleance() {
   const [quartiers, setQuartiers] = useState([]);
   const [arrondissements, setArrondissements] = useState([]);
   const [showReferenceModal, setShowReferenceModal] = useState(false);
-  const [savedReference, setSavedReference] = useState('');
+  const [savedReference, setSavedReference] = useState("");
   const [files, setFiles] = useState([]);
   const [filePreviews, setFilePreviews] = useState([]);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -108,10 +152,11 @@ function DeposerDoleance() {
   const [emailSent, setEmailSent] = useState(false);
   const [smsSent, setSmsSent] = useState(false);
   const [sendError, setSendError] = useState(null);
-  const [selectedCategory, setSelectedCategory] = useState(1);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [showOthers, setShowOthers] = useState(false);
   const [mapPosition, setMapPosition] = useState([-18.8792, 47.5079]);
-  const [searchAddress, setSearchAddress] = useState('');
-  const [locationName, setLocationName] = useState('');
+  const [searchAddress, setSearchAddress] = useState("");
+  const [locationName, setLocationName] = useState("");
   const [assignedDoleances, setAssignedDoleances] = useState([]);
   const [isLocating, setIsLocating] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
@@ -122,29 +167,29 @@ function DeposerDoleance() {
   const [dragOver, setDragOver] = useState(false);
 
   const arrondissementCoords = {
-    'Antananarivo Renivohitra': [-18.9100, 47.5250],
-    'Antananarivo Atsimondrano': [-18.9400, 47.4700],
-    'Antananarivo Avaradrano': [-18.8600, 47.5600],
-    'Antananarivo Atsimo': [-18.9700, 47.5100],
-    'Antananarivo Andrefana': [-18.9000, 47.4400],
-    'Antananarivo Avaratra': [-18.8400, 47.4900],
+    "Antananarivo Renivohitra": [-18.91, 47.525],
+    "Antananarivo Atsimondrano": [-18.94, 47.47],
+    "Antananarivo Avaradrano": [-18.86, 47.56],
+    "Antananarivo Atsimo": [-18.97, 47.51],
+    "Antananarivo Andrefana": [-18.9, 47.44],
+    "Antananarivo Avaratra": [-18.84, 47.49],
   };
 
   const [formData, setFormData] = useState({
-    nom_citoyen: '',
-    prenom_citoyen: '',
-    email: '',
-    telephone: '',
-    adresse_citoyen: '',
-    lot: '',
-    fokontany: '',
-    arrondissement: '',
-    titre: '',
-    description: '',
-    id_categorie: '1',
-    id_quartier: '',
-    lieu_exact: '',
-    suggestions: ''
+    nom_citoyen: "",
+    prenom_citoyen: "",
+    email: "",
+    telephone: "",
+    adresse_citoyen: "",
+    lot: "",
+    fokontany: "",
+    arrondissement: "",
+    titre: "",
+    description: "",
+    id_categorie: "",
+    id_quartier: "",
+    lieu_exact: "",
+    suggestions: "",
   });
 
   useEffect(() => {
@@ -152,43 +197,75 @@ function DeposerDoleance() {
   }, [t]);
 
   useEffect(() => {
-    const urls = files.map(file => {
-      if (file.type.startsWith('image/')) return URL.createObjectURL(file);
+    const urls = files.map((file) => {
+      if (file.type.startsWith("image/")) return URL.createObjectURL(file);
       return null;
     });
+
     setFilePreviews(urls);
-    return () => urls.forEach(url => { if (url) URL.revokeObjectURL(url); });
+    return () =>
+      urls.forEach((url) => {
+        if (url) URL.revokeObjectURL(url);
+      });
   }, [files]);
+
+  // Mapper les catégories DB au format attendu par CategoryCard
+  const mappedCategories = categoriesData.map((cat) => ({
+    id: cat.id_categorie,
+    label: cat.nom_categorie,
+    desc: cat.description,
+    icon: iconMap[cat.icone] || iconMap["road"],
+    gradient: gradientMap[cat.couleur] || "from-slate-500 to-slate-700",
+  }));
+
+  const firstCategories = mappedCategories.slice(0, 5);
+  const otherCategories = mappedCategories.slice(5);
 
   const fetchData = async () => {
     try {
       const [categoriesRes, quartiersRes, assignedRes] = await Promise.all([
-        api.get('/doleances/categories'),
-        api.get('/doleances/quartiers'),
-        api.get('/doleances/public/assigned-locations').catch(() => ({ data: { data: [] } }))
+        api.get("/doleances/categories"),
+        api.get("/doleances/quartiers"),
+        api
+          .get("/doleances/public/assigned-locations")
+          .catch(() => ({ data: { data: [] } })),
       ]);
       setCategoriesData(categoriesRes.data?.data || categoriesRes.data || []);
       setQuartiers(quartiersRes.data?.data || quartiersRes.data || []);
       setAssignedDoleances(assignedRes.data?.data || assignedRes.data || []);
+      
+      // Définir la première catégorie par défaut
+      const cats = categoriesRes.data?.data || categoriesRes.data || [];
+      if (cats.length > 0 && !selectedCategory) {
+        setSelectedCategory(cats[0].id_categorie);
+        setFormData((prev) => ({
+          ...prev,
+          id_categorie: String(cats[0].id_categorie),
+        }));
+      }
       setArrondissements([
-        t('districts.district1'), t('districts.district2'), t('districts.district3'),
-        t('districts.district4'), t('districts.district5'), t('districts.district6')
+        t("districts.district1"),
+        t("districts.district2"),
+        t("districts.district3"),
+        t("districts.district4"),
+        t("districts.district5"),
+        t("districts.district6"),
       ]);
     } catch (error) {
-      console.error('Erreur chargement donnees:', error);
-      toast.error(t('errors.generic'));
+      console.error("Erreur chargement donnees:", error);
+      toast.error(t("errors.generic"));
     }
   };
 
   const handleSelectCategory = (id) => {
     setSelectedCategory(id);
-    setFormData(prev => ({ ...prev, id_categorie: String(id) }));
+    setFormData((prev) => ({ ...prev, id_categorie: String(id) }));
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    if (name === 'arrondissement' && arrondissementCoords[value]) {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    if (name === "arrondissement" && arrondissementCoords[value]) {
       setMapPosition(arrondissementCoords[value]);
     }
   };
@@ -199,26 +276,27 @@ function DeposerDoleance() {
     const validFiles = [];
     const errors = [];
 
-    selectedFiles.forEach(file => {
+    selectedFiles.forEach((file) => {
       if (file.size > maxSize) {
-        errors.push(`${file.name} ${t('messages.fileTooBig')}`);
-      } else if (!file.type.startsWith('image/')) {
+        errors.push(`${file.name} ${t("messages.fileTooBig")}`);
+      } else if (!file.type.startsWith("image/")) {
         errors.push(`${file.name} - Seules les images sont acceptées`);
       } else {
         validFiles.push(file);
       }
     });
 
-    if (errors.length > 0) errors.forEach(err => toast.error(err));
+    if (errors.length > 0) errors.forEach((err) => toast.error(err));
     if (validFiles.length + files.length > 5) {
-      toast.error(t('messages.maxFilesReached'));
+      toast.error(t("messages.maxFilesReached"));
       return;
     }
-    setFiles(prev => [...prev, ...validFiles]);
-    e.target.value = '';
+    setFiles((prev) => [...prev, ...validFiles]);
+    e.target.value = "";
   };
 
-  const removeFile = (index) => setFiles(prev => prev.filter((_, i) => i !== index));
+  const removeFile = (index) =>
+    setFiles((prev) => prev.filter((_, i) => i !== index));
 
   const handleDragOver = useCallback((e) => {
     e.preventDefault();
@@ -230,52 +308,62 @@ function DeposerDoleance() {
     setDragOver(false);
   }, []);
 
-  const handleDrop = useCallback((e) => {
-    e.preventDefault();
-    setDragOver(false);
-    const droppedFiles = Array.from(e.dataTransfer.files);
-    const maxSize = 50 * 1024 * 1024;
-    const validFiles = [];
-    const errors = [];
+  const handleDrop = useCallback(
+    (e) => {
+      e.preventDefault();
+      setDragOver(false);
+      const droppedFiles = Array.from(e.dataTransfer.files);
+      const maxSize = 50 * 1024 * 1024;
+      const validFiles = [];
+      const errors = [];
 
-    droppedFiles.forEach(file => {
-      if (file.size > maxSize) {
-        errors.push(`${file.name} ${t('messages.fileTooBig')}`);
-      } else if (!file.type.startsWith('image/')) {
-        errors.push(`${file.name} - Seules les images sont acceptées`);
-      } else {
-        validFiles.push(file);
+      droppedFiles.forEach((file) => {
+        if (file.size > maxSize) {
+          errors.push(`${file.name} ${t("messages.fileTooBig")}`);
+        } else if (!file.type.startsWith("image/")) {
+          errors.push(`${file.name} - Seules les images sont acceptées`);
+        } else {
+          validFiles.push(file);
+        }
+      });
+
+      if (errors.length > 0) errors.forEach((err) => toast.error(err));
+      if (validFiles.length + files.length > 5) {
+        toast.error(t("messages.maxFilesReached"));
+        return;
       }
-    });
-
-    if (errors.length > 0) errors.forEach(err => toast.error(err));
-    if (validFiles.length + files.length > 5) {
-      toast.error(t('messages.maxFilesReached'));
-      return;
-    }
-    setFiles(prev => [...prev, ...validFiles]);
-  }, [files, t]);
+      setFiles((prev) => [...prev, ...validFiles]);
+    },
+    [files, t],
+  );
 
   const uploadFiles = async (doleanceId) => {
     if (files.length === 0) return;
     setUploading(true);
     setUploadProgress(0);
     const formDataFiles = new FormData();
-    files.forEach(file => formDataFiles.append('files', file));
-    formDataFiles.append('doleance_id', doleanceId);
+    files.forEach((file) => formDataFiles.append("files", file));
+    formDataFiles.append("doleance_id", doleanceId);
     try {
-      const uploadResponse = await api.post('/doleances/public/upload', formDataFiles, {
-        headers: { 'Content-Type': undefined },
-        onUploadProgress: (progressEvent) => {
-          setUploadProgress(Math.round((progressEvent.loaded * 100) / progressEvent.total));
-        }
-      });
+      const uploadResponse = await api.post(
+        "/doleances/public/upload",
+        formDataFiles,
+        {
+          headers: { "Content-Type": undefined },
+          onUploadProgress: (progressEvent) => {
+            setUploadProgress(
+              Math.round((progressEvent.loaded * 100) / progressEvent.total),
+            );
+          },
+        },
+      );
       if (!uploadResponse.data?.success) {
-        throw new Error(uploadResponse.data?.message || 'Upload failed');
+        throw new Error(uploadResponse.data?.message || "Upload failed");
       }
     } catch (error) {
-      console.error('Erreur upload:', error);
-      const msg = error.response?.data?.message || error.message || t('errors.generic');
+      console.error("Erreur upload:", error);
+      const msg =
+        error.response?.data?.message || error.message || t("errors.generic");
       toast.error(msg);
       throw error;
     } finally {
@@ -284,27 +372,42 @@ function DeposerDoleance() {
     }
   };
 
-  const sendReferenceAuto = async (reference, contact, contactType, nom, prenom, titre) => {
+  const sendReferenceAuto = async (
+    reference,
+    contact,
+    contactType,
+    nom,
+    prenom,
+    titre,
+  ) => {
     if (!contact || !reference) return;
     setSendingReference(true);
     setSendError(null);
     setEmailSent(false);
     setSmsSent(false);
     try {
-      const result = await EmailService.sendReference(contact, reference, nom || 'Citoyen', prenom || '', titre || 'Doleance');
+      const result = await EmailService.sendReference(
+        contact,
+        reference,
+        nom || "Citoyen",
+        prenom || "",
+        titre || "Doleance",
+      );
       if (result.success) {
-        if (contactType === 'email') setEmailSent(true);
+        if (contactType === "email") setEmailSent(true);
         else setSmsSent(true);
         setReferenceSent(true);
-        toast.success(`Reference ${reference} envoyee a ${contact}`, { duration: 6000 });
+        toast.success(`Reference ${reference} envoyee a ${contact}`, {
+          duration: 6000,
+        });
       } else {
         setSendError(result.message);
-        toast.error(result.message || t('errors.generic'), { duration: 6000 });
+        toast.error(result.message || t("errors.generic"), { duration: 6000 });
       }
     } catch (error) {
-      console.error('Erreur envoi reference:', error);
-      setSendError(error.message || 'Erreur inconnue');
-      toast.error(t('errors.generic'), { duration: 6000 });
+      console.error("Erreur envoi reference:", error);
+      setSendError(error.message || "Erreur inconnue");
+      toast.error(t("errors.generic"), { duration: 6000 });
     } finally {
       setSendingReference(false);
     }
@@ -312,13 +415,25 @@ function DeposerDoleance() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.email && !formData.telephone) { toast.error('Email ou telephone requis'); return; }
-    if (!formData.nom_citoyen || !formData.prenom_citoyen || !formData.titre || !formData.description) {
-      toast.error(t('messages.pleaseFillRequired')); return;
+    if (!formData.email && !formData.telephone) {
+      toast.error("Email ou telephone requis");
+      return;
+    }
+    if (
+      !formData.nom_citoyen ||
+      !formData.prenom_citoyen ||
+      !formData.titre ||
+      !formData.description
+    ) {
+      toast.error(t("messages.pleaseFillRequired"));
+      return;
     }
     if (formData.telephone) {
-      const digitsOnly = formData.telephone.replace(/[^0-9]/g, '');
-      if (digitsOnly.length < 8 || digitsOnly.length > 10) { toast.error(t('messages.phoneLengthError')); return; }
+      const digitsOnly = formData.telephone.replace(/[^0-9]/g, "");
+      if (digitsOnly.length < 8 || digitsOnly.length > 10) {
+        toast.error(t("messages.phoneLengthError"));
+        return;
+      }
     }
 
     setLoading(true);
@@ -331,32 +446,53 @@ function DeposerDoleance() {
         email_citoyen: formData.email || null,
         latitude: mapPosition[0],
         longitude: mapPosition[1],
-        lieu_exact: locationName || formData.lieu_exact || `${mapPosition[0].toFixed(4)}, ${mapPosition[1].toFixed(4)}`,
-        description: `${formData.description}\n\nLocalisation: ${locationName || `${mapPosition[0].toFixed(4)}, ${mapPosition[1].toFixed(4)}`}\nSuggestions: ${formData.suggestions || 'Aucune suggestion'}`
+        lieu_exact:
+          locationName ||
+          formData.lieu_exact ||
+          `${mapPosition[0].toFixed(4)}, ${mapPosition[1].toFixed(4)}`,
+        description: `${formData.description}\n\nLocalisation: ${locationName || `${mapPosition[0].toFixed(4)}, ${mapPosition[1].toFixed(4)}`}\nSuggestions: ${formData.suggestions || "Aucune suggestion"}`,
       };
 
-      const response = await api.post('/doleances', dataToSend);
-      const reference = response.data.data?.reference || response.data.reference;
-      const doleanceId = response.data.data?.id_doleance || response.data.id_doleance;
+      const response = await api.post("/doleances", dataToSend);
+      const reference =
+        response.data.data?.reference || response.data.reference;
+      const doleanceId =
+        response.data.data?.id_doleance || response.data.id_doleance;
 
       let uploadOk = true;
       if (files.length > 0 && doleanceId) {
-        try { await uploadFiles(doleanceId); } catch { uploadOk = false; }
+        try {
+          await uploadFiles(doleanceId);
+        } catch {
+          uploadOk = false;
+        }
       }
 
       setSavedReference(reference);
       const contactInfo = formData.email || formData.telephone;
-      const contactType = formData.email ? 'email' : 'phone';
+      const contactType = formData.email ? "email" : "phone";
       if (contactInfo && reference) {
-        await sendReferenceAuto(reference, contactInfo, contactType, formData.nom_citoyen, formData.prenom_citoyen, formData.titre);
+        await sendReferenceAuto(
+          reference,
+          contactInfo,
+          contactType,
+          formData.nom_citoyen,
+          formData.prenom_citoyen,
+          formData.titre,
+        );
       }
 
       toast.success(
         <div className="flex flex-col gap-1">
           <p className="font-bold">Signalement envoye avec succes !</p>
-          <p className="text-sm">Reference: <span className="font-mono font-bold text-[#1E3A8A]">{reference}</span></p>
+          <p className="text-sm">
+            Reference:{" "}
+            <span className="font-mono font-bold text-[#1E3A8A]">
+              {reference}
+            </span>
+          </p>
         </div>,
-        { duration: 8000 }
+        { duration: 8000 },
       );
 
       setShowReferenceModal(true);
@@ -368,124 +504,141 @@ function DeposerDoleance() {
       }, 5000);
 
       setFormData({
-        nom_citoyen: '', prenom_citoyen: '', email: '', telephone: '', adresse_citoyen: '', lot: '',
-        fokontany: '', arrondissement: '', titre: '', description: '', id_categorie: '1',
-        id_quartier: '', lieu_exact: '', suggestions: ''
+        nom_citoyen: "",
+        prenom_citoyen: "",
+        email: "",
+        telephone: "",
+        adresse_citoyen: "",
+        lot: "",
+        fokontany: "",
+        arrondissement: "",
+        titre: "",
+        description: "",
+        id_categorie: mappedCategories[0]?.id
+          ? String(mappedCategories[0].id)
+          : "",
+        id_quartier: "",
+        lieu_exact: "",
+        suggestions: "",
       });
       setFiles([]);
       setFilePreviews([]);
-      setReferenceSent(false); setEmailSent(false); setSmsSent(false); setSendError(null);
-
+      setReferenceSent(false);
+      setEmailSent(false);
+      setSmsSent(false);
+      setSendError(null);
     } catch (error) {
-      console.error('Erreur:', error);
-      toast.error(error.response?.data?.message || t('errors.generic'));
+      console.error("Erreur:", error);
+      toast.error(error.response?.data?.message || t("errors.generic"));
     } finally {
       setLoading(false);
     }
   };
 
-
   const formatFileSize = (bytes) => {
-    if (bytes < 1024) return bytes + ' B';
-    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
-    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    if (bytes < 1024) return bytes + " B";
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+    return (bytes / (1024 * 1024)).toFixed(1) + " MB";
   };
 
   // Remplit le formulaire à partir d'un résultat Nominatim
-const fillFromNominatim = (data) => {
-  const addr = data.address || {};
-  const quartierNom = addr.suburb || addr.neighbourhood || addr.quarter || '';
+  const fillFromNominatim = (data) => {
+    const addr = data.address || {};
+    const quartierNom = addr.suburb || addr.neighbourhood || addr.quarter || "";
 
-  // Essaie de matcher le quartier trouvé avec la liste existante
-  const matchedQuartier = quartiers.find(
-    q => q.nom_quartier.toLowerCase() === quartierNom.toLowerCase()
-  );
+    // Essaie de matcher le quartier trouvé avec la liste existante
+    const matchedQuartier = quartiers.find(
+      (q) => q.nom_quartier.toLowerCase() === quartierNom.toLowerCase(),
+    );
 
-  setFormData(prev => ({
-    ...prev,
-    arrondissement: addr.city_district || addr.district || prev.arrondissement,
-    id_quartier: matchedQuartier ? matchedQuartier.id_quartier : prev.id_quartier,
-    fokontany: prev.fokontany, // pas dispo via OSM, reste manuel
-    lieu_exact: data.display_name || prev.lieu_exact,
-  }));
+    setFormData((prev) => ({
+      ...prev,
+      arrondissement:
+        addr.city_district || addr.district || prev.arrondissement,
+      id_quartier: matchedQuartier
+        ? matchedQuartier.id_quartier
+        : prev.id_quartier,
+      fokontany: prev.fokontany, // pas dispo via OSM, reste manuel
+      lieu_exact: data.display_name || prev.lieu_exact,
+    }));
 
-  setSearchAddress(data.display_name || '');
-};
+    setSearchAddress(data.display_name || "");
+  };
 
-// Bouton "Me localiser"
-const handleLocateMe = () => {
-  if (!navigator.geolocation) return;
-  setIsLocating(true);
+  // Bouton "Me localiser"
+  const handleLocateMe = () => {
+    if (!navigator.geolocation) return;
+    setIsLocating(true);
 
-  navigator.geolocation.getCurrentPosition(
-    async (pos) => {
-      const { latitude, longitude } = pos.coords;
-      setMapPosition([latitude, longitude]);
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        setMapPosition([latitude, longitude]);
 
+        try {
+          const res = await fetch(
+            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`,
+          );
+          const data = await res.json();
+          fillFromNominatim(data);
+        } catch (err) {
+          console.error("Erreur reverse geocoding:", err);
+        } finally {
+          setIsLocating(false);
+        }
+      },
+      (err) => {
+        console.error("Erreur géolocalisation:", err);
+        setIsLocating(false);
+      },
+    );
+  };
+
+  // Recherche avec suggestions (debounce 400ms)
+  const handleSearchInputChange = (e) => {
+    const value = e.target.value;
+    setSearchAddress(value);
+
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+
+    if (value.trim().length < 3) {
+      setSuggestions([]);
+      setShowSuggestions(false);
+      return;
+    }
+
+    searchTimeoutRef.current = setTimeout(async () => {
+      setIsSearching(true);
       try {
         const res = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`
+          `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=5&q=${encodeURIComponent(value)}`,
         );
         const data = await res.json();
-        fillFromNominatim(data);
+        setSuggestions(data);
+        setShowSuggestions(true);
       } catch (err) {
-        console.error('Erreur reverse geocoding:', err);
+        console.error("Erreur recherche:", err);
       } finally {
-        setIsLocating(false);
+        setIsSearching(false);
       }
-    },
-    (err) => {
-      console.error('Erreur géolocalisation:', err);
-      setIsLocating(false);
-    }
-  );
-};
+    }, 400);
+  };
 
-// Recherche avec suggestions (debounce 400ms)
-const handleSearchInputChange = (e) => {
-  const value = e.target.value;
-  setSearchAddress(value);
-
-  if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
-
-  if (value.trim().length < 3) {
+  // Clic sur une suggestion
+  const handleSelectSuggestion = (item) => {
+    setMapPosition([parseFloat(item.lat), parseFloat(item.lon)]);
+    fillFromNominatim(item);
     setSuggestions([]);
     setShowSuggestions(false);
-    return;
-  }
+  };
 
-  searchTimeoutRef.current = setTimeout(async () => {
-    setIsSearching(true);
-    try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=5&q=${encodeURIComponent(value)}`
-      );
-      const data = await res.json();
-      setSuggestions(data);
-      setShowSuggestions(true);
-    } catch (err) {
-      console.error('Erreur recherche:', err);
-    } finally {
-      setIsSearching(false);
+  // Recherche via Entrée / bouton "Chercher" (prend la 1ère suggestion dispo)
+  const handleSearchAddress = async (e) => {
+    e.preventDefault();
+    if (suggestions.length > 0) {
+      handleSelectSuggestion(suggestions[0]);
     }
-  }, 400);
-};
-
-// Clic sur une suggestion
-const handleSelectSuggestion = (item) => {
-  setMapPosition([parseFloat(item.lat), parseFloat(item.lon)]);
-  fillFromNominatim(item);
-  setSuggestions([]);
-  setShowSuggestions(false);
-};
-
-// Recherche via Entrée / bouton "Chercher" (prend la 1ère suggestion dispo)
-const handleSearchAddress = async (e) => {
-  e.preventDefault();
-  if (suggestions.length > 0) {
-    handleSelectSuggestion(suggestions[0]);
-  }
-};
+  };
 
   const charsCount = formData.description.length;
 
@@ -554,63 +707,84 @@ const handleSearchAddress = async (e) => {
       <div className="mb-6 sm:mb-8 cua-anim">
         <h1 className="cua-display text-2xl sm:text-2xl font-semibold text-[#0F172A] flex items-center gap-2 sm:gap-3">
           <span className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#0F172A] to-[#1E3A8A] flex items-center justify-center text-white shadow-md shadow-[#0F172A]/20 flex-shrink-0">
-            <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            <svg
+              className="w-4 h-4 sm:w-5 sm:h-5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
             </svg>
           </span>
           Signaler un problème
         </h1>
         <p className=" text-slate-500 mt-1.5 ml-[44px] sm:ml-[52px] ">
-          Aidez à améliorer votre quartier — signalez rapidement tout incident ou dysfonctionnement à la Commune.
+          Aidez à améliorer votre quartier — signalez rapidement tout incident
+          ou dysfonctionnement à la Commune.
         </p>
       </div>
 
       <form onSubmit={handleSubmit}>
         {/* Categories */}
- <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-
-    {firstCategories.map(cat => (
-        <CategoryCard
-            key={cat.id}
-            cat={cat}
-            selected={selectedCategory === cat.id}
-            onClick={handleSelectCategory}
-        />
-    ))}
-
-    <CategoryCard
-        cat={{
-            id: "others",
-            label: "Autres",
-            desc: "Voir toutes les catégories"
-        }}
-        selected={false}
-        onClick={() => setShowOthers(!showOthers)}
-    />
-
-</div>
-{showOthers && (
-    <div className="mt-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-
-        {otherCategories.map(cat => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          {firstCategories.map((cat) => (
             <CategoryCard
+              key={cat.id}
+              cat={cat}
+              selected={selectedCategory === cat.id}
+              onClick={handleSelectCategory}
+            />
+          ))}
+
+          <CategoryCard
+            cat={{
+              id: "others",
+              label: "Autres",
+              desc: "Voir toutes les catégories",
+              icon: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z",
+              gradient: "from-slate-500 to-slate-700",
+            }}
+            selected={false}
+            onClick={() => setShowOthers(!showOthers)}
+          />
+        </div>
+        {showOthers && (
+          <div className="mt-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+            {otherCategories.map((cat) => (
+              <CategoryCard
                 key={cat.id}
                 cat={cat}
                 selected={selectedCategory === cat.id}
                 onClick={handleSelectCategory}
-            />
-        ))}
-
-    </div>
-)}
+              />
+            ))}
+          </div>
+        )}
 
         {/* Titre */}
-        <div className="cua-section rounded-2xl p-5 mb-6 cua-anim">
+        <div className="cua-section rounded-2xl p-5 mt-4 mb-6 cua-anim">
           <div className="flex items-center gap-2 mb-4">
-            <svg className="w-5 h-5 text-[#1E3A8A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 9h16.5m-16.5 6.75h16.5" />
+            <svg
+              className="w-5 h-5 text-[#1E3A8A]"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3.75 9h16.5m-16.5 6.75h16.5"
+              />
             </svg>
-            <h2 className="text-lg font-bold text-[#0F172A]">Titre du problème</h2>
+            <h2 className="text-lg font-bold text-[#0F172A]">
+              Titre du problème
+            </h2>
           </div>
           <input
             type="text"
@@ -626,24 +800,55 @@ const handleSearchAddress = async (e) => {
         {/* Localisation & Adresse (fusionné) */}
         <div className="cua-section rounded-2xl p-5 mb-6 cua-anim">
           <div className="flex items-center gap-2 mb-4">
-            <svg className="w-5 h-5 text-[#1E3A8A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+            <svg
+              className="w-5 h-5 text-[#1E3A8A]"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+              />
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+              />
             </svg>
-            <h2 className="text-lg font-bold text-[#0F172A]">Localisation & adresse</h2>
+            <h2 className="text-lg font-bold text-[#0F172A]">
+              Localisation & adresse
+            </h2>
           </div>
 
           {/* Barre de recherche + Me localiser */}
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-3 relative">
-            <form onSubmit={handleSearchAddress} className="cua-field-wrap flex-1 flex items-center gap-3 bg-slate-50 rounded-xl px-4 border-2 border-transparent transition-all relative order-2 sm:order-1">
-              <svg className="w-4 h-4 text-slate-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            <form
+              onSubmit={handleSearchAddress}
+              className="cua-field-wrap flex-1 flex items-center gap-3 bg-slate-50 rounded-xl px-4 border-2 border-transparent transition-all relative order-2 sm:order-1"
+            >
+              <svg
+                className="w-4 h-4 text-slate-400 flex-shrink-0"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                />
               </svg>
               <input
                 type="text"
                 value={searchAddress}
                 onChange={handleSearchInputChange}
-                onFocus={() => searchAddress.length >= 3 && setShowSuggestions(true)}
+                onFocus={() =>
+                  searchAddress.length >= 3 && setShowSuggestions(true)
+                }
                 onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
                 placeholder="Rechercher une adresse, un quartier..."
                 className="flex-1 bg-transparent py-2.5 sm:py-3 text-sm font-medium text-slate-800 outline-none placeholder:text-slate-400 min-w-0"
@@ -651,7 +856,10 @@ const handleSearchAddress = async (e) => {
               {isSearching && (
                 <div className="w-4 h-4 border-2 border-slate-300 border-t-[#1E3A8A] rounded-full animate-spin flex-shrink-0" />
               )}
-              <button type="submit" className="text-xs font-semibold text-[#1E3A8A] hover:text-[#0F172A] py-1 px-2 rounded-lg hover:bg-[#1E3A8A]/5 transition-all flex-shrink-0">
+              <button
+                type="submit"
+                className="text-xs font-semibold text-[#1E3A8A] hover:text-[#0F172A] py-1 px-2 rounded-lg hover:bg-[#1E3A8A]/5 transition-all flex-shrink-0"
+              >
                 Chercher
               </button>
 
@@ -681,16 +889,44 @@ const handleSearchAddress = async (e) => {
               {isLocating ? (
                 <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
               ) : (
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
                 </svg>
               )}
               <span className="hidden sm:inline">Me localiser</span>
               <span className="sm:hidden">
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                <svg
+                  className="w-4 h-4"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
                 </svg>
               </span>
             </button>
@@ -698,7 +934,12 @@ const handleSearchAddress = async (e) => {
 
           {/* Carte */}
           <div className="h-64 sm:h-96 rounded-xl overflow-hidden border border-slate-200 relative z-0 mb-4">
-            <MapContainer center={mapPosition} zoom={14} className="h-full w-full" scrollWheelZoom={true}>
+            <MapContainer
+              center={mapPosition}
+              zoom={14}
+              className="h-full w-full"
+              scrollWheelZoom={true}
+            >
               <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -708,38 +949,58 @@ const handleSearchAddress = async (e) => {
                 position={mapPosition}
                 setPosition={setMapPosition}
                 onPositionChange={(latlng) => {
-                  setFormData(prev => ({
+                  setFormData((prev) => ({
                     ...prev,
-                    lieu_exact: prev.lieu_exact || `${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}`
+                    lieu_exact:
+                      prev.lieu_exact ||
+                      `${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}`,
                   }));
                 }}
               />
-              {assignedDoleances.filter(d => d.latitude && d.longitude).map(d => (
-                <Marker
-                  key={d.id_doleance}
-                  position={[parseFloat(d.latitude), parseFloat(d.longitude)]}
-                  icon={L.divIcon({
-                    className: 'assigned-marker',
-                    html: '<div style="background:#D4AF37;width:12px;height:12px;border-radius:50%;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.4)"></div>',
-                    iconSize: [12, 12],
-                    iconAnchor: [6, 6]
-                  })}
-                >
-                  <Popup>
-                    <div className="text-xs">
-                      <p className="font-bold">{d.titre}</p>
-                      <p className="text-slate-500">{d.nom_categorie}</p>
-                      <p className="text-slate-400">Ref: {d.reference}</p>
-                      <p className="text-emerald-600 font-semibold mt-1">Assignée</p>
-                    </div>
-                  </Popup>
-                </Marker>
-              ))}
+              {assignedDoleances
+                .filter((d) => d.latitude && d.longitude)
+                .map((d) => (
+                  <Marker
+                    key={d.id_doleance}
+                    position={[parseFloat(d.latitude), parseFloat(d.longitude)]}
+                    icon={L.divIcon({
+                      className: "assigned-marker",
+                      html: '<div style="background:#D4AF37;width:12px;height:12px;border-radius:50%;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.4)"></div>',
+                      iconSize: [12, 12],
+                      iconAnchor: [6, 6],
+                    })}
+                  >
+                    <Popup>
+                      <div className="text-xs">
+                        <p className="font-bold">{d.titre}</p>
+                        <p className="text-slate-500">{d.nom_categorie}</p>
+                        <p className="text-slate-400">Ref: {d.reference}</p>
+                        <p className="text-emerald-600 font-semibold mt-1">
+                          Assignée
+                        </p>
+                      </div>
+                    </Popup>
+                  </Marker>
+                ))}
             </MapContainer>
             <div className="absolute bottom-3 left-3 z-[1000] bg-[#0F172A]/75 backdrop-blur-sm text-white text-xs font-medium px-3 py-1.5 rounded-full">
-              <svg className="w-3 h-3 inline mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              <svg
+                className="w-3 h-3 inline mr-1"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                />
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                />
               </svg>
               Cliquez ou déplacez le marqueur pour ajuster
             </div>
@@ -749,7 +1010,8 @@ const handleSearchAddress = async (e) => {
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
               <label className="block text-xs font-bold text-slate-600 mb-1.5">
-                Lieu exact <span className="text-slate-400 font-normal">(optionnel)</span>
+                Lieu exact{" "}
+                <span className="text-slate-400 font-normal">(optionnel)</span>
               </label>
               <input
                 type="text"
@@ -762,7 +1024,8 @@ const handleSearchAddress = async (e) => {
               {assignedDoleances.length > 0 && (
                 <p className="text-xs text-slate-400 mt-1.5 flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#D4AF37] flex-shrink-0" />
-                  Les points dorés sur la carte montrent les signalements déjà assignés
+                  Les points dorés sur la carte montrent les signalements déjà
+                  assignés
                 </p>
               )}
             </div>
@@ -772,12 +1035,24 @@ const handleSearchAddress = async (e) => {
         {/* Suggestions */}
         <div className="cua-section rounded-2xl p-5 mb-6 cua-anim">
           <div className="flex items-center gap-2 mb-1">
-            <svg className="w-5 h-5 text-[#1E3A8A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+            <svg
+              className="w-5 h-5 text-[#1E3A8A]"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"
+              />
             </svg>
             <h2 className="text-lg font-bold text-[#0F172A]">Suggestions</h2>
           </div>
-          <p className="text-sm text-slate-400 mb-4 ml-7">Proposez des idées pour résoudre le problème (optionnel)</p>
+          <p className="text-sm text-slate-400 mb-4 ml-7">
+            Proposez des idées pour résoudre le problème (optionnel)
+          </p>
           <textarea
             name="suggestions"
             value={formData.suggestions}
@@ -789,63 +1064,153 @@ const handleSearchAddress = async (e) => {
         </div>
 
         {/* Photos */}
-      
+
         <div className="cua-section rounded-2xl p-5 mb-6 cua-anim">
           <div className="flex items-center gap-2 mb-1">
-            <svg className="w-5 h-5 text-[#1E3A8A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            <svg
+              className="w-5 h-5 text-[#1E3A8A]"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
+              />
             </svg>
-            <h2 className="text-lg font-bold text-[#0F172A]">Ajouter des photos</h2>
+            <h2 className="text-lg font-bold text-[#0F172A]">
+              Ajouter des photos
+            </h2>
           </div>
-          <p className="text-sm text-slate-400 mb-4 ml-7">Montrez le problème avec des photos prises sur place (optionnel mais recommandé)</p>
+          <p className="text-sm text-slate-400 mb-4 ml-7">
+            Montrez le problème avec des photos prises sur place (optionnel mais
+            recommandé)
+          </p>
 
           <div className="flex gap-2 sm:gap-3 mb-4 overflow-x-auto pb-2 -mx-5 px-5">
             {[
-              { label: 'Nid-de-poule', icon: 'M13.5 4L5.25 12.25l4.5 4.5L18 8.5', color: 'from-rose-400 to-orange-400' },
-              { label: 'Déchet sauvage', icon: 'M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16', color: 'from-emerald-400 to-teal-500' },
-              { label: 'Lampadaire', icon: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z', color: 'from-amber-400 to-[#D4AF37]' },
-              { label: 'Espace vert', icon: 'M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5', color: 'from-green-500 to-emerald-700' },
+              {
+                label: "Nid-de-poule",
+                icon: "M13.5 4L5.25 12.25l4.5 4.5L18 8.5",
+                color: "from-rose-400 to-orange-400",
+              },
+              {
+                label: "Déchet sauvage",
+                icon: "M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16",
+                color: "from-emerald-400 to-teal-500",
+              },
+              {
+                label: "Lampadaire",
+                icon: "M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z",
+                color: "from-amber-400 to-[#D4AF37]",
+              },
+              {
+                label: "Espace vert",
+                icon: "M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5",
+                color: "from-green-500 to-emerald-700",
+              },
             ].map((ex, i) => (
-              <div key={i} className="w-24 sm:w-28 h-16 sm:h-20 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center flex-shrink-0 relative overflow-hidden">
-                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br ${ex.color} flex items-center justify-center`}>
-                  <svg className="w-4 h-4 sm:w-5 sm:h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d={ex.icon} />
+              <div
+                key={i}
+                className="w-24 sm:w-28 h-16 sm:h-20 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center flex-shrink-0 relative overflow-hidden"
+              >
+                <div
+                  className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br ${ex.color} flex items-center justify-center`}
+                >
+                  <svg
+                    className="w-4 h-4 sm:w-5 sm:h-5 text-white"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    strokeWidth={2}
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d={ex.icon}
+                    />
                   </svg>
                 </div>
-                <span className="absolute bottom-0 left-0 right-0 bg-[#0F172A]/60 text-white text-[9px] font-medium text-center py-0.5 sm:py-1">{ex.label}</span>
+                <span className="absolute bottom-0 left-0 right-0 bg-[#0F172A]/60 text-white text-[9px] font-medium text-center py-0.5 sm:py-1">
+                  {ex.label}
+                </span>
               </div>
             ))}
           </div>
 
           <div
             className={`cua-dropzone border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
-              dragOver ? 'drag' : 'border-slate-300 hover:border-[#D4AF37] hover:bg-slate-50'
+              dragOver
+                ? "drag"
+                : "border-slate-300 hover:border-[#D4AF37] hover:bg-slate-50"
             }`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
           >
-            <svg className="w-10 h-10 mx-auto text-[#1E3A8A] mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+            <svg
+              className="w-10 h-10 mx-auto text-[#1E3A8A] mb-3"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={1.5}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
+              />
             </svg>
-            <p className="text-sm font-bold text-slate-700 mb-1">Glissez-déposez vos photos ici</p>
-            <p className="text-xs text-slate-400">ou cliquez pour parcourir (JPG, PNG, WebP, GIF — max 50 Mo)</p>
-            <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/gif,image/webp" multiple onChange={handleFileChange} className="hidden" />
+            <p className="text-sm font-bold text-slate-700 mb-1">
+              Glissez-déposez vos photos ici
+            </p>
+            <p className="text-xs text-slate-400">
+              ou cliquez pour parcourir (JPG, PNG, WebP, GIF — max 50 Mo)
+            </p>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/gif,image/webp"
+              multiple
+              onChange={handleFileChange}
+              className="hidden"
+            />
           </div>
 
           {files.length > 0 && (
             <div className="mt-4">
-              <p className="text-sm font-semibold text-slate-700 mb-3">{files.length} photo(s) sélectionnée(s) — aperçu avant envoi</p>
+              <p className="text-sm font-semibold text-slate-700 mb-3">
+                {files.length} photo(s) sélectionnée(s) — aperçu avant envoi
+              </p>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                 {files.map((file, i) => (
-                  <div key={i} className="group relative rounded-xl overflow-hidden border-2 border-slate-100 hover:border-[#D4AF37] transition-all duration-200 bg-slate-50 aspect-square">
+                  <div
+                    key={i}
+                    className="group relative rounded-xl overflow-hidden border-2 border-slate-100 hover:border-[#D4AF37] transition-all duration-200 bg-slate-50 aspect-square"
+                  >
                     {filePreviews[i] ? (
-                      <img src={filePreviews[i]} alt={file.name} className="w-full h-full object-cover" />
+                      <img
+                        src={filePreviews[i]}
+                        alt={file.name}
+                        className="w-full h-full object-cover"
+                      />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <svg className="w-8 h-8 text-slate-300" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z" />
+                        <svg
+                          className="w-8 h-8 text-slate-300"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                          strokeWidth={1.5}
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z"
+                          />
                         </svg>
                       </div>
                     )}
@@ -855,13 +1220,27 @@ const handleSearchAddress = async (e) => {
                       onClick={() => removeFile(i)}
                       className="absolute top-2 right-2 w-7 h-7 bg-white/90 hover:bg-rose-500 hover:text-white rounded-full flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-all duration-200"
                     >
-                      <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                      <svg
+                        className="w-4 h-4"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2.5}
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          d="M6 18L18 6M6 6l12 12"
+                        />
                       </svg>
                     </button>
                     <div className="absolute bottom-0 left-0 right-0 px-2 py-1.5 bg-white/90 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                      <p className="text-[10px] font-medium text-slate-700 truncate">{file.name}</p>
-                      <p className="text-[9px] text-slate-400">{formatFileSize(file.size)}</p>
+                      <p className="text-[10px] font-medium text-slate-700 truncate">
+                        {file.name}
+                      </p>
+                      <p className="text-[9px] text-slate-400">
+                        {formatFileSize(file.size)}
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -873,9 +1252,14 @@ const handleSearchAddress = async (e) => {
             <div className="mt-4">
               <div className="flex items-center gap-3">
                 <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
-                  <div className="h-full bg-gradient-to-r from-[#1E3A8A] to-[#D4AF37] rounded-full transition-all duration-300" style={{ width: `${uploadProgress}%` }}></div>
+                  <div
+                    className="h-full bg-gradient-to-r from-[#1E3A8A] to-[#D4AF37] rounded-full transition-all duration-300"
+                    style={{ width: `${uploadProgress}%` }}
+                  ></div>
                 </div>
-                <span className="text-xs font-medium text-slate-500">{uploadProgress}%</span>
+                <span className="text-xs font-medium text-slate-500">
+                  {uploadProgress}%
+                </span>
               </div>
               <p className="text-xs text-slate-400 mt-1">Upload en cours...</p>
             </div>
@@ -885,12 +1269,27 @@ const handleSearchAddress = async (e) => {
         {/* Description */}
         <div className="cua-section rounded-2xl p-5 mb-6 cua-anim">
           <div className="flex items-center gap-2 mb-1">
-            <svg className="w-5 h-5 text-[#1E3A8A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+            <svg
+              className="w-5 h-5 text-[#1E3A8A]"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+              />
             </svg>
-            <h2 className="text-lg font-bold text-[#0F172A]">Description du problème</h2>
+            <h2 className="text-lg font-bold text-[#0F172A]">
+              Description du problème
+            </h2>
           </div>
-          <p className="text-sm text-slate-400 mb-4 ml-7">Décrivez le problème en quelques phrases pour aider les équipes à intervenir</p>
+          <p className="text-sm text-slate-400 mb-4 ml-7">
+            Décrivez le problème en quelques phrases pour aider les équipes à
+            intervenir
+          </p>
           <textarea
             name="description"
             value={formData.description}
@@ -902,55 +1301,118 @@ const handleSearchAddress = async (e) => {
           />
           <div className="flex justify-between items-center mt-2">
             <p className="text-xs text-slate-400">
-              <svg className="w-3.5 h-3.5 inline mr-1 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              <svg
+                className="w-3.5 h-3.5 inline mr-1 text-emerald-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                />
               </svg>
               Données confidentielles
             </p>
-            <span className="text-xs text-slate-400">{charsCount} / 1000 caractères</span>
+            <span className="text-xs text-slate-400">
+              {charsCount} / 1000 caractères
+            </span>
           </div>
         </div>
 
         {/* User Info Section */}
         <div className="cua-section rounded-2xl p-5 mb-6 cua-anim">
           <div className="flex items-center gap-2 mb-4">
-            <svg className="w-5 h-5 text-[#1E3A8A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+            <svg
+              className="w-5 h-5 text-[#1E3A8A]"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
+              />
             </svg>
-            <h2 className="text-lg font-bold text-[#0F172A]">Vos informations</h2>
+            <h2 className="text-lg font-bold text-[#0F172A]">
+              Vos informations
+            </h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1.5">Nom <span className="text-[#D4AF37]">*</span></label>
-              <input type="text" name="nom_citoyen" value={formData.nom_citoyen} onChange={handleChange}
+              <label className="block text-xs font-bold text-slate-600 mb-1.5">
+                Nom <span className="text-[#D4AF37]">*</span>
+              </label>
+              <input
+                type="text"
+                name="nom_citoyen"
+                value={formData.nom_citoyen}
+                onChange={handleChange}
                 className="cua-field w-full border-2 border-slate-100 rounded-xl px-4 py-3 text-sm outline-none bg-slate-50"
-                placeholder="Votre nom" required />
+                placeholder="Votre nom"
+                required
+              />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1.5">Prénom <span className="text-[#D4AF37]">*</span></label>
-              <input type="text" name="prenom_citoyen" value={formData.prenom_citoyen} onChange={handleChange}
+              <label className="block text-xs font-bold text-slate-600 mb-1.5">
+                Prénom <span className="text-[#D4AF37]">*</span>
+              </label>
+              <input
+                type="text"
+                name="prenom_citoyen"
+                value={formData.prenom_citoyen}
+                onChange={handleChange}
                 className="cua-field w-full border-2 border-slate-100 rounded-xl px-4 py-3 text-sm outline-none bg-slate-50"
-                placeholder="Votre prénom" required />
+                placeholder="Votre prénom"
+                required
+              />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1.5">Email</label>
-              <input type="email" name="email" value={formData.email} onChange={handleChange}
+              <label className="block text-xs font-bold text-slate-600 mb-1.5">
+                Email
+              </label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
                 className="cua-field w-full border-2 border-slate-100 rounded-xl px-4 py-3 text-sm outline-none bg-slate-50"
-                placeholder="exemple@email.com" />
+                placeholder="exemple@email.com"
+              />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1.5">Téléphone</label>
-              <input type="tel" name="telephone" value={formData.telephone} onChange={handleChange}
+              <label className="block text-xs font-bold text-slate-600 mb-1.5">
+                Téléphone
+              </label>
+              <input
+                type="tel"
+                name="telephone"
+                value={formData.telephone}
+                onChange={handleChange}
                 className="cua-field w-full border-2 border-slate-100 rounded-xl px-4 py-3 text-sm outline-none bg-slate-50"
-                placeholder="034 12 345 67" />
+                placeholder="034 12 345 67"
+              />
             </div>
-            <p className="col-span-1 sm:col-span-2 text-xs text-slate-400 -mt-1 sm:-mt-2">Email ou téléphone requis pour recevoir le suivi</p>
+            <p className="col-span-1 sm:col-span-2 text-xs text-slate-400 -mt-1 sm:-mt-2">
+              Email ou téléphone requis pour recevoir le suivi
+            </p>
             <div className="col-span-1 sm:col-span-2">
-              <label className="block text-xs font-bold text-slate-600 mb-1.5">Votre adresse</label>
-              <input type="text" name="adresse_citoyen" value={formData.adresse_citoyen} onChange={handleChange}
+              <label className="block text-xs font-bold text-slate-600 mb-1.5">
+                Votre adresse
+              </label>
+              <input
+                type="text"
+                name="adresse_citoyen"
+                value={formData.adresse_citoyen}
+                onChange={handleChange}
                 className="cua-field w-full border-2 border-slate-100 rounded-xl px-4 py-3 text-sm outline-none bg-slate-50"
-                placeholder="Votre adresse personnelle (optionnelle)" />
+                placeholder="Votre adresse personnelle (optionnelle)"
+              />
             </div>
           </div>
         </div>
@@ -958,10 +1420,22 @@ const handleSearchAddress = async (e) => {
         {/* Submit */}
         <div className="flex flex-col sm:flex-row items-center justify-end gap-3 sm:gap-4 pt-2 pb-8 cua-anim">
           <p className="text-xs sm:text-sm text-slate-400 order-2 sm:order-1">
-            <svg className="w-3.5 h-3.5 sm:w-4 sm:h-4 inline mr-1 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+            <svg
+              className="w-3.5 h-3.5 sm:w-4 sm:h-4 inline mr-1 text-emerald-600"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+              />
             </svg>
-            <span className="hidden sm:inline">Vos informations restent confidentielles</span>
+            <span className="hidden sm:inline">
+              Vos informations restent confidentielles
+            </span>
             <span className="sm:hidden">Informations confidentielles</span>
           </p>
           <button
@@ -971,16 +1445,42 @@ const handleSearchAddress = async (e) => {
           >
             {loading || uploading ? (
               <span className="flex items-center gap-2">
-                <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
+                <svg
+                  className="animate-spin h-5 w-5"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  />
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  />
                 </svg>
-                {uploading ? 'Upload...' : 'Envoi...'}
+                {uploading ? "Upload..." : "Envoi..."}
               </span>
             ) : (
               <>
-                <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                <svg
+                  className="w-4 h-4 sm:w-5 sm:h-5"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
+                  />
                 </svg>
                 Envoyer mon signalement
               </>
@@ -996,24 +1496,46 @@ const handleSearchAddress = async (e) => {
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0F172A] via-[#D4AF37] to-[#0F172A]" />
             <div className="text-center">
               <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center mb-4 shadow-lg">
-                <svg className="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                <svg
+                  className="w-8 h-8 text-white"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  strokeWidth={2.5}
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    d="M4.5 12.75l6 6 9-13.5"
+                  />
                 </svg>
               </div>
-              <h3 className="cua-display text-xl font-semibold text-[#0F172A] mb-2">Signalement envoyé !</h3>
-              <p className="text-sm text-slate-500 mb-4">Votre référence de suivi :</p>
+              <h3 className="cua-display text-xl font-semibold text-[#0F172A] mb-2">
+                Signalement envoyé !
+              </h3>
+              <p className="text-sm text-slate-500 mb-4">
+                Votre référence de suivi :
+              </p>
               <div className="bg-slate-50 rounded-xl px-4 py-3 mb-4 border border-slate-100">
-                <span className="text-2xl font-mono font-bold text-[#1E3A8A] tracking-wider">{savedReference}</span>
+                <span className="text-2xl font-mono font-bold text-[#1E3A8A] tracking-wider">
+                  {savedReference}
+                </span>
               </div>
               <div className="flex gap-3 justify-center">
                 <button
-                  onClick={() => { navigator.clipboard.writeText(savedReference); toast.success('Référence copiée !'); }}
+                  onClick={() => {
+                    navigator.clipboard.writeText(savedReference);
+                    toast.success("Référence copiée !");
+                  }}
                   className="px-5 py-2.5 bg-slate-100 text-slate-700 rounded-xl text-sm font-bold hover:bg-slate-200 transition-all"
                 >
                   Copier
                 </button>
                 <button
-                  onClick={() => { setShowReferenceModal(false); navigate(`/suivi-doleance/${savedReference}`); }}
+                  onClick={() => {
+                    setShowReferenceModal(false);
+                    navigate(`/suivi-doleance/${savedReference}`);
+                  }}
                   className="cua-btn-primary px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all"
                 >
                   Suivre mon signalement
