@@ -1,3 +1,6 @@
+
+// navbar frontend
+
 import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useTheme } from '../../contexts/ThemeContext';
@@ -152,7 +155,9 @@ function PublicLayout({ children }) {
               </button>
 
               {/* Notifications */}
-              <NotificationsDropdown />
+              <div className="hidden sm:block">
+                <NotificationsDropdown />
+              </div>
 
               {/* Settings */}
               <button
@@ -166,11 +171,26 @@ function PublicLayout({ children }) {
               >
                 <Cog6ToothIcon className="h-5 w-5" />
               </button>
+
+              {/* Hamburger mobile */}
+              <button
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className={`md:hidden p-2 rounded-xl transition-all duration-200 ${
+                  mobileMenuOpen
+                    ? 'cua-nav-active text-white'
+                    : darkMode
+                      ? 'text-slate-300 hover:bg-white/10'
+                      : 'text-slate-400 hover:bg-slate-100'
+                }`}
+                aria-label={mobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+              >
+                {mobileMenuOpen ? <XMarkIcon className="h-5 w-5" /> : <Bars3Icon className="h-5 w-5" />}
+              </button>
             </div>
           </div>
         </div>
 
-        {/* Mobile menu dropdown */}
+        {/* Mobile menu dropdown navbar eee */}
         {mobileMenuOpen && (
           <div className={`md:hidden border-t transition-colors duration-200 ${
             darkMode ? 'bg-slate-900/95 backdrop-blur-xl border-slate-700/50' : 'bg-white/95 backdrop-blur-xl border-slate-100'
@@ -182,6 +202,7 @@ function PublicLayout({ children }) {
                   <Link
                     key={item.path}
                     to={item.path}
+                    onClick={() => setMobileMenuOpen(false)}
                     className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
                       active
                         ? 'cua-nav-active text-white'
@@ -196,7 +217,20 @@ function PublicLayout({ children }) {
                 );
               })}
               <div className={`border-t my-2 ${darkMode ? 'border-slate-700' : 'border-slate-100'}`} />
-   
+
+              {/* Login link (mobile) */}
+              {/* <Link
+                to="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  darkMode
+                    ? 'text-[#D4AF37] hover:bg-white/10'
+                    : 'text-[#1E3A8A] hover:bg-slate-50'
+                }`}
+              >
+                <ArrowRightOnRectangleIcon className="h-5 w-5" />
+                <span>Espace Agent</span>
+              </Link> */}
             </div>
           </div>
         )}
