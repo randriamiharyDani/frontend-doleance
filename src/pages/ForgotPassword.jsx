@@ -174,7 +174,7 @@ function ForgotPassword() {
                 </div>
 
                 {/* Lien de développement — affiché quand SMTP n'est pas configuré */}
-                {devResetUrl && (
+                {/* {devResetUrl && (
                   <div className="mb-5 rounded-xl bg-amber-50 border border-amber-200 px-4 py-3 text-left">
                     <p className="text-xs font-semibold text-amber-700 mb-2 flex items-center gap-1.5">
                       <ExclamationTriangleIcon className="w-4 h-4" />
@@ -199,7 +199,7 @@ function ForgotPassword() {
                       </a>
                     </div>
                   </div>
-                )}
+                )} */}
 
                 <button
                   onClick={() => {
