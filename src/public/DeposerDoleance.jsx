@@ -23,14 +23,10 @@ L.Marker.prototype.options.icon = DefaultIcon;
 // Palette institutionnelle CUA : navy #0F172A, bleu #1E3A8A, or #D4AF37
 // Chaque catégorie garde une couleur distincte (code couleur fonctionnel),
 // harmonisée en tons plus sourds pour rester cohérente avec l'identité de la commune.
-const categories = [
-  { id: 1, label: 'Trou dans la route', icon: 'M13.5 4L5.25 12.25l4.5 4.5L18 8.5', desc: 'Nids-de-poule, fissures, affaissements', gradient: 'from-rose-500 to-orange-500' },
-  { id: 2, label: 'Déchets', icon: 'M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16', desc: 'Dépôts sauvages, encombrants', gradient: 'from-emerald-500 to-teal-600' },
-  { id: 3, label: 'Éclairage public', icon: 'M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z', desc: 'Lampadaires défectueux, pannes', gradient: 'from-amber-400 to-[#D4AF37]' },
-  { id: 4, label: 'Espaces verts', icon: 'M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5', desc: 'Parcs, jardins, arbres', gradient: 'from-green-600 to-emerald-700' },
-  { id: 5, label: 'Circulation', icon: 'M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4', desc: 'Embouteillages, feux défectueux', gradient: 'from-[#1E3A8A] to-[#2E4FA3]' },
-  { id: 6, label: 'Autres', icon: 'M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z', desc: 'Tout autre problème', gradient: 'from-slate-500 to-slate-700' },
-];
+const [showOthers, setShowOthers] = useState(false);
+
+const firstCategories = categories.slice(0,5);
+const otherCategories = categories.slice(5);
 
 function DraggableMarker({ position, setPosition, onPositionChange }) {
   const markerRef = useRef(null);
@@ -556,7 +552,7 @@ const handleSearchAddress = async (e) => {
 
       {/* Header */}
       <div className="mb-6 sm:mb-8 cua-anim">
-        <h1 className="cua-display text-2xl sm:text-3xl font-semibold text-[#0F172A] flex items-center gap-2 sm:gap-3">
+        <h1 className="cua-display text-2xl sm:text-2xl font-semibold text-[#0F172A] flex items-center gap-2 sm:gap-3">
           <span className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#0F172A] to-[#1E3A8A] flex items-center justify-center text-white shadow-md shadow-[#0F172A]/20 flex-shrink-0">
             <svg className="w-4 h-4 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
@@ -564,26 +560,49 @@ const handleSearchAddress = async (e) => {
           </span>
           Signaler un problème
         </h1>
-        <p className="sm:text-base text-slate-500 mt-1.5 ml-[44px] sm:ml-[52px]">
+        <p className=" text-slate-500 mt-1.5 ml-[44px] sm:ml-[52px] ">
           Aidez à améliorer votre quartier — signalez rapidement tout incident ou dysfonctionnement à la Commune.
         </p>
       </div>
 
       <form onSubmit={handleSubmit}>
         {/* Categories */}
-        <div className="mb-7 cua-anim">
-          <div className="flex items-center gap-2 mb-4">
-            <svg className="w-5 h-5 text-[#1E3A8A]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
-            </svg>
-            <h2 className="text-lg font-bold text-[#0F172A]">Catégorie du problème</h2>
-          </div>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-3">
-            {categories.map(cat => (
-              <CategoryCard key={cat.id} cat={cat} selected={selectedCategory === cat.id} onClick={handleSelectCategory} />
-            ))}
-          </div>
-        </div>
+ <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+
+    {firstCategories.map(cat => (
+        <CategoryCard
+            key={cat.id}
+            cat={cat}
+            selected={selectedCategory === cat.id}
+            onClick={handleSelectCategory}
+        />
+    ))}
+
+    <CategoryCard
+        cat={{
+            id: "others",
+            label: "Autres",
+            desc: "Voir toutes les catégories"
+        }}
+        selected={false}
+        onClick={() => setShowOthers(!showOthers)}
+    />
+
+</div>
+{showOthers && (
+    <div className="mt-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+
+        {otherCategories.map(cat => (
+            <CategoryCard
+                key={cat.id}
+                cat={cat}
+                selected={selectedCategory === cat.id}
+                onClick={handleSelectCategory}
+            />
+        ))}
+
+    </div>
+)}
 
         {/* Titre */}
         <div className="cua-section rounded-2xl p-5 mb-6 cua-anim">

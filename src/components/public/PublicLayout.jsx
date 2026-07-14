@@ -98,12 +98,12 @@ function PublicLayout({ children }) {
                   className="h-16 w-16 object-contain rounded-xl transition-transform duration-200 group-hover:scale-105"
                 />
                 <div className="hidden sm:block">
-                  <h1 className={`cua-display text-2xl font-semibold leading-tight transition-colors ${
+                  <h1 className={`cua-display text-3xl font-semibold leading-tight transition-colors ${
                     darkMode ? 'text-white' : 'text-[#0F172A]'
                   }`}>
                     Signalement
                   </h1>
-                  <p className={`text-[12px] font-medium -mt-0.5 tracking-wide ${
+                  <p className={`text-[13px] font-medium -mt-0.5 tracking-wide ${
                     darkMode ? 'text-[#D4AF37]/80' : 'text-[#9A7200]'
                   }`}>
                     Antananarivo, 101
@@ -113,6 +113,7 @@ function PublicLayout({ children }) {
             </div>
 
             {/* Center: Navigation (desktop) */}
+            
             <nav className="hidden md:flex items-center gap-1">
               {navItems.map((item) => {
                 const active = isActive(item.path);
