@@ -1,5 +1,6 @@
 import React from 'react';
-import { ShieldCheckIcon } from '@heroicons/react/24/outline';
+import { Link } from 'react-router-dom';
+import { ShieldCheckIcon, PlusCircleIcon } from '@heroicons/react/24/outline';
 
 const ROLE_LABELS = {
   administrateur_systeme: 'Super Admin',
@@ -13,7 +14,7 @@ function DoleanceHeader({ userRole, isAdminOrAgentCentral }) {
   const roleLabel = ROLE_LABELS[userRole] || 'Utilisateur';
 
   return (
-    <div className="flex justify-between items-center mb-6">
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
       <div>
         <h1 className="text-2xl font-bold text-gray-800">Gestion des doléances</h1>
         <p className="text-gray-600 mt-1">Consultez et gérez les doléances des citoyens</p>
@@ -27,6 +28,15 @@ function DoleanceHeader({ userRole, isAdminOrAgentCentral }) {
           </div>
         )}
       </div>
+      {isAdminOrAgentCentral && (
+        <Link
+          to="/backoffice/ajouter-doleance"
+          className="flex items-center gap-2 px-4 py-2.5 text-sm font-bold text-white bg-gradient-to-r from-blue-600 to-blue-700 rounded-lg shadow-md shadow-blue-600/30 hover:shadow-lg hover:shadow-blue-600/40 hover:scale-[1.02] transition-all duration-200"
+        >
+          <PlusCircleIcon className="h-4 w-4" />
+          Ajouter une doléance
+        </Link>
+      )}
     </div>
   );
 }

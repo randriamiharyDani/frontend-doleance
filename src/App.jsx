@@ -30,6 +30,7 @@ import Directions from './backoffice/Directions';
 import DirectionDoleances from './backoffice/DirectionDoleances';
 import Transfert from './backoffice/Transfert';
 import Settings from './backoffice/Settings';
+import AjouterDoleance from './backoffice/AjouterDoleance';
 
 function AppRoutes() {
   return (
@@ -58,6 +59,7 @@ function AppRoutes() {
         <Route path="directions" element={<Directions />} />
         <Route path="direction/:id_direction" element={<DirectionDoleances />} />
         <Route path="transfert" element={<Transfert />} />
+        <Route path="ajouter-doleance" element={<AjouterDoleance />} />
         <Route path="settings" element={<Settings />} />
       </Route>
       

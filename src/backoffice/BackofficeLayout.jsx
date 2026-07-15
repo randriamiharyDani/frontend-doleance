@@ -14,6 +14,7 @@ import {
   XMarkIcon,
   ChevronDownIcon,
   Cog6ToothIcon,
+  PlusCircleIcon,
 } from "@heroicons/react/24/outline";
 import Navbar from "../components/backoffice/Navbar";
 
@@ -231,8 +232,23 @@ function BackofficeLayout() {
         </span>
       </Link>
     ))}
-  </div>
+    </div>
 
+  {/* Bouton Ajouter doléance - Admin only */}
+  {isAdmin && (
+    <Link
+      to="/backoffice/ajouter-doleance"
+      onClick={() => isMobile && setSidebarOpen(false)}
+      className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold text-sm shadow-lg transition-all duration-200 mt-3 ${
+        location.pathname === "/backoffice/ajouter-doleance"
+          ? "bg-white text-blue-600 shadow-white/20 scale-[1.02]"
+          : "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-blue-600/30 hover:shadow-xl hover:shadow-blue-600/40 hover:scale-[1.02]"
+      }`}
+    >
+      <PlusCircleIcon className="h-5 w-5" />
+      Ajouter doléance
+    </Link>
+  )}
 
   {/* Séparation */}
   <div className="my-4 border-t border-white/10"></div>

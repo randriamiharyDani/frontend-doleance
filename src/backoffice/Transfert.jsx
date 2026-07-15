@@ -383,6 +383,7 @@ function Transfert() {
       )}
 
       {/* Tableau compact - tout visible sans scroll */}
+
       <div className="bg-white rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 text-sm">
@@ -398,7 +399,9 @@ function Transfert() {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
+
               {/* Doléances non transférées (prioritaires) */}
+              
               {doleancesNonTransferees.map((doleance) => (
                 <tr key={doleance.id_doleance} className="hover:bg-gray-50">
                   <td className="px-3 py-2 whitespace-nowrap font-mono font-medium text-blue-600 text-xs sm:text-sm">
@@ -437,6 +440,7 @@ function Transfert() {
               ))}
 
               {/* Doléances déjà transférées ou traitées */}
+
               {doleancesTransferees.length > 0 && (
                 <>
                   <tr className="bg-gray-50">
