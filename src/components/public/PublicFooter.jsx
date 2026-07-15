@@ -57,6 +57,7 @@ function PublicFooter() {
             </p>
           </div>
 
+       
           {/* Espace admin - avec icône de tête de personne */}
           <div>
             <Link 
