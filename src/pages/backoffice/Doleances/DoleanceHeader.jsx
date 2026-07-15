@@ -16,7 +16,9 @@ function DoleanceHeader({ userRole, isAdminOrAgentCentral }) {
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
       <div>
-        <h1 className="text-2xl font-bold text-gray-800">Gestion des doléances</h1>
+         <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight">
+           Gestion des doléances
+          </h1>
         <p className="text-gray-600 mt-1">Consultez et gérez les doléances des citoyens</p>
         <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">
           <ShieldCheckIcon className="h-3 w-3" />

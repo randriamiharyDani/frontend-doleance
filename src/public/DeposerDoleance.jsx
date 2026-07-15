@@ -11,6 +11,7 @@ import {
   useMapEvents,
   useMap,
   Popup,
+  GeoJSON,
 } from "react-leaflet";
 import L from "leaflet";
 import icon from "leaflet/dist/images/marker-icon.png";
@@ -159,6 +160,7 @@ function DeposerDoleance() {
   const [searchAddress, setSearchAddress] = useState("");
   const [locationName, setLocationName] = useState("");
   const [assignedDoleances, setAssignedDoleances] = useState([]);
+  const [quartierGeoJSON, setQuartierGeoJSON] = useState(null);
   const [isLocating, setIsLocating] = useState(false);
   const [isSearching, setIsSearching] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
@@ -224,16 +226,20 @@ function DeposerDoleance() {
 
   const fetchData = async () => {
     try {
-      const [categoriesRes, quartiersRes, assignedRes] = await Promise.all([
+      const [categoriesRes, quartiersRes, assignedRes, geojsonRes] = await Promise.all([
         api.get("/doleances/categories"),
         api.get("/doleances/quartiers"),
         api
           .get("/doleances/public/assigned-locations")
           .catch(() => ({ data: { data: [] } })),
+        api
+          .get("/doleances/quartiers/geojson")
+          .catch(() => ({ data: { type: 'FeatureCollection', features: [] } })),
       ]);
       setCategoriesData(categoriesRes.data?.data || categoriesRes.data || []);
       setQuartiers(quartiersRes.data?.data || quartiersRes.data || []);
       setAssignedDoleances(assignedRes.data?.data || assignedRes.data || []);
+      setQuartierGeoJSON(geojsonRes.data || { type: 'FeatureCollection', features: [] });
 
       // Définir la première catégorie par défaut
       const cats = categoriesRes.data?.data || categoriesRes.data || [];
@@ -969,6 +975,33 @@ function DeposerDoleance() {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
+              {quartierGeoJSON && quartierGeoJSON.features && quartierGeoJSON.features.length > 0 && (
+                <GeoJSON
+                  key={JSON.stringify(quartierGeoJSON)}
+                  data={quartierGeoJSON}
+                  style={(feature) => ({
+                    fillColor: '#D4AF37',
+                    weight: 2,
+                    opacity: 1,
+                    color: '#B8860B',
+                    dashArray: '3',
+                    fillOpacity: 0.15,
+                  })}
+                  onEachFeature={(feature, layer) => {
+                    if (feature.properties) {
+                      layer.bindPopup(
+                        `<div style="text-align:center"><b>${feature.properties.nom_quartier}</b><br/><span style="color:#666">${feature.properties.nom_arrondissement || ''}</span></div>`
+                      );
+                      layer.on('mouseover', function () {
+                        this.setStyle({ fillOpacity: 0.4, weight: 3 });
+                      });
+                      layer.on('mouseout', function () {
+                        this.setStyle({ fillOpacity: 0.15, weight: 2 });
+                      });
+                    }
+                  }}
+                />
+              )}
               <MapView center={mapPosition} />
               <DraggableMarker
                 position={mapPosition}

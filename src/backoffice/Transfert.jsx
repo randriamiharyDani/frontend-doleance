@@ -3,7 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
-import { 
+import {
   PaperAirplaneIcon,
   CheckCircleIcon,
   ClockIcon,
@@ -14,13 +14,78 @@ import {
   ArrowPathIcon,
   MagnifyingGlassIcon,
   FunnelIcon,
-  ChevronDownIcon,
-  ChevronUpIcon
+  InboxIcon,
+  ArrowTrendingUpIcon,
+  CheckBadgeIcon,
 } from '@heroicons/react/24/outline';
+
+// ---- Design tokens (kept local so the file stays drop-in) ----------------
+// Navy  #0F172A / #1E3A8A  ·  Gold accent #D4AF37  ·  Slate neutrals
+// These echo the palette already used on the localisation card, so the
+// backoffice reads as one product rather than a patchwork of screens.
+
+const STATUS_STYLES = {
+  en_attente:  { dot: 'bg-amber-500',  text: 'text-amber-700',  bg: 'bg-amber-50',  ring: 'ring-amber-200'  },
+  en_cours:    { dot: 'bg-[#1E3A8A]',  text: 'text-[#1E3A8A]',  bg: 'bg-blue-50',   ring: 'ring-blue-200'   },
+  transferee:  { dot: 'bg-violet-500', text: 'text-violet-700', bg: 'bg-violet-50', ring: 'ring-violet-200' },
+  traitee:     { dot: 'bg-emerald-500',text: 'text-emerald-700',bg: 'bg-emerald-50',ring: 'ring-emerald-200'},
+  resolue:     { dot: 'bg-emerald-500',text: 'text-emerald-700',bg: 'bg-emerald-50',ring: 'ring-emerald-200'},
+  cloturee:    { dot: 'bg-slate-400',  text: 'text-slate-600',  bg: 'bg-slate-100', ring: 'ring-slate-200'  },
+  rejetee:     { dot: 'bg-rose-500',   text: 'text-rose-700',   bg: 'bg-rose-50',   ring: 'ring-rose-200'   },
+};
+
+const STATUS_LABELS = {
+  en_attente: 'En attente',
+  en_cours: 'En cours',
+  transferee: 'Transférée',
+  traitee: 'Traitée',
+  resolue: 'Résolue',
+  cloturee: 'Clôturée',
+  rejetee: 'Rejetée',
+};
+
+function StatusPill({ statut }) {
+  const s = STATUS_STYLES[statut] || STATUS_STYLES.cloturee;
+  return (
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ring-1 ${s.bg} ${s.text} ${s.ring}`}>
+      <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
+      {STATUS_LABELS[statut] || statut}
+    </span>
+  );
+}
+
+function StatCard({ label, value, icon: Icon, accent, sub }) {
+  return (
+    <div className="relative overflow-hidden bg-white rounded-2xl shadow-sm ring-1 ring-slate-100 p-4 sm:p-5">
+      <div className={`absolute -right-4 -top-4 w-20 h-20 rounded-full opacity-10 ${accent.bgSolid}`} />
+      <div className="flex items-start justify-between">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">{label}</p>
+          <p className="text-2xl sm:text-3xl font-bold text-[#0F172A] mt-1 tabular-nums">{value}</p>
+          {sub && <p className="text-[11px] text-slate-400 mt-0.5">{sub}</p>}
+        </div>
+        <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${accent.bg}`}>
+          <Icon className={`w-5 h-5 ${accent.text}`} />
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function SkeletonRow() {
+  return (
+    <div className="animate-pulse flex items-center gap-4 px-4 py-4 border-b border-slate-50">
+      <div className="h-3 w-16 bg-slate-100 rounded" />
+      <div className="h-3 w-24 bg-slate-100 rounded hidden sm:block" />
+      <div className="h-3 flex-1 bg-slate-100 rounded" />
+      <div className="h-5 w-20 bg-slate-100 rounded-full" />
+    </div>
+  );
+}
 
 function Transfert() {
   const { user } = useAuth();
-  
+
   const [doleances, setDoleances] = useState([]);
   const [directions, setDirections] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -32,20 +97,21 @@ function Transfert() {
   const [showFilters, setShowFilters] = useState(false);
   const [transferData, setTransferData] = useState({
     id_direction: '',
-    commentaire: ''
+    commentaire: '',
   });
   const [statsTotals, setStatsTotals] = useState({
     total: 0,
     enAttente: 0,
     enCours: 0,
     transferees: 0,
-    resolues: 0
+    resolues: 0,
   });
 
-  const isAuthorized = user?.role === 'agent_central' || 
-                       user?.nom_role === 'agent_central' ||
-                       user?.role === 'administrateur_systeme' ||
-                       user?.nom_role === 'administrateur_systeme';
+  const isAuthorized =
+    user?.role === 'agent_central' ||
+    user?.nom_role === 'agent_central' ||
+    user?.role === 'administrateur_systeme' ||
+    user?.nom_role === 'administrateur_systeme';
 
   useEffect(() => {
     if (isAuthorized) {
@@ -55,22 +121,23 @@ function Transfert() {
       fetchStats();
       fetchDoleances();
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters, isAuthorized]);
 
   if (!isAuthorized) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100 p-4">
-        <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6 text-center">
-          <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-            <ShieldCheckIcon className="h-8 w-8 text-red-600" />
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
+        <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/60 max-w-md w-full mx-4 p-8 text-center ring-1 ring-slate-100">
+          <div className="w-16 h-16 bg-rose-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <ShieldCheckIcon className="h-8 w-8 text-rose-500" />
           </div>
-          <h2 className="text-xl font-bold text-gray-800 mb-2">Accès non autorisé</h2>
-          <p className="text-gray-600 mb-4 text-sm">
+          <h2 className="text-xl font-bold text-[#0F172A] mb-2">Accès non autorisé</h2>
+          <p className="text-slate-500 mb-6 text-sm leading-relaxed">
             Cette page est réservée à l'agent central et à l'administrateur système.
           </p>
           <button
-            onClick={() => window.location.href = '/backoffice/dashboard'}
-            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-sm"
+            onClick={() => (window.location.href = '/backoffice/dashboard')}
+            className="inline-flex items-center px-5 py-2.5 bg-[#1E3A8A] text-white rounded-xl font-semibold hover:bg-[#0F172A] transition-colors text-sm shadow-sm"
           >
             Retour au tableau de bord
           </button>
@@ -88,7 +155,7 @@ function Transfert() {
           enAttente: response.data.data.en_attente || 0,
           enCours: response.data.data.en_cours || 0,
           transferees: response.data.data.transferees || 0,
-          resolues: response.data.data.resolues || 0
+          resolues: response.data.data.resolues || 0,
         });
       }
     } catch (error) {
@@ -99,10 +166,12 @@ function Transfert() {
 
   const calculateStatsFromData = () => {
     const total = doleances.length;
-    const enAttente = doleances.filter(d => d.nom_statut === 'en_attente').length;
-    const enCours = doleances.filter(d => d.nom_statut === 'en_cours').length;
-    const resolues = doleances.filter(d => d.nom_statut === 'traitee' || d.nom_statut === 'resolue' || d.nom_statut === 'cloturee').length;
-    const transferees = doleances.filter(d => d.nom_statut === 'transferee').length;
+    const enAttente = doleances.filter((d) => d.nom_statut === 'en_attente').length;
+    const enCours = doleances.filter((d) => d.nom_statut === 'en_cours').length;
+    const resolues = doleances.filter(
+      (d) => d.nom_statut === 'traitee' || d.nom_statut === 'resolue' || d.nom_statut === 'cloturee'
+    ).length;
+    const transferees = doleances.filter((d) => d.nom_statut === 'transferee').length;
     setStatsTotals({ total, enAttente, enCours, resolues, transferees });
   };
 
@@ -112,17 +181,17 @@ function Transfert() {
       const params = {
         page: 1,
         limit: 1000,
-        ...filters
+        ...filters,
       };
       if (!params.categorie) delete params.categorie;
       if (!params.search) delete params.search;
       if (!params.statut || params.statut === 'all') delete params.statut;
-      
+
       const response = await api.get('/doleances', { params });
-      
+
       if (response.data.success) {
         let doleancesData = [];
-        
+
         if (response.data.data && response.data.data.doleances) {
           doleancesData = response.data.data.doleances;
         } else if (response.data.data && Array.isArray(response.data.data)) {
@@ -132,7 +201,7 @@ function Transfert() {
         } else {
           doleancesData = response.data.data || [];
         }
-        
+
         setDoleances(doleancesData);
       }
     } catch (error) {
@@ -180,17 +249,17 @@ function Transfert() {
   const handleTransfert = async (e) => {
     e.preventDefault();
     if (!selectedDoleance) return;
-    
+
     if (!transferData.id_direction) {
       toast.error('Veuillez sélectionner une direction de destination');
       return;
     }
-    
+
     setLoading(true);
     try {
       const response = await api.post(`/doleances/${selectedDoleance.id_doleance}/transfert-central`, {
         id_direction: transferData.id_direction,
-        commentaire: transferData.commentaire
+        commentaire: transferData.commentaire,
       });
       if (response.data.success) {
         toast.success(response.data.message);
@@ -216,41 +285,13 @@ function Transfert() {
     setShowTransferModal(true);
   };
 
-  const getStatusBadge = (statut) => {
-    const badges = {
-      en_attente: 'bg-yellow-100 text-yellow-800',
-      en_cours: 'bg-blue-100 text-blue-800',
-      transferee: 'bg-purple-100 text-purple-800',
-      traitee: 'bg-green-100 text-green-800',
-      resolue: 'bg-green-100 text-green-800',
-      cloturee: 'bg-gray-100 text-gray-800',
-      rejetee: 'bg-red-100 text-red-800'
-    };
-    return badges[statut] || 'bg-gray-100 text-gray-800';
-  };
-
-  const getStatusText = (statut) => {
-    const texts = {
-      en_attente: 'En attente',
-      en_cours: 'En cours',
-      transferee: 'Transférée',
-      traitee: 'Traitée',
-      resolue: 'Résolue',
-      cloturee: 'Clôturée',
-      rejetee: 'Rejetée'
-    };
-    return texts[statut] || statut;
-  };
-
   const getCategoryName = (idCategorie) => {
-    const cat = categories.find(c => c.id_categorie === idCategorie);
+    const cat = categories.find((c) => c.id_categorie === idCategorie);
     return cat?.nom_categorie || 'Non catégorisée';
   };
 
-  // Vérifier si une doléance peut être transférée
-  const canTransfer = (statut) => {
-    return statut !== 'transferee' && statut !== 'traitee' && statut !== 'resolue' && statut !== 'cloturee';
-  };
+  const canTransfer = (statut) =>
+    statut !== 'transferee' && statut !== 'traitee' && statut !== 'resolue' && statut !== 'cloturee';
 
   const refreshData = () => {
     fetchStats();
@@ -261,81 +302,93 @@ function Transfert() {
     toast.success('Données rafraîchies');
   };
 
-  if (loading && doleances.length === 0) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-      </div>
-    );
-  }
+  const hasActiveFilters = filters.categorie || filters.search || (filters.statut && filters.statut !== 'all');
 
-  // Filtrer les doléances transférées pour les afficher différemment
-  const doleancesNonTransferees = doleances.filter(d => canTransfer(d.nom_statut));
-  const doleancesTransferees = doleances.filter(d => !canTransfer(d.nom_statut));
+  const doleancesNonTransferees = doleances.filter((d) => canTransfer(d.nom_statut));
+  const doleancesTransferees = doleances.filter((d) => !canTransfer(d.nom_statut));
 
   return (
-    <div className="p-4">
+    <div className=" mx-auto">
       {/* En-tête */}
-      <div className="flex flex-wrap justify-between items-center gap-2 mb-3">
+      <div className="flex flex-wrap justify-between items-start gap-3 mb-6">
         <div>
-          <h1 className=" text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">Transfert de doléances</h1>
-          <p className="text-gray-500 ">Gérer le transfert vers les directions</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight">
+            Transfert de doléances
+          </h1>
+          <p className="text-sm sm:text-base text-gray-500 mt-1">Acheminer chaque doléance vers la bonne direction</p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={refreshData}
-            className="inline-flex items-center px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition-colors text-sm"
+            className="inline-flex items-center px-3.5 py-2.5 bg-white text-[#1E3A8A] rounded-xl hover:bg-slate-50 transition-colors text-sm font-semibold ring-1 ring-slate-200 shadow-sm"
           >
             <ArrowPathIcon className="h-4 w-4 mr-1.5" />
             Rafraîchir
           </button>
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="inline-flex items-center px-3 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors text-sm"
+            className={`inline-flex items-center px-3.5 py-2.5 rounded-xl transition-colors text-sm font-semibold ring-1 shadow-sm ${
+              showFilters || hasActiveFilters
+                ? 'bg-[#1E3A8A] text-white ring-[#1E3A8A]'
+                : 'bg-white text-slate-600 ring-slate-200 hover:bg-slate-50'
+            }`}
           >
             <FunnelIcon className="h-4 w-4 mr-1.5" />
-            {showFilters ? 'Masquer' : 'Filtres'}
+            Filtres
+            {hasActiveFilters && (
+              <span className="ml-1.5 w-1.5 h-1.5 rounded-full bg-[#D4AF37]" />
+            )}
           </button>
         </div>
       </div>
 
       {/* Statistiques */}
-      <div className="grid grid-cols-5 gap-3 mb-3">
-        <div className="bg-white rounded-lg shadow p-3 text-center border-l-4 border-blue-500">
-          <p className="text-2xl font-bold text-blue-600">{statsTotals.total}</p>
-          <p className=" text-gray-500">Total</p>
-        </div>
-        <div className="bg-white rounded-lg shadow p-3 text-center border-l-4 border-yellow-500">
-          <p className="text-2xl font-bold text-yellow-600">{statsTotals.enAttente}</p>
-          <p className=" text-gray-500">En attente</p>
-        </div>
-        <div className="bg-white rounded-lg shadow p-3 text-center border-l-4 border-blue-500">
-          <p className="text-2xl font-bold text-blue-600">{statsTotals.enCours}</p>
-          <p className=" text-gray-500">En cours</p>
-        </div>
-        <div className="bg-white rounded-lg shadow p-3 text-center border-l-4 border-purple-500">
-          <p className="text-2xl font-bold text-purple-600">{statsTotals.transferees}</p>
-          <p className=" text-gray-500">Transférées</p>
-        </div>
-        <div className="bg-white rounded-lg shadow p-3 text-center border-l-4 border-green-500">
-          <p className="text-2xl font-bold text-green-600">{statsTotals.resolues}</p>
-          <p className=" text-gray-500">Résolues</p>
-        </div>
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
+        <StatCard
+          label="Total"
+          value={statsTotals.total}
+          icon={InboxIcon}
+          accent={{ bg: 'bg-slate-100', bgSolid: 'bg-slate-400', text: 'text-slate-600' }}
+        />
+        <StatCard
+          label="En attente"
+          value={statsTotals.enAttente}
+          icon={ClockIcon}
+          accent={{ bg: 'bg-amber-50', bgSolid: 'bg-amber-400', text: 'text-amber-600' }}
+        />
+        <StatCard
+          label="En cours"
+          value={statsTotals.enCours}
+          icon={ArrowTrendingUpIcon}
+          accent={{ bg: 'bg-blue-50', bgSolid: 'bg-[#1E3A8A]', text: 'text-[#1E3A8A]' }}
+        />
+        <StatCard
+          label="Transférées"
+          value={statsTotals.transferees}
+          icon={PaperAirplaneIcon}
+          accent={{ bg: 'bg-violet-50', bgSolid: 'bg-violet-400', text: 'text-violet-600' }}
+        />
+        <StatCard
+          label="Résolues"
+          value={statsTotals.resolues}
+          icon={CheckBadgeIcon}
+          accent={{ bg: 'bg-emerald-50', bgSolid: 'bg-emerald-400', text: 'text-emerald-600' }}
+        />
       </div>
 
-      {/* Filtres compacts */}
+      {/* Filtres */}
       {showFilters && (
-        <div className="bg-white rounded-lg shadow p-3 mb-3">
+        <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-100 p-4 sm:p-5 mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div>
-              <label className="block  font-medium text-gray-700 mb-1">Catégorie</label>
+              <label className="block text-sm font-bold text-slate-500 mb-1.5">Catégorie</label>
               <select
                 value={filters.categorie}
-                onChange={(e) => setFilters(prev => ({ ...prev, categorie: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                onChange={(e) => setFilters((prev) => ({ ...prev, categorie: e.target.value }))}
+                className="w-full px-3 py-2.5 bg-slate-50 border-2 border-transparent rounded-xl text-sm outline-none focus:border-[#1E3A8A]/30 focus:bg-white transition-all"
               >
                 <option value="">Toutes catégories</option>
-                {categories.map(cat => (
+                {categories.map((cat) => (
                   <option key={cat.id_categorie} value={cat.id_categorie}>
                     {cat.nom_categorie}
                   </option>
@@ -343,37 +396,38 @@ function Transfert() {
               </select>
             </div>
             <div>
-              <label className="block  font-medium text-gray-700 mb-1">Statut</label>
+              <label className="block text-sm font-bold text-slate-500 mb-1.5">Statut</label>
               <select
                 value={filters.statut}
-                onChange={(e) => setFilters(prev => ({ ...prev, statut: e.target.value }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm"
+                onChange={(e) => setFilters((prev) => ({ ...prev, statut: e.target.value }))}
+                className="w-full px-3 py-2.5 bg-slate-50 border-2 border-transparent rounded-xl text-sm outline-none focus:border-[#1E3A8A]/30 focus:bg-white transition-all"
               >
                 <option value="all">Tous statuts</option>
-                {statuts.map(stat => (
+                {statuts.map((stat) => (
                   <option key={stat.id_statut} value={stat.nom_statut}>
-                    {getStatusText(stat.nom_statut)}
+                    {STATUS_LABELS[stat.nom_statut] || stat.nom_statut}
                   </option>
                 ))}
               </select>
             </div>
-            <div className="relative">
-              <label className="block  font-medium text-gray-700 mb-1">Rechercher</label>
+            <div>
+              <label className="block text-sm font-bold text-slate-500 mb-1.5">Rechercher</label>
               <div className="relative">
-                <MagnifyingGlassIcon className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+                <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
                 <input
                   type="text"
                   placeholder="Référence, titre..."
                   value={filters.search}
-                  onChange={(e) => setFilters(prev => ({ ...prev, search: e.target.value }))}
-                  className="w-full pl-9 pr-3 py-2 border border-gray-300 rounded-lg text-sm"
+                  onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
+                  className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border-2 border-transparent rounded-xl text-sm outline-none focus:border-[#1E3A8A]/30 focus:bg-white transition-all"
                 />
               </div>
             </div>
             <div className="flex items-end">
               <button
                 onClick={() => setFilters({ categorie: '', search: '', statut: 'all' })}
-                className="w-full px-4 py-2 text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
+                disabled={!hasActiveFilters}
+                className="w-full px-4 py-2.5 text-slate-600 bg-slate-50 rounded-xl hover:bg-slate-100 text-sm font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Réinitialiser
               </button>
@@ -382,148 +436,207 @@ function Transfert() {
         </div>
       )}
 
-      {/* Tableau compact - tout visible sans scroll */}
-
-      <div className="bg-white rounded-lg shadow overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 text-sm">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="px-3 py-2 text-left  font-medium text-gray-500 uppercase">Réf.</th>
-                <th className="px-3 py-2 text-left  font-medium text-gray-500 uppercase hidden sm:table-cell">Citoyen</th>
-                <th className="px-3 py-2 text-left  font-medium text-gray-500 uppercase hidden md:table-cell">Catégorie</th>
-                <th className="px-3 py-2 text-left  font-medium text-gray-500 uppercase">Titre</th>
-                <th className="px-3 py-2 text-center  font-medium text-gray-500 uppercase">Statut</th>
-                <th className="px-3 py-2 text-left  font-medium text-gray-500 uppercase hidden lg:table-cell">Direction</th>
-                <th className="px-3 py-2 text-center  font-medium text-gray-500 uppercase">Action</th>
-              </tr>
-            </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-
-              {/* Doléances non transférées (prioritaires) */}
-              
-              {doleancesNonTransferees.map((doleance) => (
-                <tr key={doleance.id_doleance} className="hover:bg-gray-50">
-                  <td className="px-3 py-2 whitespace-nowrap font-mono font-medium text-blue-600 text-xs sm:text-sm">
-                    {doleance.reference}
-                  </td>
-                  <td className="px-3 py-2 whitespace-nowrap text-gray-500 text-xs sm:text-sm hidden sm:table-cell">
-                    {doleance.citoyen_nom || '-'}
-                  </td>
-                  <td className="px-3 py-2 whitespace-nowrap text-gray-500 text-xs sm:text-sm hidden md:table-cell">
-                    {getCategoryName(doleance.id_categorie)}
-                  </td>
-                  <td className="px-3 py-2 text-gray-700 max-w-[80px] sm:max-w-[120px] truncate text-xs sm:text-sm">
-                    {doleance.titre}
-                  </td>
-                  <td className="px-3 py-2 whitespace-nowrap text-center">
-                    <span className={`px-1.5 sm:px-2 py-0.5 text-[9px] sm:text-[10px] rounded-full ${getStatusBadge(doleance.nom_statut)}`}>
-                      {getStatusText(doleance.nom_statut)}
-                    </span>
-                  </td>
-                  <td className="px-3 py-2 whitespace-nowrap text-gray-500 text-xs sm:text-sm hidden lg:table-cell">
-                    {doleance.nom_direction || '-'}
-                  </td>
-                  <td className="px-3 py-2 whitespace-nowrap text-center">
-                    <button
-                      onClick={() => openTransferModal(doleance)}
-                      className="inline-flex items-center px-2 sm:px-2.5 py-1 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors text-[9px] sm:text-[10px]"
-                    >
-                      <PaperAirplaneIcon className="h-3 w-3 mr-0.5 sm:mr-1" />
-                      <span className="hidden xs:inline">Transférer</span>
-                      <span className="xs:hidden">
-                        <PaperAirplaneIcon className="h-3 w-3" />
-                      </span>
-                    </button>
-                  </td>
-                </tr>
-              ))}
-
-              {/* Doléances déjà transférées ou traitées */}
-
-              {doleancesTransferees.length > 0 && (
-                <>
-                  <tr className="bg-gray-50">
-                    <td colSpan="7" className="px-3 py-1.5 text-center text-[10px] text-gray-400 font-medium">
-                      ─── Doléances déjà transférées ou traitées ───
-                    </td>
+      {/* Liste - table sur desktop, cartes sur mobile */}
+      <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-100 overflow-hidden">
+        {loading && doleances.length === 0 ? (
+          <div>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <SkeletonRow key={i} />
+            ))}
+          </div>
+        ) : doleances.length === 0 ? (
+          <div className="text-center py-16 px-4">
+            <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-3">
+              <InboxIcon className="w-7 h-7 text-slate-300" />
+            </div>
+            <p className="text-slate-600 font-semibold text-sm">Aucune doléance trouvée</p>
+            <p className="text-slate-400 text-sm mt-1">
+              {hasActiveFilters ? 'Essayez d\u2019ajuster vos filtres.' : 'Rien à transférer pour le moment.'}
+            </p>
+          </div>
+        ) : (
+          <>
+            {/* --- Vue tableau (sm+) --- */}
+            <div className="hidden sm:block overflow-x-auto">
+              <table className="min-w-full text-xl">
+                <thead>
+                  <tr className="border-b border-slate-100">
+                    <th className="px-4 py-3 text-left text-[13px] font-bold text-slate-400 uppercase tracking-wide">Réf.</th>
+                    <th className="px-4 py-3 text-left text-[13px] font-bold text-slate-400 uppercase tracking-wide hidden lg:table-cell">Citoyen</th>
+                    <th className="px-4 py-3 text-left text-[13px] font-bold text-slate-400 uppercase tracking-wide hidden md:table-cell">Catégorie</th>
+                    <th className="px-4 py-3 text-left text-[13px] font-bold text-slate-400 uppercase tracking-wide">Titre</th>
+                    <th className="px-4 py-3 text-center text-[13px] font-bold text-slate-400 uppercase tracking-wide">Statut</th>
+                    <th className="px-4 py-3 text-left text-[13px] font-bold text-slate-400 uppercase tracking-wide hidden xl:table-cell">Direction</th>
+                    <th className="px-4 py-3 text-right text-[13px] font-bold text-slate-400 uppercase tracking-wide">Action</th>
                   </tr>
-                  {doleancesTransferees.map((doleance) => (
-                    <tr key={doleance.id_doleance} className="hover:bg-gray-50/50 bg-gray-50/30">
-                      <td className="px-3 py-1.5 whitespace-nowrap text-[9px] sm:text-[10px] font-mono font-medium text-purple-400">
+                </thead>
+                <tbody className="divide-y divide-slate-50">
+                  {doleancesNonTransferees.map((doleance) => (
+                    <tr key={doleance.id_doleance} className="hover:bg-slate-50/70 transition-colors">
+                      <td className="px-4 py-3.5 whitespace-nowrap font-mono font-bold text-[#1E3A8A] text-sm">
                         {doleance.reference}
                       </td>
-                      <td className="px-3 py-1.5 whitespace-nowrap text-[9px] sm:text-[10px] text-gray-400 hidden sm:table-cell">
-                        {doleance.citoyen_nom || '-'}
+                      <td className="px-4 py-3.5 whitespace-nowrap text-slate-500 text-sm hidden lg:table-cell">
+                        {doleance.citoyen_nom || '—'}
                       </td>
-                      <td className="px-3 py-1.5 whitespace-nowrap text-[9px] sm:text-[10px] text-gray-400 hidden md:table-cell">
+                      <td className="px-4 py-3.5 whitespace-nowrap text-slate-500 text-sm hidden md:table-cell">
                         {getCategoryName(doleance.id_categorie)}
                       </td>
-                      <td className="px-3 py-1.5 text-[9px] sm:text-[10px] text-gray-400 max-w-[60px] sm:max-w-[100px] truncate">
+                      <td className="px-4 py-3.5 text-slate-700 max-w-[160px] truncate text-sm">
                         {doleance.titre}
                       </td>
-                      <td className="px-3 py-1.5 whitespace-nowrap text-center">
-                        <span className={`px-1.5 py-0.5 text-[8px] sm:text-[9px] rounded-full ${getStatusBadge(doleance.nom_statut)}`}>
-                          {getStatusText(doleance.nom_statut)}
-                        </span>
+                      <td className="px-4 py-3.5 whitespace-nowrap text-center">
+                        <StatusPill statut={doleance.nom_statut} />
                       </td>
-                      <td className="px-3 py-1.5 whitespace-nowrap text-[9px] sm:text-[10px] text-gray-400 hidden lg:table-cell">
-                        {doleance.nom_direction || '-'}
+                      <td className="px-4 py-3.5 whitespace-nowrap text-slate-500 text-sm hidden xl:table-cell">
+                        {doleance.nom_direction || '—'}
                       </td>
-                      <td className="px-3 py-1.5 whitespace-nowrap text-center">
-                        <span className="inline-flex items-center px-1.5 sm:px-2 py-0.5 bg-gray-100 text-gray-500 rounded text-[8px] sm:text-[9px]">
-                          <CheckCircleIcon className="h-2.5 w-2.5 sm:h-3 sm:w-3 mr-0.5" />
-                          {doleance.nom_statut === 'transferee' ? 'Transférée' : 'Traitée'}
-                        </span>
+                      <td className="px-4 py-3.5 whitespace-nowrap text-right">
+                        <button
+                          onClick={() => openTransferModal(doleance)}
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1E3A8A] text-white rounded-lg hover:bg-[#0F172A] transition-colors text-sm font-semibold shadow-sm"
+                        >
+                          <PaperAirplaneIcon className="h-3.5 w-3.5" />
+                          Transférer
+                        </button>
                       </td>
                     </tr>
                   ))}
+
+                  {doleancesTransferees.length > 0 && (
+                    <>
+                      <tr>
+                        <td colSpan="7" className="px-4 py-2 bg-slate-50/70 text-center text-[10px] font-semibold text-slate-400 uppercase tracking-wide">
+                          Déjà transférées ou traitées
+                        </td>
+                      </tr>
+                      {doleancesTransferees.map((doleance) => (
+                        <tr key={doleance.id_doleance} className="bg-slate-50/30 hover:bg-slate-50/60 transition-colors">
+                          <td className="px-4 py-2.5 whitespace-nowrap font-mono font-semibold text-slate-400 text-sm">
+                            {doleance.reference}
+                          </td>
+                          <td className="px-4 py-2.5 whitespace-nowrap text-slate-400 text-sm hidden lg:table-cell">
+                            {doleance.citoyen_nom || '—'}
+                          </td>
+                          <td className="px-4 py-2.5 whitespace-nowrap text-slate-400 text-sm hidden md:table-cell">
+                            {getCategoryName(doleance.id_categorie)}
+                          </td>
+                          <td className="px-4 py-2.5 text-slate-400 max-w-[160px] truncate text-sm">
+                            {doleance.titre}
+                          </td>
+                          <td className="px-4 py-2.5 whitespace-nowrap text-center">
+                            <StatusPill statut={doleance.nom_statut} />
+                          </td>
+                          <td className="px-4 py-2.5 whitespace-nowrap text-slate-400 text-sm hidden xl:table-cell">
+                            {doleance.nom_direction || '—'}
+                          </td>
+                          <td className="px-4 py-2.5 whitespace-nowrap text-right">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 text-slate-500 rounded-lg text-[10px] font-semibold">
+                              <CheckCircleIcon className="h-3 w-3" />
+                              {doleance.nom_statut === 'transferee' ? 'Transférée' : 'Traitée'}
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </>
+                  )}
+                </tbody>
+              </table>
+            </div>
+
+            {/* --- Vue cartes (mobile) --- */}
+            <div className="sm:hidden divide-y divide-slate-50">
+              {doleancesNonTransferees.map((doleance) => (
+                <div key={doleance.id_doleance} className="p-4">
+                  <div className="flex items-start justify-between gap-2 mb-2">
+                    <span className="font-mono font-bold text-[#1E3A8A] text-sm">{doleance.reference}</span>
+                    <StatusPill statut={doleance.nom_statut} />
+                  </div>
+                  <p className="text-sm font-semibold text-slate-800 mb-1">{doleance.titre}</p>
+                  <p className="text-sm text-slate-400 mb-3">
+                    {getCategoryName(doleance.id_categorie)}
+                    {doleance.citoyen_nom ? ` · ${doleance.citoyen_nom}` : ''}
+                  </p>
+                  <button
+                    onClick={() => openTransferModal(doleance)}
+                    className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2.5 bg-[#1E3A8A] text-white rounded-xl hover:bg-[#0F172A] transition-colors text-sm font-semibold shadow-sm"
+                  >
+                    <PaperAirplaneIcon className="h-3.5 w-3.5" />
+                    Transférer
+                  </button>
+                </div>
+              ))}
+
+              {doleancesTransferees.length > 0 && (
+                <>
+                  <div className="px-4 py-2 bg-slate-50/70 text-center text-[10px] font-semibold text-slate-400 uppercase tracking-wide">
+                    Déjà transférées ou traitées
+                  </div>
+                  {doleancesTransferees.map((doleance) => (
+                    <div key={doleance.id_doleance} className="p-4 bg-slate-50/30">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <span className="font-mono font-semibold text-slate-400 text-sm">{doleance.reference}</span>
+                        <StatusPill statut={doleance.nom_statut} />
+                      </div>
+                      <p className="text-sm font-medium text-slate-500">{doleance.titre}</p>
+                    </div>
+                  ))}
                 </>
               )}
-
-              {doleances.length === 0 && (
-                <tr>
-                  <td colSpan="7" className="text-center py-8">
-                    <p className="text-gray-500 text-sm">Aucune doléance trouvée</p>
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
+            </div>
+          </>
+        )}
       </div>
-
-      {/* Pagination supprimée - tout est visible */}
 
       {/* Modal de transfert */}
       {showTransferModal && selectedDoleance && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
-          <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full p-6">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900">Transférer la doléance</h3>
-              <button onClick={() => setShowTransferModal(false)} className="text-gray-400 hover:text-gray-600">
-                <XMarkIcon className="h-6 w-6" />
+        <div
+          className="fixed inset-0 bg-[#0F172A]/60 backdrop-blur-sm z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+          onClick={() => setShowTransferModal(false)}
+        >
+          <div
+            className="relative bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl max-w-md w-full p-6 animate-[slideUp_0.2s_ease-out]"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex justify-between items-start mb-5">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
+                  <BuildingOfficeIcon className="w-5 h-5 text-[#1E3A8A]" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-[#0F172A]">Transférer la doléance</h3>
+                  <p className="text-sm text-slate-400">Choisissez la direction destinataire</p>
+                </div>
+              </div>
+              <button
+                onClick={() => setShowTransferModal(false)}
+                className="text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg p-1.5 transition-colors"
+              >
+                <XMarkIcon className="h-5 w-5" />
               </button>
             </div>
-            
-            <div className="mb-4 p-3 bg-gray-50 rounded-lg text-sm">
-              <p><span className="font-medium">Réf:</span> {selectedDoleance.reference}</p>
-              <p className="mt-1"><span className="font-medium">Titre:</span> {selectedDoleance.titre}</p>
+
+            <div className="mb-5 p-3.5 bg-slate-50 rounded-xl text-sm space-y-1">
+              <p>
+                <span className="font-semibold text-slate-500">Réf.</span>{' '}
+                <span className="font-mono text-[#1E3A8A] font-semibold">{selectedDoleance.reference}</span>
+              </p>
+              <p className="text-slate-700">{selectedDoleance.titre}</p>
             </div>
 
             <form onSubmit={handleTransfert}>
               <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Direction destinataire *
+                <label className="block text-sm font-bold text-slate-600 mb-1.5">
+                  Direction destinataire <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={transferData.id_direction}
-                  onChange={(e) => setTransferData({...transferData, id_direction: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  onChange={(e) => setTransferData({ ...transferData, id_direction: e.target.value })}
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-transparent rounded-xl focus:outline-none focus:border-[#1E3A8A]/30 focus:bg-white transition-all text-sm"
                   required
                 >
                   <option value="">Sélectionner une direction</option>
-                  {directions.map(dir => (
+                  {directions.map((dir) => (
                     <option key={dir.id_direction} value={dir.id_direction}>
                       {dir.nom_direction}
                     </option>
@@ -531,39 +644,51 @@ function Transfert() {
                 </select>
               </div>
 
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Motif du transfert
+              <div className="mb-6">
+                <label className="block text-sm font-bold text-slate-600 mb-1.5">
+                  Motif du transfert <span className="text-slate-400 font-normal">(optionnel)</span>
                 </label>
                 <textarea
                   value={transferData.commentaire}
-                  onChange={(e) => setTransferData({...transferData, commentaire: e.target.value})}
+                  onChange={(e) => setTransferData({ ...transferData, commentaire: e.target.value })}
                   rows="3"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-transparent rounded-xl focus:outline-none focus:border-[#1E3A8A]/30 focus:bg-white transition-all text-sm resize-none"
                   placeholder="Précisez la raison du transfert..."
                 />
               </div>
 
-              <div className="flex justify-end gap-3">
+              <div className="flex gap-3">
                 <button
                   type="button"
                   onClick={() => setShowTransferModal(false)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50 text-sm"
+                  className="flex-1 px-4 py-2.5 text-slate-600 bg-slate-50 rounded-xl hover:bg-slate-100 font-semibold text-sm transition-colors"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
                   disabled={loading}
-                  className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm"
+                  className="flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-[#1E3A8A] text-white rounded-xl hover:bg-[#0F172A] disabled:opacity-50 font-semibold text-sm shadow-sm transition-colors"
                 >
-                  {loading ? 'Transfert...' : 'Confirmer le transfert'}
+                  {loading ? (
+                    <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                  ) : (
+                    <PaperAirplaneIcon className="w-4 h-4" />
+                  )}
+                  {loading ? 'Transfert...' : 'Confirmer'}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
+
+      <style>{`
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateY(16px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </div>
   );
 }

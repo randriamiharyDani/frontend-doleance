@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import doleanceService from '../services/doleanceService';
 import toast from 'react-hot-toast';
@@ -18,6 +19,7 @@ import { DocumentTextIcon } from '@heroicons/react/24/outline';
 
 function Doleances() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const userRole = user?.role || user?.nom_role;
   const isSuperAdmin = userRole === 'administrateur_systeme';
   const isAgentCentral = userRole === 'agent_central';
@@ -137,9 +139,7 @@ function Doleances() {
   };
 
   const openDetailsModal = async (doleance) => {
-    setSelectedDoleance(doleance);
-    await fetchPiecesJointes(doleance.id_doleance);
-    setShowDetailsModal(true);
+    navigate(`/backoffice/doleances/${doleance.id_doleance}`);
   };
 
   const confirmDelete = (doleance) => {

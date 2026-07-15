@@ -36,11 +36,81 @@ function DoleanceDetail() {
   const [loadingPieces, setLoadingPieces] = useState(false);
   const [showPiecesModal, setShowPiecesModal] = useState(false);
   const [selectedPiece, setSelectedPiece] = useState(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editForm, setEditForm] = useState({});
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [categories, setCategories] = useState([]);
+  const [quartiers, setQuartiers] = useState([]);
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = React.useRef(null);
 
   useEffect(() => {
     fetchDoleance();
     fetchPiecesJointes();
+    fetchReferenceData();
   }, [id]);
+
+  const fetchReferenceData = async () => {
+    try {
+      const [catRes, qRes] = await Promise.all([
+        api.get('/doleances/categories'),
+        api.get('/doleances/quartiers')
+      ]);
+      if (catRes.data.success) setCategories(catRes.data.data);
+      if (qRes.data.success) setQuartiers(qRes.data.data);
+    } catch (error) {
+      console.warn('Erreur chargement données de référence');
+    }
+  };
+
+  const openEditModal = () => {
+    setEditForm({
+      titre: doleance.titre || '',
+      description: doleance.description || '',
+      id_categorie: doleance.id_categorie || '',
+      id_quartier: doleance.id_quartier || '',
+      lieu_exact: doleance.lieu_exact || '',
+      suggestions: doleance.suggestions || '',
+      citoyen_nom: doleance.citoyen_nom || '',
+      citoyen_prenom: doleance.citoyen_prenom || '',
+      citoyen_email: doleance.citoyen_email || '',
+      citoyen_telephone: doleance.citoyen_telephone || '',
+      citoyen_adresse: doleance.citoyen_adresse || ''
+    });
+    setShowEditModal(true);
+  };
+
+  const handleSaveEdit = async (e) => {
+    e.preventDefault();
+    setSavingEdit(true);
+    try {
+      const payload = {
+        titre: editForm.titre,
+        description: editForm.description,
+        id_categorie: editForm.id_categorie || null,
+        id_quartier: editForm.id_quartier || null,
+        lieu_exact: editForm.lieu_exact,
+        suggestions: editForm.suggestions,
+        citoyen: {
+          nom: editForm.citoyen_nom,
+          prenom: editForm.citoyen_prenom,
+          email: editForm.citoyen_email,
+          telephone: editForm.citoyen_telephone,
+          adresse: editForm.citoyen_adresse
+        }
+      };
+      const response = await api.put(`/doleances/${id}`, payload);
+      if (response.data.success) {
+        toast.success('Doléance mise à jour avec succès');
+        setShowEditModal(false);
+        fetchDoleance();
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Erreur lors de la mise à jour');
+    } finally {
+      setSavingEdit(false);
+    }
+  };
 
   const fetchDoleance = async () => {
     try {
@@ -110,6 +180,45 @@ function DoleanceDetail() {
       toast.error('Erreur lors de l\'envoi');
     } finally {
       setSending(false);
+    }
+  };
+
+  const handleUploadFiles = async (e) => {
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    const maxSize = 10 * 1024 * 1024;
+    const allowed = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'video/mp4', 'video/quicktime', 'application/pdf'];
+    for (const file of files) {
+      if (file.size > maxSize) {
+        toast.error(`${file.name} dépasse 10 Mo`);
+        return;
+      }
+      if (!allowed.includes(file.type)) {
+        toast.error(`${file.name} n'est pas un format accepté`);
+        return;
+      }
+    }
+
+    setUploading(true);
+    try {
+      const formData = new FormData();
+      formData.append('doleance_id', id);
+      for (const file of files) {
+        formData.append('files', file);
+      }
+      const response = await api.post('/doleances/upload', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      });
+      if (response.data.success) {
+        toast.success(`${files.length} fichier(s) ajouté(s)`);
+        fetchPiecesJointes();
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Erreur lors de l\'upload');
+    } finally {
+      setUploading(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
     }
   };
 
@@ -237,7 +346,16 @@ function DoleanceDetail() {
                 </div>
                 <h1 className="text-2xl font-bold text-gray-800">{doleance.titre}</h1>
               </div>
-              {getStatusBadge(doleance.nom_statut, doleance.statut_couleur)}
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={openEditModal}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors"
+                >
+                  <PencilIcon className="h-4 w-4" />
+                  Modifier
+                </button>
+                {getStatusBadge(doleance.nom_statut, doleance.statut_couleur)}
+              </div>
             </div>
             
             <div className="border-t pt-4">
@@ -281,9 +399,36 @@ function DoleanceDetail() {
                 <PaperClipIcon className="h-5 w-5" />
                 Pièces jointes
               </h3>
-              <span className="text-sm text-gray-500">
-                {piecesJointes.length} fichier(s)
-              </span>
+              <div className="flex items-center gap-3">
+                <span className="text-sm text-gray-500">
+                  {piecesJointes.length} fichier(s)
+                </span>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  multiple
+                  accept="image/*,video/mp4,video/quicktime,.pdf"
+                  onChange={handleUploadFiles}
+                  className="hidden"
+                />
+                <button
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploading}
+                  className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 transition-colors"
+                >
+                  {uploading ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Ajout...
+                    </>
+                  ) : (
+                    <>
+                      <PaperClipIcon className="h-4 w-4" />
+                      Ajouter
+                    </>
+                  )}
+                </button>
+              </div>
             </div>
 
             {loadingPieces ? (
@@ -614,6 +759,113 @@ function DoleanceDetail() {
                 Fermer
               </button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal de modification */}
+      {showEditModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center rounded-t-2xl">
+              <h2 className="text-lg font-bold text-gray-800">Modifier la doléance</h2>
+              <button onClick={() => setShowEditModal(false)} className="text-gray-400 hover:text-gray-600">
+                <XMarkIcon className="h-6 w-6" />
+              </button>
+            </div>
+            <form onSubmit={handleSaveEdit} className="p-6 space-y-6">
+              {/* Section Doléance */}
+              <div>
+                <h3 className="font-semibold text-gray-700 mb-3">Doléance</h3>
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">Titre *</label>
+                    <input type="text" value={editForm.titre} onChange={(e) => setEditForm({...editForm, titre: e.target.value})} required
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-500" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">Description *</label>
+                    <textarea value={editForm.description} onChange={(e) => setEditForm({...editForm, description: e.target.value})} required rows={4}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-500" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-1">Catégorie</label>
+                      <select value={editForm.id_categorie} onChange={(e) => setEditForm({...editForm, id_categorie: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-500">
+                        <option value="">-- Sélectionner --</option>
+                        {categories.map(c => <option key={c.id_categorie} value={c.id_categorie}>{c.nom_categorie}</option>)}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-1">Quartier</label>
+                      <select value={editForm.id_quartier} onChange={(e) => setEditForm({...editForm, id_quartier: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-500">
+                        <option value="">-- Sélectionner --</option>
+                        {quartiers.map(q => <option key={q.id_quartier} value={q.id_quartier}>{q.nom_quartier}</option>)}
+                      </select>
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">Lieu exact</label>
+                    <input type="text" value={editForm.lieu_exact} onChange={(e) => setEditForm({...editForm, lieu_exact: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-500" />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">Suggestions</label>
+                    <textarea value={editForm.suggestions} onChange={(e) => setEditForm({...editForm, suggestions: e.target.value})} rows={2}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-500" />
+                  </div>
+                </div>
+              </div>
+
+              {/* Section Citoyen */}
+              <div>
+                <h3 className="font-semibold text-gray-700 mb-3">Citoyen</h3>
+                <div className="space-y-3">
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-1">Nom</label>
+                      <input type="text" value={editForm.citoyen_nom} onChange={(e) => setEditForm({...editForm, citoyen_nom: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-500" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-1">Prénom</label>
+                      <input type="text" value={editForm.citoyen_prenom} onChange={(e) => setEditForm({...editForm, citoyen_prenom: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-500" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-600 mb-1">Email</label>
+                    <input type="email" value={editForm.citoyen_email} onChange={(e) => setEditForm({...editForm, citoyen_email: e.target.value})}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-500" />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-1">Téléphone</label>
+                      <input type="text" value={editForm.citoyen_telephone} onChange={(e) => setEditForm({...editForm, citoyen_telephone: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-500" />
+                    </div>
+                    <div>
+                      <label className="block text-sm font-medium text-gray-600 mb-1">Adresse</label>
+                      <input type="text" value={editForm.citoyen_adresse} onChange={(e) => setEditForm({...editForm, citoyen_adresse: e.target.value})}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-500" />
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Boutons */}
+              <div className="flex justify-end gap-3 pt-2 border-t">
+                <button type="button" onClick={() => setShowEditModal(false)}
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800">Annuler</button>
+                <button type="submit" disabled={savingEdit}
+                  className="px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 disabled:opacity-50 flex items-center gap-2">
+                  {savingEdit ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div> : <PencilIcon className="h-4 w-4" />}
+                  {savingEdit ? 'Enregistrement...' : 'Enregistrer'}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

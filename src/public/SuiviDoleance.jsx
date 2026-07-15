@@ -141,7 +141,7 @@ function SuiviDoleance() {
             Commune Urbaine d'Antananarivo
           </span>
           <h1 className={`cua-display text-2xl sm:text-xl md:text-3xl font-semibold mb-2 ${
-            darkMode ? 'text-white' : 'text-[#0F172A]'
+            darkMode ? 'text-white' : 'text-[#1E3A8A]'
           }`}>
             {t('tracking.title')}
           </h1>
@@ -207,13 +207,13 @@ function SuiviDoleance() {
                           {t('tracking.reference')}
                         </p>
                       </div>
-                      <p className={`text-base sm:text-xl md:text-2xl font-mono font-bold break-all ${
+                      <p className={`text-base sm:text-xl md:text-2xl  font-mono font-bold break-all ${
                         darkMode ? 'text-[#D4AF37]' : 'text-[#1E3A8A]'
                       }`}>
                         {doleance.reference}
                       </p>
                       <h2 className={`cua-display text-base sm:text-lg md:text-xl font-semibold mt-2 sm:mt-3 break-words ${
-                        darkMode ? 'text-white' : 'text-[#0F172A]'
+                        darkMode ? 'text-white' : 'text-[#1E3A8A]'
                       }`}>
                         {doleance.titre}
                       </h2>
@@ -232,8 +232,8 @@ function SuiviDoleance() {
                 <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
                   {/* Description détaillée */}
                   <div>
-                    <h3 className={`font-semibold mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-base ${
-                      darkMode ? 'text-white' : 'text-[#0F172A]'
+                    <h3 className={`font-semibold mb-2 sm:mb-3  flex items-center gap-2 text-sm sm:text-base ${
+                      darkMode ? 'text-white' : 'text-[#1E3A8A]'
                     }`}>
                       <div className="cua-gold-bar w-1 h-5 sm:h-6 rounded-full"></div>
                       <InformationCircleIcon className={`h-4 w-4 sm:h-5 sm:w-5 ${darkMode ? 'text-[#D4AF37]' : 'text-[#1E3A8A]'}`} />
@@ -251,7 +251,7 @@ function SuiviDoleance() {
                   {/* Informations supplémentaires */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                     {/* Catégorie */}
-                    <div className={`flex items-start gap-3 p-2 sm:p-3 rounded-lg border-l-4 border-[#D4AF37] ${
+                    <div className={`flex items-start gap-3 p-2 sm:p-3 rounded-lg border-l-4 border-[#D4AF37]  ${
                       darkMode ? 'bg-gray-700' : 'bg-slate-50'
                     }`}>
                       <TagIcon className={`h-4 w-4 sm:h-5 sm:w-5 mt-0.5 ${darkMode ? 'text-[#D4AF37]' : 'text-[#1E3A8A]'}`} />
@@ -304,7 +304,7 @@ function SuiviDoleance() {
                   {doleance.pieces_jointes && doleance.pieces_jointes.length > 0 && (
                     <div>
                       <h3 className={`font-semibold mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-base ${
-                        darkMode ? 'text-white' : 'text-[#0F172A]'
+                        darkMode ? 'text-white' : 'text-[#1E3A8A]'
                       }`}>
                         <div className="cua-gold-bar w-1 h-5 sm:h-6 rounded-full"></div>
                         <PhotoIcon className={`h-4 w-4 sm:h-5 sm:w-5 ${darkMode ? 'text-[#D4AF37]' : 'text-[#1E3A8A]'}`} />
@@ -341,7 +341,7 @@ function SuiviDoleance() {
                   {doleance.suggestions && (
                     <div>
                       <h3 className={`font-semibold mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-base ${
-                        darkMode ? 'text-white' : 'text-[#0F172A]'
+                        darkMode ? 'text-white' : 'text-[#1E3A8A]'
                       }`}>
                         <div className="cua-gold-bar w-1 h-5 sm:h-6 rounded-full"></div>
                         <ChatBubbleLeftRightIcon className={`h-4 w-4 sm:h-5 sm:w-5 ${darkMode ? 'text-[#D4AF37]' : 'text-[#1E3A8A]'}`} />
@@ -360,7 +360,7 @@ function SuiviDoleance() {
                   {/* Historique du traitement - Statuts côte à côte responsive */}
                   <div>
                     <h3 className={`font-semibold mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base ${
-                      darkMode ? 'text-white' : 'text-[#0F172A]'
+                      darkMode ? 'text-white' : 'text-[#1E3A8A]'
                     }`}>
                       <div className="cua-gold-bar w-1 h-5 sm:h-6 rounded-full"></div>
                       <ArrowPathIcon className={`h-4 w-4 sm:h-5 sm:w-5 ${darkMode ? 'text-[#D4AF37]' : 'text-[#1E3A8A]'}`} />
@@ -407,7 +407,7 @@ function SuiviDoleance() {
                   {doleance.reponses && doleance.reponses.length > 0 && (
                     <div>
                       <h3 className={`font-semibold mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base ${
-                        darkMode ? 'text-white' : 'text-[#0F172A]'
+                        darkMode ? 'text-white' : 'text-[#1E3A8A]'
                       }`}>
                         <div className="cua-gold-bar w-1 h-5 sm:h-6 rounded-full"></div>
                         <ChatBubbleLeftRightIcon className={`h-4 w-4 sm:h-5 sm:w-5 ${darkMode ? 'text-[#D4AF37]' : 'text-[#1E3A8A]'}`} />
@@ -454,7 +454,7 @@ function SuiviDoleance() {
                 }`}>
                   <DocumentTextIcon className={`h-8 w-8 sm:h-10 sm:w-10 ${darkMode ? 'text-gray-500' : 'text-slate-400'}`} />
                 </div>
-                <h3 className={`cua-display text-lg sm:text-xl font-semibold mb-2 ${darkMode ? 'text-gray-200' : 'text-[#0F172A]'}`}>
+                <h3 className={`cua-display text-lg sm:text-xl font-semibold mb-2 ${darkMode ? 'text-gray-200' : 'text-[#1E3A8A]'}`}>
                   {t('tracking.notFound')}
                 </h3>
                 <p className={`text-sm sm:text-base mb-4 ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>
