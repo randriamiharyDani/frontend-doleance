@@ -13,6 +13,8 @@ class SocketManager {
     this.userId = null;
     this.currentRoom = null;
     this.lockedResources = {}; // Pour suivre les ressources verrouillées
+    this.onlineUsers = []; // Liste des utilisateurs en ligne
+    this.onOnlineUsersUpdate = null; // Callback pour la mise à jour
   }
 
   // ========== CONNEXION ==========
@@ -100,6 +102,16 @@ class SocketManager {
 
     this.socket.on('lock-conflict', (data) => {
       this.emit('lock-conflict', data);
+    });
+
+    // Écouter les mises à jour des utilisateurs en ligne
+    this.socket.on('online-users-updated', (users) => {
+      this.onlineUsers = users;
+      console.log(`👥 Utilisateurs en ligne: ${users.length}`);
+      if (this.onOnlineUsersUpdate) {
+        this.onOnlineUsersUpdate(users);
+      }
+      this.emit('online-users-updated', users);
     });
 
     return this.socket;
@@ -268,6 +280,19 @@ class SocketManager {
 
   notifyLeaveRejected(leaveId, userId, userName) {
     this.emit('leave-rejected', { leaveId, userId, userName });
+  }
+
+  // ========== UTILISATEURS EN LIGNE ==========
+  getOnlineUsers() {
+    return this.onlineUsers;
+  }
+
+  isUserOnline(userId) {
+    return this.onlineUsers.some(u => u.userId === userId);
+  }
+
+  setOnlineUsersCallback(callback) {
+    this.onOnlineUsersUpdate = callback;
   }
 
   // ========== MÉTHODES UTILITAIRES ==========

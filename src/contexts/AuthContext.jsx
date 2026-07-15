@@ -1,5 +1,6 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
 import api from '../services/api';
+import socket from '../config/socket';
 import toast from 'react-hot-toast';
 
 const AuthContext = createContext();
@@ -9,6 +10,14 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const connectSocket = (userData, token) => {
+    if (!userData || !token) return;
+    const userId = userData.id || userData.id_utilisateur;
+    const userName = `${userData.prenom || ''} ${userData.nom || ''}`.trim() || 'Utilisateur';
+    const userRole = userData.role || userData.nom_role || '';
+    socket.connect(token, userId, userName, userRole);
+  };
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -21,12 +30,12 @@ export const AuthProvider = ({ children }) => {
           setUser(parsedUser);
           api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
           
-          // Vérifier si le token est encore valide
+          connectSocket(parsedUser, token);
+          
           try {
             await api.get('/auth/profile');
           } catch (error) {
             if (error.response?.status === 401) {
-              // Token invalide, déconnexion
               logout();
             }
           }
@@ -39,6 +48,10 @@ export const AuthProvider = ({ children }) => {
     };
     
     checkAuth();
+
+    return () => {
+      socket.disconnect();
+    };
   }, []);
 
   const login = async (email, password) => {
@@ -50,6 +63,8 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('user', JSON.stringify(user));
       api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
       setUser(user);
+
+      connectSocket(user, token);
       
       toast.success('Connexion réussie');
       return true;
@@ -60,12 +75,13 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    socket.disconnect();
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     delete api.defaults.headers.common['Authorization'];
     setUser(null);
     toast.success('Déconnexion réussie');
-    window.location.href = '/login'; // Redirection forcée
+    window.location.href = '/login';
   };
 
   return (

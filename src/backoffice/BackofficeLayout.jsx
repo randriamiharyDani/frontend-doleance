@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Outlet, Link, useLocation } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
+import socket from "../config/socket";
 import {
   HomeIcon,
   DocumentTextIcon,
@@ -23,6 +24,7 @@ function BackofficeLayout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [openMenus, setOpenMenus] = useState({});
+  const [isCurrentUserOnline, setIsCurrentUserOnline] = useState(false);
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -36,6 +38,18 @@ function BackofficeLayout() {
     window.addEventListener("resize", checkScreenSize);
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
+
+  // Vérifier si l'utilisateur actuel est en ligne
+  useEffect(() => {
+    if (user?.id) {
+      const checkOnline = () => {
+        setIsCurrentUserOnline(socket.isUserOnline(user.id));
+      };
+      checkOnline();
+      socket.setOnlineUsersCallback(checkOnline);
+      return () => socket.setOnlineUsersCallback(null);
+    }
+  }, [user?.id]);
 
   useEffect(() => {
     if (isMobile) {
@@ -391,11 +405,12 @@ function BackofficeLayout() {
         {/* Infos utilisateur */}
         <div className="absolute bottom-0 left-0 right-0 z-10 p-4 border-t border-white/10 bg-opacity-95 backdrop-blur-sm">
           <div className="flex items-center">
-            <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-md bg-white/10">
+            <div className="relative w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-md bg-white/10">
               <span className="text-white text-sm font-medium">
                 {user?.prenom?.charAt(0) || "U"}
                 {user?.nom?.charAt(0) || "?"}
               </span>
+              <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[#0B1A33] ${isCurrentUserOnline ? 'bg-green-500' : 'bg-gray-400'}`} />
             </div>
 
             <div className="ml-3 flex-1 min-w-0">
@@ -406,6 +421,12 @@ function BackofficeLayout() {
               <p className="text-xs text-white/50 capitalize truncate">
                 {user?.role?.replace(/_/g, " ") || "Chargement..."}
               </p>
+              <div className="flex items-center gap-1 mt-0.5">
+                <span className={`h-1.5 w-1.5 rounded-full ${isCurrentUserOnline ? 'bg-green-400 animate-pulse' : 'bg-gray-500'}`} />
+                <span className={`text-[10px] ${isCurrentUserOnline ? 'text-green-400' : 'text-white/40'}`}>
+                  {isCurrentUserOnline ? 'En ligne' : 'Hors ligne'}
+                </span>
+              </div>
             </div>
           </div>
         </div>

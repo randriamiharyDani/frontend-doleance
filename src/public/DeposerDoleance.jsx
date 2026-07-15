@@ -568,7 +568,10 @@ function DeposerDoleance() {
 
   // Bouton "Me localiser"
   const handleLocateMe = () => {
-    if (!navigator.geolocation) return;
+    if (!navigator.geolocation) {
+      toast.error("La géolocalisation n'est pas supportée par votre navigateur");
+      return;
+    }
     setIsLocating(true);
 
     navigator.geolocation.getCurrentPosition(
@@ -582,16 +585,27 @@ function DeposerDoleance() {
           );
           const data = await res.json();
           fillFromNominatim(data);
+          toast.success("Position trouvée !");
         } catch (err) {
           console.error("Erreur reverse geocoding:", err);
+          toast.error("Position obtenue, mais erreur lors de la récupération de l'adresse");
         } finally {
           setIsLocating(false);
         }
       },
       (err) => {
-        console.error("Erreur géolocalisation:", err);
         setIsLocating(false);
+        if (err.code === err.PERMISSION_DENIED) {
+          toast.error("Autorisation de localisation refusée. Veuillez activer les permissions de localisation dans votre navigateur.");
+        } else if (err.code === err.POSITION_UNAVAILABLE) {
+          toast.error("Position non disponible. Vérifiez que le GPS est activé.");
+        } else if (err.code === err.TIMEOUT) {
+          toast.error("La demande de localisation a expiré. Réessayez.");
+        } else {
+          toast.error("Erreur lors de la géolocalisation. Réessayez.");
+        }
       },
+      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
     );
   };
 

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
+import socket from '../config/socket';
 import toast from 'react-hot-toast';
 import { 
   UserPlusIcon, 
@@ -31,6 +32,7 @@ function Users() {
   const [users, setUsers] = useState([]);
   const [roles, setRoles] = useState([]);
   const [directions, setDirections] = useState([]);
+  const [onlineUsers, setOnlineUsers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [loadingDirections, setLoadingDirections] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -164,6 +166,22 @@ function Users() {
     fetchRoles();
     fetchDirections();
   }, [fetchUsers, fetchRoles, fetchDirections]);
+
+  // Écouter les mises à jour des utilisateurs en ligne
+  useEffect(() => {
+    // Récupérer la liste initiale
+    setOnlineUsers(socket.getOnlineUsers());
+
+    // S'abonner aux mises à jour
+    const handleOnlineUpdate = (users) => {
+      setOnlineUsers(users);
+    };
+    socket.setOnlineUsersCallback(handleOnlineUpdate);
+
+    return () => {
+      socket.setOnlineUsersCallback(null);
+    };
+  }, []);
 
   // Fonctions de gestion avec useCallback
   const closeModal = useCallback(() => {
@@ -344,6 +362,10 @@ function Users() {
     const direction = directions.find(d => d.id === directionId);
     return direction?.categorie || 'Non catégorisé';
   }, [directions]);
+
+  const isUserOnline = useCallback((userId) => {
+    return onlineUsers.some(u => u.userId === userId);
+  }, [onlineUsers]);
 
   const getCategorieColor = useCallback((categorie) => {
     const colors = {
@@ -558,7 +580,7 @@ function Users() {
                 <th className="px-2 md:px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Fonction</th>
                 <th className="px-2 md:px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase hidden lg:table-cell">Direction</th>
                 <th className="px-2 md:px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase hidden xl:table-cell">Catégorie</th>
-                <th className="px-2 md:px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+                <th className="px-2 md:px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">En ligne</th>
                 <th className="px-2 md:px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
               </tr>
             </thead>
@@ -607,9 +629,12 @@ function Users() {
                     </span>
                   </td>
                   <td className="px-2 md:px-3 py-2 whitespace-nowrap">
-                    <span className={`px-1.5 md:px-2 py-0.5 text-[10px] md:text-xs rounded-full border ${user.actif ? 'bg-green-100 text-green-800 border-green-200' : 'bg-red-100 text-red-800 border-red-200'}`}>
-                      {user.actif ? 'Actif' : 'Inactif'}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span className={`h-2.5 w-2.5 rounded-full ${isUserOnline(user.id_utilisateur) ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`} />
+                      <span className={`text-[10px] md:text-xs ${isUserOnline(user.id_utilisateur) ? 'text-green-600' : 'text-gray-500'}`}>
+                        {isUserOnline(user.id_utilisateur) ? 'En ligne' : 'Hors ligne'}
+                      </span>
+                    </div>
                   </td>
                   <td className="px-2 md:px-3 py-2 whitespace-nowrap text-right">
                     <div className="flex items-center justify-end gap-0.5 md:gap-1">
