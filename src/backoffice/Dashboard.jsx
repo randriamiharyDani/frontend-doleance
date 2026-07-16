@@ -88,10 +88,10 @@ function Dashboard() {
   useEffect(() => { fetchAll(true); }, [fetchAll]);
 
   const statsCards = [
-    { title: 'Total Doléances', value: stats.total, icon: DocumentTextIcon, color: 'bg-blue-500', change: '+12%', changeType: 'up', link: '/backoffice/doleances' },
-    { title: 'En cours', value: stats.enCours, icon: ClockIcon, color: 'bg-amber-500', change: '+5%', changeType: 'up', link: '/backoffice/doleances?statut=en_cours' },
-    { title: 'Résolues', value: stats.resolues, icon: CheckCircleIcon, color: 'bg-emerald-500', change: '+18%', changeType: 'up', link: '/backoffice/doleances?statut=resolues' },
-    { title: 'Urgentes', value: stats.urgentes, icon: ExclamationTriangleIcon, color: 'bg-rose-500', change: '-2%', changeType: 'down', link: '/backoffice/doleances?priorite=urgente' },
+    { title: 'Total Doléances', value: stats.total, icon: DocumentTextIcon, color: 'bg-blue-500', link: '/backoffice/doleances' },
+    { title: 'En cours', value: stats.enCours, icon: ClockIcon, color: 'bg-amber-500', link: '/backoffice/doleances?statut=en_cours' },
+    { title: 'Résolues', value: stats.resolues, icon: CheckCircleIcon, color: 'bg-emerald-500', link: '/backoffice/doleances?statut=resolues' },
+    { title: 'Urgentes', value: stats.urgentes, icon: ExclamationTriangleIcon, color: 'bg-rose-500', link: '/backoffice/doleances?priorite=urgente' },
   ];
 
   if (loading) {

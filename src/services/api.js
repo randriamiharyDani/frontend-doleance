@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000/api',
   headers: {
     'Content-Type': 'application/json',
   },
@@ -25,15 +25,9 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response?.status === 401) {
-      // Token expiré ou invalide
       localStorage.removeItem('token');
       localStorage.removeItem('user');
       delete api.defaults.headers.common['Authorization'];
-      
-      // Redirection vers login
-      if (window.location.pathname !== '/login' && !window.location.pathname.includes('/public')) {
-        window.location.href = '/login';
-      }
     }
     return Promise.reject(error);
   }

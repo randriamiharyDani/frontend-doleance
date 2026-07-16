@@ -118,7 +118,13 @@ function Doleances() {
     }
   }, []);
 
-  useEffect(() => { fetchDoleances(); fetchFilters(); }, [fetchDoleances, fetchFilters]);
+  useEffect(() => {
+    fetchFilters();
+  }, [fetchFilters]);
+
+  useEffect(() => {
+    fetchDoleances();
+  }, [fetchDoleances]);
 
   const fetchPiecesJointes = async (doleanceId) => {
     setLoadingPieces(true);
@@ -132,10 +138,10 @@ function Doleances() {
     }
   };
 
-  const handleSearch = (e) => { e.preventDefault(); setPagination(prev => ({ ...prev, page: 1 })); fetchDoleances(); };
+  const handleSearch = (e) => { e.preventDefault(); setPagination(prev => ({ ...prev, page: 1 })); };
   const handleReset = () => {
     setSearchTerm(''); setSelectedCategorie(''); setSelectedStatut(''); setSelectedPriorite('');
-    setPagination(prev => ({ ...prev, page: 1 })); fetchDoleances();
+    setPagination(prev => ({ ...prev, page: 1 }));
   };
 
   const openDetailsModal = async (doleance) => {

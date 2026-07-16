@@ -36,12 +36,12 @@ export const AuthProvider = ({ children }) => {
             await api.get('/auth/profile');
           } catch (error) {
             if (error.response?.status === 401) {
-              logout();
+              logout(true);
             }
           }
         } catch (error) {
           console.error('Erreur chargement utilisateur:', error);
-          logout();
+          logout(true);
         }
       }
       setLoading(false);
@@ -74,14 +74,18 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
+  const logout = (silent = false) => {
     socket.disconnect();
     localStorage.removeItem('token');
     localStorage.removeItem('user');
     delete api.defaults.headers.common['Authorization'];
     setUser(null);
-    toast.success('Déconnexion réussie');
-    window.location.href = '/login';
+    if (!silent) {
+      toast.success('Déconnexion réussie');
+    }
+    if (window.location.pathname !== '/login') {
+      window.location.href = '/login';
+    }
   };
 
   return (

@@ -27,7 +27,7 @@ import {
 const STATUS_STYLES = {
   en_attente:  { dot: 'bg-amber-500',  text: 'text-amber-700',  bg: 'bg-amber-50',  ring: 'ring-amber-200'  },
   en_cours:    { dot: 'bg-[#1E3A8A]',  text: 'text-[#1E3A8A]',  bg: 'bg-blue-50',   ring: 'ring-blue-200'   },
-  transferee:  { dot: 'bg-violet-500', text: 'text-violet-700', bg: 'bg-violet-50', ring: 'ring-violet-200' },
+  transfert:  { dot: 'bg-violet-500', text: 'text-violet-700', bg: 'bg-violet-50', ring: 'ring-violet-200' },
   traitee:     { dot: 'bg-emerald-500',text: 'text-emerald-700',bg: 'bg-emerald-50',ring: 'ring-emerald-200'},
   resolue:     { dot: 'bg-emerald-500',text: 'text-emerald-700',bg: 'bg-emerald-50',ring: 'ring-emerald-200'},
   cloturee:    { dot: 'bg-slate-400',  text: 'text-slate-600',  bg: 'bg-slate-100', ring: 'ring-slate-200'  },
@@ -37,7 +37,7 @@ const STATUS_STYLES = {
 const STATUS_LABELS = {
   en_attente: 'En attente',
   en_cours: 'En cours',
-  transferee: 'Transférée',
+  transfert: 'Transférée',
   traitee: 'Traitée',
   resolue: 'Résolue',
   cloturee: 'Clôturée',
@@ -103,7 +103,7 @@ function Transfert() {
     total: 0,
     enAttente: 0,
     enCours: 0,
-    transferees: 0,
+    transferts: 0,
     resolues: 0,
   });
 
@@ -154,7 +154,7 @@ function Transfert() {
           total: response.data.data.total || 0,
           enAttente: response.data.data.en_attente || 0,
           enCours: response.data.data.en_cours || 0,
-          transferees: response.data.data.transferees || 0,
+          transferts: response.data.data.transferts || 0,
           resolues: response.data.data.resolues || 0,
         });
       }
@@ -171,8 +171,8 @@ function Transfert() {
     const resolues = doleances.filter(
       (d) => d.nom_statut === 'traitee' || d.nom_statut === 'resolue' || d.nom_statut === 'cloturee'
     ).length;
-    const transferees = doleances.filter((d) => d.nom_statut === 'transferee').length;
-    setStatsTotals({ total, enAttente, enCours, resolues, transferees });
+    const transferts = doleances.filter((d) => d.nom_statut === 'transfert').length;
+    setStatsTotals({ total, enAttente, enCours, resolues, transferts });
   };
 
   const fetchDoleances = async () => {
@@ -291,7 +291,7 @@ function Transfert() {
   };
 
   const canTransfer = (statut) =>
-    statut !== 'transferee' && statut !== 'traitee' && statut !== 'resolue' && statut !== 'cloturee';
+    statut !== 'transfert' && statut !== 'traitee' && statut !== 'resolue' && statut !== 'cloturee';
 
   const refreshData = () => {
     fetchStats();
@@ -304,8 +304,8 @@ function Transfert() {
 
   const hasActiveFilters = filters.categorie || filters.search || (filters.statut && filters.statut !== 'all');
 
-  const doleancesNonTransferees = doleances.filter((d) => canTransfer(d.nom_statut));
-  const doleancesTransferees = doleances.filter((d) => !canTransfer(d.nom_statut));
+  const doleancesNontransferts = doleances.filter((d) => canTransfer(d.nom_statut));
+  const doleancestransferts = doleances.filter((d) => !canTransfer(d.nom_statut));
 
   return (
     <div className=" mx-auto">
@@ -364,7 +364,7 @@ function Transfert() {
         />
         <StatCard
           label="Transférées"
-          value={statsTotals.transferees}
+          value={statsTotals.transferts}
           icon={PaperAirplaneIcon}
           accent={{ bg: 'bg-violet-50', bgSolid: 'bg-violet-400', text: 'text-violet-600' }}
         />
@@ -471,7 +471,7 @@ function Transfert() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50">
-                  {doleancesNonTransferees.map((doleance) => (
+                  {doleancesNontransferts.map((doleance) => (
                     <tr key={doleance.id_doleance} className="hover:bg-slate-50/70 transition-colors">
                       <td className="px-4 py-3.5 whitespace-nowrap font-mono font-bold text-[#1E3A8A] text-sm">
                         {doleance.reference}
@@ -503,14 +503,14 @@ function Transfert() {
                     </tr>
                   ))}
 
-                  {doleancesTransferees.length > 0 && (
+                  {doleancestransferts.length > 0 && (
                     <>
                       <tr>
                         <td colSpan="7" className="px-4 py-2 bg-slate-50/70 text-center text-[10px] font-semibold text-slate-400 uppercase tracking-wide">
                           Déjà transférées ou traitées
                         </td>
                       </tr>
-                      {doleancesTransferees.map((doleance) => (
+                      {doleancestransferts.map((doleance) => (
                         <tr key={doleance.id_doleance} className="bg-slate-50/30 hover:bg-slate-50/60 transition-colors">
                           <td className="px-4 py-2.5 whitespace-nowrap font-mono font-semibold text-slate-400 text-sm">
                             {doleance.reference}
@@ -533,7 +533,7 @@ function Transfert() {
                           <td className="px-4 py-2.5 whitespace-nowrap text-right">
                             <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 text-slate-500 rounded-lg text-[10px] font-semibold">
                               <CheckCircleIcon className="h-3 w-3" />
-                              {doleance.nom_statut === 'transferee' ? 'Transférée' : 'Traitée'}
+                              {doleance.nom_statut === 'transfert' ? 'Transférée' : 'Traitée'}
                             </span>
                           </td>
                         </tr>
@@ -546,7 +546,7 @@ function Transfert() {
 
             {/* --- Vue cartes (mobile) --- */}
             <div className="sm:hidden divide-y divide-slate-50">
-              {doleancesNonTransferees.map((doleance) => (
+              {doleancesNontransferts.map((doleance) => (
                 <div key={doleance.id_doleance} className="p-4">
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <span className="font-mono font-bold text-[#1E3A8A] text-sm">{doleance.reference}</span>
@@ -567,12 +567,12 @@ function Transfert() {
                 </div>
               ))}
 
-              {doleancesTransferees.length > 0 && (
+              {doleancestransferts.length > 0 && (
                 <>
                   <div className="px-4 py-2 bg-slate-50/70 text-center text-[10px] font-semibold text-slate-400 uppercase tracking-wide">
                     Déjà transférées ou traitées
                   </div>
-                  {doleancesTransferees.map((doleance) => (
+                  {doleancestransferts.map((doleance) => (
                     <div key={doleance.id_doleance} className="p-4 bg-slate-50/30">
                       <div className="flex items-start justify-between gap-2 mb-2">
                         <span className="font-mono font-semibold text-slate-400 text-sm">{doleance.reference}</span>

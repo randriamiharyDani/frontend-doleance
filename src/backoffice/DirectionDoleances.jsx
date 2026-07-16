@@ -34,7 +34,7 @@ function DirectionDoleances() {
     services: [],
     agents: [],
     doleances: [],
-    doleancesTransferees: [],
+    doleancestransferts: [],
     stats: {}
   });
   const [activeTab, setActiveTab] = useState('doleances');
@@ -142,7 +142,7 @@ function DirectionDoleances() {
     const statutsMap = {
       'en_attente': { text: 'En attente', color: 'bg-yellow-100 text-yellow-800' },
       'en_cours': { text: 'En cours', color: 'bg-blue-100 text-blue-800' },
-      'transferee': { text: 'Transférée', color: 'bg-purple-100 text-purple-800' },
+      'transfert': { text: 'Transférée', color: 'bg-purple-100 text-purple-800' },
       'traitee': { text: 'Traitée', color: 'bg-green-100 text-green-800' },
       'rejetee': { text: 'Rejetée', color: 'bg-red-100 text-red-800' },
       'cloturee': { text: 'Clôturée', color: 'bg-gray-100 text-gray-800' }
