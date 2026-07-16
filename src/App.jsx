@@ -30,6 +30,7 @@ import Directions from './backoffice/Directions';
 import DirectionDoleances from './backoffice/DirectionDoleances';
 import Transfert from './backoffice/Transfert';
 import Settings from './backoffice/Settings';
+import Historique from './backoffice/Historique';
 import AjouterDoleance from './backoffice/AjouterDoleance';
 
 function AppRoutes() {
@@ -56,6 +57,7 @@ function AppRoutes() {
         <Route path="users" element={<Users />} />
         <Route path="roles" element={<Roles />} />
         <Route path="statistiques" element={<Statistiques />} />
+        <Route path="historique" element={<Historique />} />
         <Route path="directions" element={<Directions />} />
         <Route path="direction/:id_direction" element={<DirectionDoleances />} />
         <Route path="transfert" element={<Transfert />} />
