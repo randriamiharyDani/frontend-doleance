@@ -7,23 +7,18 @@ import { useTranslation } from "react-i18next";
 import {
   DocumentTextIcon,
   MagnifyingGlassIcon,
-  Cog6ToothIcon,
   Bars3Icon,
   XMarkIcon,
   SunIcon,
   MoonIcon,
-  ArrowRightOnRectangleIcon,
   ShieldCheckIcon,
 } from "@heroicons/react/24/outline";
-import SettingsModal from "./SettingsModal";
-import NotificationsDropdown from "./NotificationsDropdown";
 
 function PublicLayout({ children }) {
   const { darkMode, toggleDarkMode } = useTheme();
-  const { i18n, t } = useTranslation();
+  const { i18n } = useTranslation();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
   useEffect(() => {
@@ -189,23 +184,30 @@ function PublicLayout({ children }) {
                 )}
               </button>
 
-              {/* Notifications */}
-              <div className="hidden sm:block">
-                <NotificationsDropdown />
+              {/* Language selector */}
+              <div className={`hidden sm:flex items-center rounded-xl overflow-hidden border ${
+                darkMode ? "border-slate-600" : "border-slate-200"
+              }`}>
+                {[
+                  { code: "mg", label: "MG", flag: "🇲🇬" },
+                  { code: "fr", label: "FR", flag: "🇫🇷" },
+                ].map((lang) => (
+                  <button
+                    key={lang.code}
+                    onClick={() => i18n.changeLanguage(lang.code)}
+                    className={`px-2.5 py-1.5 text-xs font-semibold transition-all duration-200 ${
+                      i18n.language === lang.code
+                        ? "bg-[#D4AF37] text-white"
+                        : darkMode
+                          ? "text-slate-400 hover:text-white hover:bg-white/10"
+                          : "text-slate-500 hover:text-[#0F172A] hover:bg-slate-100"
+                    }`}
+                    aria-label={`Langue ${lang.label}`}
+                  >
+                    <span className="mr-0.5">{lang.flag}</span>{lang.label}
+                  </button>
+                ))}
               </div>
-
-              {/* Settings */}
-              <button
-                onClick={() => setSettingsOpen(true)}
-                className={`cua-icon-btn p-2 rounded-xl transition-all duration-200 ${
-                  darkMode
-                    ? "text-slate-300 hover:bg-white/10"
-                    : "text-slate-400 hover:bg-slate-100"
-                }`}
-                aria-label="Paramètres"
-              >
-                <Cog6ToothIcon className="h-5 w-5" />
-              </button>
 
               {/* Hamburger mobile */}
               <button
@@ -264,6 +266,39 @@ function PublicLayout({ children }) {
               <div
                 className={`border-t my-2 ${darkMode ? "border-slate-700" : "border-slate-100"}`}
               />
+
+              {/* Language selector (mobile) */}
+              <div className={`flex items-center gap-2 px-4 py-2`}>
+                <span className={`text-xs font-medium ${darkMode ? "text-slate-400" : "text-slate-500"}`}>
+                  Langue :
+                </span>
+                <div className={`flex items-center rounded-lg overflow-hidden border ${
+                  darkMode ? "border-slate-600" : "border-slate-200"
+                }`}>
+                  {[
+                    { code: "mg", label: "MG", flag: "🇲🇬" },
+                    { code: "fr", label: "FR", flag: "🇫🇷" },
+                  ].map((lang) => (
+                    <button
+                      key={lang.code}
+                      onClick={() => {
+                        i18n.changeLanguage(lang.code);
+                        setMobileMenuOpen(false);
+                      }}
+                      className={`px-3 py-2 text-xs font-semibold transition-all duration-200 ${
+                        i18n.language === lang.code
+                          ? "bg-[#D4AF37] text-white"
+                          : darkMode
+                            ? "text-slate-400 hover:text-white hover:bg-white/10"
+                            : "text-slate-500 hover:text-[#0F172A] hover:bg-slate-100"
+                      }`}
+                      aria-label={`Langue ${lang.label}`}
+                    >
+                      <span className="mr-0.5">{lang.flag}</span>{lang.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
 
               {/* Login link (mobile) */}
               {/* <Link
@@ -364,15 +399,6 @@ function PublicLayout({ children }) {
         </div>
       </footer>
 
-      {/* Settings Modal */}
-      <SettingsModal
-        isOpen={settingsOpen}
-        onClose={() => setSettingsOpen(false)}
-        darkMode={darkMode}
-        toggleDarkMode={toggleDarkMode}
-        i18n={i18n}
-        t={t}
-      />
     </div>
   );
 }

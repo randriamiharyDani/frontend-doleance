@@ -13,6 +13,7 @@ import {
   BellIcon
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
+import api from '../../services/api';
 import { useTranslation } from 'react-i18next';
 
 function Switch({ enabled, onChange }) {
@@ -71,10 +72,18 @@ function BackofficeSettingsModal({ isOpen, onClose }) {
 
     setLoading(true);
     try {
-      toast.success('Mot de passe modifié avec succès');
-      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      const response = await api.post('/auth/change-password', {
+        oldPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword
+      });
+      if (response.data.success) {
+        toast.success('Mot de passe modifié avec succès');
+        setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      } else {
+        toast.error(response.data.message || 'Erreur lors du changement de mot de passe');
+      }
     } catch (error) {
-      toast.error('Erreur lors du changement de mot de passe');
+      toast.error(error.response?.data?.message || 'Erreur lors du changement de mot de passe');
     } finally {
       setLoading(false);
     }

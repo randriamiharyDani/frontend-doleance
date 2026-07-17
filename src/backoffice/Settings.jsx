@@ -16,6 +16,7 @@ import {
   CheckCircleIcon,
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
+import api from '../services/api';
 
 // ---- Design tokens ---------------------------------------------------
 // Même identité que les autres écrans du backoffice : navy #1E3A8A /
@@ -113,11 +114,18 @@ function Settings() {
 
     setLoading(true);
     try {
-      // Appel API pour changer le mot de passe
-      toast.success('Mot de passe modifié avec succès');
-      setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      const response = await api.post('/auth/change-password', {
+        oldPassword: passwordData.currentPassword,
+        newPassword: passwordData.newPassword
+      });
+      if (response.data.success) {
+        toast.success('Mot de passe modifié avec succès');
+        setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
+      } else {
+        toast.error(response.data.message || 'Erreur lors du changement de mot de passe');
+      }
     } catch (error) {
-      toast.error('Erreur lors du changement de mot de passe');
+      toast.error(error.response?.data?.message || 'Erreur lors du changement de mot de passe');
     } finally {
       setLoading(false);
     }
