@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Outlet, Link, useLocation } from "react-router-dom";
+import { Outlet, Link, useLocation, useNavigate, Navigate } from "react-router-dom";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import socket from "../config/socket";
@@ -20,13 +20,39 @@ import {
 import Navbar from "../components/backoffice/Navbar";
 
 function BackofficeLayout() {
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const { darkMode } = useTheme();
   const location = useLocation();
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [openMenus, setOpenMenus] = useState({});
   const [isCurrentUserOnline, setIsCurrentUserOnline] = useState(false);
+
+  // Auth guard : redirection si non connecté
+  if (!loading && !user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Route restriction pour les Directions
+  const userRole = user?.role || user?.nom_role;
+  const isAdmin =
+    userRole === "administrateur_systeme" ||
+    userRole === "administrateur" ||
+    userRole === "agent_central";
+
+  const adminOnlyRoutes = [
+    "/backoffice/users",
+    "/backoffice/roles",
+    "/backoffice/directions",
+    "/backoffice/direction/",
+    "/backoffice/transfert",
+    "/backoffice/ajouter-doleance",
+  ];
+
+  if (!isAdmin && adminOnlyRoutes.some(route => location.pathname.startsWith(route))) {
+    return <Navigate to="/backoffice/dashboard" replace />;
+  }
 
   useEffect(() => {
     const checkScreenSize = () => {
@@ -91,11 +117,13 @@ function BackofficeLayout() {
       href: "/backoffice/doleances",
       icon: DocumentTextIcon,
     },
-    { name: "Transfert", href: "/backoffice/transfert", icon: ArrowPathIcon },
+    ...(isAdmin ? [
+      { name: "Transfert", href: "/backoffice/transfert", icon: ArrowPathIcon },
+    ] : []),
   ];
 
   const secondaryNavigation = [
-    {
+    ...(isAdmin ? [{
       name: "Administration",
       icon: BuildingOfficeIcon,
       subItems: [
@@ -111,20 +139,13 @@ function BackofficeLayout() {
         },
         { name: "Rôles", href: "/backoffice/roles", icon: ShieldCheckIcon },
       ],
-    },
+    }] : []),
     {
       name: "Statistiques",
       href: "/backoffice/statistiques",
       icon: ChartBarIcon,
     },
   ];
-
-  // Déterminer les permissions
-  const userRole = user?.role || user?.nom_role;
-  const isAdmin =
-    userRole === "administrateur_systeme" ||
-    userRole === "administrateur" ||
-    userRole === "agent_central";
 
   // Auto-ouvrir les sous-menus dont un enfant est actif
   useEffect(() => {

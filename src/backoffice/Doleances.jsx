@@ -184,7 +184,7 @@ function Doleances() {
   const openReponseModal = (doleance) => {
     if (isBloquee(doleance.nom_statut)) { toast.error('Cette doléance est verrouillée'); return; }
     if (isNouvelle(doleance.nom_statut) && !isAdminOrAgentCentral) { toast.error('Seul l\'administrateur peut répondre aux nouvelles doléances'); return; }
-    if (!isAdminOrAgentCentral && doleance.id_direction !== user?.id_direction) { toast.error('Vous ne pouvez pas répondre à cette doléance'); return; }
+    if (!isAdminOrAgentCentral && doleance.id_direction !== user?.id_direction && doleance.id_utilisateur_assignee !== user?.id_utilisateur) { toast.error('Vous ne pouvez pas répondre à cette doléance'); return; }
     setSelectedDoleanceForReponse(doleance);
     setReponseText('');
     setShowReponseModal(true);
@@ -217,13 +217,19 @@ function Doleances() {
     }
   };
 
-  const canUserView = (doleance) => isAdminOrAgentCentral || (!isBloquee(doleance.nom_statut) && doleance.id_direction === user?.id_direction);
+  const canUserView = (doleance) => {
+    if (isAdminOrAgentCentral) return true;
+    if (!user?.id_direction && doleance.id_utilisateur_assignee === user?.id_utilisateur) return true;
+    if (doleance.id_direction === user?.id_direction) return true;
+    return false;
+  };
 
   const canUserAct = (doleance) => {
     if (isBloquee(doleance.nom_statut)) return false;
     if (isAdminOrAgentCentral) return true;
     if (isNouvelle(doleance.nom_statut)) return false;
-    if (canTraiter && doleance.id_direction === user?.id_direction) return true;
+    if (doleance.id_direction === user?.id_direction && canTraiter) return true;
+    if (!user?.id_direction && doleance.id_utilisateur_assignee === user?.id_utilisateur && canTraiter) return true;
     return false;
   };
 
@@ -262,7 +268,7 @@ function Doleances() {
               onStatut={openStatutModal}
               isNouvelle={isNouvelle(doleance.nom_statut)}
               isBloquee={isBloquee(doleance.nom_statut)}
-              isDeSaDirection={doleance.id_direction === user?.id_direction}
+              isDeSaDirection={doleance.id_direction === user?.id_direction || (!user?.id_direction && doleance.id_utilisateur_assignee === user?.id_utilisateur)}
               userCanAct={canUserAct(doleance)}
               userCanView={canUserView(doleance)}
               fullAddress={buildFullAddress(doleance)}
