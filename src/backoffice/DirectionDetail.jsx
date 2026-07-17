@@ -321,7 +321,7 @@ function DirectionDetail() {
                       <span className={`px-2 py-1 text-xs rounded-full ${
                         doleance.nom_statut === 'traitee' || doleance.nom_statut === 'resolue' || doleance.nom_statut === 'cloturee' 
                           ? 'bg-green-100 text-green-700' 
-                          : doleance.nom_statut === 'transfert' 
+                          : doleance.nom_statut === 'transferee' 
                             ? 'bg-purple-100 text-purple-700'
                             : doleance.nom_statut === 'rejetee'
                               ? 'bg-red-100 text-red-700'

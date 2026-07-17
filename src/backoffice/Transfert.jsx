@@ -27,7 +27,7 @@ import {
 const STATUS_STYLES = {
   en_attente:  { dot: 'bg-amber-500',  text: 'text-amber-700',  bg: 'bg-amber-50',  ring: 'ring-amber-200'  },
   en_cours:    { dot: 'bg-[#1E3A8A]',  text: 'text-[#1E3A8A]',  bg: 'bg-blue-50',   ring: 'ring-blue-200'   },
-  transfert:  { dot: 'bg-violet-500', text: 'text-violet-700', bg: 'bg-violet-50', ring: 'ring-violet-200' },
+  transferee:  { dot: 'bg-violet-500', text: 'text-violet-700', bg: 'bg-violet-50', ring: 'ring-violet-200' },
   traitee:     { dot: 'bg-emerald-500',text: 'text-emerald-700',bg: 'bg-emerald-50',ring: 'ring-emerald-200'},
   resolue:     { dot: 'bg-emerald-500',text: 'text-emerald-700',bg: 'bg-emerald-50',ring: 'ring-emerald-200'},
   cloturee:    { dot: 'bg-slate-400',  text: 'text-slate-600',  bg: 'bg-slate-100', ring: 'ring-slate-200'  },
@@ -37,7 +37,7 @@ const STATUS_STYLES = {
 const STATUS_LABELS = {
   en_attente: 'En attente',
   en_cours: 'En cours',
-  transfert: 'Transférée',
+  transferee: 'Transférée',
   traitee: 'Traitée',
   resolue: 'Résolue',
   cloturee: 'Clôturée',
@@ -171,7 +171,7 @@ function Transfert() {
     const resolues = doleances.filter(
       (d) => d.nom_statut === 'traitee' || d.nom_statut === 'resolue' || d.nom_statut === 'cloturee'
     ).length;
-    const transferts = doleances.filter((d) => d.nom_statut === 'transfert').length;
+    const transferts = doleances.filter((d) => d.nom_statut === 'transferee').length;
     setStatsTotals({ total, enAttente, enCours, resolues, transferts });
   };
 
@@ -291,7 +291,7 @@ function Transfert() {
   };
 
   const canTransfer = (statut) =>
-    statut !== 'transfert' && statut !== 'traitee' && statut !== 'resolue' && statut !== 'cloturee';
+    statut !== 'transferee' && statut !== 'traitee' && statut !== 'resolue' && statut !== 'cloturee';
 
   const refreshData = () => {
     fetchStats();
@@ -533,7 +533,7 @@ function Transfert() {
                           <td className="px-4 py-2.5 whitespace-nowrap text-right">
                             <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 text-slate-500 rounded-lg text-[10px] font-semibold">
                               <CheckCircleIcon className="h-3 w-3" />
-                              {doleance.nom_statut === 'transfert' ? 'Transférée' : 'Traitée'}
+                              {doleance.nom_statut === 'transferee' ? 'Transférée' : 'Traitée'}
                             </span>
                           </td>
                         </tr>

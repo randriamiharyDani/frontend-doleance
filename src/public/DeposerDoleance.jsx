@@ -1354,7 +1354,7 @@ function DeposerDoleance() {
             value={formData.description}
             onChange={handleChange}
             rows={5}
-            placeholder="Décrivez le problème que vous avez constaté... Ex : Un nid-de-poule d'environ 30 cm de profondeur sur la chaussée, situé au croisement de la Rue de Rivoli et du Boulevard de Sébastopol. Le trou est dangereux pour les cyclistes et les motards, surtout de nuit."
+            placeholder="Décrivez le problème que vous avez constaté..."
             className="cua-field w-full border-2 border-slate-100 rounded-xl px-5 py-4 text-sm text-slate-800 outline-none resize-y placeholder:text-slate-400"
             required
           />
