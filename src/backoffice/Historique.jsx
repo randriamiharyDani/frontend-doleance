@@ -133,7 +133,7 @@ function Historique() {
           <div className="w-16 h-16 bg-rose-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <ShieldCheckIcon className="h-8 w-8 text-rose-500" />
           </div>
-          <h2 className="text-xl font-bold text-[#0F172A] mb-2">Accès non autorisé</h2>
+          <h2 className="text-xl font-bold text-[#0F172A] ">Accès non autorisé</h2>
           <p className="text-slate-500 text-sm leading-relaxed">
             Cette page est réservée aux administrateurs et agents centraux.
           </p>
@@ -143,7 +143,7 @@ function Historique() {
   }
 
   return (
-    <div className="mx-auto p-4 sm:p-6 space-y-6">
+    <div className="mx-auto space-y-6">
       {/* Header */}
       <div className="flex flex-wrap justify-between items-start gap-3">
         <div>

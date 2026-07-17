@@ -55,7 +55,7 @@ return (
 
     {/* Sidebar */}
     <aside
-      className={`fixed top-0 left-0 z-30 h-full w-72 shadow-2xl transition-transform duration-300 ease-in-out flex flex-col bg-gradient-to-b from-[#0B1A33] to-[#1A365D] ${
+      className={`no-print fixed top-0 left-0 z-30 h-full w-72 shadow-2xl transition-transform duration-300 ease-in-out flex flex-col bg-gradient-to-b from-[#0B1A33] to-[#1A365D] ${
         sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'
       }`}
     

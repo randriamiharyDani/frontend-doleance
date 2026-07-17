@@ -336,7 +336,7 @@ function DoleanceDetail() {
         Retour à la liste
       </button>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="no-print grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Colonne principale - Informations de la doléance */}
         <div className="lg:col-span-2 space-y-6">
           {/* En-tête de la doléance */}
@@ -884,41 +884,11 @@ function DoleanceDetail() {
 
       {/* ===== Layout d'impression ===== */}
       <div className="print-only" id="print-area">
-        <style>{`
-          @media print {
-            body * { visibility: hidden !important; }
-            #print-area, #print-area * { visibility: visible !important; }
-            #print-area {
-              position: absolute;
-              left: 0; top: 0;
-              width: 100%;
-              padding: 20mm 15mm;
-              background: white;
-              font-family: 'Segoe UI', Arial, sans-serif;
-              color: #1a1a1a;
-            }
-            .print-header { text-align: center; margin-bottom: 24px; border-bottom: 3px solid #1E3A8A; padding-bottom: 16px; }
-            .print-header img { height: 70px; margin: 0 auto 8px; }
-            .print-header h1 { font-size: 16px; font-weight: 700; color: #1E3A8A; margin: 0; letter-spacing: 0.5px; }
-            .print-header h2 { font-size: 13px; font-weight: 400; color: #555; margin: 4px 0 0; }
-            .print-title { font-size: 15px; font-weight: 700; color: #0F172A; text-align: center; margin: 20px 0 16px; padding: 10px; background: #f0f4ff; border-radius: 6px; border-left: 4px solid #1E3A8A; text-align: left; }
-            .print-table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
-            .print-table td { padding: 8px 12px; border-bottom: 1px solid #e5e7eb; font-size: 12px; vertical-align: top; }
-            .print-table .label { font-weight: 700; color: #374151; width: 140px; white-space: nowrap; }
-            .print-table .value { color: #1f2937; }
-            .print-desc { margin: 16px 0; }
-            .print-desc .label { font-weight: 700; color: #374151; font-size: 12px; margin-bottom: 6px; }
-            .print-desc .value { color: #1f2937; font-size: 12px; line-height: 1.6; white-space: pre-wrap; border: 1px solid #e5e7eb; padding: 12px; border-radius: 6px; background: #fafafa; }
-            .print-footer { margin-top: 40px; padding-top: 16px; border-top: 2px solid #1E3A8A; text-align: center; }
-            .print-footer p { font-size: 13px; font-weight: 700; color: #1E3A8A; margin: 0; letter-spacing: 1px; }
-            .print-date { font-size: 10px; color: #999; text-align: right; margin-top: 8px; }
-          }
-        `}</style>
 
         <div className="print-header">
-          <img src="/images/logo_CUA.svg" alt="Logo CUA" />
+          <img className="h-10 w-10" src="/images/logo_CUA.svg" alt="Logo CUA" />
           <h1>COMMUNE URBAINE D'ANTANANARIVO</h1>
-          <h2>Fiche de Doléance Citoyenne</h2>
+          <h2>DELEGATION SPECIALE</h2>
         </div>
 
         <div className="print-title">
@@ -935,14 +905,14 @@ function DoleanceDetail() {
               <td className="label">Nom du plaignant</td>
               <td className="value">{doleance.citoyen_prenom} {doleance.citoyen_nom}</td>
             </tr>
-            <tr>
+            {/* <tr>
               <td className="label">Arrondissement</td>
               <td className="value">{doleance.nom_arrondissement || '—'}</td>
             </tr>
             <tr>
               <td className="label">Fokontany</td>
               <td className="value">{doleance.nom_quartier || '—'}</td>
-            </tr>
+            </tr> */}
             <tr>
               <td className="label">Adresse</td>
               <td className="value">{doleance.citoyen_adresse || doleance.lieu_exact || '—'}</td>

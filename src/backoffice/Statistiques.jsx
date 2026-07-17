@@ -182,10 +182,10 @@ function Statistiques() {
   }
 
   return (
-    <div className="space-y-6 p-4 md:p-6 bg-gray-50 min-h-screen">
+    <div className="space-y-6 bg-gray-50 min-h-screen">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Statistiques</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight">Statistiques</h1>
           <p className="text-gray-500 mt-1">Analyse des doléances et performances</p>
           <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs border border-blue-100">
             <ChartBarIcon className="h-3 w-3" />

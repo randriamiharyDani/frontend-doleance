@@ -45,7 +45,7 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
   };
 
   return (
-    <nav className={`sticky top-0 z-20 transition-all duration-300 ${
+    <nav className={`no-print sticky top-0 z-20 transition-all duration-300 ${
       scrolled ? 'shadow-lg' : 'shadow-md'
     } ${darkMode ? 'bg-slate-800' : 'bg-white'}`}>
       <div className="px-3 sm:px-4 md:px-6">

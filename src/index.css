@@ -363,17 +363,144 @@ img {
 }
 
 /* Print styles */
+.print-only {
+  display: none;
+}
+
 @media print {
-  .no-print {
-    display: none;
+  .no-print,
+  .no-print * {
+    display: none !important;
   }
-  
+
+  .print-only {
+    display: block !important;
+  }
+
   body {
     @apply bg-white;
   }
-  
+
   .card {
     @apply shadow-none border;
+  }
+
+  #print-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    padding: 20mm 15mm;
+    background: white;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    color: #1a1a1a;
+  }
+
+  #print-area .print-header {
+    text-align: center;
+    margin-bottom: 24px;
+    border-bottom: 3px solid #1E3A8A;
+    padding-bottom: 16px;
+  }
+
+  #print-area .print-header img {
+    height: 70px;
+    margin: 0 auto 8px;
+  }
+
+  #print-area .print-header h1 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1E3A8A;
+    margin: 0;
+    letter-spacing: 0.5px;
+  }
+
+  #print-area .print-header h2 {
+    font-size: 13px;
+    font-weight: 400;
+    color: #555;
+    margin: 4px 0 0;
+  }
+
+  #print-area .print-title {
+    font-size: 15px;
+    font-weight: 700;
+    color: #0F172A;
+    text-align: left;
+    margin: 20px 0 16px;
+    padding: 10px;
+    background: #f0f4ff;
+    border-radius: 6px;
+    border-left: 4px solid #1E3A8A;
+  }
+
+  #print-area .print-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 20px;
+  }
+
+  #print-area .print-table td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 12px;
+    vertical-align: top;
+  }
+
+  #print-area .print-table .label {
+    font-weight: 700;
+    color: #374151;
+    width: 140px;
+    white-space: nowrap;
+  }
+
+  #print-area .print-table .value {
+    color: #1f2937;
+  }
+
+  #print-area .print-desc {
+    margin: 16px 0;
+  }
+
+  #print-area .print-desc .label {
+    font-weight: 700;
+    color: #374151;
+    font-size: 12px;
+    margin-bottom: 6px;
+  }
+
+  #print-area .print-desc .value {
+    color: #1f2937;
+    font-size: 12px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    border: 1px solid #e5e7eb;
+    padding: 12px;
+    border-radius: 6px;
+    background: #fafafa;
+  }
+
+  #print-area .print-footer {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 2px solid #1E3A8A;
+    text-align: center;
+  }
+
+  #print-area .print-footer p {
+    font-size: 13px;
+    font-weight: 700;
+    color: #1E3A8A;
+    margin: 0;
+    letter-spacing: 1px;
+  }
+
+  #print-area .print-date {
+    font-size: 10px;
+    color: #999;
+    text-align: right;
+    margin-top: 8px;
   }
 }
 
