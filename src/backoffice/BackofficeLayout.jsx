@@ -16,6 +16,7 @@ import {
   Cog6ToothIcon,
   PlusCircleIcon,
   ClockIcon,
+  TrashIcon,
 } from "@heroicons/react/24/outline";
 import Navbar from "../components/backoffice/Navbar";
 
@@ -40,6 +41,7 @@ function BackofficeLayout() {
     userRole === "administrateur_systeme" ||
     userRole === "administrateur" ||
     userRole === "agent_central";
+  const isSuperAdmin = userRole === "administrateur_systeme";
 
   const adminOnlyRoutes = [
     "/backoffice/users",
@@ -50,7 +52,15 @@ function BackofficeLayout() {
     "/backoffice/ajouter-doleance",
   ];
 
+  const superAdminOnlyRoutes = [
+    "/backoffice/corbeille",
+  ];
+
   if (!isAdmin && adminOnlyRoutes.some(route => location.pathname.startsWith(route))) {
+    return <Navigate to="/backoffice/dashboard" replace />;
+  }
+
+  if (!isSuperAdmin && superAdminOnlyRoutes.some(route => location.pathname.startsWith(route))) {
     return <Navigate to="/backoffice/dashboard" replace />;
   }
 
@@ -426,6 +436,35 @@ function BackofficeLayout() {
       </span>
     </Link>
   </div>
+
+  {/* Corbeille - Super Admin only */}
+  {isSuperAdmin && (
+    <div className="mt-2">
+      <Link
+        to="/backoffice/corbeille"
+        onClick={() => isMobile && setSidebarOpen(false)}
+        className={`relative w-full flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group ${
+          isActive("/backoffice/corbeille")
+            ? "bg-[#D4AF37] text-white shadow-md shadow-[#D4AF37]/20"
+            : "text-white/70 hover:bg-[#D4AF37]/20 hover:text-white hover:shadow-lg hover:shadow-[#D4AF37]/25"
+        }`}
+      >
+        {isActive("/backoffice/corbeille") && (
+          <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 bg-white rounded-r-full" />
+        )}
+        <TrashIcon
+          className={`h-5 w-5 mr-3 flex-shrink-0 ${
+            isActive("/backoffice/corbeille")
+              ? "text-white"
+              : "text-white/40 group-hover:text-white"
+          }`}
+        />
+        <span className="text-sm font-medium">
+          Corbeille
+        </span>
+      </Link>
+    </div>
+  )}
 
   {/* Paramètres */}
   <div className="mt-4">

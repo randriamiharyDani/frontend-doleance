@@ -32,6 +32,7 @@ import Transfert from './backoffice/Transfert';
 import Settings from './backoffice/Settings';
 import Historique from './backoffice/Historique';
 import AjouterDoleance from './backoffice/AjouterDoleance';
+import Corbeille from './backoffice/Corbeille';
 
 function AppRoutes() {
   return (
@@ -63,6 +64,8 @@ function AppRoutes() {
         <Route path="transfert" element={<Transfert />} />
         <Route path="ajouter-doleance" element={<AjouterDoleance />} />
         <Route path="settings" element={<Settings />} />
+        <Route path="corbeille" element={<Corbeille />} />
+
       </Route>
       
       {/* Redirection 404 */}

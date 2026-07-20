@@ -203,6 +203,57 @@ const doleanceService = {
     } catch (error) {
       return { success: false, message: error.response?.data?.message };
     }
+  },
+
+  // ========== CORBEILLE ==========
+
+  getTrashed: async (params = {}) => {
+    try {
+      const queryParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, val]) => {
+        if (val) queryParams.append(key, val);
+      });
+      const response = await api.get(`/corbeille?${queryParams.toString()}`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message };
+    }
+  },
+
+  getTrashCount: async () => {
+    try {
+      const response = await api.get('/corbeille/count');
+      return { success: true, data: response.data?.data };
+    } catch (error) {
+      return { success: false, data: { total: 0 } };
+    }
+  },
+
+  restoreDoleance: async (id) => {
+    try {
+      const response = await api.post(`/corbeille/${id}/restore`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message };
+    }
+  },
+
+  permanentDelete: async (id) => {
+    try {
+      const response = await api.delete(`/corbeille/${id}`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message };
+    }
+  },
+
+  emptyTrash: async (ids = null) => {
+    try {
+      const response = await api.post('/corbeille/empty', { ids });
+      return { success: true, data: response.data };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message };
+    }
   }
 };
 
