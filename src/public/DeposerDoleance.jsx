@@ -48,6 +48,13 @@ const iconMap = {
     "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4",
   people:
     "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z",
+  fire: "M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z",
+  accident: "M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z",
+  medical: "M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z",
+  flood: "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4",
+  disaster: "M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z",
+  animal: "M7.5 21L3 16.5m0 0L7.5 11M3 16.5h13.5m0 0l-4.5-5.25m4.5 5.25l-4.5 5.25",
+  hazard: "M12 12v5m0 0a1.5 1.5 0 000 3m0-3a1.5 1.5 0 010 3m0-3l6.253-6.253M12 17l-6.253-6.253M9.75 21h4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
 };
 
 // Mapping des couleurs DB vers des gradients Tailwind
@@ -60,6 +67,12 @@ const gradientMap = {
   "#F44336": "from-red-500 to-rose-600",
   "#795548": "from-amber-700 to-orange-800",
   "#E91E63": "from-pink-500 to-rose-500",
+  "#EF4444": "from-red-500 to-rose-600",
+  "#F97316": "from-orange-500 to-red-600",
+  "#06B6D4": "from-cyan-500 to-teal-600",
+  "#8B5CF6": "from-violet-500 to-purple-600",
+  "#84CC16": "from-lime-500 to-green-600",
+  "#EC4899": "from-pink-400 to-pink-600",
 };
 
 function DraggableMarker({ position, setPosition, onPositionChange }) {
@@ -156,6 +169,7 @@ function DeposerDoleance() {
   const [sendError, setSendError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [showOthers, setShowOthers] = useState(false);
+  const [module, setModule] = useState('CUA');
   const [mapPosition, setMapPosition] = useState([-18.8792, 47.5079]);
   const [searchAddress, setSearchAddress] = useState("");
   const [locationName, setLocationName] = useState("");
@@ -197,7 +211,9 @@ function DeposerDoleance() {
 
   useEffect(() => {
     fetchData();
-  }, [t]);
+    setShowOthers(false);
+    setSelectedCategory(null);
+  }, [t, module]);
 
   useEffect(() => {
     const urls = files.map((file) => {
@@ -227,7 +243,7 @@ function DeposerDoleance() {
   const fetchData = async () => {
     try {
       const [categoriesRes, quartiersRes, assignedRes, geojsonRes] = await Promise.all([
-        api.get("/doleances/categories"),
+        api.get(`/categories?module=${module}`),
         api.get("/doleances/quartiers"),
         api
           .get("/doleances/public/assigned-locations")
@@ -243,7 +259,7 @@ function DeposerDoleance() {
 
       // Définir la première catégorie par défaut
       const cats = categoriesRes.data?.data || categoriesRes.data || [];
-      if (cats.length > 0 && !selectedCategory) {
+      if (cats.length > 0) {
         setSelectedCategory(cats[0].id_categorie);
         setFormData((prev) => ({
           ...prev,
@@ -762,6 +778,39 @@ function DeposerDoleance() {
 
 
       <form onSubmit={handleSubmit}>
+        {/* Type d'entité */}
+        <div className="mb-6">
+          <label className="block text-sm font-bold text-slate-700 mb-3">
+            Type d'entité concernée
+          </label>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => setModule('CUA')}
+              className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold border-2 transition-all ${
+                module === 'CUA'
+                  ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-sm'
+                  : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+              }`}
+            >
+              <span className="block text-base">🏛️</span>
+              <span>Commune Urbaine (CUA)</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setModule('Sapeurs-Pompiers')}
+              className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold border-2 transition-all ${
+                module === 'Sapeurs-Pompiers'
+                  ? 'border-red-600 bg-red-50 text-red-700 shadow-sm'
+                  : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+              }`}
+            >
+              <span className="block text-base">🚒</span>
+              <span>Sapeurs-Pompiers</span>
+            </button>
+          </div>
+        </div>
+
         {/* Categories */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
           {firstCategories.map((cat) => (

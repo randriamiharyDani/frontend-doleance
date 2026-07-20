@@ -17,6 +17,7 @@ import {
   PlusCircleIcon,
   ClockIcon,
   TrashIcon,
+  TagIcon,
 } from "@heroicons/react/24/outline";
 import Navbar from "../components/backoffice/Navbar";
 
@@ -50,6 +51,7 @@ function BackofficeLayout() {
     "/backoffice/direction/",
     "/backoffice/transfert",
     "/backoffice/ajouter-doleance",
+    "/backoffice/categories",
   ];
 
   const superAdminOnlyRoutes = [
@@ -148,6 +150,7 @@ function BackofficeLayout() {
           icon: UserGroupIcon,
         },
         { name: "Rôles", href: "/backoffice/roles", icon: ShieldCheckIcon },
+        { name: "Catégories", href: "/backoffice/categories", icon: TagIcon },
       ],
     }] : []),
     {

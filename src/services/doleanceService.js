@@ -128,14 +128,55 @@ const doleanceService = {
     }
   },
 
-  // ========== DONNÉES DE RÉFÉRENCE ==========
+  // ========== CATÉGORIES (CRUD) ==========
 
-  getCategories: async () => {
+  getCategories: async (params = {}) => {
     try {
-      const response = await api.get('/doleances/categories');
+      const queryParams = new URLSearchParams();
+      Object.entries(params).forEach(([key, val]) => {
+        if (val) queryParams.append(key, val);
+      });
+      const qs = queryParams.toString();
+      const response = await api.get(`/categories${qs ? '?' + qs : ''}`);
       return { success: true, data: response.data.data || response.data };
     } catch (error) {
       return { success: false, data: [] };
+    }
+  },
+
+  getCategorie: async (id) => {
+    try {
+      const response = await api.get(`/categories/${id}`);
+      return { success: true, data: response.data.data };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message };
+    }
+  },
+
+  createCategory: async (data) => {
+    try {
+      const response = await api.post('/categories', data);
+      return { success: true, data: response.data.data };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message };
+    }
+  },
+
+  updateCategory: async (id, data) => {
+    try {
+      const response = await api.put(`/categories/${id}`, data);
+      return { success: true, data: response.data.data };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message };
+    }
+  },
+
+  deleteCategory: async (id) => {
+    try {
+      const response = await api.delete(`/categories/${id}`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message };
     }
   },
 

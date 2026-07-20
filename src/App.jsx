@@ -33,6 +33,7 @@ import Settings from './backoffice/Settings';
 import Historique from './backoffice/Historique';
 import AjouterDoleance from './backoffice/AjouterDoleance';
 import Corbeille from './backoffice/Corbeille';
+import Categories from './backoffice/Categories';
 
 function AppRoutes() {
   return (
@@ -65,6 +66,7 @@ function AppRoutes() {
         <Route path="ajouter-doleance" element={<AjouterDoleance />} />
         <Route path="settings" element={<Settings />} />
         <Route path="corbeille" element={<Corbeille />} />
+        <Route path="categories" element={<Categories />} />
 
       </Route>
       
