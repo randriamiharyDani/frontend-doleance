@@ -71,7 +71,9 @@ function SuiviDoleance() {
       'Assignée': 'bg-indigo-600 text-white border-indigo-700',
       'En traitement': 'bg-purple-600 text-white border-purple-700',
       'Résolue': 'bg-emerald-600 text-white border-emerald-700',
-      'Clôturée': 'bg-slate-500 text-white border-slate-600'
+      'Clôturée': 'bg-slate-500 text-white border-slate-600',
+      'Rejetée': 'bg-red-500 text-white border-red-600',
+      'Urgente': 'bg-red-600 text-white border-red-700'
     };
     return colors[statut] || 'bg-slate-500 text-white border-slate-600';
   };

@@ -323,9 +323,11 @@ function DirectionDetail() {
                           ? 'bg-green-100 text-green-700' 
                           : doleance.nom_statut === 'transferee' 
                             ? 'bg-purple-100 text-purple-700'
-                            : doleance.nom_statut === 'rejetee'
+                            : doleance.nom_statut === 'urgente'
                               ? 'bg-red-100 text-red-700'
-                              : 'bg-yellow-100 text-yellow-700'
+                              : doleance.nom_statut === 'rejetee'
+                                ? 'bg-red-100 text-red-700'
+                                : 'bg-yellow-100 text-yellow-700'
                       }`}>
                         {doleance.nom_statut || 'En attente'}
                       </span>

@@ -32,6 +32,7 @@ const STATUS_STYLES = {
   resolue:     { dot: 'bg-emerald-500',text: 'text-emerald-700',bg: 'bg-emerald-50',ring: 'ring-emerald-200'},
   cloturee:    { dot: 'bg-slate-400',  text: 'text-slate-600',  bg: 'bg-slate-100', ring: 'ring-slate-200'  },
   rejetee:     { dot: 'bg-rose-500',   text: 'text-rose-700',   bg: 'bg-rose-50',   ring: 'ring-rose-200'   },
+  urgente:     { dot: 'bg-red-600',    text: 'text-red-700',    bg: 'bg-red-50',    ring: 'ring-red-200'    },
 };
 
 const STATUS_LABELS = {
@@ -42,6 +43,7 @@ const STATUS_LABELS = {
   resolue: 'Résolue',
   cloturee: 'Clôturée',
   rejetee: 'Rejetée',
+  urgente: 'Urgente',
 };
 
 function StatusPill({ statut }) {
@@ -291,7 +293,7 @@ function Transfert() {
   };
 
   const canTransfer = (statut) =>
-    statut !== 'transferee' && statut !== 'traitee' && statut !== 'resolue' && statut !== 'cloturee';
+    statut !== 'transferee' && statut !== 'traitee' && statut !== 'resolue' && statut !== 'cloturee' && statut !== 'urgente';
 
   const refreshData = () => {
     fetchStats();

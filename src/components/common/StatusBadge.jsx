@@ -9,7 +9,8 @@ const STATUS_STYLES = {
   'En attente': 'bg-amber-500 text-white',
   'En cours': 'bg-purple-500 text-white',
   'Transférée': 'bg-cyan-500 text-white',
-  'Traitée': 'bg-emerald-500 text-white'
+  'Traitée': 'bg-emerald-500 text-white',
+  'Urgente': 'bg-red-600 text-white'
 };
 
 const STATUS_ICONS = {
@@ -18,6 +19,7 @@ const STATUS_ICONS = {
   'Clôturée': '\uD83D\uDD12',
   'Fermée': '\uD83D\uDD12',
   'Nouvelle': '\uD83C\uDD95',
+  'Urgente': '\u26A0\uFE0F',
 };
 
 function StatusBadge({ statut, couleur }) {

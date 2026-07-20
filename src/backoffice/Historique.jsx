@@ -18,12 +18,14 @@ const STATUS_STYLES = {
   resolue:  { dot: 'bg-emerald-500', text: 'text-emerald-700', bg: 'bg-emerald-50', ring: 'ring-emerald-200' },
   cloturee: { dot: 'bg-slate-400',   text: 'text-slate-600',   bg: 'bg-slate-100', ring: 'ring-slate-200' },
   traitee:  { dot: 'bg-blue-500',    text: 'text-blue-700',    bg: 'bg-blue-50',    ring: 'ring-blue-200' },
+  urgente:  { dot: 'bg-red-600',     text: 'text-red-700',     bg: 'bg-red-50',     ring: 'ring-red-200' },
 };
 
 const STATUS_LABELS = {
   resolue: 'Résolue',
   cloturee: 'Clôturée',
   traitee: 'Traitée',
+  urgente: 'Urgente',
 };
 
 const FILTER_OPTIONS = [

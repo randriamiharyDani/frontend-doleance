@@ -4,7 +4,7 @@ import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recha
 const STATUS_COLORS = {
   'Nouvelle': '#3B82F6', 'En attente': '#F59E0B', 'En cours': '#8B5CF6',
   'Transférée': '#06B6D4', 'Traitée': '#10B981', 'Résolue': '#10B981',
-  'Clôturée': '#6B7280', 'Rejetée': '#EF4444'
+  'Clôturée': '#6B7280', 'Rejetée': '#EF4444', 'Urgente': '#DC2626'
 };
 const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16'];
 

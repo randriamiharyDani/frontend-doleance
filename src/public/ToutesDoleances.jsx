@@ -317,6 +317,8 @@ function ToutesDoleances() {
         return <ClockIcon className="h-4 w-4 text-yellow-500" />;
       case 'En cours':
         return <ExclamationTriangleIcon className="h-4 w-4 text-blue-500" />;
+      case 'Urgente':
+        return <ExclamationTriangleIcon className="h-4 w-4 text-red-600" />;
       default:
         return <DocumentTextIcon className="h-4 w-4 text-gray-500" />;
     }

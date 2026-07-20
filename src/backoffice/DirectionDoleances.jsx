@@ -145,7 +145,8 @@ function DirectionDoleances() {
       'transferee': { text: 'Transférée', color: 'bg-purple-100 text-purple-800' },
       'traitee': { text: 'Traitée', color: 'bg-green-100 text-green-800' },
       'rejetee': { text: 'Rejetée', color: 'bg-red-100 text-red-800' },
-      'cloturee': { text: 'Clôturée', color: 'bg-gray-100 text-gray-800' }
+      'cloturee': { text: 'Clôturée', color: 'bg-gray-100 text-gray-800' },
+      'urgente': { text: 'Urgente', color: 'bg-red-100 text-red-800' }
     };
     const s = statutsMap[statut] || { text: statut || 'Inconnu', color: 'bg-gray-100 text-gray-800' };
     return <span className={`px-2 py-1 text-xs rounded-full ${s.color}`}>{s.text}</span>;
