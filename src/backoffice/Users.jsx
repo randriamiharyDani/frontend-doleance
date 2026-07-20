@@ -425,7 +425,7 @@ function Users() {
   // Rediriger si ce n'est pas le super admin
   if (!isSuperAdmin) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="max-auto flex items-center justify-center bg-gray-100">
         <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-8 text-center">
           <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <ShieldCheckIcon className="h-10 w-10 text-red-600" />

@@ -215,7 +215,7 @@ function DirectionDetail() {
   }
 
   return (
-    <div>
+    <div className="max-auto">
       <button onClick={() => navigate('/backoffice/directions')} className="mb-4 flex items-center text-gray-600 hover:text-gray-800">
         <ArrowLeftIcon className="h-5 w-5 mr-2" />
         Retour aux directions

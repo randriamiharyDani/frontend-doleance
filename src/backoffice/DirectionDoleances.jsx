@@ -210,7 +210,7 @@ function DirectionDoleances() {
   const filteredDoleancesList = filteredDoleances();
 
   return (
-    <div className="p-4 md:p-6">
+    <div className="max-auto p-4 md:p-6">
       {/* En-tête */}
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <div className="flex items-start justify-between flex-wrap gap-4">

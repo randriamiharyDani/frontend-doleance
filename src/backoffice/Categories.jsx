@@ -38,7 +38,9 @@ const COLOR_OPTIONS = [
   { value: '#E91E63', label: 'Rose vif' },
   { value: '#4CAF50', label: 'Vert foncé' },
 ];
+// function Direction(){
 
+// }
 function Categories() {
   const [activeTab, setActiveTab] = useState('CUA');
   const [categories, setCategories] = useState([]);
@@ -164,7 +166,7 @@ function Categories() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto">
+    <div className="max-auto mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
         <h1 className="text-2xl font-bold text-gray-800">Gestion des catégories</h1>
         <button
