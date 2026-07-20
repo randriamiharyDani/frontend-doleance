@@ -49,12 +49,17 @@ const iconMap = {
   people:
     "M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z",
   fire: "M17.657 18.657A8 8 0 016.343 7.343S7 9 9 10c0-2 .5-5 2.986-7C14 5 16.09 5.777 17.656 7.343A7.975 7.975 0 0120 13a7.975 7.975 0 01-2.343 5.657z",
-  accident: "M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z",
-  medical: "M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z",
+  accident:
+    "M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z",
+  medical:
+    "M12 9v3.75m0-10.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286zm0 13.036h.008v.008H12v-.008z",
   flood: "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4",
-  disaster: "M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z",
-  animal: "M7.5 21L3 16.5m0 0L7.5 11M3 16.5h13.5m0 0l-4.5-5.25m4.5 5.25l-4.5 5.25",
-  hazard: "M12 12v5m0 0a1.5 1.5 0 000 3m0-3a1.5 1.5 0 010 3m0-3l6.253-6.253M12 17l-6.253-6.253M9.75 21h4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
+  disaster:
+    "M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z",
+  animal:
+    "M7.5 21L3 16.5m0 0L7.5 11M3 16.5h13.5m0 0l-4.5-5.25m4.5 5.25l-4.5 5.25",
+  hazard:
+    "M12 12v5m0 0a1.5 1.5 0 000 3m0-3a1.5 1.5 0 010 3m0-3l6.253-6.253M12 17l-6.253-6.253M9.75 21h4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
 };
 
 // Mapping des couleurs DB vers des gradients Tailwind
@@ -169,7 +174,7 @@ function DeposerDoleance() {
   const [sendError, setSendError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [showOthers, setShowOthers] = useState(false);
-  const [module, setModule] = useState('CUA');
+  const [module, setModule] = useState(null);
   const [mapPosition, setMapPosition] = useState([-18.8792, 47.5079]);
   const [searchAddress, setSearchAddress] = useState("");
   const [locationName, setLocationName] = useState("");
@@ -210,9 +215,16 @@ function DeposerDoleance() {
   });
 
   useEffect(() => {
-    fetchData();
-    setShowOthers(false);
-    setSelectedCategory(null);
+    if (module) {
+      fetchData();
+      setShowOthers(false);
+      setSelectedCategory(null);
+      setFormData((prev) => ({ ...prev, id_categorie: "" }));
+    } else {
+      setCategoriesData([]);
+      setSelectedCategory(null);
+      setFormData((prev) => ({ ...prev, id_categorie: "" }));
+    }
   }, [t, module]);
 
   useEffect(() => {
@@ -242,30 +254,24 @@ function DeposerDoleance() {
 
   const fetchData = async () => {
     try {
-      const [categoriesRes, quartiersRes, assignedRes, geojsonRes] = await Promise.all([
-        api.get(`/categories?module=${module}`),
-        api.get("/doleances/quartiers"),
-        api
-          .get("/doleances/public/assigned-locations")
-          .catch(() => ({ data: { data: [] } })),
-        api
-          .get("/doleances/quartiers/geojson")
-          .catch(() => ({ data: { type: 'FeatureCollection', features: [] } })),
-      ]);
+      const [categoriesRes, quartiersRes, assignedRes, geojsonRes] =
+        await Promise.all([
+          api.get(`/categories?module=${module}`),
+          api.get("/doleances/quartiers"),
+          api
+            .get("/doleances/public/assigned-locations")
+            .catch(() => ({ data: { data: [] } })),
+          api.get("/doleances/quartiers/geojson").catch(() => ({
+            data: { type: "FeatureCollection", features: [] },
+          })),
+        ]);
       setCategoriesData(categoriesRes.data?.data || categoriesRes.data || []);
       setQuartiers(quartiersRes.data?.data || quartiersRes.data || []);
       setAssignedDoleances(assignedRes.data?.data || assignedRes.data || []);
-      setQuartierGeoJSON(geojsonRes.data || { type: 'FeatureCollection', features: [] });
+      setQuartierGeoJSON(
+        geojsonRes.data || { type: "FeatureCollection", features: [] },
+      );
 
-      // Définir la première catégorie par défaut
-      const cats = categoriesRes.data?.data || categoriesRes.data || [];
-      if (cats.length > 0) {
-        setSelectedCategory(cats[0].id_categorie);
-        setFormData((prev) => ({
-          ...prev,
-          id_categorie: String(cats[0].id_categorie),
-        }));
-      }
       setArrondissements([
         t("districts.district1"),
         t("districts.district2"),
@@ -591,7 +597,9 @@ function DeposerDoleance() {
   // Bouton "Me localiser"
   const handleLocateMe = () => {
     if (!navigator.geolocation) {
-      toast.error("La géolocalisation n'est pas supportée par votre navigateur");
+      toast.error(
+        "La géolocalisation n'est pas supportée par votre navigateur",
+      );
       return;
     }
     setIsLocating(true);
@@ -610,7 +618,9 @@ function DeposerDoleance() {
           toast.success("Position trouvée !");
         } catch (err) {
           console.error("Erreur reverse geocoding:", err);
-          toast.error("Position obtenue, mais erreur lors de la récupération de l'adresse");
+          toast.error(
+            "Position obtenue, mais erreur lors de la récupération de l'adresse",
+          );
         } finally {
           setIsLocating(false);
         }
@@ -618,9 +628,13 @@ function DeposerDoleance() {
       (err) => {
         setIsLocating(false);
         if (err.code === err.PERMISSION_DENIED) {
-          toast.error("Autorisation de localisation refusée. Veuillez activer les permissions de localisation dans votre navigateur.");
+          toast.error(
+            "Autorisation de localisation refusée. Veuillez activer les permissions de localisation dans votre navigateur.",
+          );
         } else if (err.code === err.POSITION_UNAVAILABLE) {
-          toast.error("Position non disponible. Vérifiez que le GPS est activé.");
+          toast.error(
+            "Position non disponible. Vérifiez que le GPS est activé.",
+          );
         } else if (err.code === err.TIMEOUT) {
           toast.error("La demande de localisation a expiré. Réessayez.");
         } else {
@@ -776,21 +790,21 @@ function DeposerDoleance() {
         </p>
       </div>
 
-
       <form onSubmit={handleSubmit}>
         {/* Type d'entité */}
         <div className="mb-6">
-          <label className="block text-sm font-bold text-slate-700 mb-3">
+          <h2 className="block text-[16px] font-bold text-[#0F172A]">
             Type d'entité concernée
-          </label>
+          </h2>
+
           <div className="flex gap-3">
             <button
               type="button"
-              onClick={() => setModule('CUA')}
+              onClick={() => setModule("CUA")}
               className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold border-2 transition-all ${
-                module === 'CUA'
-                  ? 'border-blue-600 bg-blue-50 text-blue-700 shadow-sm'
-                  : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+                module === "CUA"
+                  ? "border-blue-600 bg-blue-50 text-blue-700 shadow-sm"
+                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
               }`}
             >
               <span className="block text-base">🏛️</span>
@@ -798,11 +812,11 @@ function DeposerDoleance() {
             </button>
             <button
               type="button"
-              onClick={() => setModule('Sapeurs-Pompiers')}
+              onClick={() => setModule("Sapeurs-Pompiers")}
               className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold border-2 transition-all ${
-                module === 'Sapeurs-Pompiers'
-                  ? 'border-red-600 bg-red-50 text-red-700 shadow-sm'
-                  : 'border-slate-200 bg-white text-slate-600 hover:border-slate-300'
+                module === "Sapeurs-Pompiers"
+                  ? "border-red-600 bg-red-50 text-red-700 shadow-sm"
+                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
               }`}
             >
               <span className="block text-base">🚒</span>
@@ -812,39 +826,58 @@ function DeposerDoleance() {
         </div>
 
         {/* Categories */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-          {firstCategories.map((cat) => (
-            <CategoryCard
-              key={cat.id}
-              cat={cat}
-              selected={selectedCategory === cat.id}
-              onClick={handleSelectCategory}
-            />
-          ))}
+        {module && mappedCategories.length > 0 && (
+          <>
+            <p className="italic text-blue-600 text-xs my-3">
+              *__________Raha misy amin'ireo sokajy ireo mifanaraka amin'ny
+              olanao, kitiho azafady.
+            </p>
 
-          <CategoryCard
-            cat={{
-              id: "others",
-              label: "Autres",
-              desc: "Voir toutes les catégories",
-              icon: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z",
-              gradient: "from-slate-500 to-slate-700",
-            }}
-            selected={false}
-            onClick={() => setShowOthers(!showOthers)}
-          />
-        </div>
-        {showOthers && (
-          <div className="mt-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-            {otherCategories.map((cat) => (
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+              {firstCategories.map((cat) => (
+                <CategoryCard
+                  key={cat.id}
+                  cat={cat}
+                  selected={selectedCategory === cat.id}
+                  onClick={handleSelectCategory}
+                />
+              ))}
+
               <CategoryCard
-                key={cat.id}
-                cat={cat}
-                selected={selectedCategory === cat.id}
-                onClick={handleSelectCategory}
+                cat={{
+                  id: "others",
+                  label: "Autres",
+                  desc: "Voir toutes les catégories",
+                  icon: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z",
+                  gradient: "from-slate-500 to-slate-700",
+                }}
+                selected={false}
+                onClick={() => setShowOthers(!showOthers)}
               />
-            ))}
-          </div>
+            </div>
+            {showOthers && (
+              <div className="mt-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
+                {otherCategories.map((cat) => (
+                  <CategoryCard
+                    key={cat.id}
+                    cat={cat}
+                    selected={selectedCategory === cat.id}
+                    onClick={handleSelectCategory}
+                  />
+                ))}
+              </div>
+            )}
+            <p className="italic text-blue-600 text-xs my-3">
+              *__________Raha tsy mahita sokajy mifanaraka ianao dia soraty eto
+              ambany ny olanao.
+            </p>
+          </>
+        )}
+
+        {module && mappedCategories.length === 0 && (
+          <p className="text-slate-400 text-sm text-center mb-2 py-4">
+            Aucune catégorie disponible
+          </p>
         )}
 
         {/* Titre */}
@@ -863,7 +896,7 @@ function DeposerDoleance() {
                 d="M3.75 9h16.5m-16.5 6.75h16.5"
               />
             </svg>
-            <h2 className="text-lg font-bold text-[#0F172A]">
+            <h2 className="text-[16px]  font-bold text-[#0F172A]">
               Titre du problème
             </h2>
           </div>
@@ -899,7 +932,7 @@ function DeposerDoleance() {
                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
               />
             </svg>
-            <h2 className="text-lg font-bold text-[#0F172A]">
+            <h2 className="text-[16px]  font-bold text-[#0F172A]">
               Localisation & adresse
             </h2>
           </div>
@@ -1025,33 +1058,35 @@ function DeposerDoleance() {
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
-              {quartierGeoJSON && quartierGeoJSON.features && quartierGeoJSON.features.length > 0 && (
-                <GeoJSON
-                  key={JSON.stringify(quartierGeoJSON)}
-                  data={quartierGeoJSON}
-                  style={(feature) => ({
-                    fillColor: '#D4AF37',
-                    weight: 2,
-                    opacity: 1,
-                    color: '#B8860B',
-                    dashArray: '3',
-                    fillOpacity: 0.15,
-                  })}
-                  onEachFeature={(feature, layer) => {
-                    if (feature.properties) {
-                      layer.bindPopup(
-                        `<div style="text-align:center"><b>${feature.properties.nom_quartier}</b><br/><span style="color:#666">${feature.properties.nom_arrondissement || ''}</span></div>`
-                      );
-                      layer.on('mouseover', function () {
-                        this.setStyle({ fillOpacity: 0.4, weight: 3 });
-                      });
-                      layer.on('mouseout', function () {
-                        this.setStyle({ fillOpacity: 0.15, weight: 2 });
-                      });
-                    }
-                  }}
-                />
-              )}
+              {quartierGeoJSON &&
+                quartierGeoJSON.features &&
+                quartierGeoJSON.features.length > 0 && (
+                  <GeoJSON
+                    key={JSON.stringify(quartierGeoJSON)}
+                    data={quartierGeoJSON}
+                    style={(feature) => ({
+                      fillColor: "#D4AF37",
+                      weight: 2,
+                      opacity: 1,
+                      color: "#B8860B",
+                      dashArray: "3",
+                      fillOpacity: 0.15,
+                    })}
+                    onEachFeature={(feature, layer) => {
+                      if (feature.properties) {
+                        layer.bindPopup(
+                          `<div style="text-align:center"><b>${feature.properties.nom_quartier}</b><br/><span style="color:#666">${feature.properties.nom_arrondissement || ""}</span></div>`,
+                        );
+                        layer.on("mouseover", function () {
+                          this.setStyle({ fillOpacity: 0.4, weight: 3 });
+                        });
+                        layer.on("mouseout", function () {
+                          this.setStyle({ fillOpacity: 0.15, weight: 2 });
+                        });
+                      }
+                    }}
+                  />
+                )}
               <MapView center={mapPosition} />
               <DraggableMarker
                 position={mapPosition}
@@ -1156,7 +1191,9 @@ function DeposerDoleance() {
                 d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"
               />
             </svg>
-            <h2 className="text-lg font-bold text-[#0F172A]">Suggestions</h2>
+            <h2 className="text-[16px]  font-bold text-[#0F172A]">
+              Suggestions
+            </h2>
           </div>
           <p className="text-sm text-slate-400 mb-4 ml-7">
             Proposez des idées pour résoudre le problème (optionnel)
@@ -1188,7 +1225,7 @@ function DeposerDoleance() {
                 d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
             </svg>
-            <h2 className="text-lg font-bold text-[#0F172A]">
+            <h2 className="text-[16px]  font-bold text-[#0F172A]">
               Ajouter des photos
             </h2>
           </div>
@@ -1390,7 +1427,7 @@ function DeposerDoleance() {
                 d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
               />
             </svg>
-            <h2 className="text-lg font-bold text-[#0F172A]">
+            <h2 className="text-[16px]  font-bold text-[#0F172A]">
               Description du problème
             </h2>
           </div>
@@ -1446,7 +1483,7 @@ function DeposerDoleance() {
                 d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
               />
             </svg>
-            <h2 className="text-lg font-bold text-[#0F172A]">
+            <h2 className="text-[16px]  font-bold text-[#0F172A]">
               Vos informations
             </h2>
           </div>
@@ -1549,7 +1586,7 @@ function DeposerDoleance() {
           <button
             type="submit"
             disabled={loading || uploading}
-            className="cua-btn-submit flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-10 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-base sm:text-lg font-bold text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 w-full sm:w-auto order-1 sm:order-2 hover:scale-[1.02] hover:-translate-y-0.5"
+            className="cua-btn-submit flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-10 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-base sm:text-[16px]  font-bold text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 w-full sm:w-auto order-1 sm:order-2 hover:scale-[1.02] hover:-translate-y-0.5"
           >
             {loading || uploading ? (
               <span className="flex items-center gap-2">
