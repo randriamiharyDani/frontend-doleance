@@ -440,34 +440,7 @@ function BackofficeLayout() {
     </Link>
   </div>
 
-  {/* Corbeille - Super Admin only */}
-  {isSuperAdmin && (
-    <div className="mt-2">
-      <Link
-        to="/backoffice/corbeille"
-        onClick={() => isMobile && setSidebarOpen(false)}
-        className={`relative w-full flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group ${
-          isActive("/backoffice/corbeille")
-            ? "bg-[#D4AF37] text-white shadow-md shadow-[#D4AF37]/20"
-            : "text-white/70 hover:bg-[#D4AF37]/20 hover:text-white hover:shadow-lg hover:shadow-[#D4AF37]/25"
-        }`}
-      >
-        {isActive("/backoffice/corbeille") && (
-          <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 bg-white rounded-r-full" />
-        )}
-        <TrashIcon
-          className={`h-5 w-5 mr-3 flex-shrink-0 ${
-            isActive("/backoffice/corbeille")
-              ? "text-white"
-              : "text-white/40 group-hover:text-white"
-          }`}
-        />
-        <span className="text-sm font-medium">
-          Corbeille
-        </span>
-      </Link>
-    </div>
-  )}
+
 
   {/* Paramètres */}
   <div className="mt-4">
@@ -548,6 +521,24 @@ function BackofficeLayout() {
           </div>
         </main>
       </div>
+
+      {/* Floating Corbeille Button - Super Admin only */}
+      {isSuperAdmin && (
+        <button
+          onClick={() => navigate("/backoffice/corbeille")}
+          title="Corbeille"
+          className={`fixed bottom-6 right-6 z-50 w-11 h-11 rounded-full flex items-center justify-center transition-all duration-300 hover:scale-110 group backdrop-blur-md ${
+            isActive("/backoffice/corbeille")
+              ? "bg-[#D4AF37] text-white shadow-lg shadow-[#D4AF37]/40 ring-2 ring-[#D4AF37]/30"
+              : "bg-white/80 text-slate-400 hover:bg-[#D4AF37] hover:text-white shadow-lg shadow-slate-900/10 dark:bg-slate-800/80 dark:text-slate-400 dark:hover:bg-[#D4AF37] dark:shadow-black/30"
+          }`}
+        >
+          <TrashIcon className="w-[18px] h-[18px] stroke-[2]" />
+          <span className="absolute right-full mr-3 px-2.5 py-1 rounded-lg bg-[#0F172A] text-white text-[11px] font-semibold whitespace-nowrap opacity-0 group-hover:opacity-100 transition-all duration-200 pointer-events-none shadow-xl translate-x-1 group-hover:translate-x-0">
+            Corbeille
+          </span>
+        </button>
+      )}
     </div>
   );
 }

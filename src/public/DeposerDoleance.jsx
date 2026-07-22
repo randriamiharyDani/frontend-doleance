@@ -799,6 +799,9 @@ function DeposerDoleance() {
           Aidez à améliorer votre quartier — signalez rapidement tout incident
           ou dysfonctionnement à la Commune.
         </p>
+        <p className="inline-flex items-center rounded-xl border border-yellow-400 bg-yellow-100 px-4 py-2 text-sm font-medium text-yellow-800 w-fit">
+          📋 Veuillez remplir le formulaire ci-dessous.
+        </p>
       </div>
 
       <form onSubmit={handleSubmit}>
@@ -893,35 +896,35 @@ function DeposerDoleance() {
 
         {/* Titre */}
         {module && (
-        <div className="cua-section rounded-2xl p-5 mt-4 mb-6 cua-anim">
-          <div className="flex items-center gap-2 mb-4">
-            <svg
-              className="w-5 h-5 text-[#1E3A8A]"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3.75 9h16.5m-16.5 6.75h16.5"
-              />
-            </svg>
-            <h2 className="text-[16px]  font-bold text-[#0F172A]">
-              Titre du problème
-            </h2>
+          <div className="cua-section rounded-2xl p-5 mt-4 mb-6 cua-anim">
+            <div className="flex items-center gap-2 mb-4">
+              <svg
+                className="w-5 h-5 text-[#1E3A8A]"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M3.75 9h16.5m-16.5 6.75h16.5"
+                />
+              </svg>
+              <h2 className="text-[16px]  font-bold text-[#0F172A]">
+                Titre du problème
+              </h2>
+            </div>
+            <input
+              type="text"
+              name="titre"
+              value={formData.titre}
+              onChange={handleChange}
+              placeholder="Ex : Nid-de-poule dangereux Rue de la Liberté"
+              className="cua-field w-full border-2 border-slate-100 rounded-xl px-5 py-4 text-sm font-medium text-slate-800 outline-none placeholder:text-slate-400"
+              required
+            />
           </div>
-          <input
-            type="text"
-            name="titre"
-            value={formData.titre}
-            onChange={handleChange}
-            placeholder="Ex : Nid-de-poule dangereux Rue de la Liberté"
-            className="cua-field w-full border-2 border-slate-100 rounded-xl px-5 py-4 text-sm font-medium text-slate-800 outline-none placeholder:text-slate-400"
-            required
-          />
-        </div>
         )}
 
         {/* Description */}
@@ -1479,8 +1482,6 @@ function DeposerDoleance() {
             </div>
           )}
         </div>
-
-
 
         {/* User Info Section */}
         <div className="cua-section rounded-2xl p-5 mb-6 cua-anim">
