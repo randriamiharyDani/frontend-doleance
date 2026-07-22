@@ -91,7 +91,8 @@ function SuiviDoleance() {
       'Culture': '🎨',
       'Sport': '⚽',
       'Environnement': '🌳',
-      'Autre': '📋'
+      'Autre': '📋',
+      'Autre (Hafa)': '📋'
     };
     return icons[categorie] || '📋';
   };

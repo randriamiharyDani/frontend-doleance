@@ -60,6 +60,8 @@ const iconMap = {
     "M7.5 21L3 16.5m0 0L7.5 11M3 16.5h13.5m0 0l-4.5-5.25m4.5 5.25l-4.5 5.25",
   hazard:
     "M12 12v5m0 0a1.5 1.5 0 000 3m0-3a1.5 1.5 0 010 3m0-3l6.253-6.253M12 17l-6.253-6.253M9.75 21h4.5M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
+  other:
+    "M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
 };
 
 // Mapping des couleurs DB vers des gradients Tailwind
@@ -78,6 +80,7 @@ const gradientMap = {
   "#8B5CF6": "from-violet-500 to-purple-600",
   "#84CC16": "from-lime-500 to-green-600",
   "#EC4899": "from-pink-400 to-pink-600",
+  "#6B7280": "from-gray-500 to-slate-600",
 };
 
 function DraggableMarker({ position, setPosition, onPositionChange }) {
@@ -173,7 +176,6 @@ function DeposerDoleance() {
   const [smsSent, setSmsSent] = useState(false);
   const [sendError, setSendError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
-  const [showOthers, setShowOthers] = useState(false);
   const [module, setModule] = useState(null);
   const [mapPosition, setMapPosition] = useState([-18.8792, 47.5079]);
   const [searchAddress, setSearchAddress] = useState("");
@@ -217,7 +219,6 @@ function DeposerDoleance() {
   useEffect(() => {
     if (module) {
       fetchData();
-      setShowOthers(false);
       setSelectedCategory(null);
       setFormData((prev) => ({ ...prev, id_categorie: "" }));
     } else {
@@ -241,16 +242,22 @@ function DeposerDoleance() {
   }, [files]);
 
   // Mapper les catégories DB au format attendu par CategoryCard
-  const mappedCategories = categoriesData.map((cat) => ({
-    id: cat.id_categorie,
-    label: cat.nom_categorie,
-    desc: cat.description,
-    icon: iconMap[cat.icone] || iconMap["road"],
-    gradient: gradientMap[cat.couleur] || "from-slate-500 to-slate-700",
-  }));
+  const mappedCategories = [...categoriesData]
+    .sort((a, b) => {
+      if (a.nom_categorie?.includes('Autre')) return 1;
+      if (b.nom_categorie?.includes('Autre')) return -1;
+      return 0;
+    })
+    .map((cat) => ({
+      id: cat.id_categorie,
+      label: cat.nom_categorie,
+      desc: cat.description,
+      icon: iconMap[cat.icone] || iconMap["road"],
+      gradient: gradientMap[cat.couleur] || "from-slate-500 to-slate-700",
+    }));
 
-  const firstCategories = mappedCategories.slice(0, 5);
-  const otherCategories = mappedCategories.slice(5);
+  const autreCategorie = mappedCategories.find((c) => c.label?.includes('Autre'));
+  const otherCategories = mappedCategories.filter((c) => !c.label?.includes('Autre'));
 
   const fetchData = async () => {
     try {
@@ -265,12 +272,19 @@ function DeposerDoleance() {
             data: { type: "FeatureCollection", features: [] },
           })),
         ]);
-      setCategoriesData(categoriesRes.data?.data || categoriesRes.data || []);
+      const catsData = categoriesRes.data?.data || categoriesRes.data || [];
+      setCategoriesData(catsData);
       setQuartiers(quartiersRes.data?.data || quartiersRes.data || []);
       setAssignedDoleances(assignedRes.data?.data || assignedRes.data || []);
       setQuartierGeoJSON(
         geojsonRes.data || { type: "FeatureCollection", features: [] },
       );
+
+      const defaultCat = catsData.find((c) => c.nom_categorie?.includes('Autre'));
+      if (defaultCat) {
+        setSelectedCategory(defaultCat.id_categorie);
+        setFormData((prev) => ({ ...prev, id_categorie: String(defaultCat.id_categorie) }));
+      }
 
       setArrondissements([
         t("districts.district1"),
@@ -289,10 +303,11 @@ function DeposerDoleance() {
   const handleSelectCategory = (id) => {
     setSelectedCategory(id);
     const cat = mappedCategories.find((c) => c.id === id);
+    const isAutre = cat?.label?.includes('Autre');
     setFormData((prev) => ({
       ...prev,
       id_categorie: String(id),
-      titre: cat ? cat.label : prev.titre,
+      titre: isAutre ? "" : (cat ? cat.label : prev.titre),
     }));
   };
 
@@ -704,7 +719,7 @@ function DeposerDoleance() {
   const charsCount = formData.description.length;
 
   return (
-    <div className="cua-doleance">
+    <div className="cua-doleance shadow-2xl p-5 rounded-2xl">
       <style>{`
         .cua-doleance { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
         .cua-doleance .cua-display { font-family: 'Fraunces', ui-serif, Georgia, serif; }
@@ -718,16 +733,16 @@ function DeposerDoleance() {
           box-shadow: 0 4px 16px -4px rgba(15, 23, 42, 0.08);
         }
         .cua-doleance .cua-field {
-          border-color: #D4AF37;
+          border-color: #D1D5DB;
           transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
         }
         .cua-doleance .cua-field:focus {
-          border-color: #B8960E;
+          border-color: #135ecf;
           box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15);
           background-color: #ffffff;
         }
         .cua-doleance .cua-field-wrap:focus-within {
-          border-color: #B8960E !important;
+          border-color: #135ecf !important;
           box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15);
         }
         .cua-doleance .cua-btn-primary {
@@ -766,7 +781,7 @@ function DeposerDoleance() {
       `}</style>
 
       {/* Header */}
-      <div className="mb-6 sm:mb-8 cua-anim flex flex-col">
+      <div className=" sm:mb-4 cua-anim flex flex-col">
         <div className="text-center">
           <span
             className={`inline-flex items-center justify-center gap-1.5 text-[11px] uppercase tracking-[0.2em] font-semibold mb-3 ${
@@ -796,17 +811,16 @@ function DeposerDoleance() {
           Signaler un problème
         </h1>
         <p className=" text-slate-500 mt-1.5 ml-[44px] sm:ml-[52px] ">
-          Aidez à améliorer votre quartier — signalez rapidement tout incident
-          ou dysfonctionnement à la Commune.
+        Vous avez constaté un problème ? Signalez-le à la Commune Urbaine d'Antananarivo pour un traitement rapide.
         </p>
-        <p className="inline-flex items-center rounded-xl border border-yellow-400 bg-yellow-100 px-4 py-2 text-sm font-medium text-yellow-800 w-fit">
+        <p className="inline-flex items-center rounded-xl border border-yellow-400 bg-yellow-100 mt-5 px-4 py-2 text-sm font-medium text-yellow-800 w-fit">
           📋 Veuillez remplir le formulaire ci-dessous.
         </p>
       </div>
 
       <form onSubmit={handleSubmit}>
         {/* Type d'entité */}
-        <div className="mb-6">
+        <div className="mb-1">
           <h2 className="block text-[16px] font-bold text-[#0F172A]">
             Type d'entité concernée
           </h2>
@@ -848,7 +862,7 @@ function DeposerDoleance() {
             </p>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
-              {firstCategories.map((cat) => (
+              {otherCategories.map((cat) => (
                 <CategoryCard
                   key={cat.id}
                   cat={cat}
@@ -857,30 +871,14 @@ function DeposerDoleance() {
                 />
               ))}
 
-              <CategoryCard
-                cat={{
-                  id: "others",
-                  label: "Autres",
-                  desc: "Voir toutes les catégories",
-                  icon: "M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z",
-                  gradient: "from-slate-500 to-slate-700",
-                }}
-                selected={false}
-                onClick={() => setShowOthers(!showOthers)}
-              />
+              {autreCategorie && (
+                <CategoryCard
+                  cat={autreCategorie}
+                  selected={selectedCategory === autreCategorie.id}
+                  onClick={handleSelectCategory}
+                />
+              )}
             </div>
-            {showOthers && (
-              <div className="mt-5 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-3">
-                {otherCategories.map((cat) => (
-                  <CategoryCard
-                    key={cat.id}
-                    cat={cat}
-                    selected={selectedCategory === cat.id}
-                    onClick={handleSelectCategory}
-                  />
-                ))}
-              </div>
-            )}
             <p className="italic text-blue-600 text-xs my-3">
               *__________Si vous ne trouvez pas de catégorie correspondante,
               veuillez décrire votre problème ci-dessous.

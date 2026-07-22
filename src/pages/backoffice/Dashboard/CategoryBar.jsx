@@ -2,6 +2,13 @@ import React from 'react';
 
 const COLORS = ['#3B82F6', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4', '#84CC16', '#F97316', '#6366F1'];
 
+function formatDelay(hours) {
+  if (hours == null) return '-';
+  if (hours < 1) return `${Math.round(hours * 60)}min`;
+  if (hours < 24) return `${Math.round(hours)}h`;
+  return `${Math.round(hours / 24)}j`;
+}
+
 function CategoryBar({ data, error, selectedId, onSelect }) {
   const total = data.reduce((sum, c) => sum + (c.count || 0), 0);
 
@@ -40,6 +47,11 @@ function CategoryBar({ data, error, selectedId, onSelect }) {
                   <div className="h-2 sm:h-2.5 rounded-full transition-all duration-500"
                     style={{ width: `${Math.min(percentage, 100)}%`, backgroundColor: cat.couleur || COLORS[0] }} />
                 </div>
+                {cat.delai_moyen_heures != null && (
+                  <p className="text-[10px] sm:text-xs text-gray-400 mt-1">
+                    Délai moyen : {formatDelay(cat.delai_moyen_heures)}
+                  </p>
+                )}
               </div>
             );
           })}

@@ -60,6 +60,7 @@ function Categories() {
     actif: 1,
   });
   const [saving, setSaving] = useState(false);
+  const [directions, setDirections] = useState([]);
 
   const tabs = [
     { key: 'CUA', label: 'Catégories CUA' },
@@ -81,6 +82,16 @@ function Categories() {
   useEffect(() => {
     fetchCategories();
   }, [fetchCategories]);
+
+  useEffect(() => {
+    const loadDirections = async () => {
+      const result = await doleanceService.getDirections();
+      if (result.success) {
+        setDirections(Array.isArray(result.data) ? result.data : []);
+      }
+    };
+    loadDirections();
+  }, []);
 
   const filtered = categories.filter((c) =>
     !search || 
@@ -323,13 +334,18 @@ function Categories() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Direction/Service concerné</label>
-                <input
-                  type="text"
+                <select
                   value={formData.direction_concernee}
                   onChange={(e) => setFormData({ ...formData, direction_concernee: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-                  placeholder="Ex: Direction de la Voirie"
-                />
+                >
+                  <option value="">Aucune direction</option>
+                  {directions.map((dir) => (
+                    <option key={dir.id_direction} value={dir.nom_direction}>
+                      {dir.nom_direction}
+                    </option>
+                  ))}
+                </select>
               </div>
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Description</label>
