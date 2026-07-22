@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useStatsRefresh } from '../contexts/StatsContext';
 import doleanceService from '../services/doleanceService';
 import toast from 'react-hot-toast';
 import { STATUTS_BLOQUES } from '../pages/backoffice/Doleances/DoleanceCard';
@@ -20,6 +21,7 @@ import { DocumentTextIcon } from '@heroicons/react/24/outline';
 function Doleances() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { notifyStatsChange } = useStatsRefresh();
   const userRole = user?.role || user?.nom_role;
   const isSuperAdmin = userRole === 'administrateur_systeme';
   const isAgentCentral = userRole === 'agent_central';
@@ -157,7 +159,7 @@ function Doleances() {
   const handleDelete = async () => {
     try {
       const result = await doleanceService.delete(doleanceToDelete.id_doleance);
-      if (result?.success) { toast.success('Doléance supprimée'); fetchDoleances(); }
+      if (result?.success) { toast.success('Doléance supprimée'); fetchDoleances(); notifyStatsChange(); }
     } catch (error) {
       toast.error(error?.response?.data?.message || 'Erreur suppression');
     } finally {
@@ -175,7 +177,7 @@ function Doleances() {
   const handleUpdatePriorite = async () => {
     try {
       const result = await doleanceService.updatePriorite(doleanceToUpdate.id_doleance, parseInt(selectedPrioriteValue));
-      if (result?.success) { toast.success('Priorité modifiée'); fetchDoleances(); setShowPrioriteModal(false); }
+      if (result?.success) { toast.success('Priorité modifiée'); fetchDoleances(); setShowPrioriteModal(false); notifyStatsChange(); }
     } catch (error) {
       toast.error(error?.response?.data?.message || 'Erreur modification');
     }
@@ -211,7 +213,7 @@ function Doleances() {
   const handleUpdateStatut = async () => {
     try {
       const result = await doleanceService.updateStatut(selectedDoleanceForReponse.id_doleance, parseInt(selectedStatutValue));
-      if (result?.success) { toast.success('Statut modifié'); setShowStatutModal(false); fetchDoleances(); }
+      if (result?.success) { toast.success('Statut modifié'); setShowStatutModal(false); fetchDoleances(); notifyStatsChange(); }
     } catch (error) {
       toast.error(error?.response?.data?.message || 'Erreur modification');
     }

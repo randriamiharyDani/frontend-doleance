@@ -1,6 +1,7 @@
 // backoffice/Transfert.jsx
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useStatsRefresh } from '../contexts/StatsContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import {
@@ -87,6 +88,7 @@ function SkeletonRow() {
 
 function Transfert() {
   const { user } = useAuth();
+  const { notifyStatsChange } = useStatsRefresh();
 
   const [doleances, setDoleances] = useState([]);
   const [directions, setDirections] = useState([]);
@@ -270,6 +272,7 @@ function Transfert() {
         setTransferData({ id_direction: '', commentaire: '' });
         fetchStats();
         fetchDoleances();
+        notifyStatsChange();
       } else {
         toast.error(response.data.message || 'Erreur lors du transfert');
       }

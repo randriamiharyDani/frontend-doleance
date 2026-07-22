@@ -462,6 +462,10 @@ function DeposerDoleance() {
       toast.error(t("messages.pleaseFillRequired"));
       return;
     }
+    if (!formData.id_categorie) {
+      toast.error("Veuillez sélectionner une catégorie");
+      return;
+    }
     if (formData.telephone) {
       const digitsOnly = formData.telephone.replace(/[^0-9]/g, "");
       if (digitsOnly.length < 8 || digitsOnly.length > 10) {
@@ -836,8 +840,8 @@ function DeposerDoleance() {
         {module && mappedCategories.length > 0 && (
           <>
             <p className="italic text-blue-600 text-xs my-3">
-              *__________Raha misy amin'ireo sokajy ireo mifanaraka amin'ny
-              olanao, kitiho azafady.
+              *__________Si vous trouvez une catégorie correspondante, cochez-la
+              s'il vous plaît.
             </p>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -875,8 +879,8 @@ function DeposerDoleance() {
               </div>
             )}
             <p className="italic text-blue-600 text-xs my-3">
-              *__________Raha tsy mahita sokajy mifanaraka ianao dia soraty eto
-              ambany ny olanao.
+              *__________Si vous ne trouvez pas de catégorie correspondante,
+              veuillez décrire votre problème ci-dessous.
             </p>
           </>
         )}

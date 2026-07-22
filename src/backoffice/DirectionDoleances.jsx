@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+import { useStatsRefresh } from '../contexts/StatsContext';
 import {
   BuildingOfficeIcon,
   UserGroupIcon,
@@ -27,6 +28,7 @@ import {
 function DirectionDoleances() {
   const { id_direction } = useParams();
   const navigate = useNavigate();
+  const { notifyStatsChange } = useStatsRefresh();
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [directionData, setDirectionData] = useState({
@@ -123,6 +125,7 @@ function DirectionDoleances() {
       if (response.data.success) {
         toast.success('Statut mis à jour avec succès');
         fetchDirectionDetails();
+        notifyStatsChange();
       } else {
         toast.error(response.data.message || 'Erreur lors du changement de statut');
       }

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate, Link } from 'react-router-dom';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+import { useStatsRefresh } from '../contexts/StatsContext';
 import { 
   ArrowLeftIcon, 
   DocumentTextIcon,
@@ -28,6 +29,7 @@ import {
 function DoleanceDetail() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { notifyStatsChange } = useStatsRefresh();
   const [doleance, setDoleance] = useState(null);
   const [loading, setLoading] = useState(true);
   const [reponse, setReponse] = useState('');
@@ -155,6 +157,7 @@ function DoleanceDetail() {
       if (response.data.success) {
         toast.success('Statut mis à jour avec succès');
         fetchDoleance();
+        notifyStatsChange();
       }
     } catch (error) {
       toast.error('Erreur lors de la mise à jour');

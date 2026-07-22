@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import { useStatsRefresh } from '../contexts/StatsContext';
 import statistiqueService from '../services/statistiqueService';
 import doleanceService from '../services/doleanceService';
 import toast from 'react-hot-toast';
@@ -16,6 +17,7 @@ import RecentDoleancesTable from '../pages/backoffice/Dashboard/RecentDoleancesT
 
 function Dashboard() {
   const { user } = useAuth();
+  const { statsVersion } = useStatsRefresh();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [stats, setStats] = useState({ total: 0, enCours: 0, resolues: 0, urgentes: 0 });
@@ -91,7 +93,7 @@ function Dashboard() {
     setLoading(false); setRefreshing(false);
   }, [fetchStats, selectedCategoryId, fetchRecentDoleances, fetchMonthlyStats, fetchStatsByCategory, fetchStatsByStatus, fetchFiltersCount]);
 
-  useEffect(() => { fetchAll(true); }, [fetchAll]);
+  useEffect(() => { fetchAll(true); }, [fetchAll, statsVersion]);
 
   const statsCards = [
     { title: 'Total Doléances', value: stats.total, icon: DocumentTextIcon, color: 'bg-blue-500', link: '/backoffice/doleances' },

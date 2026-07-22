@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import { useStatsRefresh } from '../contexts/StatsContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import {
@@ -26,6 +27,7 @@ function generateReference() {
 function AjouterDoleance() {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const { notifyStatsChange } = useStatsRefresh();
   const fileInputRef = useRef(null);
 
   const [reference] = useState(generateReference());
@@ -180,6 +182,7 @@ function AjouterDoleance() {
         }
 
         toast.success(`Doléance créée (${response.data.data.reference})`);
+        notifyStatsChange();
         navigate('/backoffice/doleances');
       }
     } catch (error) {

@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import doleanceService from '../services/doleanceService';
+import { useStatsRefresh } from '../contexts/StatsContext';
 import toast from 'react-hot-toast';
 import Pagination from '../components/common/Pagination';
 import LoadingSpinner from '../components/common/LoadingSpinner';
@@ -8,6 +9,7 @@ import Modal from '../components/common/Modal';
 import { TrashIcon, ArrowPathIcon, MagnifyingGlassIcon, FunnelIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 function Corbeille() {
+  const { notifyStatsChange } = useStatsRefresh();
   const [doleances, setDoleances] = useState([]);
   const [loading, setLoading] = useState(true);
   const [directions, setDirections] = useState([]);
@@ -113,6 +115,7 @@ function Corbeille() {
       if (result?.success) {
         toast.success(result.data?.message || 'Doléance restaurée');
         fetchDoleances();
+        notifyStatsChange();
       } else {
         toast.error(result?.message || 'Erreur lors de la restauration');
       }
