@@ -68,7 +68,7 @@ const statistiqueService = {
 
   getPerformanceAgents: async (periode = 'month') => {
     try {
-      const response = await api.get('/statistiques/agents-performance', { params: { periode } });
+      const response = await api.get('/statistiques/performance-agents', { params: { periode } });
       return { success: true, data: response.data.data || response.data };
     } catch (error) {
       return { success: false, data: [] };

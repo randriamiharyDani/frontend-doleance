@@ -13,6 +13,8 @@ import InfoCard from '../pages/backoffice/Dashboard/InfoCard';
 import EvolutionChart from '../pages/backoffice/Dashboard/EvolutionChart';
 import StatusPieChart from '../pages/backoffice/Dashboard/StatusPieChart';
 import CategoryBar from '../pages/backoffice/Dashboard/CategoryBar';
+import DirectionBar from '../pages/backoffice/Dashboard/DirectionBar';
+import AgentPerformance from '../pages/backoffice/Dashboard/AgentPerformance';
 import RecentDoleancesTable from '../pages/backoffice/Dashboard/RecentDoleancesTable';
 
 function Dashboard() {
@@ -27,7 +29,9 @@ function Dashboard() {
   const [statsByStatus, setStatsByStatus] = useState([]);
   const [categoriesCount, setCategoriesCount] = useState(0);
   const [prioritesCount, setPrioritesCount] = useState(0);
-  const [errors, setErrors] = useState({ monthly: false, categories: false, status: false, recent: false });
+  const [statsByDirection, setStatsByDirection] = useState([]);
+  const [agentPerformance, setAgentPerformance] = useState([]);
+  const [errors, setErrors] = useState({ monthly: false, categories: false, status: false, recent: false, direction: false });
   const [selectedCategoryId, setSelectedCategoryId] = useState(null);
 
   const sortAlpha = (data, key = 'nom_categorie') => {
@@ -70,6 +74,17 @@ function Dashboard() {
     else setErrors(prev => ({ ...prev, status: true }));
   }, []);
 
+  const fetchStatsByDirection = useCallback(async () => {
+    const result = await statistiqueService.getStatsByDirection();
+    if (result?.success && result.data?.length > 0) setStatsByDirection(result.data);
+    else setErrors(prev => ({ ...prev, direction: true }));
+  }, []);
+
+  const fetchAgentPerformance = useCallback(async () => {
+    const result = await statistiqueService.getPerformanceAgents();
+    if (result?.success) setAgentPerformance(result.data || []);
+  }, []);
+
   const fetchFiltersCount = useCallback(async () => {
     const [catRes, prioRes] = await Promise.all([
       doleanceService.getCategories(),
@@ -88,18 +103,21 @@ function Dashboard() {
     if (showLoading) setLoading(true); else setRefreshing(true);
     await Promise.allSettled([
       fetchStats(selectedCategoryId), fetchRecentDoleances(), fetchMonthlyStats(),
-      fetchStatsByCategory(), fetchStatsByStatus(), fetchFiltersCount()
+      fetchStatsByCategory(), fetchStatsByStatus(), fetchFiltersCount(), fetchStatsByDirection(), fetchAgentPerformance()
     ]);
     setLoading(false); setRefreshing(false);
-  }, [fetchStats, selectedCategoryId, fetchRecentDoleances, fetchMonthlyStats, fetchStatsByCategory, fetchStatsByStatus, fetchFiltersCount]);
+  }, [fetchStats, selectedCategoryId, fetchRecentDoleances, fetchMonthlyStats, fetchStatsByCategory, fetchStatsByStatus, fetchFiltersCount, fetchStatsByDirection, fetchAgentPerformance]);
 
   useEffect(() => { fetchAll(true); }, [fetchAll, statsVersion]);
 
+  const evo = stats.evolution || {};
+  const tauxResolution = stats.total > 0 ? Math.round((stats.resolues / stats.total) * 100) : 0;
   const statsCards = [
-    { title: 'Total Doléances', value: stats.total, icon: DocumentTextIcon, color: 'bg-blue-500', link: '/backoffice/doleances' },
-    { title: 'En cours', value: stats.enCours, icon: ClockIcon, color: 'bg-amber-500', link: '/backoffice/doleances?statut=en_cours' },
-    { title: 'Résolues', value: stats.resolues, icon: CheckCircleIcon, color: 'bg-emerald-500', link: '/backoffice/doleances?statut=resolues' },
-    { title: 'Urgentes', value: stats.urgentes, icon: ExclamationTriangleIcon, color: 'bg-rose-500', link: '/backoffice/doleances?priorite=urgente' },
+    { title: 'Total Doléances', value: stats.total, icon: DocumentTextIcon, color: 'bg-blue-500', link: '/backoffice/doleances', change: evo.total?.value, changeType: evo.total?.type },
+    { title: 'En cours', value: stats.enCours, icon: ClockIcon, color: 'bg-amber-500', link: '/backoffice/doleances?statut=en_cours', change: evo.enCours?.value, changeType: evo.enCours?.type },
+    { title: 'Résolues', value: stats.resolues, icon: CheckCircleIcon, color: 'bg-emerald-500', link: '/backoffice/doleances?statut=resolues', change: evo.resolues?.value, changeType: evo.resolues?.type },
+    { title: 'Urgentes', value: stats.urgentes, icon: ExclamationTriangleIcon, color: 'bg-rose-500', link: '/backoffice/doleances?priorite=urgente', change: evo.urgentes?.value, changeType: evo.urgentes?.type },
+    { title: 'Taux de résolution', value: `${tauxResolution}%`, icon: CheckCircleIcon, color: 'bg-indigo-500', link: '/backoffice/statistiques' },
   ];
 
   if (loading) {
@@ -126,7 +144,7 @@ function Dashboard() {
         </button>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
         {statsCards.map((stat, i) => <StatCard key={i} {...stat} />)}
       </div>
 
@@ -142,7 +160,12 @@ function Dashboard() {
         <StatusPieChart data={statsByStatus} error={errors.status} />
       </div>
 
-      <CategoryBar data={statsByCategory} error={errors.categories} selectedId={selectedCategoryId} onSelect={handleCategorySelect} />
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+        <CategoryBar data={statsByCategory} error={errors.categories} selectedId={selectedCategoryId} onSelect={handleCategorySelect} />
+        <DirectionBar data={statsByDirection} error={errors.direction} />
+      </div>
+
+      <AgentPerformance data={agentPerformance} />
 
       <div className="mt-6 sm:mt-8">
         <RecentDoleancesTable doleances={recentDoleances} error={errors.recent} />

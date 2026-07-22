@@ -124,7 +124,7 @@ function CategoryCard({ cat, selected, onClick }) {
     <button
       type="button"
       onClick={() => onClick(cat.id)}
-      className={`cua-card-tap flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-5 rounded-xl sm:rounded-2xl text-center cursor-pointer transition-all duration-200 border-2 ${
+      className={`cua-card-tap flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-5 rounded-xl sm:rounded-2xl text-center cursor-pointer transition-all duration-200 border ${
         selected
           ? "border-[#D4AF37] shadow-lg shadow-[#D4AF37]/20 scale-[1.02] bg-[#D4AF37]/[0.06]"
           : "border-transparent hover:border-slate-200 hover:shadow-md"
@@ -244,8 +244,8 @@ function DeposerDoleance() {
   // Mapper les catégories DB au format attendu par CategoryCard
   const mappedCategories = [...categoriesData]
     .sort((a, b) => {
-      if (a.nom_categorie?.includes('Autre')) return 1;
-      if (b.nom_categorie?.includes('Autre')) return -1;
+      if (a.nom_categorie?.includes("Autre")) return 1;
+      if (b.nom_categorie?.includes("Autre")) return -1;
       return 0;
     })
     .map((cat) => ({
@@ -256,8 +256,12 @@ function DeposerDoleance() {
       gradient: gradientMap[cat.couleur] || "from-slate-500 to-slate-700",
     }));
 
-  const autreCategorie = mappedCategories.find((c) => c.label?.includes('Autre'));
-  const otherCategories = mappedCategories.filter((c) => !c.label?.includes('Autre'));
+  const autreCategorie = mappedCategories.find((c) =>
+    c.label?.includes("Autre"),
+  );
+  const otherCategories = mappedCategories.filter(
+    (c) => !c.label?.includes("Autre"),
+  );
 
   const fetchData = async () => {
     try {
@@ -280,10 +284,15 @@ function DeposerDoleance() {
         geojsonRes.data || { type: "FeatureCollection", features: [] },
       );
 
-      const defaultCat = catsData.find((c) => c.nom_categorie?.includes('Autre'));
+      const defaultCat = catsData.find((c) =>
+        c.nom_categorie?.includes("Autre"),
+      );
       if (defaultCat) {
         setSelectedCategory(defaultCat.id_categorie);
-        setFormData((prev) => ({ ...prev, id_categorie: String(defaultCat.id_categorie) }));
+        setFormData((prev) => ({
+          ...prev,
+          id_categorie: String(defaultCat.id_categorie),
+        }));
       }
 
       setArrondissements([
@@ -303,11 +312,11 @@ function DeposerDoleance() {
   const handleSelectCategory = (id) => {
     setSelectedCategory(id);
     const cat = mappedCategories.find((c) => c.id === id);
-    const isAutre = cat?.label?.includes('Autre');
+    const isAutre = cat?.label?.includes("Autre");
     setFormData((prev) => ({
       ...prev,
       id_categorie: String(id),
-      titre: isAutre ? "" : (cat ? cat.label : prev.titre),
+      titre: isAutre ? "" : cat ? cat.label : prev.titre,
     }));
   };
 
@@ -811,9 +820,10 @@ function DeposerDoleance() {
           Signaler un problème
         </h1>
         <p className=" text-slate-500 mt-1.5 ml-[44px] sm:ml-[52px] ">
-        Vous avez constaté un problème ? Signalez-le à la Commune Urbaine d'Antananarivo pour un traitement rapide.
+          Vous avez constaté un problème ? Signalez-le à la Commune Urbaine
+          d'Antananarivo pour un traitement rapide.
         </p>
-        <p className="inline-flex items-center rounded-xl border border-yellow-400 bg-yellow-100 mt-5 px-4 py-2 text-sm font-medium text-yellow-800 w-fit">
+        <p className="inline-flex items-center rounded-xl border border-yellow-400 bg-yellow-100 mt-5 px-4 py-2 text-[13px] font-medium text-yellow-800 w-fit">
           📋 Veuillez remplir le formulaire ci-dessous.
         </p>
       </div>
@@ -822,14 +832,16 @@ function DeposerDoleance() {
         {/* Type d'entité */}
         <div className="mb-1">
           <h2 className="block text-[16px] font-bold text-[#0F172A]">
-            Type d'entité concernée
+            Type de situation
+            <span className="ml-1 text-sm font-medium text-gray-500">
+              (à choisir)
+            </span>
           </h2>
-
           <div className="flex gap-3">
             <button
               type="button"
               onClick={() => setModule("CUA")}
-              className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold border-2 transition-all ${
+              className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold border transition-all ${
                 module === "CUA"
                   ? "border-blue-600 bg-blue-50 text-blue-700 shadow-sm"
                   : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
@@ -841,7 +853,7 @@ function DeposerDoleance() {
             <button
               type="button"
               onClick={() => setModule("Sapeurs-Pompiers")}
-              className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold border-2 transition-all ${
+              className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold border transition-all ${
                 module === "Sapeurs-Pompiers"
                   ? "border-red-600 bg-red-50 text-red-700 shadow-sm"
                   : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
@@ -919,7 +931,7 @@ function DeposerDoleance() {
               value={formData.titre}
               onChange={handleChange}
               placeholder="Ex : Nid-de-poule dangereux Rue de la Liberté"
-              className="cua-field w-full border-2 border-slate-100 rounded-xl px-5 py-4 text-sm font-medium text-slate-800 outline-none placeholder:text-slate-400"
+              className="cua-field w-full border  rounded-xl px-5 py-4 text-sm font-medium text-slate-800 outline-none placeholder:text-slate-400"
               required
             />
           </div>
@@ -955,7 +967,7 @@ function DeposerDoleance() {
             onChange={handleChange}
             rows={5}
             placeholder="Décrivez le problème que vous avez constaté..."
-            className="cua-field w-full border-2 border-slate-100 rounded-xl px-5 py-4 text-sm text-slate-800 outline-none resize-y placeholder:text-slate-400"
+            className="cua-field w-full border  rounded-xl px-5 py-4 text-sm text-slate-800 outline-none resize-y placeholder:text-slate-400"
             required
           />
           <div className="flex justify-between items-center mt-2">
@@ -1011,7 +1023,7 @@ function DeposerDoleance() {
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-3 relative">
             <form
               onSubmit={handleSearchAddress}
-              className="cua-field-wrap flex-1 flex items-center gap-3 bg-slate-50 rounded-xl px-4 border-2 border-transparent transition-all relative order-2 sm:order-1"
+              className="cua-field-wrap flex-1 flex items-center gap-3 bg-slate-50 rounded-xl px-4 border border-transparent transition-all relative order-2 sm:order-1"
             >
               <svg
                 className="w-4 h-4 text-slate-400 flex-shrink-0"
@@ -1038,7 +1050,7 @@ function DeposerDoleance() {
                 className="flex-1 bg-transparent py-2.5 sm:py-3 text-sm font-medium text-slate-800 outline-none placeholder:text-slate-400 min-w-0"
               />
               {isSearching && (
-                <div className="w-4 h-4 border-2 border-slate-300 border-t-[#1E3A8A] rounded-full animate-spin flex-shrink-0" />
+                <div className="w-4 h-4 border border-slate-300 border-t-[#1E3A8A] rounded-full animate-spin flex-shrink-0" />
               )}
               <button
                 type="submit"
@@ -1049,7 +1061,7 @@ function DeposerDoleance() {
 
               {/* Dropdown de suggestions */}
               {showSuggestions && suggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-lg border border-slate-100 z-[1001] max-h-60 overflow-y-auto">
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-lg border  z-[1001] max-h-60 overflow-y-auto">
                   {suggestions.map((item, i) => (
                     <button
                       key={i}
@@ -1071,7 +1083,7 @@ function DeposerDoleance() {
               className="cua-btn-primary flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl text-sm font-bold text-white shadow-md disabled:opacity-60 order-1 sm:order-2"
             >
               {isLocating ? (
-                <div className="w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+                <div className="w-4 h-4 border border-white/40 border-t-white rounded-full animate-spin" />
               ) : (
                 <svg
                   className="w-4 h-4"
@@ -1232,7 +1244,7 @@ function DeposerDoleance() {
                 value={formData.lieu_exact}
                 onChange={handleChange}
                 placeholder="Entrez ou modifiez le lieu exact"
-                className="cua-field w-full border-2 border-slate-100 rounded-xl px-4 py-3 text-sm outline-none bg-slate-50"
+                className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50"
               />
               {assignedDoleances.length > 0 && (
                 <p className="text-xs text-slate-400 mt-1.5 flex items-center gap-1.5">
@@ -1274,7 +1286,7 @@ function DeposerDoleance() {
             onChange={handleChange}
             rows={3}
             placeholder="Ex : Il faudrait installer un ralentisseur et refaire le revêtement de la route..."
-            className="cua-field w-full border-2 border-slate-100 rounded-xl px-5 py-4 text-sm text-slate-800 outline-none resize-y placeholder:text-slate-400"
+            className="cua-field w-full border  rounded-xl px-5 py-4 text-sm text-slate-800 outline-none resize-y placeholder:text-slate-400"
           />
         </div>
 
@@ -1356,7 +1368,7 @@ function DeposerDoleance() {
           </div>
 
           <div
-            className={`cua-dropzone border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
+            className={`cua-dropzone border border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
               dragOver
                 ? "drag"
                 : "border-slate-300 hover:border-[#D4AF37] hover:bg-slate-50"
@@ -1404,7 +1416,7 @@ function DeposerDoleance() {
                 {files.map((file, i) => (
                   <div
                     key={i}
-                    className="group relative rounded-xl overflow-hidden border-2 border-slate-100 hover:border-[#D4AF37] transition-all duration-200 bg-slate-50 aspect-square"
+                    className="group relative rounded-xl overflow-hidden border  hover:border-[#D4AF37] transition-all duration-200 bg-slate-50 aspect-square"
                   >
                     {filePreviews[i] ? (
                       <img
@@ -1512,7 +1524,7 @@ function DeposerDoleance() {
                 name="nom_citoyen"
                 value={formData.nom_citoyen}
                 onChange={handleChange}
-                className="cua-field w-full border-2 border-slate-100 rounded-xl px-4 py-3 text-sm outline-none bg-slate-50"
+                className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50"
                 placeholder="Votre nom"
                 required
               />
@@ -1526,7 +1538,7 @@ function DeposerDoleance() {
                 name="prenom_citoyen"
                 value={formData.prenom_citoyen}
                 onChange={handleChange}
-                className="cua-field w-full border-2 border-slate-100 rounded-xl px-4 py-3 text-sm outline-none bg-slate-50"
+                className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50"
                 placeholder="Votre prénom"
                 required
               />
@@ -1540,7 +1552,7 @@ function DeposerDoleance() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="cua-field w-full border-2 border-slate-100 rounded-xl px-4 py-3 text-sm outline-none bg-slate-50"
+                className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50"
                 placeholder="exemple@email.com"
               />
             </div>
@@ -1553,7 +1565,7 @@ function DeposerDoleance() {
                 name="telephone"
                 value={formData.telephone}
                 onChange={handleChange}
-                className="cua-field w-full border-2 border-slate-100 rounded-xl px-4 py-3 text-sm outline-none bg-slate-50"
+                className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50"
                 placeholder="034 12 345 67"
               />
             </div>
@@ -1569,7 +1581,7 @@ function DeposerDoleance() {
                 name="adresse_citoyen"
                 value={formData.adresse_citoyen}
                 onChange={handleChange}
-                className="cua-field w-full border-2 border-slate-100 rounded-xl px-4 py-3 text-sm outline-none bg-slate-50"
+                className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50"
                 placeholder="Votre adresse personnelle (optionnelle)"
               />
             </div>
@@ -1651,7 +1663,7 @@ function DeposerDoleance() {
       {/* Reference Modal */}
       {showReferenceModal && (
         <div className="fixed inset-0 bg-[#0F172A]/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-auto p-6 border border-slate-100 relative overflow-hidden">
+          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-auto p-6 border  relative overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0F172A] via-[#D4AF37] to-[#0F172A]" />
             <div className="text-center">
               <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center mb-4 shadow-lg">
@@ -1675,7 +1687,7 @@ function DeposerDoleance() {
               <p className="text-sm text-slate-500 mb-4">
                 Votre référence de suivi :
               </p>
-              <div className="bg-slate-50 rounded-xl px-4 py-3 mb-4 border border-slate-100">
+              <div className="bg-slate-50 rounded-xl px-4 py-3 mb-4 border ">
                 <span className="text-2xl font-mono font-bold text-[#1E3A8A] tracking-wider">
                   {savedReference}
                 </span>

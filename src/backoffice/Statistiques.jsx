@@ -8,7 +8,6 @@ import StatsCards from '../pages/backoffice/Statistiques/StatsCards';
 import EvolutionAreaChart from '../pages/backoffice/Statistiques/EvolutionAreaChart';
 import CategoryBarChart from '../pages/backoffice/Statistiques/CategoryBarChart';
 import StatusDonutChart from '../pages/backoffice/Statistiques/StatusDonutChart';
-import ProcessingTimeCard from '../pages/backoffice/Statistiques/ProcessingTimeCard';
 import SatisfactionCard from '../pages/backoffice/Statistiques/SatisfactionCard';
 
 function Statistiques() {
@@ -20,7 +19,6 @@ function Statistiques() {
   const [statsByCategory, setStatsByCategory] = useState([]);
   const [statsByStatus, setStatsByStatus] = useState([]);
   const [evolutionData, setEvolutionData] = useState([]);
-  const [avgProcessingTime, setAvgProcessingTime] = useState(null);
   const [satisfactionRate, setSatisfactionRate] = useState(null);
   const [chartReady, setChartReady] = useState(false);
 
@@ -42,7 +40,6 @@ function Statistiques() {
         fetchStatsByCategory(),
         fetchStatsByStatus(),
         fetchEvolutionData(),
-        fetchAvgProcessingTime(),
         fetchSatisfactionRate()
       ]);
     } catch (error) {
@@ -73,11 +70,6 @@ function Statistiques() {
     if (result?.success) setEvolutionData(result.data || []);
   };
 
-  const fetchAvgProcessingTime = async () => {
-    const result = await statistiqueService.getTempsTraitementMoyen();
-    if (result?.success) setAvgProcessingTime(result.data);
-  };
-
   const fetchSatisfactionRate = async () => {
     const result = await statistiqueService.getTauxSatisfaction();
     if (result?.success) setSatisfactionRate(result.data);
@@ -104,13 +96,6 @@ function Statistiques() {
       if (evolutionData.length > 0) {
         csv += "ÉVOLUTION\nPériode;Total;Résolues;Urgentes\n";
         evolutionData.forEach(e => { csv += `${e.periode};${e.total || 0};${e.resolues || 0};${e.urgentes || 0}\n`; });
-        csv += "\n";
-      }
-      if (avgProcessingTime) {
-        csv += "TEMPS TRAITEMENT\nIndicateur;Valeur (heures)\n";
-        ['moyen_heures', 'min_heures', 'max_heures', 'basse_heures', 'moyenne_heures', 'haute_heures', 'urgente_heures'].forEach(k => {
-          csv += `${k.replace('_heures', '').replace(/_/g, ' ')};${Math.round(avgProcessingTime[k] || 0)}\n`;
-        });
         csv += "\n";
       }
       if (satisfactionRate?.total_avis > 0) {
@@ -219,10 +204,7 @@ function Statistiques() {
         {chartReady && statsByStatus.length > 0 && <StatusDonutChart data={statsByStatus} />}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <ProcessingTimeCard data={avgProcessingTime} />
-        <SatisfactionCard data={satisfactionRate} />
-      </div>
+      {satisfactionRate && <SatisfactionCard data={satisfactionRate} />}
 
       {chartReady && evolutionData.length === 0 && statsByCategory.length === 0 && statsByStatus.length === 0 && (
         <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 p-12 text-center">
