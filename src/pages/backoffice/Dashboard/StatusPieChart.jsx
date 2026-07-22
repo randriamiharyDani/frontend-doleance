@@ -2,9 +2,9 @@ import React from 'react';
 import { PieChart, Pie, Cell, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
 const STATUS_COLORS = {
-  'Nouvelle': '#3B82F6', 'En attente': '#F59E0B', 'En cours': '#8B5CF6',
-  'Transférée': '#06B6D4', 'Traitée': '#10B981', 'Résolue': '#10B981',
-  'Clôturée': '#6B7280', 'Rejetée': '#EF4444', 'Urgente': '#DC2626'
+  'Nouvelle': '#3B82F6', 'En attente': '#F59E0B', 'Assignée': '#2102d1',
+  'En traitement': '#8B5CF6', 'Résolue': '#10B981',
+  'Clôturée': '#0f0f0f', 'Rejetée': '#ec5b5b', 'transferee': '#06B6D4', 'Urgente': '#f10404'
 };
 
 const CustomTooltip = ({ active, payload }) => {
