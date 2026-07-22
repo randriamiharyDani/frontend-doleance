@@ -276,7 +276,7 @@ function BackofficeLayout() {
       onClick={() => isMobile && setSidebarOpen(false)}
       className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold text-sm shadow-lg transition-all duration-200 mt-3 ${
         location.pathname === "/backoffice/ajouter-doleance"
-          ? "bg-white text-blue-600 shadow-white/20 scale-[1.02]"
+          ? "bg-white text-blue-600 shadow-white/20 scale-[1.02] dark:bg-slate-800 dark:text-blue-400"
           : "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-blue-600/30 hover:shadow-xl hover:shadow-blue-600/40 hover:scale-[1.02]"
       }`}
     >
@@ -517,7 +517,7 @@ function BackofficeLayout() {
                 {user?.prenom?.charAt(0) || "U"}
                 {user?.nom?.charAt(0) || "?"}
               </span>
-              <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[#0B1A33] ${isCurrentUserOnline ? 'bg-green-500' : 'bg-gray-400'}`} />
+              <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[#0B1A33] ${isCurrentUserOnline ? 'bg-green-500' : 'bg-gray-400 dark:bg-gray-500'}`} />
             </div>
 
             <div className="ml-3 flex-1 min-w-0">
@@ -529,7 +529,7 @@ function BackofficeLayout() {
                 {user?.role?.replace(/_/g, " ") || "Chargement..."}
               </p>
               <div className="flex items-center gap-1 mt-0.5">
-                <span className={`h-1.5 w-1.5 rounded-full ${isCurrentUserOnline ? 'bg-green-400 animate-pulse' : 'bg-gray-500'}`} />
+                <span className={`h-1.5 w-1.5 rounded-full ${isCurrentUserOnline ? 'bg-green-400 animate-pulse' : 'bg-gray-500 dark:bg-gray-400'}`} />
                 <span className={`text-[10px] ${isCurrentUserOnline ? 'text-green-400' : 'text-white/40'}`}>
                   {isCurrentUserOnline ? 'En ligne' : 'Hors ligne'}
                 </span>

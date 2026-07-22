@@ -168,7 +168,7 @@ function Categories() {
   return (
     <div className="max-auto mx-auto">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Gestion des catégories</h1>
+        <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Gestion des catégories</h1>
         <button
           onClick={openAdd}
           className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
@@ -179,15 +179,15 @@ function Categories() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-6 bg-gray-100 rounded-xl p-1">
+      <div className="flex gap-1 mb-6 bg-gray-100 dark:bg-slate-700 rounded-xl p-1">
         {tabs.map((tab) => (
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
             className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
               activeTab === tab.key
-                ? 'bg-white text-blue-700 shadow-sm'
-                : 'text-gray-600 hover:text-gray-800'
+                ? 'bg-white dark:bg-slate-800 text-blue-700 shadow-sm'
+                : 'text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100'
             }`}
           >
             {tab.label}
@@ -197,60 +197,60 @@ function Categories() {
 
       {/* Search */}
       <div className="relative mb-4">
-        <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+        <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
         <input
           type="text"
           placeholder="Rechercher..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-9 pr-4 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full pl-9 pr-4 py-2 border border-gray-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden">
         {loading ? (
           <div className="flex justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-12 text-gray-500 text-sm">
+          <div className="text-center py-12 text-gray-500 dark:text-gray-400 text-sm">
             Aucune catégorie trouvée
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b border-gray-200">
+              <thead className="bg-gray-50 dark:bg-slate-700 border-b border-gray-200 dark:border-slate-600">
                 <tr>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Nom français</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600">Traduction malgache</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600 hidden sm:table-cell">Direction concernée</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600 hidden md:table-cell">Description</th>
-                  <th className="text-center px-4 py-3 font-medium text-gray-600">Actif</th>
-                  <th className="text-right px-4 py-3 font-medium text-gray-600">Actions</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600 dark:text-gray-300">Nom français</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600 dark:text-gray-300">Traduction malgache</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600 dark:text-gray-300 hidden sm:table-cell">Direction concernée</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-600 dark:text-gray-300 hidden md:table-cell">Description</th>
+                  <th className="text-center px-4 py-3 font-medium text-gray-600 dark:text-gray-300">Actif</th>
+                  <th className="text-right px-4 py-3 font-medium text-gray-600 dark:text-gray-300">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100">
+              <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
                 {filtered.map((cat) => (
-                  <tr key={cat.id_categorie} className="hover:bg-gray-50 transition-colors">
+                  <tr key={cat.id_categorie} className="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-2">
                         {cat.couleur && (
                           <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: cat.couleur }} />
                         )}
-                        <span className="font-medium text-gray-800">{cat.nom_categorie}</span>
+                        <span className="font-medium text-gray-800 dark:text-gray-100">{cat.nom_categorie}</span>
                       </div>
                     </td>
-                    <td className="px-4 py-3 text-gray-600">{cat.nom_malgache || '-'}</td>
-                    <td className="px-4 py-3 text-gray-600 hidden sm:table-cell">{cat.direction_concernee || '-'}</td>
-                    <td className="px-4 py-3 text-gray-500 hidden md:table-cell max-w-xs truncate">
+                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{cat.nom_malgache || '-'}</td>
+                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300 hidden sm:table-cell">{cat.direction_concernee || '-'}</td>
+                    <td className="px-4 py-3 text-gray-500 dark:text-gray-400 hidden md:table-cell max-w-xs truncate">
                       {cat.description || '-'}
                     </td>
                     <td className="px-4 py-3 text-center">
                       <button
                         onClick={() => toggleActif(cat)}
                         className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                          cat.actif ? 'bg-green-500' : 'bg-gray-300'
+                          cat.actif ? 'bg-green-500' : 'bg-gray-300 dark:bg-slate-600'
                         }`}
                       >
                         <span
@@ -264,14 +264,14 @@ function Categories() {
                       <div className="flex items-center justify-end gap-1">
                         <button
                           onClick={() => openEdit(cat)}
-                          className="p-1.5 text-gray-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                          className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
                           title="Modifier"
                         >
                           <PencilIcon className="h-4 w-4" />
                         </button>
                         <button
                           onClick={() => setShowDeleteConfirm(cat)}
-                          className="p-1.5 text-gray-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
                           title="Supprimer"
                         >
                           <TrashIcon className="h-4 w-4" />
@@ -289,72 +289,72 @@ function Categories() {
       {/* Add/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between p-5 border-b border-gray-200">
-              <h2 className="text-lg font-bold text-gray-800">
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-slate-600">
+              <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">
                 {editing ? 'Modifier la catégorie' : 'Nouvelle catégorie'}
               </h2>
-              <button onClick={() => setShowModal(false)} className="text-gray-400 hover:text-gray-600">
+              <button onClick={() => setShowModal(false)} className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
                 <XMarkIcon className="h-5 w-5" />
               </button>
             </div>
             <form onSubmit={handleSave} className="p-5 space-y-4">
               <input type="hidden" name="module" value={activeTab} />
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Nom français *</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Nom français *</label>
                 <input
                   type="text"
                   required
                   value={formData.nom_categorie}
                   onChange={(e) => setFormData({ ...formData, nom_categorie: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Ex: Voirie"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Traduction malgache</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Traduction malgache</label>
                 <input
                   type="text"
                   value={formData.nom_malgache}
                   onChange={(e) => setFormData({ ...formData, nom_malgache: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Ex: Lalana"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Direction/Service concerné</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Direction/Service concerné</label>
                 <input
                   type="text"
                   value={formData.direction_concernee}
                   onChange={(e) => setFormData({ ...formData, direction_concernee: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Ex: Direction de la Voirie"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Description</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   placeholder="Description de la catégorie"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Couleur</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Couleur</label>
                   <div className="flex items-center gap-2">
                     <input
                       type="color"
                       value={formData.couleur || '#3B82F6'}
                       onChange={(e) => setFormData({ ...formData, couleur: e.target.value })}
-                      className="w-9 h-9 rounded cursor-pointer border border-gray-200"
+                      className="w-9 h-9 rounded cursor-pointer border border-gray-200 dark:border-slate-600"
                     />
                     <select
                       value={formData.couleur || '#3B82F6'}
                       onChange={(e) => setFormData({ ...formData, couleur: e.target.value })}
-                      className="flex-1 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="flex-1 px-3 py-2 border border-gray-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                     >
                       {COLOR_OPTIONS.map((c) => (
                         <option key={c.value} value={c.value}>{c.label}</option>
@@ -363,11 +363,11 @@ function Categories() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Icône</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Icône</label>
                   <select
                     value={formData.icone}
                     onChange={(e) => setFormData({ ...formData, icone: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                   >
                     <option value="">Sélectionner</option>
                     {ICON_OPTIONS.map((ic) => (
@@ -384,13 +384,13 @@ function Categories() {
                   onChange={(e) => setFormData({ ...formData, actif: e.target.checked ? 1 : 0 })}
                   className="rounded border-gray-300"
                 />
-                <label htmlFor="actif" className="text-sm text-gray-700">Catégorie active</label>
+                <label htmlFor="actif" className="text-sm text-gray-700 dark:text-gray-200">Catégorie active</label>
               </div>
-              <div className="flex justify-end gap-3 pt-2 border-t border-gray-200">
+              <div className="flex justify-end gap-3 pt-2 border-t border-gray-200 dark:border-slate-600">
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
                 >
                   Annuler
                 </button>
@@ -410,12 +410,12 @@ function Categories() {
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
-            <h3 className="text-lg font-bold text-gray-800 mb-2">Confirmer la suppression</h3>
-            <p className="text-sm text-gray-600 mb-1">
+          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md p-6">
+            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-2">Confirmer la suppression</h3>
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">
               Êtes-vous sûr de vouloir supprimer la catégorie :
             </p>
-            <p className="text-sm font-semibold text-gray-800 mb-4">
+            <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-4">
               « {showDeleteConfirm.nom_categorie} » ?
             </p>
             <p className="text-xs text-red-600 mb-4">
@@ -424,7 +424,7 @@ function Categories() {
             <div className="flex justify-end gap-3">
               <button
                 onClick={() => setShowDeleteConfirm(null)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
               >
                 Annuler
               </button>

@@ -88,7 +88,7 @@ function DoleanceDetail() {
   if (!doleance) {
     return (
       <div className="card text-center py-12">
-        <p className="text-gray-500">Doléance non trouvée</p>
+        <p className="text-gray-500 dark:text-gray-400">Doléance non trouvée</p>
         <button onClick={() => navigate('/doleances')} className="btn-primary mt-4">
           Retour aux doléances
         </button>
@@ -100,7 +100,7 @@ function DoleanceDetail() {
     <div>
       <button
         onClick={() => navigate('/doleances')}
-        className="mb-4 flex items-center text-gray-600 hover:text-gray-800"
+        className="mb-4 flex items-center text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-white"
       >
         <ArrowLeftIcon className="h-5 w-5 mr-2" />
         Retour à la liste
@@ -114,17 +114,17 @@ function DoleanceDetail() {
             <div className="flex justify-between items-start mb-4">
               <div>
                 <div className="flex items-center gap-2 mb-2">
-                  <span className="text-sm font-mono text-gray-500">{doleance.reference}</span>
+                  <span className="text-sm font-mono text-gray-500 dark:text-gray-400">{doleance.reference}</span>
                   <span className={`px-2 py-0.5 text-xs rounded-full ${
-                    doleance.niveau === 4 ? 'bg-red-100 text-red-800' :
-                    doleance.niveau === 3 ? 'bg-orange-100 text-orange-800' :
-                    doleance.niveau === 2 ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-blue-100 text-blue-800'
+                    doleance.niveau === 4 ? 'bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300' :
+                    doleance.niveau === 3 ? 'bg-orange-100 dark:bg-orange-900/30 text-orange-800 dark:text-orange-300' :
+                    doleance.niveau === 2 ? 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300' :
+                    'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300'
                   }`}>
                     {doleance.nom_priorite}
                   </span>
                 </div>
-                <h1 className="text-2xl font-bold text-gray-800">{doleance.titre}</h1>
+                <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{doleance.titre}</h1>
               </div>
               <span
                 className="px-3 py-1 rounded-full text-sm font-medium text-white"
@@ -135,14 +135,14 @@ function DoleanceDetail() {
             </div>
             
             <div className="border-t pt-4 mt-2">
-              <h3 className="font-semibold text-gray-700 mb-2">Description</h3>
-              <p className="text-gray-600 whitespace-pre-wrap">{doleance.description}</p>
+              <h3 className="font-semibold text-gray-700 dark:text-gray-200 mb-2">Description</h3>
+              <p className="text-gray-600 dark:text-gray-300 whitespace-pre-wrap">{doleance.description}</p>
             </div>
 
             {/* Photos / Pièces jointes */}
             {doleance.pieces_jointes && doleance.pieces_jointes.length > 0 && (
               <div className="border-t pt-4 mt-4">
-                <h3 className="font-semibold text-gray-700 mb-3 flex items-center gap-2">
+                <h3 className="font-semibold text-gray-700 dark:text-gray-200 mb-3 flex items-center gap-2">
                   <PhotoIcon className="h-5 w-5 text-blue-600" />
                   Photos du problème ({doleance.pieces_jointes.length})
                 </h3>
@@ -151,7 +151,7 @@ function DoleanceDetail() {
                     <div
                       key={index}
                       onClick={() => setLightboxImage(piece.url)}
-                      className="group relative aspect-square rounded-xl overflow-hidden border-2 border-gray-200 hover:border-blue-500 cursor-pointer transition-all duration-200"
+                      className="group relative aspect-square rounded-xl overflow-hidden border-2 border-gray-200 dark:border-slate-600 hover:border-blue-500 cursor-pointer transition-all duration-200"
                     >
                       <img
                         src={piece.url}
@@ -160,8 +160,8 @@ function DoleanceDetail() {
                         loading="lazy"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
-                      <div className="absolute bottom-0 left-0 right-0 px-2 py-1.5 bg-white/90 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                        <p className="text-[10px] font-medium text-gray-700 truncate">{piece.nom_fichier}</p>
+                      <div className="absolute bottom-0 left-0 right-0 px-2 py-1.5 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                        <p className="text-[10px] font-medium text-gray-700 dark:text-gray-200 truncate">{piece.nom_fichier}</p>
                       </div>
                     </div>
                   ))}
@@ -170,20 +170,20 @@ function DoleanceDetail() {
             )}
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 pt-4 border-t text-sm">
-              <div className="flex items-center text-gray-500">
+              <div className="flex items-center text-gray-500 dark:text-gray-400">
                 <TagIcon className="h-4 w-4 mr-2" />
                 {doleance.nom_categorie}
               </div>
-              <div className="flex items-center text-gray-500">
+              <div className="flex items-center text-gray-500 dark:text-gray-400">
                 <BuildingOfficeIcon className="h-4 w-4 mr-2" />
                 {doleance.nom_direction}
               </div>
-              <div className="flex items-center text-gray-500">
+              <div className="flex items-center text-gray-500 dark:text-gray-400">
                 <CalendarIcon className="h-4 w-4 mr-2" />
                 {new Date(doleance.date_creation).toLocaleDateString('fr-FR')}
               </div>
               {doleance.nom_quartier && (
-                <div className="flex items-center text-gray-500">
+                <div className="flex items-center text-gray-500 dark:text-gray-400">
                   <FlagIcon className="h-4 w-4 mr-2" />
                   {doleance.nom_quartier}
                 </div>
@@ -201,24 +201,24 @@ function DoleanceDetail() {
                   <div key={rep.id_reponse} className="border-l-4 border-blue-500 pl-4">
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex items-center">
-                        <UserCircleIcon className="h-5 w-5 text-gray-400 mr-2" />
+                        <UserCircleIcon className="h-5 w-5 text-gray-400 dark:text-gray-500 mr-2" />
                         <span className="font-medium">
                           {rep.prenom} {rep.nom}
-                          <span className="ml-2 text-xs text-gray-400">
+                          <span className="ml-2 text-xs text-gray-400 dark:text-gray-500">
                             Agent
                           </span>
                         </span>
                       </div>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
                         {new Date(rep.date_reponse).toLocaleString('fr-FR')}
                       </span>
                     </div>
-                    <p className="text-gray-700">{rep.message}</p>
+                    <p className="text-gray-700 dark:text-gray-200">{rep.message}</p>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-center py-4">Aucune réponse pour le moment</p>
+              <p className="text-gray-500 dark:text-gray-400 text-center py-4">Aucune réponse pour le moment</p>
             )}
             
             {/* Formulaire de réponse pour les agents */}
@@ -230,7 +230,7 @@ function DoleanceDetail() {
                   onChange={(e) => setReponse(e.target.value)}
                   placeholder="Écrire une réponse..."
                   rows="3"
-                  className="input"
+                  className="input dark:bg-slate-700 dark:border-slate-600 dark:text-white"
                 />
                 <button
                   type="submit"
@@ -252,26 +252,26 @@ function DoleanceDetail() {
             <h3 className="text-lg font-semibold mb-4">Citoyen</h3>
             <div className="space-y-2">
               <p>
-                <span className="text-gray-500">Nom complet:</span>
+                <span className="text-gray-500 dark:text-gray-400">Nom complet:</span>
                 <span className="ml-2 font-medium">
                   {doleance.citoyen_prenom} {doleance.citoyen_nom}
                 </span>
               </p>
               {doleance.citoyen_email && (
                 <p>
-                  <span className="text-gray-500">Email:</span>
+                  <span className="text-gray-500 dark:text-gray-400">Email:</span>
                   <span className="ml-2 text-sm">{doleance.citoyen_email}</span>
                 </p>
               )}
               {doleance.citoyen_telephone && (
                 <p>
-                  <span className="text-gray-500">Téléphone:</span>
+                  <span className="text-gray-500 dark:text-gray-400">Téléphone:</span>
                   <span className="ml-2">{doleance.citoyen_telephone}</span>
                 </p>
               )}
               {doleance.citoyen_adresse && (
                 <p>
-                  <span className="text-gray-500">Adresse:</span>
+                  <span className="text-gray-500 dark:text-gray-400">Adresse:</span>
                   <span className="ml-2 text-sm">{doleance.citoyen_adresse}</span>
                 </p>
               )}
@@ -287,7 +287,7 @@ function DoleanceDetail() {
                 <select
                   value={newStatut}
                   onChange={(e) => setNewStatut(e.target.value)}
-                  className="input mb-3"
+                  className="input dark:bg-slate-700 dark:border-slate-600 dark:text-white mb-3"
                 >
                   <option value="">Sélectionner un statut</option>
                   <option value="2">En attente</option>
@@ -314,12 +314,12 @@ function DoleanceDetail() {
               <div className="space-y-3 max-h-64 overflow-y-auto">
                 {doleance.historique_statuts.map((hist) => (
                   <div key={hist.id_historique} className="flex items-start gap-2 text-sm">
-                    <ClockIcon className="h-4 w-4 text-gray-400 mt-0.5 flex-shrink-0" />
+                    <ClockIcon className="h-4 w-4 text-gray-400 dark:text-gray-500 mt-0.5 flex-shrink-0" />
                     <div>
                       <p>
                         {hist.ancien_statut || 'Création'} → {hist.nouveau_statut}
                       </p>
-                      <p className="text-xs text-gray-400">
+                      <p className="text-xs text-gray-400 dark:text-gray-500">
                         {new Date(hist.date_changement).toLocaleString('fr-FR')}
                       </p>
                     </div>

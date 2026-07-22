@@ -136,13 +136,13 @@ function Profile() {
 
   const getRoleBadge = (role) => {
     const colors = {
-      administrateur: 'bg-purple-100 text-purple-800',
-      agent: 'bg-blue-100 text-blue-800',
-      directeur: 'bg-green-100 text-green-800',
-      maire: 'bg-red-100 text-red-800',
-      citoyen: 'bg-gray-100 text-gray-800'
+      administrateur: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300',
+      agent: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300',
+      directeur: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+      maire: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300',
+      citoyen: 'bg-gray-100 text-gray-800 dark:bg-slate-700 dark:text-gray-100'
     };
-    return colors[role] || 'bg-gray-100 text-gray-800';
+    return colors[role] || 'bg-gray-100 text-gray-800 dark:bg-slate-700 dark:text-gray-100';
   };
 
   const getRoleIcon = (role) => {
@@ -157,12 +157,12 @@ function Profile() {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold text-gray-800 mb-4">Mon profil</h1>
+      <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-4">Mon profil</h1>
       
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Carte de profil */}
         <div className="lg:col-span-1">
-          <div className="bg-white rounded-lg shadow-md p-6 text-center">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6 text-center">
             <div className="flex justify-center mb-4">
               <div className="w-24 h-24 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center">
                 <span className="text-white text-4xl font-bold">
@@ -170,7 +170,7 @@ function Profile() {
                 </span>
               </div>
             </div>
-            <h2 className="text-xl font-semibold text-gray-800">
+            <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-100">
               {user?.prenom} {user?.nom}
             </h2>
             <div className="mt-2">
@@ -179,7 +179,7 @@ function Profile() {
               </span>
             </div>
             <div className="mt-4 pt-4 border-t">
-              <p className="text-sm text-gray-500">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
                 Membre depuis le {new Date(user?.date_creation).toLocaleDateString('fr-FR')}
               </p>
             </div>
@@ -189,7 +189,7 @@ function Profile() {
         {/* Informations personnelles */}
         <div className="lg:col-span-2 space-y-6">
           {/* Section Informations */}
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold flex items-center gap-2">
                 <UserCircleIcon className="h-5 w-5 text-blue-600" />
@@ -210,46 +210,46 @@ function Profile() {
               <form onSubmit={handleUpdateInfo} className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Nom</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Nom</label>
                     <input
                       type="text"
                       name="nom"
                       value={formData.nom}
                       onChange={handleInfoChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Prénom</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Prénom</label>
                     <input
                       type="text"
                       name="prenom"
                       value={formData.prenom}
                       onChange={handleInfoChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Email</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Email</label>
                     <input
                       type="email"
                       name="email"
                       value={formData.email}
                       onChange={handleInfoChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                       required
                     />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-1">Téléphone</label>
+                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Téléphone</label>
                     <input
                       type="tel"
                       name="telephone"
                       value={formData.telephone}
                       onChange={handleInfoChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     />
                   </div>
                 </div>
@@ -257,7 +257,7 @@ function Profile() {
                   <button
                     type="button"
                     onClick={() => setEditMode({ ...editMode, info: false })}
-                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                    className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700"
                   >
                     Annuler
                   </button>
@@ -274,19 +274,19 @@ function Profile() {
               <div className="space-y-3">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <p className="text-sm text-gray-500">Nom complet</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Nom complet</p>
                     <p className="font-medium">{user?.prenom} {user?.nom}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Rôle</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Rôle</p>
                     <p className="font-medium capitalize">{user?.role}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Email</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Email</p>
                     <p className="font-medium">{user?.email}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-500">Téléphone</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Téléphone</p>
                     <p className="font-medium">{user?.telephone || 'Non renseigné'}</p>
                   </div>
                 </div>
@@ -295,7 +295,7 @@ function Profile() {
           </div>
           
           {/* Section Changement de mot de passe */}
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-lg font-semibold flex items-center gap-2">
                 <KeyIcon className="h-5 w-5 text-blue-600" />
@@ -315,20 +315,20 @@ function Profile() {
             {editMode.password ? (
               <form onSubmit={handleUpdatePassword} className="space-y-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Mot de passe actuel</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Mot de passe actuel</label>
                   <div className="relative">
                     <input
                       type={showPassword ? 'text' : 'password'}
                       name="currentPassword"
                       value={passwordData.currentPassword}
                       onChange={handlePasswordChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400"
                     >
                       {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
                     </button>
@@ -336,42 +336,42 @@ function Profile() {
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Nouveau mot de passe</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Nouveau mot de passe</label>
                   <div className="relative">
                     <input
                       type={showNewPassword ? 'text' : 'password'}
                       name="newPassword"
                       value={passwordData.newPassword}
                       onChange={handlePasswordChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowNewPassword(!showNewPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400"
                     >
                       {showNewPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
                     </button>
                   </div>
-                  <p className="text-xs text-gray-500 mt-1">Minimum 6 caractères</p>
+                  <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Minimum 6 caractères</p>
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">Confirmer le nouveau mot de passe</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Confirmer le nouveau mot de passe</label>
                   <div className="relative">
                     <input
                       type={showConfirmPassword ? 'text' : 'password'}
                       name="confirmPassword"
                       value={passwordData.confirmPassword}
                       onChange={handlePasswordChange}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
                       required
                     />
                     <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500"
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 dark:text-gray-400"
                     >
                       {showConfirmPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
                     </button>
@@ -389,7 +389,7 @@ function Profile() {
                         confirmPassword: ''
                       });
                     }}
-                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                    className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700"
                   >
                     Annuler
                   </button>
@@ -404,10 +404,10 @@ function Profile() {
               </form>
             ) : (
               <div className="text-center py-4">
-                <p className="text-gray-500 text-sm">
+                <p className="text-gray-500 dark:text-gray-400 text-sm">
                   Pour des raisons de sécurité, votre mot de passe n'est pas affiché.
                 </p>
-                <p className="text-gray-500 text-sm mt-1">
+                <p className="text-gray-500 dark:text-gray-400 text-sm mt-1">
                   Cliquez sur "Changer le mot de passe" pour le modifier.
                 </p>
               </div>
@@ -416,12 +416,12 @@ function Profile() {
           
           {/* Informations sur la direction (si applicable) */}
           {user?.direction && (
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
               <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <BuildingOfficeIcon className="h-5 w-5 text-blue-600" />
                 Direction
               </h2>
-              <p className="text-gray-700">{user.direction}</p>
+              <p className="text-gray-700 dark:text-gray-200">{user.direction}</p>
             </div>
           )}
         </div>

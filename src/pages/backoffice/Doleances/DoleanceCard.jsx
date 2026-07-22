@@ -29,7 +29,7 @@ function DoleanceCard({
 
   return (
     <div
-      className={`bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow ${
+      className={`bg-white dark:bg-slate-800 rounded-lg shadow-md hover:shadow-lg transition-shadow ${
         isNouvelle ? 'border-l-4 border-blue-500' : ''
       }`}
     >
@@ -37,7 +37,7 @@ function DoleanceCard({
         <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap mb-2 sm:mb-3">
-              <span className="text-[10px] sm:text-sm font-mono bg-gray-100 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
+              <span className="text-[10px] sm:text-sm font-mono bg-gray-100 dark:bg-slate-700 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
                 {doleance.reference}
               </span>
               {isNouvelle && (
@@ -48,21 +48,21 @@ function DoleanceCard({
               <PriorityBadge priorite={doleance.nom_priorite} niveau={doleance.niveau} />
               <StatusBadge statut={doleance.nom_statut} couleur={doleance.statut_couleur} />
               {doleance.nom_direction && (
-                <span className="text-[10px] sm:text-xs bg-purple-100 text-purple-700 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
+                <span className="text-[10px] sm:text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
                   {doleance.nom_direction}
                 </span>
               )}
               {isBloquee && (
-                <span className="text-[10px] sm:text-xs bg-gray-200 text-gray-600 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
+                <span className="text-[10px] sm:text-xs bg-gray-200 dark:bg-slate-600 text-gray-600 dark:text-gray-300 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
                   Non modifiable
                 </span>
               )}
             </div>
 
-            <h3 className="text-base sm:text-lg font-semibold text-gray-800 mb-1 sm:mb-2 break-words">{doleance.titre}</h3>
-            <p className="text-gray-600 text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-2">{doleance.description}</p>
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-100 mb-1 sm:mb-2 break-words">{doleance.titre}</h3>
+            <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-2">{doleance.description}</p>
 
-            <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 mb-1 sm:mb-2">
+            <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1 sm:mb-2">
               <span className="flex items-center gap-1">
                 <UserIcon className="h-3 w-3 flex-shrink-0" />
                 <span className="truncate max-w-[80px] sm:max-w-none">{doleance.citoyen_nom || 'Anonyme'} {doleance.citoyen_prenom || ''}</span>
@@ -93,9 +93,9 @@ function DoleanceCard({
             </div>
 
             {fullAddress && (
-              <div className="flex items-start gap-1 text-[10px] sm:text-xs text-gray-400 mt-1">
+              <div className="flex items-start gap-1 text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 mt-1">
                 <MapPinIcon className="h-3 w-3 flex-shrink-0 mt-0.5" />
-                <span className="text-gray-500 truncate">{fullAddress}</span>
+                <span className="text-gray-500 dark:text-gray-400 truncate">{fullAddress}</span>
               </div>
             )}
           </div>
@@ -105,7 +105,7 @@ function DoleanceCard({
               <button
                 onClick={() => onPriorite(doleance)}
                 className={`p-1.5 sm:p-2 rounded-lg transition-colors ${
-                  isBloquee ? 'text-gray-400 cursor-not-allowed' : 'text-yellow-600 hover:bg-yellow-50'
+                  isBloquee ? 'text-gray-400 dark:text-slate-500 cursor-not-allowed' : 'text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/20'
                 }`}
                 disabled={isBloquee}
                 title="Changer la priorité"
@@ -116,7 +116,7 @@ function DoleanceCard({
             {isAdminOrAgentCentral && (
               <button
                 onClick={() => onDelete(doleance)}
-                className="p-1.5 sm:p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                className="p-1.5 sm:p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
                 title="Supprimer"
               >
                 <TrashIcon className="h-4 w-4 sm:h-5 sm:w-5" />
@@ -127,8 +127,8 @@ function DoleanceCard({
                 onClick={() => onReponse(doleance)}
                 className={`p-1.5 sm:p-2 rounded-lg transition-colors ${
                   isNouvelle && !isAdminOrAgentCentral
-                    ? 'text-gray-400 cursor-not-allowed'
-                    : 'text-green-600 hover:bg-green-50'
+                    ? 'text-gray-400 dark:text-slate-500 cursor-not-allowed'
+                    : 'text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'
                 }`}
                 disabled={isNouvelle && !isAdminOrAgentCentral}
                 title="Répondre"
@@ -140,7 +140,7 @@ function DoleanceCard({
               <button
                 onClick={() => onStatut(doleance)}
                 className={`p-1.5 sm:p-2 rounded-lg transition-colors ${
-                  isBloquee ? 'text-gray-400 cursor-not-allowed' : 'text-purple-600 hover:bg-purple-50'
+                  isBloquee ? 'text-gray-400 dark:text-slate-500 cursor-not-allowed' : 'text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20'
                 }`}
                 disabled={isBloquee}
                 title="Changer le statut"
@@ -151,7 +151,7 @@ function DoleanceCard({
             <button
               onClick={() => onView(doleance)}
               className={`p-1.5 sm:p-2 rounded-lg transition-colors ${
-                !userCanView ? 'text-gray-400 cursor-not-allowed' : 'text-blue-600 hover:bg-blue-50'
+                !userCanView ? 'text-gray-400 dark:text-slate-500 cursor-not-allowed' : 'text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20'
               }`}
               disabled={!userCanView}
               title="Voir tous les détails"

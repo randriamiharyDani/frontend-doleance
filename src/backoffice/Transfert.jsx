@@ -59,13 +59,13 @@ function StatusPill({ statut }) {
 
 function StatCard({ label, value, icon: Icon, accent, sub }) {
   return (
-    <div className="relative overflow-hidden bg-white rounded-2xl shadow-sm ring-1 ring-slate-100 p-4 sm:p-5">
+    <div className="relative overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm ring-1 ring-slate-100 dark:ring-slate-700 p-4 sm:p-5">
       <div className={`absolute -right-4 -top-4 w-20 h-20 rounded-full opacity-10 ${accent.bgSolid}`} />
       <div className="flex items-start justify-between">
         <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400">{label}</p>
-          <p className="text-2xl sm:text-3xl font-bold text-[#0F172A] mt-1 tabular-nums">{value}</p>
-          {sub && <p className="text-[11px] text-slate-400 mt-0.5">{sub}</p>}
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">{label}</p>
+          <p className="text-2xl sm:text-3xl font-bold text-[#0F172A] dark:text-white mt-1 tabular-nums">{value}</p>
+          {sub && <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">{sub}</p>}
         </div>
         <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${accent.bg}`}>
           <Icon className={`w-5 h-5 ${accent.text}`} />
@@ -77,11 +77,11 @@ function StatCard({ label, value, icon: Icon, accent, sub }) {
 
 function SkeletonRow() {
   return (
-    <div className="animate-pulse flex items-center gap-4 px-4 py-4 border-b border-slate-50">
-      <div className="h-3 w-16 bg-slate-100 rounded" />
-      <div className="h-3 w-24 bg-slate-100 rounded hidden sm:block" />
-      <div className="h-3 flex-1 bg-slate-100 rounded" />
-      <div className="h-5 w-20 bg-slate-100 rounded-full" />
+    <div className="animate-pulse flex items-center gap-4 px-4 py-4 border-b border-slate-50 dark:border-slate-700">
+      <div className="h-3 w-16 bg-slate-100 dark:bg-slate-700 rounded" />
+      <div className="h-3 w-24 bg-slate-100 dark:bg-slate-700 rounded hidden sm:block" />
+      <div className="h-3 flex-1 bg-slate-100 dark:bg-slate-700 rounded" />
+      <div className="h-5 w-20 bg-slate-100 dark:bg-slate-700 rounded-full" />
     </div>
   );
 }
@@ -130,13 +130,13 @@ function Transfert() {
 
   if (!isAuthorized) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 p-4">
-        <div className="bg-white rounded-3xl shadow-xl shadow-slate-200/60 max-w-md w-full mx-4 p-8 text-center ring-1 ring-slate-100">
-          <div className="w-16 h-16 bg-rose-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 p-4">
+        <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-xl shadow-slate-200/60 max-w-md w-full mx-4 p-8 text-center ring-1 ring-slate-100 dark:ring-slate-700">
+          <div className="w-16 h-16 bg-rose-50 dark:bg-rose-900/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <ShieldCheckIcon className="h-8 w-8 text-rose-500" />
           </div>
-          <h2 className="text-xl font-bold text-[#0F172A] mb-2">Accès non autorisé</h2>
-          <p className="text-slate-500 mb-6 text-sm leading-relaxed">
+          <h2 className="text-xl font-bold text-[#0F172A] dark:text-white mb-2">Accès non autorisé</h2>
+          <p className="text-slate-500 dark:text-slate-400 mb-6 text-sm leading-relaxed">
             Cette page est réservée à l'agent central et à l'administrateur système.
           </p>
           <button
@@ -317,15 +317,15 @@ function Transfert() {
       {/* En-tête */}
       <div className="flex flex-wrap justify-between items-start gap-3 mb-6">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight">
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] dark:text-white tracking-tight">
             Transfert de doléances
           </h1>
-          <p className="text-sm sm:text-base text-gray-500 mt-1">Acheminer chaque doléance vers la bonne direction</p>
+          <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mt-1">Acheminer chaque doléance vers la bonne direction</p>
         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={refreshData}
-            className="inline-flex items-center px-3.5 py-2.5 bg-white text-[#1E3A8A] rounded-xl hover:bg-slate-50 transition-colors text-sm font-semibold ring-1 ring-slate-200 shadow-sm"
+            className="inline-flex items-center px-3.5 py-2.5 bg-white dark:bg-slate-800 text-[#1E3A8A] rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-sm font-semibold ring-1 ring-slate-200 dark:ring-slate-700 shadow-sm"
           >
             <ArrowPathIcon className="h-4 w-4 mr-1.5" />
             Rafraîchir
@@ -335,7 +335,7 @@ function Transfert() {
             className={`inline-flex items-center px-3.5 py-2.5 rounded-xl transition-colors text-sm font-semibold ring-1 shadow-sm ${
               showFilters || hasActiveFilters
                 ? 'bg-[#1E3A8A] text-white ring-[#1E3A8A]'
-                : 'bg-white text-slate-600 ring-slate-200 hover:bg-slate-50'
+                : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 ring-slate-200 dark:ring-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
             }`}
           >
             <FunnelIcon className="h-4 w-4 mr-1.5" />
@@ -353,44 +353,44 @@ function Transfert() {
           label="Total"
           value={statsTotals.total}
           icon={InboxIcon}
-          accent={{ bg: 'bg-slate-100', bgSolid: 'bg-slate-400', text: 'text-slate-600' }}
+          accent={{ bg: 'bg-slate-100 dark:bg-slate-700', bgSolid: 'bg-slate-400', text: 'text-slate-600 dark:text-slate-300' }}
         />
         <StatCard
           label="En attente"
           value={statsTotals.enAttente}
           icon={ClockIcon}
-          accent={{ bg: 'bg-amber-50', bgSolid: 'bg-amber-400', text: 'text-amber-600' }}
+          accent={{ bg: 'bg-amber-50 dark:bg-amber-900/30', bgSolid: 'bg-amber-400', text: 'text-amber-600' }}
         />
         <StatCard
           label="En cours"
           value={statsTotals.enCours}
           icon={ArrowTrendingUpIcon}
-          accent={{ bg: 'bg-blue-50', bgSolid: 'bg-[#1E3A8A]', text: 'text-[#1E3A8A]' }}
+          accent={{ bg: 'bg-blue-50 dark:bg-blue-900/30', bgSolid: 'bg-[#1E3A8A]', text: 'text-[#1E3A8A]' }}
         />
         <StatCard
           label="Transférées"
           value={statsTotals.transferts}
           icon={PaperAirplaneIcon}
-          accent={{ bg: 'bg-violet-50', bgSolid: 'bg-violet-400', text: 'text-violet-600' }}
+          accent={{ bg: 'bg-violet-50 dark:bg-violet-900/30', bgSolid: 'bg-violet-400', text: 'text-violet-600' }}
         />
         <StatCard
           label="Résolues"
           value={statsTotals.resolues}
           icon={CheckBadgeIcon}
-          accent={{ bg: 'bg-emerald-50', bgSolid: 'bg-emerald-400', text: 'text-emerald-600' }}
+          accent={{ bg: 'bg-emerald-50 dark:bg-emerald-900/30', bgSolid: 'bg-emerald-400', text: 'text-emerald-600' }}
         />
       </div>
 
       {/* Filtres */}
       {showFilters && (
-        <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-100 p-4 sm:p-5 mb-6">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm ring-1 ring-slate-100 dark:ring-slate-700 p-4 sm:p-5 mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
             <div>
-              <label className="block text-sm font-bold text-slate-500 mb-1.5">Catégorie</label>
+              <label className="block text-sm font-bold text-slate-500 dark:text-slate-400 mb-1.5">Catégorie</label>
               <select
                 value={filters.categorie}
                 onChange={(e) => setFilters((prev) => ({ ...prev, categorie: e.target.value }))}
-                className="w-full px-3 py-2.5 bg-slate-50 border-2 border-transparent rounded-xl text-sm outline-none focus:border-[#1E3A8A]/30 focus:bg-white transition-all"
+                className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border-2 border-transparent rounded-xl text-sm outline-none focus:border-[#1E3A8A]/30 focus:bg-white dark:focus:bg-slate-800 transition-all"
               >
                 <option value="">Toutes catégories</option>
                 {categories.map((cat) => (
@@ -401,11 +401,11 @@ function Transfert() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-500 mb-1.5">Statut</label>
+              <label className="block text-sm font-bold text-slate-500 dark:text-slate-400 mb-1.5">Statut</label>
               <select
                 value={filters.statut}
                 onChange={(e) => setFilters((prev) => ({ ...prev, statut: e.target.value }))}
-                className="w-full px-3 py-2.5 bg-slate-50 border-2 border-transparent rounded-xl text-sm outline-none focus:border-[#1E3A8A]/30 focus:bg-white transition-all"
+                className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border-2 border-transparent rounded-xl text-sm outline-none focus:border-[#1E3A8A]/30 focus:bg-white dark:focus:bg-slate-800 transition-all"
               >
                 <option value="all">Tous statuts</option>
                 {statuts.map((stat) => (
@@ -416,15 +416,15 @@ function Transfert() {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-bold text-slate-500 mb-1.5">Rechercher</label>
+              <label className="block text-sm font-bold text-slate-500 dark:text-slate-400 mb-1.5">Rechercher</label>
               <div className="relative">
-                <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+                <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-500" />
                 <input
                   type="text"
                   placeholder="Référence, titre..."
                   value={filters.search}
                   onChange={(e) => setFilters((prev) => ({ ...prev, search: e.target.value }))}
-                  className="w-full pl-9 pr-3 py-2.5 bg-slate-50 border-2 border-transparent rounded-xl text-sm outline-none focus:border-[#1E3A8A]/30 focus:bg-white transition-all"
+                  className="w-full pl-9 pr-3 py-2.5 bg-slate-50 dark:bg-slate-900 border-2 border-transparent rounded-xl text-sm outline-none focus:border-[#1E3A8A]/30 focus:bg-white dark:focus:bg-slate-800 transition-all"
                 />
               </div>
             </div>
@@ -432,7 +432,7 @@ function Transfert() {
               <button
                 onClick={() => setFilters({ categorie: '', search: '', statut: 'all' })}
                 disabled={!hasActiveFilters}
-                className="w-full px-4 py-2.5 text-slate-600 bg-slate-50 rounded-xl hover:bg-slate-100 text-sm font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+                className="w-full px-4 py-2.5 text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-900 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 text-sm font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
                 Réinitialiser
               </button>
@@ -442,7 +442,7 @@ function Transfert() {
       )}
 
       {/* Liste - table sur desktop, cartes sur mobile */}
-      <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-100 overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm ring-1 ring-slate-100 dark:ring-slate-700 overflow-hidden">
         {loading && doleances.length === 0 ? (
           <div>
             {Array.from({ length: 6 }).map((_, i) => (
@@ -451,11 +451,11 @@ function Transfert() {
           </div>
         ) : doleances.length === 0 ? (
           <div className="text-center py-16 px-4">
-            <div className="w-14 h-14 bg-slate-50 rounded-2xl flex items-center justify-center mx-auto mb-3">
-              <InboxIcon className="w-7 h-7 text-slate-300" />
+            <div className="w-14 h-14 bg-slate-50 dark:bg-slate-900 rounded-2xl flex items-center justify-center mx-auto mb-3">
+              <InboxIcon className="w-7 h-7 text-slate-300 dark:text-slate-600" />
             </div>
-            <p className="text-slate-600 font-semibold text-sm">Aucune doléance trouvée</p>
-            <p className="text-slate-400 text-sm mt-1">
+            <p className="text-slate-600 dark:text-slate-300 font-semibold text-sm">Aucune doléance trouvée</p>
+            <p className="text-slate-400 dark:text-slate-500 text-sm mt-1">
               {hasActiveFilters ? 'Essayez d\u2019ajuster vos filtres.' : 'Rien à transférer pour le moment.'}
             </p>
           </div>
@@ -465,35 +465,35 @@ function Transfert() {
             <div className="hidden sm:block overflow-x-auto">
               <table className="min-w-full text-xl">
                 <thead>
-                  <tr className="border-b border-slate-100">
-                    <th className="px-4 py-3 text-left text-[13px] font-bold text-slate-400 uppercase tracking-wide">Réf.</th>
-                    <th className="px-4 py-3 text-left text-[13px] font-bold text-slate-400 uppercase tracking-wide hidden lg:table-cell">Citoyen</th>
-                    <th className="px-4 py-3 text-left text-[13px] font-bold text-slate-400 uppercase tracking-wide hidden md:table-cell">Catégorie</th>
-                    <th className="px-4 py-3 text-left text-[13px] font-bold text-slate-400 uppercase tracking-wide">Titre</th>
-                    <th className="px-4 py-3 text-center text-[13px] font-bold text-slate-400 uppercase tracking-wide">Statut</th>
-                    <th className="px-4 py-3 text-left text-[13px] font-bold text-slate-400 uppercase tracking-wide hidden xl:table-cell">Direction</th>
-                    <th className="px-4 py-3 text-right text-[13px] font-bold text-slate-400 uppercase tracking-wide">Action</th>
+                  <tr className="border-b border-slate-100 dark:border-slate-700">
+                    <th className="px-4 py-3 text-left text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Réf.</th>
+                    <th className="px-4 py-3 text-left text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide hidden lg:table-cell">Citoyen</th>
+                    <th className="px-4 py-3 text-left text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide hidden md:table-cell">Catégorie</th>
+                    <th className="px-4 py-3 text-left text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Titre</th>
+                    <th className="px-4 py-3 text-center text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Statut</th>
+                    <th className="px-4 py-3 text-left text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide hidden xl:table-cell">Direction</th>
+                    <th className="px-4 py-3 text-right text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-50">
+                <tbody className="divide-y divide-slate-50 dark:divide-slate-700">
                   {doleancesNontransferts.map((doleance) => (
-                    <tr key={doleance.id_doleance} className="hover:bg-slate-50/70 transition-colors">
-                      <td className="px-4 py-3.5 whitespace-nowrap font-mono font-bold text-[#1E3A8A] text-sm">
+                    <tr key={doleance.id_doleance} className="hover:bg-slate-50/70 dark:hover:bg-slate-700/50 transition-colors">
+                      <td className="px-4 py-3.5 whitespace-nowrap font-mono font-bold text-[#1E3A8A] dark:text-blue-400 text-sm">
                         {doleance.reference}
                       </td>
-                      <td className="px-4 py-3.5 whitespace-nowrap text-slate-500 text-sm hidden lg:table-cell">
+                      <td className="px-4 py-3.5 whitespace-nowrap text-slate-500 dark:text-slate-400 text-sm hidden lg:table-cell">
                         {doleance.citoyen_nom || '—'}
                       </td>
-                      <td className="px-4 py-3.5 whitespace-nowrap text-slate-500 text-sm hidden md:table-cell">
+                      <td className="px-4 py-3.5 whitespace-nowrap text-slate-500 dark:text-slate-400 text-sm hidden md:table-cell">
                         {getCategoryName(doleance.id_categorie)}
                       </td>
-                      <td className="px-4 py-3.5 text-slate-700 max-w-[160px] truncate text-sm">
+                      <td className="px-4 py-3.5 text-slate-700 dark:text-slate-200 max-w-[160px] truncate text-sm">
                         {doleance.titre}
                       </td>
                       <td className="px-4 py-3.5 whitespace-nowrap text-center">
                         <StatusPill statut={doleance.nom_statut} />
                       </td>
-                      <td className="px-4 py-3.5 whitespace-nowrap text-slate-500 text-sm hidden xl:table-cell">
+                      <td className="px-4 py-3.5 whitespace-nowrap text-slate-500 dark:text-slate-400 text-sm hidden xl:table-cell">
                         {doleance.nom_direction || '—'}
                       </td>
                       <td className="px-4 py-3.5 whitespace-nowrap text-right">
@@ -511,32 +511,32 @@ function Transfert() {
                   {doleancestransferts.length > 0 && (
                     <>
                       <tr>
-                        <td colSpan="7" className="px-4 py-2 bg-slate-50/70 text-center text-[10px] font-semibold text-slate-400 uppercase tracking-wide">
+                        <td colSpan="7" className="px-4 py-2 bg-slate-50/70 dark:bg-slate-900/50 text-center text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">
                           Déjà transférées ou traitées
                         </td>
                       </tr>
                       {doleancestransferts.map((doleance) => (
-                        <tr key={doleance.id_doleance} className="bg-slate-50/30 hover:bg-slate-50/60 transition-colors">
-                          <td className="px-4 py-2.5 whitespace-nowrap font-mono font-semibold text-slate-400 text-sm">
+                        <tr key={doleance.id_doleance} className="bg-slate-50/30 dark:bg-slate-900/30 hover:bg-slate-50/60 dark:hover:bg-slate-700/50 transition-colors">
+                          <td className="px-4 py-2.5 whitespace-nowrap font-mono font-semibold text-slate-400 dark:text-slate-500 text-sm">
                             {doleance.reference}
                           </td>
-                          <td className="px-4 py-2.5 whitespace-nowrap text-slate-400 text-sm hidden lg:table-cell">
+                          <td className="px-4 py-2.5 whitespace-nowrap text-slate-400 dark:text-slate-500 text-sm hidden lg:table-cell">
                             {doleance.citoyen_nom || '—'}
                           </td>
-                          <td className="px-4 py-2.5 whitespace-nowrap text-slate-400 text-sm hidden md:table-cell">
+                          <td className="px-4 py-2.5 whitespace-nowrap text-slate-400 dark:text-slate-500 text-sm hidden md:table-cell">
                             {getCategoryName(doleance.id_categorie)}
                           </td>
-                          <td className="px-4 py-2.5 text-slate-400 max-w-[160px] truncate text-sm">
+                          <td className="px-4 py-2.5 text-slate-400 dark:text-slate-500 max-w-[160px] truncate text-sm">
                             {doleance.titre}
                           </td>
                           <td className="px-4 py-2.5 whitespace-nowrap text-center">
                             <StatusPill statut={doleance.nom_statut} />
                           </td>
-                          <td className="px-4 py-2.5 whitespace-nowrap text-slate-400 text-sm hidden xl:table-cell">
+                          <td className="px-4 py-2.5 whitespace-nowrap text-slate-400 dark:text-slate-500 text-sm hidden xl:table-cell">
                             {doleance.nom_direction || '—'}
                           </td>
                           <td className="px-4 py-2.5 whitespace-nowrap text-right">
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 text-slate-500 rounded-lg text-[10px] font-semibold">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-lg text-[10px] font-semibold">
                               <CheckCircleIcon className="h-3 w-3" />
                               {doleance.nom_statut === 'transferee' ? 'Transférée' : 'Traitée'}
                             </span>
@@ -550,15 +550,15 @@ function Transfert() {
             </div>
 
             {/* --- Vue cartes (mobile) --- */}
-            <div className="sm:hidden divide-y divide-slate-50">
+            <div className="sm:hidden divide-y divide-slate-50 dark:divide-slate-700">
               {doleancesNontransferts.map((doleance) => (
                 <div key={doleance.id_doleance} className="p-4">
                   <div className="flex items-start justify-between gap-2 mb-2">
-                    <span className="font-mono font-bold text-[#1E3A8A] text-sm">{doleance.reference}</span>
+                    <span className="font-mono font-bold text-[#1E3A8A] dark:text-blue-400 text-sm">{doleance.reference}</span>
                     <StatusPill statut={doleance.nom_statut} />
                   </div>
-                  <p className="text-sm font-semibold text-slate-800 mb-1">{doleance.titre}</p>
-                  <p className="text-sm text-slate-400 mb-3">
+                  <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-1">{doleance.titre}</p>
+                  <p className="text-sm text-slate-400 dark:text-slate-500 mb-3">
                     {getCategoryName(doleance.id_categorie)}
                     {doleance.citoyen_nom ? ` · ${doleance.citoyen_nom}` : ''}
                   </p>
@@ -574,16 +574,16 @@ function Transfert() {
 
               {doleancestransferts.length > 0 && (
                 <>
-                  <div className="px-4 py-2 bg-slate-50/70 text-center text-[10px] font-semibold text-slate-400 uppercase tracking-wide">
+                  <div className="px-4 py-2 bg-slate-50/70 dark:bg-slate-900/50 text-center text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">
                     Déjà transférées ou traitées
                   </div>
                   {doleancestransferts.map((doleance) => (
-                    <div key={doleance.id_doleance} className="p-4 bg-slate-50/30">
+                    <div key={doleance.id_doleance} className="p-4 bg-slate-50/30 dark:bg-slate-900/30">
                       <div className="flex items-start justify-between gap-2 mb-2">
-                        <span className="font-mono font-semibold text-slate-400 text-sm">{doleance.reference}</span>
+                        <span className="font-mono font-semibold text-slate-400 dark:text-slate-500 text-sm">{doleance.reference}</span>
                         <StatusPill statut={doleance.nom_statut} />
                       </div>
-                      <p className="text-sm font-medium text-slate-500">{doleance.titre}</p>
+                      <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{doleance.titre}</p>
                     </div>
                   ))}
                 </>
@@ -600,44 +600,44 @@ function Transfert() {
           onClick={() => setShowTransferModal(false)}
         >
           <div
-            className="relative bg-white rounded-t-3xl sm:rounded-2xl shadow-2xl max-w-md w-full p-6 animate-[slideUp_0.2s_ease-out]"
+            className="relative bg-white dark:bg-slate-800 rounded-t-3xl sm:rounded-2xl shadow-2xl max-w-md w-full p-6 animate-[slideUp_0.2s_ease-out]"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex justify-between items-start mb-5">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
                   <BuildingOfficeIcon className="w-5 h-5 text-[#1E3A8A]" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-[#0F172A]">Transférer la doléance</h3>
-                  <p className="text-sm text-slate-400">Choisissez la direction destinataire</p>
+                  <h3 className="text-base font-bold text-[#0F172A] dark:text-white">Transférer la doléance</h3>
+                  <p className="text-sm text-slate-400 dark:text-slate-500">Choisissez la direction destinataire</p>
                 </div>
               </div>
               <button
                 onClick={() => setShowTransferModal(false)}
-                className="text-slate-400 hover:text-slate-600 hover:bg-slate-50 rounded-lg p-1.5 transition-colors"
+                className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg p-1.5 transition-colors"
               >
                 <XMarkIcon className="h-5 w-5" />
               </button>
             </div>
 
-            <div className="mb-5 p-3.5 bg-slate-50 rounded-xl text-sm space-y-1">
+            <div className="mb-5 p-3.5 bg-slate-50 dark:bg-slate-900 rounded-xl text-sm space-y-1">
               <p>
-                <span className="font-semibold text-slate-500">Réf.</span>{' '}
+                <span className="font-semibold text-slate-500 dark:text-slate-400">Réf.</span>{' '}
                 <span className="font-mono text-[#1E3A8A] font-semibold">{selectedDoleance.reference}</span>
               </p>
-              <p className="text-slate-700">{selectedDoleance.titre}</p>
+              <p className="text-slate-700 dark:text-slate-200">{selectedDoleance.titre}</p>
             </div>
 
             <form onSubmit={handleTransfert}>
               <div className="mb-4">
-                <label className="block text-sm font-bold text-slate-600 mb-1.5">
+                <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1.5">
                   Direction destinataire <span className="text-rose-500">*</span>
                 </label>
                 <select
                   value={transferData.id_direction}
                   onChange={(e) => setTransferData({ ...transferData, id_direction: e.target.value })}
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-transparent rounded-xl focus:outline-none focus:border-[#1E3A8A]/30 focus:bg-white transition-all text-sm"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900 border-2 border-transparent rounded-xl focus:outline-none focus:border-[#1E3A8A]/30 focus:bg-white dark:focus:bg-slate-800 transition-all text-sm"
                   required
                 >
                   <option value="">Sélectionner une direction</option>
@@ -650,14 +650,14 @@ function Transfert() {
               </div>
 
               <div className="mb-6">
-                <label className="block text-sm font-bold text-slate-600 mb-1.5">
-                  Motif du transfert <span className="text-slate-400 font-normal">(optionnel)</span>
+                <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1.5">
+                  Motif du transfert <span className="text-slate-400 dark:text-slate-500 font-normal">(optionnel)</span>
                 </label>
                 <textarea
                   value={transferData.commentaire}
                   onChange={(e) => setTransferData({ ...transferData, commentaire: e.target.value })}
                   rows="3"
-                  className="w-full px-3.5 py-2.5 bg-slate-50 border-2 border-transparent rounded-xl focus:outline-none focus:border-[#1E3A8A]/30 focus:bg-white transition-all text-sm resize-none"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900 border-2 border-transparent rounded-xl focus:outline-none focus:border-[#1E3A8A]/30 focus:bg-white dark:focus:bg-slate-800 transition-all text-sm resize-none"
                   placeholder="Précisez la raison du transfert..."
                 />
               </div>
@@ -666,7 +666,7 @@ function Transfert() {
                 <button
                   type="button"
                   onClick={() => setShowTransferModal(false)}
-                  className="flex-1 px-4 py-2.5 text-slate-600 bg-slate-50 rounded-xl hover:bg-slate-100 font-semibold text-sm transition-colors"
+                  className="flex-1 px-4 py-2.5 text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-900 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 font-semibold text-sm transition-colors"
                 >
                   Annuler
                 </button>

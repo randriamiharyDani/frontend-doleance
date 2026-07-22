@@ -11,7 +11,7 @@ function ReponseModal({ isOpen, onClose, onSend, reponseText, onTextChange, dole
       size="max-w-lg"
       footer={
         <>
-          <button onClick={onClose} className="px-4 py-2 border rounded-lg hover:bg-gray-100 transition-colors">
+          <button onClick={onClose} className="px-4 py-2 border rounded-lg hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors">
             Annuler
           </button>
           <button
@@ -25,7 +25,7 @@ function ReponseModal({ isOpen, onClose, onSend, reponseText, onTextChange, dole
       }
     >
       {isNouvelle && (
-        <div className="p-3 bg-yellow-50 rounded-lg border border-yellow-200 text-xs text-yellow-700">
+        <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg border border-yellow-200 dark:border-yellow-800 text-xs text-yellow-700 dark:text-yellow-300">
           Cette doléance est en attente. L'administrateur doit la traiter en priorité.
         </div>
       )}
@@ -33,7 +33,7 @@ function ReponseModal({ isOpen, onClose, onSend, reponseText, onTextChange, dole
         value={reponseText}
         onChange={(e) => onTextChange(e.target.value)}
         rows="5"
-        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-slate-700 dark:border-slate-600 dark:text-white"
         placeholder="Saisissez votre réponse..."
       />
     </Modal>

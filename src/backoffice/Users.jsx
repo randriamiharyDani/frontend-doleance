@@ -330,17 +330,17 @@ function Users() {
 
   const getRoleBadge = useCallback((roleNom) => {
     const colors = {
-      administrateur_systeme: 'bg-purple-100 text-purple-800 border-purple-200',
-      administrateur: 'bg-purple-100 text-purple-800 border-purple-200',
-      agent: 'bg-blue-100 text-blue-800 border-blue-200',
-      chef_service: 'bg-cyan-100 text-cyan-800 border-cyan-200',
-      directeur: 'bg-green-100 text-green-800 border-green-200',
-      secretaire_general: 'bg-indigo-100 text-indigo-800 border-indigo-200',
-      maire: 'bg-red-100 text-red-800 border-red-200',
-      responsable_arrondissement: 'bg-teal-100 text-teal-800 border-teal-200',
-      citoyen: 'bg-gray-100 text-gray-800 border-gray-200'
+      administrateur_systeme: 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800',
+      administrateur: 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800',
+      agent: 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800',
+      chef_service: 'bg-cyan-100 text-cyan-800 border-cyan-200 dark:bg-cyan-900/30 dark:text-cyan-300 dark:border-cyan-800',
+      directeur: 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800',
+      secretaire_general: 'bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800',
+      maire: 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800',
+      responsable_arrondissement: 'bg-teal-100 text-teal-800 border-teal-200 dark:bg-teal-900/30 dark:text-teal-300 dark:border-teal-800',
+      citoyen: 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600'
     };
-    return colors[roleNom] || 'bg-gray-100 text-gray-800 border-gray-200';
+    return colors[roleNom] || 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600';
   }, []);
 
   const getRoleLabel = useCallback((roleNom) => {
@@ -369,27 +369,27 @@ function Users() {
 
   const getCategorieColor = useCallback((categorie) => {
     const colors = {
-      'Sécurité': 'bg-red-100 text-red-800 border-red-200',
-      'Administration': 'bg-blue-100 text-blue-800 border-blue-200',
-      'RH': 'bg-pink-100 text-pink-800 border-pink-200',
-      'Juridique': 'bg-purple-100 text-purple-800 border-purple-200',
-      'Relations': 'bg-indigo-100 text-indigo-800 border-indigo-200',
-      'Patrimoine': 'bg-yellow-100 text-yellow-800 border-yellow-200',
-      'Logistique': 'bg-gray-100 text-gray-800 border-gray-200',
-      'Finance': 'bg-emerald-100 text-emerald-800 border-emerald-200',
-      'Marchés': 'bg-teal-100 text-teal-800 border-teal-200',
-      'Urbanisme': 'bg-lime-100 text-lime-800 border-lime-200',
-      'Infrastructures': 'bg-orange-100 text-orange-800 border-orange-200',
-      'BTP': 'bg-stone-100 text-stone-800 border-stone-200',
-      'Transport': 'bg-cyan-100 text-cyan-800 border-cyan-200',
-      'Environnement': 'bg-green-100 text-green-800 border-green-200',
-      'Social': 'bg-rose-100 text-rose-800 border-rose-200',
-      'Culture': 'bg-violet-100 text-violet-800 border-violet-200',
-      'Sports': 'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-200',
-      'Informatique': 'bg-slate-100 text-slate-800 border-slate-200',
-      'Arrondissement': 'bg-gray-100 text-gray-800 border-gray-200'
+      'Sécurité': 'bg-red-100 text-red-800 border-red-200 dark:bg-red-900/30 dark:text-red-300 dark:border-red-800',
+      'Administration': 'bg-blue-100 text-blue-800 border-blue-200 dark:bg-blue-900/30 dark:text-blue-300 dark:border-blue-800',
+      'RH': 'bg-pink-100 text-pink-800 border-pink-200 dark:bg-pink-900/30 dark:text-pink-300 dark:border-pink-800',
+      'Juridique': 'bg-purple-100 text-purple-800 border-purple-200 dark:bg-purple-900/30 dark:text-purple-300 dark:border-purple-800',
+      'Relations': 'bg-indigo-100 text-indigo-800 border-indigo-200 dark:bg-indigo-900/30 dark:text-indigo-300 dark:border-indigo-800',
+      'Patrimoine': 'bg-yellow-100 text-yellow-800 border-yellow-200 dark:bg-yellow-900/30 dark:text-yellow-300 dark:border-yellow-800',
+      'Logistique': 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600',
+      'Finance': 'bg-emerald-100 text-emerald-800 border-emerald-200 dark:bg-emerald-900/30 dark:text-emerald-300 dark:border-emerald-800',
+      'Marchés': 'bg-teal-100 text-teal-800 border-teal-200 dark:bg-teal-900/30 dark:text-teal-300 dark:border-teal-800',
+      'Urbanisme': 'bg-lime-100 text-lime-800 border-lime-200 dark:bg-lime-900/30 dark:text-lime-300 dark:border-lime-800',
+      'Infrastructures': 'bg-orange-100 text-orange-800 border-orange-200 dark:bg-orange-900/30 dark:text-orange-300 dark:border-orange-800',
+      'BTP': 'bg-stone-100 text-stone-800 border-stone-200 dark:bg-stone-900/30 dark:text-stone-300 dark:border-stone-800',
+      'Transport': 'bg-cyan-100 text-cyan-800 border-cyan-200 dark:bg-cyan-900/30 dark:text-cyan-300 dark:border-cyan-800',
+      'Environnement': 'bg-green-100 text-green-800 border-green-200 dark:bg-green-900/30 dark:text-green-300 dark:border-green-800',
+      'Social': 'bg-rose-100 text-rose-800 border-rose-200 dark:bg-rose-900/30 dark:text-rose-300 dark:border-rose-800',
+      'Culture': 'bg-violet-100 text-violet-800 border-violet-200 dark:bg-violet-900/30 dark:text-violet-300 dark:border-violet-800',
+      'Sports': 'bg-fuchsia-100 text-fuchsia-800 border-fuchsia-200 dark:bg-fuchsia-900/30 dark:text-fuchsia-300 dark:border-fuchsia-800',
+      'Informatique': 'bg-slate-100 text-slate-800 border-slate-200 dark:bg-slate-900/30 dark:text-slate-300 dark:border-slate-800',
+      'Arrondissement': 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600'
     };
-    return colors[categorie] || 'bg-gray-100 text-gray-800 border-gray-200';
+    return colors[categorie] || 'bg-gray-100 text-gray-800 border-gray-200 dark:bg-gray-700 dark:text-gray-300 dark:border-gray-600';
   }, []);
 
   // Données dérivées avec useMemo
@@ -425,16 +425,16 @@ function Users() {
   // Rediriger si ce n'est pas le super admin
   if (!isSuperAdmin) {
     return (
-      <div className="max-auto flex items-center justify-center bg-gray-100">
-        <div className="bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-8 text-center">
+      <div className="max-auto flex items-center justify-center bg-gray-100 dark:bg-slate-900">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-md w-full mx-4 p-8 text-center">
           <div className="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
             <ShieldCheckIcon className="h-10 w-10 text-red-600" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-800 mb-2">Accès non autorisé</h2>
-          <p className="text-gray-600 mb-4">
+          <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 mb-2">Accès non autorisé</h2>
+          <p className="text-gray-600 dark:text-gray-300 mb-4">
             Cette page est réservée à l'administrateur système.
           </p>
-          <p className="text-sm text-gray-500 mb-6">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
             Vous n'avez pas les permissions nécessaires pour accéder à cette section.
           </p>
           <button
@@ -461,9 +461,9 @@ function Users() {
       {/* En-tête */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 md:mb-6">
         <div className="w-full sm:w-auto">
-          <h1 className="text-xl md:text-2xl font-bold text-gray-800">Gestion des utilisateurs</h1>
-          <p className="text-gray-600 text-sm">Consulter et gérer les comptes agents</p>
-          <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">
+          <h1 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100">Gestion des utilisateurs</h1>
+          <p className="text-gray-600 dark:text-gray-300 text-sm">Consulter et gérer les comptes agents</p>
+          <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs dark:bg-purple-900/30 dark:text-purple-300">
             <ShieldCheckIcon className="h-3 w-3" />
             Accès réservé à l'administrateur système
           </div>
@@ -491,33 +491,33 @@ function Users() {
 
       {/* Statistiques - Version responsive */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
-        <div className="bg-white rounded-xl shadow-sm hover:shadow-md border border-gray-100 p-3 md:p-4 transition-all duration-200 hover:-translate-y-0.5 relative overflow-hidden">
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-md border border-gray-100 dark:border-slate-700 p-3 md:p-4 transition-all duration-200 hover:-translate-y-0.5 relative overflow-hidden">
           <span className="absolute left-0 top-0 h-full w-1 bg-blue-500" />
-          <p className="text-xs font-medium text-gray-500">Total agents</p>
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Total agents</p>
           <p className="text-xl md:text-2xl font-bold text-blue-600 tabular-nums mt-1">
             {filteredUsers.length}
           </p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm hover:shadow-md border border-gray-100 p-3 md:p-4 transition-all duration-200 hover:-translate-y-0.5 relative overflow-hidden">
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-md border border-gray-100 dark:border-slate-700 p-3 md:p-4 transition-all duration-200 hover:-translate-y-0.5 relative overflow-hidden">
           <span className="absolute left-0 top-0 h-full w-1 bg-purple-500" />
-          <p className="text-xs font-medium text-gray-500">Administrateurs</p>
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Administrateurs</p>
           <p className="text-xl md:text-2xl font-bold text-purple-600 tabular-nums mt-1">
             {filteredUsers.filter(u => u.role_nom === 'administrateur_systeme' || u.role_nom === 'administrateur').length}
           </p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm hover:shadow-md border border-gray-100 p-3 md:p-4 transition-all duration-200 hover:-translate-y-0.5 relative overflow-hidden">
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-md border border-gray-100 dark:border-slate-700 p-3 md:p-4 transition-all duration-200 hover:-translate-y-0.5 relative overflow-hidden">
           <span className="absolute left-0 top-0 h-full w-1 bg-green-500" />
-          <p className="text-xs font-medium text-gray-500">Directeurs</p>
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Directeurs</p>
           <p className="text-xl md:text-2xl font-bold text-green-600 tabular-nums mt-1">
             {filteredUsers.filter(u => u.role_nom === 'directeur').length}
           </p>
         </div>
 
-        <div className="bg-white rounded-xl shadow-sm hover:shadow-md border border-gray-100 p-3 md:p-4 transition-all duration-200 hover:-translate-y-0.5 relative overflow-hidden">
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-md border border-gray-100 dark:border-slate-700 p-3 md:p-4 transition-all duration-200 hover:-translate-y-0.5 relative overflow-hidden">
           <span className="absolute left-0 top-0 h-full w-1 bg-emerald-500" />
-          <p className="text-xs font-medium text-gray-500">Agents actifs</p>
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Agents actifs</p>
           <p className="text-xl md:text-2xl font-bold text-emerald-600 tabular-nums mt-1">
             {filteredUsers.filter(u => u.actif === 1).length}
           </p>
@@ -525,24 +525,24 @@ function Users() {
       </div>
 
       {/* Filtres - Version compacte */}
-      <div className="bg-white rounded-lg shadow p-2 md:p-3 mb-4 md:mb-6">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-2 md:p-3 mb-4 md:mb-6">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3">
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Rechercher</label>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Rechercher</label>
             <input
               type="text"
               placeholder="Nom, prénom ou email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-800 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
             />
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Filtrer par rôle</label>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Filtrer par rôle</label>
             <select
               value={filterRole}
               onChange={(e) => setFilterRole(e.target.value)}
-              className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-800 dark:text-white"
             >
               <option value="all">Tous les rôles</option>
               {availableRolesForForm.map(role => (
@@ -553,11 +553,11 @@ function Users() {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-medium text-gray-700 mb-1">Catégorie</label>
+            <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Catégorie</label>
             <select
               value={selectedDirectionCategorie}
               onChange={(e) => setSelectedDirectionCategorie(e.target.value)}
-              className="w-full px-2 py-1.5 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-800 dark:text-white"
             >
               <option value="all">Toutes les catégories</option>
               {directionCategories.map(cat => (
@@ -569,49 +569,49 @@ function Users() {
       </div>
 
       {/* Tableau avec overflow et taille adaptée */}
-      <div className="bg-white rounded-lg shadow overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 text-sm">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700 text-sm">
+            <thead className="bg-gray-50 dark:bg-slate-900">
               <tr>
-                <th className="px-2 md:px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Agent</th>
-                <th className="px-2 md:px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase hidden sm:table-cell">Email</th>
-                <th className="px-2 md:px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase hidden md:table-cell">Téléphone</th>
-                <th className="px-2 md:px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Fonction</th>
-                <th className="px-2 md:px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase hidden lg:table-cell">Direction</th>
-                <th className="px-2 md:px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase hidden xl:table-cell">Catégorie</th>
-                <th className="px-2 md:px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">En ligne</th>
-                <th className="px-2 md:px-3 py-2 text-right text-xs font-medium text-gray-500 uppercase">Actions</th>
+                <th className="px-2 md:px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Agent</th>
+                <th className="px-2 md:px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden sm:table-cell">Email</th>
+                <th className="px-2 md:px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden md:table-cell">Téléphone</th>
+                <th className="px-2 md:px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Fonction</th>
+                <th className="px-2 md:px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden lg:table-cell">Direction</th>
+                <th className="px-2 md:px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden xl:table-cell">Catégorie</th>
+                <th className="px-2 md:px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">En ligne</th>
+                <th className="px-2 md:px-3 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
               {filteredUsers.map((user) => (
-                <tr key={user.id_utilisateur} className="hover:bg-gray-50">
+                <tr key={user.id_utilisateur} className="hover:bg-gray-50 dark:hover:bg-slate-700">
                   <td className="px-2 md:px-3 py-2 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="flex-shrink-0 h-7 w-7 md:h-8 md:w-8 bg-gray-100 rounded-full flex items-center justify-center border border-gray-200">
+                      <div className="flex-shrink-0 h-7 w-7 md:h-8 md:w-8 bg-gray-100 dark:bg-slate-700 rounded-full flex items-center justify-center border border-gray-200 dark:border-slate-600">
                         {getRoleIcon(user.role_nom)}
                       </div>
                       <div className="ml-2 min-w-0">
-                        <div className="text-xs md:text-sm font-medium text-gray-900 truncate max-w-[80px] sm:max-w-[120px]">
+                        <div className="text-xs md:text-sm font-medium text-gray-900 dark:text-gray-100 truncate max-w-[80px] sm:max-w-[120px]">
                           {user.prenom} {user.nom}
                         </div>
-                        <div className="text-xs text-gray-500 flex items-center gap-1 sm:hidden">
+                        <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 sm:hidden">
                           <EnvelopeIcon className="h-3 w-3 flex-shrink-0" />
                           <span className="truncate max-w-[60px]">{user.email}</span>
                         </div>
                       </div>
                     </div>
                   </td>
-                  <td className="px-2 md:px-3 py-2 text-xs text-gray-500 max-w-[120px] truncate hidden sm:table-cell">
+                  <td className="px-2 md:px-3 py-2 text-xs text-gray-500 dark:text-gray-400 max-w-[120px] truncate hidden sm:table-cell">
                     <div className="flex items-center gap-1">
-                      <EnvelopeIcon className="h-3 w-3 text-gray-400 flex-shrink-0" />
+                      <EnvelopeIcon className="h-3 w-3 text-gray-400 dark:text-gray-500 flex-shrink-0" />
                       <span className="truncate">{user.email}</span>
                     </div>
                   </td>
-                  <td className="px-2 md:px-3 py-2 text-xs text-gray-500 hidden md:table-cell">
+                  <td className="px-2 md:px-3 py-2 text-xs text-gray-500 dark:text-gray-400 hidden md:table-cell">
                     <div className="flex items-center gap-1">
-                      <PhoneIcon className="h-3 w-3 text-gray-400 flex-shrink-0" />
+                      <PhoneIcon className="h-3 w-3 text-gray-400 dark:text-gray-500 flex-shrink-0" />
                       <span>{user.telephone || '-'}</span>
                     </div>
                   </td>
@@ -620,7 +620,7 @@ function Users() {
                       {getRoleLabel(user.role_nom)}
                     </span>
                   </td>
-                  <td className="px-2 md:px-3 py-2 text-xs text-gray-500 max-w-[100px] truncate hidden lg:table-cell">
+                  <td className="px-2 md:px-3 py-2 text-xs text-gray-500 dark:text-gray-400 max-w-[100px] truncate hidden lg:table-cell">
                     {user.nom_direction || '-'}
                   </td>
                   <td className="px-2 md:px-3 py-2 whitespace-nowrap hidden xl:table-cell">
@@ -630,8 +630,8 @@ function Users() {
                   </td>
                   <td className="px-2 md:px-3 py-2 whitespace-nowrap">
                     <div className="flex items-center gap-1.5">
-                      <span className={`h-2.5 w-2.5 rounded-full ${isUserOnline(user.id_utilisateur) ? 'bg-green-500 animate-pulse' : 'bg-gray-400'}`} />
-                      <span className={`text-[10px] md:text-xs ${isUserOnline(user.id_utilisateur) ? 'text-green-600' : 'text-gray-500'}`}>
+                      <span className={`h-2.5 w-2.5 rounded-full ${isUserOnline(user.id_utilisateur) ? 'bg-green-500 animate-pulse' : 'bg-gray-400 dark:bg-gray-500'}`} />
+                      <span className={`text-[10px] md:text-xs ${isUserOnline(user.id_utilisateur) ? 'text-green-600' : 'text-gray-500 dark:text-gray-400'}`}>
                         {isUserOnline(user.id_utilisateur) ? 'En ligne' : 'Hors ligne'}
                       </span>
                     </div>
@@ -640,14 +640,14 @@ function Users() {
                     <div className="flex items-center justify-end gap-0.5 md:gap-1">
                       <button
                         onClick={() => handleToggleActif(user.id_utilisateur, user.actif)}
-                        className={`p-1 rounded-lg transition-colors ${user.actif ? 'text-red-600 hover:bg-red-50' : 'text-green-600 hover:bg-green-50'}`}
+                        className={`p-1 rounded-lg transition-colors ${user.actif ? 'text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30' : 'text-green-600 hover:bg-green-50 dark:hover:bg-green-900/30'}`}
                         title={user.actif ? 'Désactiver' : 'Activer'}
                       >
                         {user.actif ? <XCircleIcon className="h-4 w-4" /> : <CheckCircleIcon className="h-4 w-4" />}
                       </button>
                       <button
                         onClick={() => handleEdit(user)}
-                        className="p-1 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                        className="p-1 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
                         title="Modifier"
                       >
                         <PencilIcon className="h-4 w-4" />
@@ -655,7 +655,7 @@ function Users() {
                       {user.id_utilisateur !== currentUser?.id && (
                         <button
                           onClick={() => confirmDelete(user)}
-                          className="p-1 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                          className="p-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
                           title="Supprimer"
                         >
                           <TrashIcon className="h-4 w-4" />
@@ -671,8 +671,8 @@ function Users() {
         
         {filteredUsers.length === 0 && (
           <div className="text-center py-6 md:py-8">
-            <UserIcon className="h-10 w-10 md:h-12 md:w-12 text-gray-300 mx-auto mb-3" />
-            <p className="text-gray-500">Aucun utilisateur trouvé</p>
+            <UserIcon className="h-10 w-10 md:h-12 md:w-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+            <p className="text-gray-500 dark:text-gray-400">Aucun utilisateur trouvé</p>
           </div>
         )}
       </div>
@@ -680,19 +680,19 @@ function Users() {
       {/* Modales - restent identiques */}
       {showDeleteConfirm && userToDelete && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
-          <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-4">
+          <div className="relative bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-md w-full mx-4 p-4">
             <div className="text-center">
-              <div className="mx-auto flex items-center justify-center h-10 w-10 rounded-full bg-red-100 mb-3">
+              <div className="mx-auto flex items-center justify-center h-10 w-10 rounded-full bg-red-100 dark:bg-red-900/30 mb-3">
                 <ExclamationTriangleIcon className="h-5 w-5 text-red-600" />
               </div>
-              <h3 className="text-md font-medium text-gray-900 mb-2">Confirmation</h3>
-              <p className="text-sm text-gray-500 mb-3">
+              <h3 className="text-md font-medium text-gray-900 dark:text-gray-100 mb-2">Confirmation</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
                 Supprimer <span className="font-semibold">{userToDelete.prenom} {userToDelete.nom}</span> ?
               </p>
               <div className="flex justify-center gap-2">
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="px-3 py-1.5 text-sm border border-gray-300 rounded-lg hover:bg-gray-50"
+                  className="px-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700"
                 >
                   Annuler
                 </button>
@@ -710,21 +710,21 @@ function Users() {
 
       {showModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
-          <div className="relative bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white flex justify-between items-center p-4 border-b">
+          <div className="relative bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white dark:bg-slate-800 flex justify-between items-center p-4 border-b dark:border-slate-700">
               <div className="flex items-center gap-2">
                 <UserPlusIcon className="h-5 w-5 text-blue-600" />
-                <h3 className="text-md font-semibold">
+                <h3 className="text-md font-semibold dark:text-gray-100">
                   {editingUser ? 'Modifier l\'agent' : 'Ajouter un agent'}
                 </h3>
               </div>
-              <button onClick={closeModal} className="text-gray-400 hover:text-gray-600">✕</button>
+              <button onClick={closeModal} className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">✕</button>
             </div>
             
             <form onSubmit={handleSubmit} className="p-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">
                     <span className="flex items-center gap-1">
                       <UserIcon className="h-3 w-3" />
                       Nom *
@@ -734,13 +734,13 @@ function Users() {
                     type="text"
                     value={formData.nom}
                     onChange={(e) => setFormData({...formData, nom: e.target.value})}
-                    className="w-full px-2 py-1.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-800 dark:text-white"
                     required
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">
                     <span className="flex items-center gap-1">
                       <UserIcon className="h-3 w-3" />
                       Prénom *
@@ -750,13 +750,13 @@ function Users() {
                     type="text"
                     value={formData.prenom}
                     onChange={(e) => setFormData({...formData, prenom: e.target.value})}
-                    className="w-full px-2 py-1.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-800 dark:text-white"
                     required
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">
                     <span className="flex items-center gap-1">
                       <EnvelopeIcon className="h-3 w-3" />
                       Email *
@@ -766,13 +766,13 @@ function Users() {
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    className="w-full px-2 py-1.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-800 dark:text-white"
                     required
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">
                     <span className="flex items-center gap-1">
                       <PhoneIcon className="h-3 w-3" />
                       Téléphone
@@ -782,13 +782,13 @@ function Users() {
                     type="tel"
                     value={formData.telephone}
                     onChange={(e) => setFormData({...formData, telephone: e.target.value})}
-                    className="w-full px-2 py-1.5 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-800 dark:text-white"
                   />
                 </div>
                 
                 {!editingUser && (
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">
                       <span className="flex items-center gap-1">
                         <ShieldCheckIcon className="h-3 w-3" />
                         Mot de passe *
@@ -799,13 +799,13 @@ function Users() {
                         type={showPassword ? 'text' : 'password'}
                         value={formData.password}
                         onChange={(e) => setFormData({...formData, password: e.target.value})}
-                        className="w-full px-2 py-1.5 text-sm border rounded-lg pr-8"
+                        className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg pr-8 bg-white dark:bg-slate-700 text-gray-800 dark:text-white"
                         required
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                        className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
                       >
                         {showPassword ? <EyeSlashIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
                       </button>
@@ -814,7 +814,7 @@ function Users() {
                 )}
                 
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">
                     <span className="flex items-center gap-1">
                       <BriefcaseIcon className="h-3 w-3" />
                       Fonction *
@@ -823,7 +823,7 @@ function Users() {
                   <select
                     value={formData.id_role}
                     onChange={(e) => setFormData({...formData, id_role: e.target.value})}
-                    className="w-full px-2 py-1.5 text-sm border rounded-lg"
+                    className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-800 dark:text-white"
                     required
                   >
                     <option value="">Sélectionner</option>
@@ -836,7 +836,7 @@ function Users() {
                 </div>
                 
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 mb-1">
+                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">
                     <span className="flex items-center gap-1">
                       <BuildingOfficeIcon className="h-3 w-3" />
                       Direction
@@ -845,7 +845,7 @@ function Users() {
                   <select
                     value={formData.id_direction}
                     onChange={(e) => setFormData({...formData, id_direction: e.target.value})}
-                    className="w-full px-2 py-1.5 text-sm border rounded-lg"
+                    className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-800 dark:text-white"
                   >
                     <option value="">Aucune</option>
                     {filteredDirections.map(dir => (
@@ -857,8 +857,8 @@ function Users() {
                 </div>
               </div>
               
-              <div className="flex justify-end gap-2 mt-4 pt-3 border-t">
-                <button type="button" onClick={closeModal} className="px-3 py-1.5 text-sm border rounded-lg hover:bg-gray-50">
+              <div className="flex justify-end gap-2 mt-4 pt-3 border-t dark:border-slate-700">
+                <button type="button" onClick={closeModal} className="px-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700">
                   Annuler
                 </button>
                 <button type="submit" className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2">

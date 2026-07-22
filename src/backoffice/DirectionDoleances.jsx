@@ -143,27 +143,27 @@ function DirectionDoleances() {
 
   const getStatusBadge = (statut, couleur) => {
     const statutsMap = {
-      'en_attente': { text: 'En attente', color: 'bg-yellow-100 text-yellow-800' },
-      'en_cours': { text: 'En cours', color: 'bg-blue-100 text-blue-800' },
-      'transferee': { text: 'Transférée', color: 'bg-purple-100 text-purple-800' },
-      'traitee': { text: 'Traitée', color: 'bg-green-100 text-green-800' },
-      'rejetee': { text: 'Rejetée', color: 'bg-red-100 text-red-800' },
-      'cloturee': { text: 'Clôturée', color: 'bg-gray-100 text-gray-800' },
-      'urgente': { text: 'Urgente', color: 'bg-red-100 text-red-800' }
+      'en_attente': { text: 'En attente', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300' },
+      'en_cours': { text: 'En cours', color: 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300' },
+      'transferee': { text: 'Transférée', color: 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300' },
+      'traitee': { text: 'Traitée', color: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' },
+      'rejetee': { text: 'Rejetée', color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' },
+      'cloturee': { text: 'Clôturée', color: 'bg-gray-100 text-gray-800 dark:bg-slate-700 dark:text-gray-100' },
+      'urgente': { text: 'Urgente', color: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300' }
     };
-    const s = statutsMap[statut] || { text: statut || 'Inconnu', color: 'bg-gray-100 text-gray-800' };
+    const s = statutsMap[statut] || { text: statut || 'Inconnu', color: 'bg-gray-100 text-gray-800 dark:bg-slate-700 dark:text-gray-100' };
     return <span className={`px-2 py-1 text-xs rounded-full ${s.color}`}>{s.text}</span>;
   };
 
   const getPriorityBadge = (priorite, niveau) => {
     const colors = {
-      1: 'bg-green-100 text-green-800',
-      2: 'bg-yellow-100 text-yellow-800',
-      3: 'bg-orange-100 text-orange-800',
-      4: 'bg-red-100 text-red-800'
+      1: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+      2: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
+      3: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
+      4: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
     };
     return (
-      <span className={`px-2 py-1 text-xs rounded-full ${colors[niveau] || 'bg-gray-100 text-gray-800'}`}>
+      <span className={`px-2 py-1 text-xs rounded-full ${colors[niveau] || 'bg-gray-100 text-gray-800 dark:bg-slate-700 dark:text-gray-100'}`}>
         {priorite || 'Normal'}
       </span>
     );
@@ -201,8 +201,8 @@ function DirectionDoleances() {
   if (!direction) {
     return (
       <div className="text-center py-12">
-        <BuildingOfficeIcon className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-        <h2 className="text-xl font-semibold text-gray-700">Direction non trouvée</h2>
+        <BuildingOfficeIcon className="h-16 w-16 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+        <h2 className="text-xl font-semibold text-gray-700 dark:text-gray-200">Direction non trouvée</h2>
         <Link to="/backoffice/directions" className="mt-4 inline-block text-blue-600 hover:underline">
           Retour aux directions
         </Link>
@@ -215,33 +215,33 @@ function DirectionDoleances() {
   return (
     <div className="max-auto p-4 md:p-6">
       {/* En-tête */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6 mb-6">
         <div className="flex items-start justify-between flex-wrap gap-4">
           <div className="flex items-center gap-4">
-            <div className="p-3 bg-blue-100 rounded-xl">
+            <div className="p-3 bg-blue-100 dark:bg-blue-900/30 rounded-xl">
               <BuildingOfficeIcon className="h-10 w-10 text-blue-600" />
             </div>
             <div>
-              <h1 className="text-2xl font-bold text-gray-800">{direction.nom_direction}</h1>
+              <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{direction.nom_direction}</h1>
               <div className="flex flex-wrap gap-3 mt-2">
                 {direction.categorie && (
-                  <span className="text-sm bg-gray-100 text-gray-600 px-2 py-1 rounded-full">
+                  <span className="text-sm bg-gray-100 text-gray-600 dark:bg-slate-700 dark:text-gray-300 px-2 py-1 rounded-full">
                     📁 {direction.categorie}
                   </span>
                 )}
                 {direction.email && (
-                  <span className="text-sm text-gray-500 flex items-center gap-1">
+                  <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
                     <EnvelopeIcon className="h-4 w-4" /> {direction.email}
                   </span>
                 )}
                 {direction.telephone && (
-                  <span className="text-sm text-gray-500 flex items-center gap-1">
+                  <span className="text-sm text-gray-500 dark:text-gray-400 flex items-center gap-1">
                     <PhoneIcon className="h-4 w-4" /> {direction.telephone}
                   </span>
                 )}
               </div>
               {direction.description && (
-                <p className="text-gray-600 mt-3">{direction.description}</p>
+                <p className="text-gray-600 dark:text-gray-300 mt-3">{direction.description}</p>
               )}
             </div>
           </div>
@@ -256,37 +256,37 @@ function DirectionDoleances() {
 
       {/* Statistiques */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <div className="bg-white rounded-lg shadow-md p-4">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Total doléances</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Total doléances</p>
               <p className="text-2xl font-bold text-blue-600">{stats?.total_doleances || 0}</p>
             </div>
             <DocumentTextIcon className="h-8 w-8 text-blue-500" />
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-md p-4">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">En cours</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">En cours</p>
               <p className="text-2xl font-bold text-yellow-600">{stats?.doleances_en_cours || 0}</p>
             </div>
             <ClockIcon className="h-8 w-8 text-yellow-500" />
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-md p-4">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Traitées</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Traitées</p>
               <p className="text-2xl font-bold text-green-600">{stats?.doleances_traitees || 0}</p>
             </div>
             <CheckCircleIcon className="h-8 w-8 text-green-500" />
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-md p-4">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-4">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm text-gray-500">Agents / Services</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400">Agents / Services</p>
               <p className="text-2xl font-bold text-indigo-600">{agents?.length || 0} / {services?.length || 0}</p>
             </div>
             <UserGroupIcon className="h-8 w-8 text-indigo-500" />
@@ -295,14 +295,14 @@ function DirectionDoleances() {
       </div>
 
       {/* Onglets */}
-      <div className="border-b border-gray-200 mb-6">
+      <div className="border-b border-gray-200 dark:border-slate-700 mb-6">
         <nav className="flex flex-wrap gap-4">
           <button
             onClick={() => setActiveTab('doleances')}
             className={`pb-3 px-3 text-sm font-medium transition-colors flex items-center gap-2 ${
               activeTab === 'doleances'
                 ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-500 hover:text-gray-700'
+                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
             }`}
           >
             <DocumentTextIcon className="h-4 w-4" />
@@ -313,7 +313,7 @@ function DirectionDoleances() {
             className={`pb-3 px-3 text-sm font-medium transition-colors flex items-center gap-2 ${
               activeTab === 'services'
                 ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-500 hover:text-gray-700'
+                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
             }`}
           >
             <FolderIcon className="h-4 w-4" />
@@ -324,7 +324,7 @@ function DirectionDoleances() {
             className={`pb-3 px-3 text-sm font-medium transition-colors flex items-center gap-2 ${
               activeTab === 'agents'
                 ? 'text-blue-600 border-b-2 border-blue-600'
-                : 'text-gray-500 hover:text-gray-700'
+                : 'text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200'
             }`}
           >
             <UserGroupIcon className="h-4 w-4" />
@@ -337,30 +337,30 @@ function DirectionDoleances() {
       {activeTab === 'doleances' && (
         <div>
           {/* Filtres */}
-          <div className="bg-white rounded-lg shadow mb-4">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow mb-4">
             <button
               onClick={() => setShowFilters(!showFilters)}
               className="flex items-center justify-between w-full px-4 py-3 text-left"
             >
               <div className="flex items-center gap-2">
-                <FunnelIcon className="h-5 w-5 text-gray-500" />
-                <span className="font-medium text-gray-700">Filtres</span>
+                <FunnelIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />
+                <span className="font-medium text-gray-700 dark:text-gray-200">Filtres</span>
                 {(filters.statut || filters.categorie || filters.search) && (
-                  <span className="bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">Actifs</span>
+                  <span className="bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300 text-xs px-2 py-1 rounded-full">Actifs</span>
                 )}
               </div>
               {showFilters ? <ChevronUpIcon className="h-5 w-5" /> : <ChevronDownIcon className="h-5 w-5" />}
             </button>
             
             {showFilters && (
-              <div className="border-t p-4">
+              <div className="border-t dark:border-slate-700 p-4">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Statut</label>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Statut</label>
                     <select
                       value={filters.statut}
                       onChange={(e) => setFilters({...filters, statut: e.target.value})}
-                      className="w-full px-3 py-2 border rounded-lg text-sm"
+                      className="w-full px-3 py-2 border dark:border-slate-600 rounded-lg text-sm"
                     >
                       <option value="">Tous</option>
                       {statuts.map(s => (
@@ -369,11 +369,11 @@ function DirectionDoleances() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Catégorie</label>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Catégorie</label>
                     <select
                       value={filters.categorie}
                       onChange={(e) => setFilters({...filters, categorie: e.target.value})}
-                      className="w-full px-3 py-2 border rounded-lg text-sm"
+                      className="w-full px-3 py-2 border dark:border-slate-600 rounded-lg text-sm"
                     >
                       <option value="">Toutes</option>
                       {categories.map(c => (
@@ -382,20 +382,20 @@ function DirectionDoleances() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 mb-1">Recherche</label>
+                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-300 mb-1">Recherche</label>
                     <input
                       type="text"
                       placeholder="Référence, titre..."
                       value={filters.search}
                       onChange={(e) => setFilters({...filters, search: e.target.value})}
-                      className="w-full px-3 py-2 border rounded-lg text-sm"
+                      className="w-full px-3 py-2 border dark:border-slate-600 rounded-lg text-sm"
                     />
                   </div>
                 </div>
                 <div className="mt-3 flex justify-end">
                   <button
                     onClick={() => setFilters({ statut: '', categorie: '', search: '' })}
-                    className="text-sm text-gray-500 hover:text-gray-700"
+                    className="text-sm text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
                   >
                     Réinitialiser
                   </button>
@@ -407,38 +407,38 @@ function DirectionDoleances() {
           {/* Liste des doléances */}
           <div className="space-y-4">
             {filteredDoleancesList.length === 0 ? (
-              <div className="bg-white rounded-lg shadow-md p-12 text-center">
-                <DocumentTextIcon className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-                <p className="text-gray-500">Aucune doléance trouvée</p>
+              <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-12 text-center">
+                <DocumentTextIcon className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-3" />
+                <p className="text-gray-500 dark:text-gray-400">Aucune doléance trouvée</p>
               </div>
             ) : (
               filteredDoleancesList.map((doleance) => (
-                <div key={doleance.id_doleance} className="bg-white rounded-lg shadow-md overflow-hidden border-l-4 border-yellow-400">
+                <div key={doleance.id_doleance} className="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden border-l-4 border-yellow-400">
                   <div className="p-5">
                     <div className="flex flex-wrap justify-between items-start gap-3">
                       <div className="flex-1">
                         {/* En-tête */}
                         <div className="flex flex-wrap items-center gap-2 mb-2">
-                          <code className="text-xs font-mono text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                          <code className="text-xs font-mono text-gray-500 bg-gray-100 dark:text-gray-400 dark:bg-slate-700 px-2 py-1 rounded">
                             {doleance.reference}
                           </code>
                           {getPriorityBadge(doleance.nom_priorite, doleance.niveau)}
                           {getStatusBadge(doleance.nom_statut, doleance.statut_couleur)}
-                          <span className="text-xs text-gray-400">
+                          <span className="text-xs text-gray-400 dark:text-gray-500">
                             {new Date(doleance.date_creation).toLocaleDateString()}
                           </span>
                         </div>
                         
                         {/* Titre */}
-                        <h3 className="text-lg font-semibold text-blue-800 mb-2">{doleance.titre}</h3>
+                        <h3 className="text-lg font-semibold text-blue-800 dark:text-blue-300 mb-2">{doleance.titre}</h3>
                         
                         {/* Description */}
-                        <p className="text-gray-600 text-sm mb-3 line-clamp-3">
+                        <p className="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-3">
                           {doleance.description}
                         </p>
                         
                         {/* Infos citoyen */}
-                        <div className="flex flex-wrap gap-4 text-xs text-gray-500">
+                        <div className="flex flex-wrap gap-4 text-xs text-gray-500 dark:text-gray-400">
                           <span>👤 {doleance.citoyen_nom || 'Non renseigné'}</span>
                           {doleance.citoyen_telephone && <span>📞 {doleance.citoyen_telephone}</span>}
                           {doleance.citoyen_email && <span>✉️ {doleance.citoyen_email}</span>}
@@ -457,7 +457,7 @@ function DirectionDoleances() {
                           <select
                             onChange={(e) => handleChangerStatut(doleance.id_doleance, e.target.value)}
                             value={doleance.id_statut}
-                            className="px-3 py-1.5 border rounded-lg text-sm"
+                            className="px-3 py-1.5 border dark:border-slate-600 rounded-lg text-sm"
                           >
                             {statuts.map(s => (
                               <option key={s.id_statut} value={s.id_statut}>
@@ -488,28 +488,28 @@ function DirectionDoleances() {
       {activeTab === 'services' && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {services?.length === 0 ? (
-            <div className="col-span-full bg-white rounded-lg shadow-md p-12 text-center">
-              <FolderIcon className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-              <p className="text-gray-500">Aucun service pour cette direction</p>
+            <div className="col-span-full bg-white dark:bg-slate-800 rounded-lg shadow-md p-12 text-center">
+              <FolderIcon className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-3" />
+              <p className="text-gray-500 dark:text-gray-400">Aucun service pour cette direction</p>
             </div>
           ) : (
             services.map((service) => (
-              <div key={service.id_service} className="bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow">
+              <div key={service.id_service} className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow">
                 <div className="flex items-center gap-3 mb-3">
-                  <div className="p-2 bg-blue-100 rounded-lg">
+                  <div className="p-2 bg-blue-100 dark:bg-blue-900/30 rounded-lg">
                     <FolderIcon className="h-6 w-6 text-blue-600" />
                   </div>
                   <div>
-                    <h3 className="font-semibold text-gray-800">{service.nom_service}</h3>
+                    <h3 className="font-semibold text-gray-800 dark:text-gray-100">{service.nom_service}</h3>
                     {service.responsable && (
-                      <p className="text-xs text-gray-500">Responsable: {service.responsable}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">Responsable: {service.responsable}</p>
                     )}
                   </div>
                 </div>
                 {service.description && (
-                  <p className="text-sm text-gray-600 mb-3">{service.description}</p>
+                  <p className="text-sm text-gray-600 dark:text-gray-300 mb-3">{service.description}</p>
                 )}
-                <div className="flex flex-wrap gap-2 text-xs text-gray-500">
+                <div className="flex flex-wrap gap-2 text-xs text-gray-500 dark:text-gray-400">
                   {service.email && <span>📧 {service.email}</span>}
                   {service.telephone && <span>📞 {service.telephone}</span>}
                 </div>
@@ -521,48 +521,48 @@ function DirectionDoleances() {
 
       {/* Onglet Agents */}
       {activeTab === 'agents' && (
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden">
           {agents?.length === 0 ? (
             <div className="text-center py-12">
-              <UserGroupIcon className="h-12 w-12 text-gray-400 mx-auto mb-3" />
-              <p className="text-gray-500">Aucun agent affecté à cette direction</p>
+              <UserGroupIcon className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-3" />
+              <p className="text-gray-500 dark:text-gray-400">Aucun agent affecté à cette direction</p>
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+                <thead className="bg-gray-50 dark:bg-slate-900">
                   <tr>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Agent</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Téléphone</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rôle</th>
-                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Agent</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Email</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Téléphone</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Rôle</th>
+                    <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Statut</th>
                   </tr>
                 </thead>
-                <tbody className="bg-white divide-y divide-gray-200">
+                <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
                   {agents.map((agent) => (
-                    <tr key={agent.id_utilisateur} className="hover:bg-gray-50">
+                    <tr key={agent.id_utilisateur} className="hover:bg-gray-50 dark:hover:bg-slate-700">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center">
-                          <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
+                          <div className="h-8 w-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
                             <span className="text-blue-600 font-medium">
                               {agent.prenom?.charAt(0)}{agent.nom?.charAt(0)}
                             </span>
                           </div>
                           <div className="ml-3">
-                            <p className="text-sm font-medium text-gray-900">{agent.prenom} {agent.nom}</p>
+                            <p className="text-sm font-medium text-gray-900 dark:text-gray-100">{agent.prenom} {agent.nom}</p>
                           </div>
                         </div>
                        </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{agent.email}</td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{agent.telephone || '-'}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{agent.email}</td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{agent.telephone || '-'}</td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">
+                        <span className="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800 dark:bg-slate-700 dark:text-gray-100">
                           {agent.nom_role?.replace(/_/g, ' ')}
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap">
-                        <span className={`px-2 py-1 text-xs rounded-full ${agent.actif ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}`}>
+                        <span className={`px-2 py-1 text-xs rounded-full ${agent.actif ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300' : 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'}`}>
                           {agent.actif ? 'Actif' : 'Inactif'}
                         </span>
                       </td>
@@ -578,42 +578,42 @@ function DirectionDoleances() {
       {/* Modal de réponse */}
       {showReponseModal && selectedDoleance && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
-          <div className="relative bg-white rounded-lg shadow-xl max-w-lg w-full">
-            <div className="flex justify-between items-center p-4 border-b">
-              <h3 className="text-lg font-semibold text-gray-900">
+          <div className="relative bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-lg w-full">
+            <div className="flex justify-between items-center p-4 border-b dark:border-slate-700">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                 Répondre à la doléance
               </h3>
               <button
                 onClick={() => setShowReponseModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
               >
                 <XMarkIcon className="h-6 w-6" />
               </button>
             </div>
             
             <div className="p-4">
-              <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-                <p className="text-sm text-gray-600">
+              <div className="mb-4 p-3 bg-gray-50 dark:bg-slate-900 rounded-lg">
+                <p className="text-sm text-gray-600 dark:text-gray-300">
                   <span className="font-medium">Référence:</span> {selectedDoleance.reference}
                 </p>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                   <span className="font-medium">Citoyen:</span> {selectedDoleance.citoyen_nom || 'Non renseigné'}
                 </p>
-                <p className="text-sm text-gray-600 mt-1">
+                <p className="text-sm text-gray-600 dark:text-gray-300 mt-1">
                   <span className="font-medium">Titre:</span> {selectedDoleance.titre}
                 </p>
               </div>
               
               <form onSubmit={handleRepondre}>
                 <div className="mb-4">
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                     Votre réponse *
                   </label>
                   <textarea
                     value={reponseText}
                     onChange={(e) => setReponseText(e.target.value)}
                     rows="6"
-                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
                     placeholder="Saisissez votre réponse ici..."
                     required
                   />
@@ -623,7 +623,7 @@ function DirectionDoleances() {
                   <button
                     type="button"
                     onClick={() => setShowReponseModal(false)}
-                    className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-50"
+                    className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700"
                   >
                     Annuler
                   </button>

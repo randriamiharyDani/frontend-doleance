@@ -6,15 +6,15 @@ import {
 const CustomTooltip = ({ active, payload, label }) => {
   if (active && payload && payload.length) {
     return (
-      <div className="bg-white p-4 rounded-xl shadow-lg border border-gray-200">
-        <p className="font-semibold text-gray-800 mb-2">{label}</p>
+      <div className="bg-white dark:bg-slate-800 p-4 rounded-xl shadow-lg border border-gray-200 dark:border-slate-700">
+        <p className="font-semibold text-gray-800 dark:text-gray-100 mb-2">{label}</p>
         {payload.map((item, index) => (
           <div key={index} className="flex items-center justify-between gap-4 text-sm">
             <span className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: item.color }}></span>
               {item.name}
             </span>
-            <span className="font-bold text-gray-800">{item.value}</span>
+            <span className="font-bold text-gray-800 dark:text-gray-100">{item.value}</span>
           </div>
         ))}
       </div>
@@ -27,8 +27,8 @@ function CategoryBarChart({ data }) {
   if (!data || data.length === 0) return null;
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6">
-      <h2 className="text-lg font-semibold text-gray-700 mb-4">Doléances par catégorie</h2>
+    <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 p-4 md:p-6">
+      <h2 className="text-lg font-semibold text-gray-700 dark:text-gray-200 mb-4">Doléances par catégorie</h2>
       <div style={{ width: '100%', height: 350 }}>
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data} layout="vertical" margin={{ top: 5, right: 30, left: 80, bottom: 5 }}>

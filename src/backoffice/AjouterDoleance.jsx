@@ -193,9 +193,9 @@ function AjouterDoleance() {
     }
   }, [formData, files, navigate]);
 
-  const inputClass = "w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors";
+  const inputClass = "w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors";
   const textareaClass = `${inputClass} resize-none`;
-  const labelClass = "block text-xs font-semibold text-gray-700 mb-1";
+  const labelClass = "block text-xs font-semibold text-gray-700 dark:text-gray-200 mb-1";
   const requiredStar = <span className="text-red-500">*</span>;
 
   if (loadingData) {
@@ -212,13 +212,13 @@ function AjouterDoleance() {
       <div className="flex items-center gap-3 mb-6">
         <button
           onClick={() => navigate('/backoffice/doleances')}
-          className="p-2 rounded-lg hover:bg-gray-100 transition-colors"
+          className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700 transition-colors"
         >
-          <ArrowLeftIcon className="h-5 w-5 text-gray-600" />
+          <ArrowLeftIcon className="h-5 w-5 text-gray-600 dark:text-gray-300" />
         </button>
         <div>
-          <h1 className="text-xl md:text-2xl font-bold text-gray-800">Ajouter une doléance</h1>
-          <p className="text-gray-500 text-sm">Créer une doléance au nom d'un citoyen</p>
+          <h1 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100">Ajouter une doléance</h1>
+          <p className="text-gray-500 dark:text-gray-400 text-sm">Créer une doléance au nom d'un citoyen</p>
         </div>
       </div>
 
@@ -235,8 +235,8 @@ function AjouterDoleance() {
 
       <form onSubmit={handleSubmit}>
         {/* Informations sur la doléance */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 mb-4">
-          <h2 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 p-4 md:p-6 mb-4">
+          <h2 className="text-sm font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
             <DocumentTextIcon className="h-4 w-4 text-blue-600" />
             Informations sur la doléance
           </h2>
@@ -286,8 +286,8 @@ function AjouterDoleance() {
         </div>
 
         {/* Informations du citoyen */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 mb-4">
-          <h2 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 p-4 md:p-6 mb-4">
+          <h2 className="text-sm font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
             <UserIcon className="h-4 w-4 text-blue-600" />
             Informations du citoyen
           </h2>
@@ -353,8 +353,8 @@ function AjouterDoleance() {
         </div>
 
         {/* Localisation */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 mb-4">
-          <h2 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 p-4 md:p-6 mb-4">
+          <h2 className="text-sm font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
             <MapPinIcon className="h-4 w-4 text-blue-600" />
             Localisation de l'incident
           </h2>
@@ -401,11 +401,11 @@ function AjouterDoleance() {
         </div>
 
         {/* Images / Pièces jointes */}
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-4 md:p-6 mb-6">
-          <h2 className="text-sm font-bold text-gray-800 mb-4 flex items-center gap-2">
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 p-4 md:p-6 mb-6">
+          <h2 className="text-sm font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
             <PhotoIcon className="h-4 w-4 text-blue-600" />
             Images (optionnel)
-            <span className="text-xs font-normal text-gray-400 ml-1">— Max 5 images, 50 Mo chacune</span>
+            <span className="text-xs font-normal text-gray-400 dark:text-gray-500 ml-1">— Max 5 images, 50 Mo chacune</span>
           </h2>
 
           {/* Zone de drop */}
@@ -416,15 +416,15 @@ function AjouterDoleance() {
             onClick={() => fileInputRef.current?.click()}
             className={`border-2 border-dashed rounded-xl p-6 text-center cursor-pointer transition-all duration-200 ${
               dragOver
-                ? 'border-blue-500 bg-blue-50'
-                : 'border-gray-300 hover:border-blue-400 hover:bg-blue-50/50'
+                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                : 'border-gray-300 dark:border-slate-600 hover:border-blue-400 hover:bg-blue-50/50 dark:hover:bg-slate-700/50'
             }`}
           >
-            <CloudArrowUpIcon className={`h-10 w-10 mx-auto mb-2 ${dragOver ? 'text-blue-500' : 'text-gray-400'}`} />
-            <p className="text-sm text-gray-600 font-medium">
+            <CloudArrowUpIcon className={`h-10 w-10 mx-auto mb-2 ${dragOver ? 'text-blue-500' : 'text-gray-400 dark:text-gray-500'}`} />
+            <p className="text-sm text-gray-600 dark:text-gray-300 font-medium">
               Glissez vos images ici ou <span className="text-blue-600 underline">parcourir</span>
             </p>
-            <p className="text-xs text-gray-400 mt-1">PNG, JPG, GIF — Max 50 Mo</p>
+            <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">PNG, JPG, GIF — Max 50 Mo</p>
             <input
               ref={fileInputRef}
               type="file"
@@ -439,7 +439,7 @@ function AjouterDoleance() {
           {files.length > 0 && (
             <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
               {files.map((file, index) => (
-                <div key={index} className="relative group rounded-lg overflow-hidden border border-gray-200 shadow-sm">
+                <div key={index} className="relative group rounded-lg overflow-hidden border border-gray-200 dark:border-slate-600 shadow-sm">
                   <img
                     src={URL.createObjectURL(file)}
                     alt={file.name}
@@ -453,8 +453,8 @@ function AjouterDoleance() {
                   >
                     <XMarkIcon className="h-3 w-3" />
                   </button>
-                  <div className="p-1.5 bg-white">
-                    <p className="text-[10px] text-gray-500 truncate">{file.name}</p>
+                  <div className="p-1.5 bg-white dark:bg-slate-800">
+                    <p className="text-[10px] text-gray-500 dark:text-gray-400 truncate">{file.name}</p>
                   </div>
                 </div>
               ))}
@@ -467,7 +467,7 @@ function AjouterDoleance() {
           <button
             type="button"
             onClick={() => navigate('/backoffice/doleances')}
-            className="px-5 py-2.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition-colors"
+            className="px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-slate-800 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
           >
             Annuler
           </button>

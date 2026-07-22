@@ -176,17 +176,17 @@ function Statistiques() {
     return (
       <div className="flex justify-center items-center h-96">
         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-        <p className="mt-4 text-gray-600 ml-3">Chargement des statistiques...</p>
+        <p className="mt-4 text-gray-600 dark:text-gray-300 ml-3">Chargement des statistiques...</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6 bg-gray-50 min-h-screen">
+    <div className="space-y-6 bg-gray-50 dark:bg-slate-900 min-h-screen">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight">Statistiques</h1>
-          <p className="text-gray-500 mt-1">Analyse des doléances et performances</p>
+          <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] dark:text-white tracking-tight">Statistiques</h1>
+          <p className="text-gray-500 dark:text-gray-400 mt-1">Analyse des doléances et performances</p>
           <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs border border-blue-100">
             <ChartBarIcon className="h-3 w-3" />
             {isAdmin ? 'Vue administrateur' : isDirector ? 'Vue direction' : 'Vue générale'}
@@ -194,7 +194,7 @@ function Statistiques() {
         </div>
         <div className="flex gap-2 flex-wrap">
           <select value={period} onChange={(e) => setPeriod(e.target.value)}
-            className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 text-sm bg-white">
+            className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 text-sm bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-white">
             <option value="week">7 derniers jours</option>
             <option value="month">30 derniers jours</option>
             <option value="year">12 derniers mois</option>
@@ -225,10 +225,10 @@ function Statistiques() {
       </div>
 
       {chartReady && evolutionData.length === 0 && statsByCategory.length === 0 && statsByStatus.length === 0 && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-100 p-12 text-center">
-          <ChartBarIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-800 mb-2">Aucune donnée disponible</h3>
-          <p className="text-gray-500">Les statistiques seront disponibles lorsque des doléances seront déposées.</p>
+        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 p-12 text-center">
+          <ChartBarIcon className="h-16 w-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+          <h3 className="text-lg font-medium text-gray-800 dark:text-gray-100 mb-2">Aucune donnée disponible</h3>
+          <p className="text-gray-500 dark:text-gray-400">Les statistiques seront disponibles lorsque des doléances seront déposées.</p>
         </div>
       )}
     </div>

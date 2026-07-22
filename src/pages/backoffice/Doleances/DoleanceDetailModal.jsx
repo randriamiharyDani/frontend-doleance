@@ -25,7 +25,7 @@ function DoleanceDetailModal({ isOpen, onClose, doleance, piecesJointes, loading
     const ext = file.nom_fichier?.split('.').pop()?.toLowerCase();
     if (['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(ext)) return <PhotoIcon className="h-5 w-5 text-blue-500" />;
     if (['mp4', 'mov', 'avi', 'mkv', 'webm', 'ogg'].includes(ext)) return <VideoCameraIcon className="h-5 w-5 text-purple-500" />;
-    return <DocumentDuplicateIcon className="h-5 w-5 text-gray-500" />;
+    return <DocumentDuplicateIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />;
   };
 
   const formatFileSize = (bytes) => {
@@ -54,7 +54,7 @@ function DoleanceDetailModal({ isOpen, onClose, doleance, piecesJointes, loading
       subtitle={doleance.reference}
       size="max-w-4xl"
       footer={
-        <button onClick={onClose} className="px-4 py-2 border rounded-lg hover:bg-gray-100 transition-colors">
+        <button onClick={onClose} className="px-4 py-2 border rounded-lg hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors">
           Fermer
         </button>
       }
@@ -63,17 +63,17 @@ function DoleanceDetailModal({ isOpen, onClose, doleance, piecesJointes, loading
         <PriorityBadge priorite={doleance.nom_priorite} niveau={doleance.niveau} />
         <StatusBadge statut={doleance.nom_statut} couleur={doleance.statut_couleur} />
         {doleance.nom_direction && (
-          <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded">{doleance.nom_direction}</span>
+          <span className="text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-2 py-1 rounded">{doleance.nom_direction}</span>
         )}
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold text-gray-800">{doleance.titre}</h3>
+        <h3 className="text-lg font-semibold text-gray-800 dark:text-gray-100">{doleance.titre}</h3>
       </div>
 
-      <div className="bg-gray-50 rounded-lg p-4">
-        <h4 className="font-medium text-gray-700 mb-2">Description détaillée</h4>
-        <p className="text-gray-600 whitespace-pre-wrap">{doleance.description}</p>
+      <div className="bg-gray-50 dark:bg-slate-900 rounded-lg p-4">
+        <h4 className="font-medium text-gray-700 dark:text-gray-200 mb-2">Description détaillée</h4>
+        <p className="text-gray-600 dark:text-gray-300 whitespace-pre-wrap">{doleance.description}</p>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -104,7 +104,7 @@ function DoleanceDetailModal({ isOpen, onClose, doleance, piecesJointes, loading
             {buildFullAddress(doleance) && (
               <div className="mt-2 pt-2 border-t border-green-200">
                 <p className="font-medium text-green-700">Adresse complète :</p>
-                <p className="text-gray-700">{buildFullAddress(doleance)}</p>
+                <p className="text-gray-700 dark:text-gray-200">{buildFullAddress(doleance)}</p>
               </div>
             )}
           </div>
@@ -117,16 +117,16 @@ function DoleanceDetailModal({ isOpen, onClose, doleance, piecesJointes, loading
             <ChatBubbleLeftRightIcon className="h-4 w-4" />
             Suggestions / Actions souhaitées
           </h4>
-          <p className="text-gray-700">{doleance.suggestions}</p>
+          <p className="text-gray-700 dark:text-gray-200">{doleance.suggestions}</p>
         </div>
       )}
 
-      <div className="bg-gray-50 rounded-lg p-4">
-        <h4 className="font-medium text-gray-700 mb-3 flex items-center gap-2">
+      <div className="bg-gray-50 dark:bg-slate-900 rounded-lg p-4">
+        <h4 className="font-medium text-gray-700 dark:text-gray-200 mb-3 flex items-center gap-2">
           <PaperClipIcon className="h-4 w-4" />
           Pièces jointes
           {piecesJointes.length > 0 && (
-            <span className="ml-2 text-xs bg-gray-200 px-2 py-0.5 rounded-full">{piecesJointes.length}</span>
+            <span className="ml-2 text-xs bg-gray-200 dark:bg-slate-600 px-2 py-0.5 rounded-full">{piecesJointes.length}</span>
           )}
         </h4>
 
@@ -134,8 +134,8 @@ function DoleanceDetailModal({ isOpen, onClose, doleance, piecesJointes, loading
           <LoadingSpinner text="" size="sm" />
         ) : piecesJointes.length === 0 ? (
           <div className="text-center py-6">
-            <DocumentDuplicateIcon className="h-10 w-10 text-gray-300 mx-auto mb-2" />
-            <p className="text-gray-500 text-sm">Aucune pièce jointe disponible</p>
+            <DocumentDuplicateIcon className="h-10 w-10 text-gray-300 dark:text-gray-600 mx-auto mb-2" />
+            <p className="text-gray-500 dark:text-gray-400 text-sm">Aucune pièce jointe disponible</p>
           </div>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
@@ -144,7 +144,7 @@ function DoleanceDetailModal({ isOpen, onClose, doleance, piecesJointes, loading
               const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(ext);
               const downloadUrl = file.url || `/api/doleances/${doleance.id_doleance}/pieces-jointes/${file.id_piece || index}`;
               return (
-                <div key={index} className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                <div key={index} className="bg-white dark:bg-slate-700 rounded-lg border border-gray-200 dark:border-slate-600 overflow-hidden hover:shadow-md transition-shadow">
                   {isImage && file.url ? (
                     <div className="aspect-square cursor-pointer relative group" onClick={() => setLightboxImage(file.url)}>
                       <img src={file.url} alt={file.nom_fichier} className="w-full h-full object-cover" loading="lazy" />
@@ -153,13 +153,13 @@ function DoleanceDetailModal({ isOpen, onClose, doleance, piecesJointes, loading
                       </div>
                     </div>
                   ) : (
-                    <div className="aspect-square flex items-center justify-center bg-gray-50">
+                    <div className="aspect-square flex items-center justify-center bg-gray-50 dark:bg-slate-800">
                       {getFileIcon(file)}
                     </div>
                   )}
                   <div className="p-2">
-                    <p className="text-xs text-gray-600 truncate font-medium" title={file.nom_fichier}>{file.nom_fichier}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">{formatFileSize(file.taille)}</p>
+                    <p className="text-xs text-gray-600 dark:text-gray-300 truncate font-medium" title={file.nom_fichier}>{file.nom_fichier}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-0.5">{formatFileSize(file.taille)}</p>
                     <div className="mt-1.5 flex justify-center">
                       <a href={downloadUrl} target="_blank" rel="noopener noreferrer"
                         className="text-xs text-blue-600 hover:text-blue-800 inline-flex items-center gap-1 bg-blue-50 px-2 py-1 rounded hover:bg-blue-100 transition-colors">
@@ -196,9 +196,9 @@ function DoleanceDetailModal({ isOpen, onClose, doleance, piecesJointes, loading
           </h4>
           <div className="space-y-3 max-h-60 overflow-y-auto">
             {doleance.reponses.map((rep, idx) => (
-              <div key={idx} className="bg-white rounded-lg p-3 border-l-4 border-purple-400">
-                <p className="text-sm text-gray-700 whitespace-pre-wrap">{rep.message}</p>
-                <p className="text-xs text-gray-400 mt-1">
+              <div key={idx} className="bg-white dark:bg-slate-700 rounded-lg p-3 border-l-4 border-purple-400">
+                <p className="text-sm text-gray-700 dark:text-gray-200 whitespace-pre-wrap">{rep.message}</p>
+                <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                   {formatDateTime(rep.date_reponse)} par {rep.agent_nom || 'Service municipal'}
                 </p>
               </div>

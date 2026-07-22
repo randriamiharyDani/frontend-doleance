@@ -10,23 +10,23 @@ function DoleanceFilters({
   categories, statuts, priorites
 }) {
   return (
-    <div className="bg-white rounded-lg shadow-md p-4 mb-6">
+    <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-4 mb-6">
       <form onSubmit={onSubmit} className="flex flex-col md:flex-row gap-4">
         <div className="flex-1 relative">
-          <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" />
           <input
             type="text"
             placeholder="Rechercher par référence, titre, citoyen..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none"
+            className="w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none dark:bg-slate-700 dark:border-slate-600 dark:text-white"
           />
         </div>
         <div className="flex gap-2">
           <button
             type="button"
             onClick={onToggleFilters}
-            className="px-4 py-2 text-gray-600 border rounded-lg hover:bg-gray-50 flex items-center gap-2 transition-colors"
+            className="px-4 py-2 text-gray-600 dark:text-gray-300 border rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-2 transition-colors"
           >
             <FunnelIcon className="h-5 w-5" />
             Filtres
@@ -34,7 +34,7 @@ function DoleanceFilters({
           <button
             type="button"
             onClick={onReset}
-            className="px-4 py-2 text-gray-600 border rounded-lg hover:bg-gray-50 transition-colors"
+            className="px-4 py-2 text-gray-600 dark:text-gray-300 border rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
           >
             Réinitialiser
           </button>
@@ -50,11 +50,11 @@ function DoleanceFilters({
       {showFilters && (
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4 pt-4 border-t">
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Catégorie</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Catégorie</label>
             <select
               value={selectedCategorie}
               onChange={(e) => onCategorieChange(e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-slate-700 dark:border-slate-600 dark:text-white"
             >
               <option value="">Toutes les catégories</option>
               {categories.map(cat => (
@@ -63,11 +63,11 @@ function DoleanceFilters({
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Statut</label>
             <select
               value={selectedStatut}
               onChange={(e) => onStatutChange(e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-slate-700 dark:border-slate-600 dark:text-white"
             >
               <option value="">Tous les statuts</option>
               {statuts.map(statut => (
@@ -76,11 +76,11 @@ function DoleanceFilters({
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-1">Priorité</label>
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Priorité</label>
             <select
               value={selectedPriorite}
               onChange={(e) => onPrioriteChange(e.target.value)}
-              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+              className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-slate-700 dark:border-slate-600 dark:text-white"
             >
               <option value="">Toutes les priorités</option>
               {priorites.map(prio => (

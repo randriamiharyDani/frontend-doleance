@@ -237,7 +237,7 @@ function DoleanceDetail() {
     if (['pdf', 'doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx'].includes(extension)) {
       return <DocumentTextIcon className="h-6 w-6 text-red-500" />;
     }
-    return <DocumentDuplicateIcon className="h-6 w-6 text-gray-500" />;
+    return <DocumentDuplicateIcon className="h-6 w-6 text-gray-500 dark:text-gray-400" />;
   };
 
   const getFileTypeLabel = (file) => {
@@ -281,13 +281,13 @@ function DoleanceDetail() {
 
   const getPriorityBadge = (priorite, niveau) => {
     const colors = {
-      1: 'bg-green-100 text-green-800',
-      2: 'bg-yellow-100 text-yellow-800',
-      3: 'bg-orange-100 text-orange-800',
-      4: 'bg-red-100 text-red-800'
+      1: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300',
+      2: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-300',
+      3: 'bg-orange-100 text-orange-800 dark:bg-orange-900/30 dark:text-orange-300',
+      4: 'bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-300'
     };
     return (
-      <span className={`px-2 py-1 text-xs font-medium rounded-full ${colors[niveau] || 'bg-gray-100 text-gray-800'}`}>
+      <span className={`px-2 py-1 text-xs font-medium rounded-full ${colors[niveau] || 'bg-gray-100 text-gray-800 dark:bg-slate-700 dark:text-gray-100'}`}>
         {priorite}
       </span>
     );
@@ -320,7 +320,7 @@ function DoleanceDetail() {
   if (!doleance) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500">Doléance non trouvée</p>
+        <p className="text-gray-500 dark:text-gray-400">Doléance non trouvée</p>
         <button onClick={() => navigate('/backoffice/doleances')} className="mt-4 btn-primary">
           Retour à la liste
         </button>
@@ -333,7 +333,7 @@ function DoleanceDetail() {
       {/* Bouton retour */}
       <button
         onClick={() => navigate('/backoffice/doleances')}
-        className="mb-4 flex items-center text-gray-600 hover:text-gray-800 print:hidden"
+        className="mb-4 flex items-center text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100 print:hidden"
       >
         <ArrowLeftIcon className="h-5 w-5 mr-2" />
         Retour à la liste
@@ -343,16 +343,16 @@ function DoleanceDetail() {
         {/* Colonne principale - Informations de la doléance */}
         <div className="lg:col-span-2 space-y-6">
           {/* En-tête de la doléance */}
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
             <div className="flex flex-wrap justify-between items-start gap-4 mb-4">
               <div>
                 <div className="flex items-center gap-2 mb-2 flex-wrap">
-                  <span className="text-sm font-mono text-gray-500 bg-gray-100 px-2 py-1 rounded">
+                  <span className="text-sm font-mono text-gray-500 bg-gray-100 dark:text-gray-400 dark:bg-slate-700 px-2 py-1 rounded">
                     {doleance.reference}
                   </span>
                   {getPriorityBadge(doleance.nom_priorite, doleance.niveau)}
                 </div>
-                <h1 className="text-2xl font-bold text-gray-800">{doleance.titre}</h1>
+                <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{doleance.titre}</h1>
               </div>
               <div className="flex items-center gap-2">
                 <button
@@ -373,26 +373,26 @@ function DoleanceDetail() {
               </div>
             </div>
             
-            <div className="border-t pt-4">
-              <h3 className="font-semibold text-gray-700 mb-2">Description</h3>
-              <p className="text-gray-600 whitespace-pre-wrap">{doleance.description}</p>
+            <div className="border-t dark:border-slate-700 pt-4">
+              <h3 className="font-semibold text-gray-700 dark:text-gray-200 mb-2">Description</h3>
+              <p className="text-gray-600 dark:text-gray-300 whitespace-pre-wrap">{doleance.description}</p>
             </div>
 
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 pt-4 border-t">
-              <div className="flex items-center text-gray-500 text-sm">
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 pt-4 border-t dark:border-slate-700">
+              <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
                 <TagIcon className="h-4 w-4 mr-2" />
                 {doleance.nom_categorie || 'Non catégorisé'}
               </div>
-              <div className="flex items-center text-gray-500 text-sm">
+              <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
                 <BuildingOfficeIcon className="h-4 w-4 mr-2" />
                 {doleance.nom_direction || 'Non assignée'}
               </div>
-              <div className="flex items-center text-gray-500 text-sm">
+              <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
                 <CalendarIcon className="h-4 w-4 mr-2" />
                 {formatDateTime(doleance.date_creation)}
               </div>
               {doleance.nom_quartier && (
-                <div className="flex items-center text-gray-500 text-sm">
+                <div className="flex items-center text-gray-500 dark:text-gray-400 text-sm">
                   <FlagIcon className="h-4 w-4 mr-2" />
                   {doleance.nom_quartier}
                 </div>
@@ -400,7 +400,7 @@ function DoleanceDetail() {
             </div>
 
             {doleance.assignee_nom && (
-              <div className="mt-3 pt-3 border-t flex items-center text-gray-500 text-sm">
+              <div className="mt-3 pt-3 border-t dark:border-slate-700 flex items-center text-gray-500 dark:text-gray-400 text-sm">
                 <UserCircleIcon className="h-4 w-4 mr-2" />
                 Assigné à : {doleance.assignee_nom}
               </div>
@@ -408,14 +408,14 @@ function DoleanceDetail() {
           </div>
 
           {/* Section Pièces jointes */}
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <PaperClipIcon className="h-5 w-5" />
                 Pièces jointes
               </h3>
               <div className="flex items-center gap-3">
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-gray-500 dark:text-gray-400">
                   {piecesJointes.length} fichier(s)
                 </span>
                 <input
@@ -451,8 +451,8 @@ function DoleanceDetail() {
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
               </div>
             ) : piecesJointes.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                <DocumentDuplicateIcon className="h-12 w-12 mx-auto mb-2 text-gray-300" />
+              <div className="text-center py-8 text-gray-500 dark:text-gray-400">
+                <DocumentDuplicateIcon className="h-12 w-12 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
                 <p>Aucune pièce jointe pour cette doléance</p>
               </div>
             ) : (
@@ -463,7 +463,7 @@ function DoleanceDetail() {
                   return (
                     <div 
                       key={index} 
-                      className="bg-gray-50 rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+                      className="bg-gray-50 dark:bg-slate-900 rounded-lg border border-gray-200 dark:border-slate-700 overflow-hidden hover:shadow-md transition-shadow"
                     >
                       {isImage && file.url ? (
                         <div className="aspect-square cursor-pointer relative group" onClick={() => {
@@ -476,7 +476,7 @@ function DoleanceDetail() {
                           </div>
                         </div>
                       ) : (
-                        <div className="aspect-square flex items-center justify-center bg-gray-50 cursor-pointer" onClick={() => {
+                        <div className="aspect-square flex items-center justify-center bg-gray-50 dark:bg-slate-900 cursor-pointer" onClick={() => {
                           setSelectedPiece(file);
                           setShowPiecesModal(true);
                         }}>
@@ -484,10 +484,10 @@ function DoleanceDetail() {
                         </div>
                       )}
                       <div className="p-2 text-center">
-                        <p className="text-xs text-gray-600 truncate" title={file.nom_fichier}>
+                        <p className="text-xs text-gray-600 dark:text-gray-300 truncate" title={file.nom_fichier}>
                           {file.nom_fichier}
                         </p>
-                        <p className="text-xs text-gray-400">
+                        <p className="text-xs text-gray-400 dark:text-gray-500">
                           {formatFileSize(file.taille)}
                         </p>
                         {file.url && (
@@ -511,7 +511,7 @@ function DoleanceDetail() {
           </div>
 
           {/* Section des réponses */}
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <ChatBubbleLeftRightIcon className="h-5 w-5" />
@@ -532,29 +532,29 @@ function DoleanceDetail() {
                   <div key={index} className="border-l-4 border-blue-500 pl-4">
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex items-center">
-                        <UserCircleIcon className="h-5 w-5 text-gray-400 mr-2" />
+                        <UserCircleIcon className="h-5 w-5 text-gray-400 dark:text-gray-500 mr-2" />
                         <span className="font-medium">{rep.auteur || 'Agent'}</span>
                       </div>
-                      <span className="text-xs text-gray-400">
+                      <span className="text-xs text-gray-400 dark:text-gray-500">
                         {formatDateTime(rep.date_reponse)}
                       </span>
                     </div>
-                    <p className="text-gray-700">{rep.message}</p>
+                    <p className="text-gray-700 dark:text-gray-200">{rep.message}</p>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-gray-500 text-center py-4">Aucune réponse pour le moment</p>
+              <p className="text-gray-500 dark:text-gray-400 text-center py-4">Aucune réponse pour le moment</p>
             )}
 
             {showReponseForm && (
-              <form onSubmit={handleAddReponse} className="mt-4 pt-4 border-t">
+              <form onSubmit={handleAddReponse} className="mt-4 pt-4 border-t dark:border-slate-700">
                 <textarea
                   value={reponse}
                   onChange={(e) => setReponse(e.target.value)}
                   placeholder="Écrire une réponse..."
                   rows="4"
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:border-blue-500"
                 />
                 <div className="flex justify-end mt-2">
                   <button
@@ -572,7 +572,7 @@ function DoleanceDetail() {
 
           {/* Historique des statuts */}
           {doleance.historique_statuts && doleance.historique_statuts.length > 0 && (
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
               <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
                 <ClockIcon className="h-5 w-5" />
                 Historique du traitement
@@ -590,14 +590,14 @@ function DoleanceDetail() {
                     <div className="flex-1">
                       <p className="text-sm">
                         <span className="font-medium">{hist.ancien_statut_nom || 'Création'}</span>
-                        <span className="text-gray-400 mx-2">→</span>
+                        <span className="text-gray-400 dark:text-gray-500 mx-2">→</span>
                         <span className="font-medium">{hist.nouveau_statut_nom}</span>
-                        {hist.auteur && <span className="text-gray-500 ml-2">par {hist.auteur}</span>}
+                        {hist.auteur && <span className="text-gray-500 dark:text-gray-400 ml-2">par {hist.auteur}</span>}
                       </p>
                       {hist.commentaire && (
-                        <p className="text-xs text-gray-500 mt-1">{hist.commentaire}</p>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">{hist.commentaire}</p>
                       )}
-                      <p className="text-xs text-gray-400 mt-1">
+                      <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">
                         {formatDateTime(hist.date_changement)}
                       </p>
                     </div>
@@ -611,33 +611,33 @@ function DoleanceDetail() {
         {/* Sidebar droite - Informations citoyen et actions */}
         <div className="space-y-6">
           {/* Informations citoyen */}
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
             <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
               <UserCircleIcon className="h-5 w-5" />
               Informations citoyen
             </h3>
             <div className="space-y-3">
               <div>
-                <p className="text-sm text-gray-500">Nom complet</p>
+                <p className="text-sm text-gray-500 dark:text-gray-400">Nom complet</p>
                 <p className="font-medium">
                   {doleance.citoyen_prenom} {doleance.citoyen_nom}
                 </p>
               </div>
               {doleance.citoyen_email && (
                 <div>
-                  <p className="text-sm text-gray-500">Email</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Email</p>
                   <p className="text-sm">{doleance.citoyen_email}</p>
                 </div>
               )}
               {doleance.citoyen_telephone && (
                 <div>
-                  <p className="text-sm text-gray-500">Téléphone</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Téléphone</p>
                   <p className="text-sm">{doleance.citoyen_telephone}</p>
                 </div>
               )}
               {doleance.citoyen_adresse && (
                 <div>
-                  <p className="text-sm text-gray-500">Adresse</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Adresse</p>
                   <p className="text-sm">{doleance.citoyen_adresse}</p>
                 </div>
               )}
@@ -645,12 +645,12 @@ function DoleanceDetail() {
           </div>
 
           {/* Actions */}
-          <div className="bg-white rounded-lg shadow-md p-6">
+          <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
             <h3 className="text-lg font-semibold mb-4">Actions</h3>
             <div className="space-y-3">
               <select
                 onChange={(e) => handleUpdateStatut(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:border-blue-500"
                 defaultValue=""
               >
                 <option value="" disabled>Changer le statut</option>
@@ -673,17 +673,17 @@ function DoleanceDetail() {
 
           {/* Informations de localisation */}
           {(doleance.latitude || doleance.longitude) && (
-            <div className="bg-white rounded-lg shadow-md p-6">
+            <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
               <h3 className="text-lg font-semibold mb-4">Localisation</h3>
               {doleance.latitude && doleance.longitude ? (
                 <div>
-                  <p className="text-sm text-gray-500">Coordonnées GPS</p>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">Coordonnées GPS</p>
                   <p className="text-sm font-mono">
                     Lat: {doleance.latitude}, Lng: {doleance.longitude}
                   </p>
                 </div>
               ) : (
-                <p className="text-gray-500 text-sm">Aucune localisation fournie</p>
+                <p className="text-gray-500 dark:text-gray-400 text-sm">Aucune localisation fournie</p>
               )}
             </div>
           )}
@@ -693,20 +693,20 @@ function DoleanceDetail() {
       {/* Modal d'aperçu des pièces jointes */}
       {showPiecesModal && selectedPiece && (
         <div className="fixed inset-0 bg-black bg-opacity-75 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b p-4 flex justify-between items-center">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-3xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white dark:bg-slate-800 border-b dark:border-slate-700 p-4 flex justify-between items-center">
               <div className="flex items-center gap-3">
                 {getFileIcon(selectedPiece)}
                 <div>
-                  <h3 className="font-semibold text-gray-800">{selectedPiece.nom_fichier}</h3>
-                  <p className="text-sm text-gray-500">
+                  <h3 className="font-semibold text-gray-800 dark:text-gray-100">{selectedPiece.nom_fichier}</h3>
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
                     {getFileTypeLabel(selectedPiece)} • {formatFileSize(selectedPiece.taille)}
                   </p>
                 </div>
               </div>
               <button
                 onClick={() => setShowPiecesModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
               >
                 <XMarkIcon className="h-6 w-6" />
               </button>
@@ -715,7 +715,7 @@ function DoleanceDetail() {
             <div className="p-6">
               {/* Aperçu du fichier */}
               {selectedPiece.url && (
-                <div className="bg-gray-50 rounded-lg p-4 text-center">
+                <div className="bg-gray-50 dark:bg-slate-900 rounded-lg p-4 text-center">
                   {selectedPiece.nom_fichier?.match(/\.(jpg|jpeg|png|gif|webp|bmp|svg)$/i) ? (
                     <img 
                       src={selectedPiece.url} 
@@ -730,8 +730,8 @@ function DoleanceDetail() {
                     />
                   ) : (
                     <div className="py-12">
-                      <DocumentDuplicateIcon className="h-24 w-24 text-gray-300 mx-auto mb-4" />
-                      <p className="text-gray-500">Aperçu non disponible pour ce type de fichier</p>
+                      <DocumentDuplicateIcon className="h-24 w-24 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+                      <p className="text-gray-500 dark:text-gray-400">Aperçu non disponible pour ce type de fichier</p>
                     </div>
                   )}
                 </div>
@@ -740,19 +740,19 @@ function DoleanceDetail() {
               {/* Informations du fichier */}
               <div className="mt-4 grid grid-cols-2 gap-4 text-sm">
                 <div>
-                  <p className="text-gray-500">Nom du fichier</p>
+                  <p className="text-gray-500 dark:text-gray-400">Nom du fichier</p>
                   <p className="font-medium">{selectedPiece.nom_fichier}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500">Type</p>
+                  <p className="text-gray-500 dark:text-gray-400">Type</p>
                   <p className="font-medium">{getFileTypeLabel(selectedPiece)}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500">Taille</p>
+                  <p className="text-gray-500 dark:text-gray-400">Taille</p>
                   <p className="font-medium">{formatFileSize(selectedPiece.taille)}</p>
                 </div>
                 <div>
-                  <p className="text-gray-500">Téléchargement</p>
+                  <p className="text-gray-500 dark:text-gray-400">Téléchargement</p>
                   <a
                     href={selectedPiece.url}
                     target="_blank"
@@ -766,7 +766,7 @@ function DoleanceDetail() {
               </div>
             </div>
 
-            <div className="sticky bottom-0 bg-gray-50 border-t p-4 flex justify-end">
+            <div className="sticky bottom-0 bg-gray-50 dark:bg-slate-900 border-t dark:border-slate-700 p-4 flex justify-end">
               <button
                 onClick={() => setShowPiecesModal(false)}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
@@ -781,99 +781,99 @@ function DoleanceDetail() {
       {/* Modal de modification */}
       {showEditModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white border-b px-6 py-4 flex justify-between items-center rounded-t-2xl">
-              <h2 className="text-lg font-bold text-gray-800">Modifier la doléance</h2>
-              <button onClick={() => setShowEditModal(false)} className="text-gray-400 hover:text-gray-600">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+            <div className="sticky top-0 bg-white dark:bg-slate-800 border-b dark:border-slate-700 px-6 py-4 flex justify-between items-center rounded-t-2xl">
+              <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">Modifier la doléance</h2>
+              <button onClick={() => setShowEditModal(false)} className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
                 <XMarkIcon className="h-6 w-6" />
               </button>
             </div>
             <form onSubmit={handleSaveEdit} className="p-6 space-y-6">
               {/* Section Doléance */}
               <div>
-                <h3 className="font-semibold text-gray-700 mb-3">Doléance</h3>
+                <h3 className="font-semibold text-gray-700 dark:text-gray-200 mb-3">Doléance</h3>
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Titre *</label>
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Titre *</label>
                     <input type="text" value={editForm.titre} onChange={(e) => setEditForm({...editForm, titre: e.target.value})} required
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-500" />
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:border-amber-500" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Description *</label>
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Description *</label>
                     <textarea value={editForm.description} onChange={(e) => setEditForm({...editForm, description: e.target.value})} required rows={4}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-500" />
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:border-amber-500" />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">Catégorie</label>
+                      <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Catégorie</label>
                       <select value={editForm.id_categorie} onChange={(e) => setEditForm({...editForm, id_categorie: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-500">
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:border-amber-500">
                         <option value="">-- Sélectionner --</option>
                         {categories.map(c => <option key={c.id_categorie} value={c.id_categorie}>{c.nom_categorie}</option>)}
                       </select>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">Quartier</label>
+                      <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Quartier</label>
                       <select value={editForm.id_quartier} onChange={(e) => setEditForm({...editForm, id_quartier: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-500">
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:border-amber-500">
                         <option value="">-- Sélectionner --</option>
                         {quartiers.map(q => <option key={q.id_quartier} value={q.id_quartier}>{q.nom_quartier}</option>)}
                       </select>
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Lieu exact</label>
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Lieu exact</label>
                     <input type="text" value={editForm.lieu_exact} onChange={(e) => setEditForm({...editForm, lieu_exact: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-500" />
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:border-amber-500" />
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Suggestions</label>
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Suggestions</label>
                     <textarea value={editForm.suggestions} onChange={(e) => setEditForm({...editForm, suggestions: e.target.value})} rows={2}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-500" />
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:border-amber-500" />
                   </div>
                 </div>
               </div>
 
               {/* Section Citoyen */}
               <div>
-                <h3 className="font-semibold text-gray-700 mb-3">Citoyen</h3>
+                <h3 className="font-semibold text-gray-700 dark:text-gray-200 mb-3">Citoyen</h3>
                 <div className="space-y-3">
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">Nom</label>
+                      <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Nom</label>
                       <input type="text" value={editForm.citoyen_nom} onChange={(e) => setEditForm({...editForm, citoyen_nom: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-500" />
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:border-amber-500" />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">Prénom</label>
+                      <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Prénom</label>
                       <input type="text" value={editForm.citoyen_prenom} onChange={(e) => setEditForm({...editForm, citoyen_prenom: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-500" />
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:border-amber-500" />
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-gray-600 mb-1">Email</label>
+                    <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Email</label>
                     <input type="email" value={editForm.citoyen_email} onChange={(e) => setEditForm({...editForm, citoyen_email: e.target.value})}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-500" />
+                      className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:border-amber-500" />
                   </div>
                   <div className="grid grid-cols-2 gap-3">
                     <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">Téléphone</label>
+                      <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Téléphone</label>
                       <input type="text" value={editForm.citoyen_telephone} onChange={(e) => setEditForm({...editForm, citoyen_telephone: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-500" />
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:border-amber-500" />
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-gray-600 mb-1">Adresse</label>
+                      <label className="block text-sm font-medium text-gray-600 dark:text-gray-300 mb-1">Adresse</label>
                       <input type="text" value={editForm.citoyen_adresse} onChange={(e) => setEditForm({...editForm, citoyen_adresse: e.target.value})}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-amber-500" />
+                        className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:border-amber-500" />
                     </div>
                   </div>
                 </div>
               </div>
 
               {/* Boutons */}
-              <div className="flex justify-end gap-3 pt-2 border-t">
+              <div className="flex justify-end gap-3 pt-2 border-t dark:border-slate-700">
                 <button type="button" onClick={() => setShowEditModal(false)}
-                  className="px-4 py-2 text-gray-600 hover:text-gray-800">Annuler</button>
+                  className="px-4 py-2 text-gray-600 hover:text-gray-800 dark:text-gray-300 dark:hover:text-gray-100">Annuler</button>
                 <button type="submit" disabled={savingEdit}
                   className="px-6 py-2 bg-amber-500 text-white rounded-lg hover:bg-amber-600 disabled:opacity-50 flex items-center gap-2">
                   {savingEdit ? <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div> : <PencilIcon className="h-4 w-4" />}

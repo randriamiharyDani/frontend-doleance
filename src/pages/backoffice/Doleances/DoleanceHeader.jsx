@@ -16,16 +16,16 @@ function DoleanceHeader({ userRole, isAdminOrAgentCentral }) {
   return (
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
       <div>
-         <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] tracking-tight">
+         <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] dark:text-white tracking-tight">
            Gestion des doléances
           </h1>
-        <p className="text-gray-600 mt-1">Consultez et gérez les doléances des citoyens</p>
+        <p className="text-gray-600 dark:text-gray-300 mt-1">Consultez et gérez les doléances des citoyens</p>
         <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs">
           <ShieldCheckIcon className="h-3 w-3" />
           {roleLabel}
         </div>
         {!isAdminOrAgentCentral && (
-          <div className="mt-2 text-xs text-gray-500">
+          <div className="mt-2 text-xs text-gray-500 dark:text-gray-400">
             Vous ne pouvez voir que les détails des doléances NON RÉSOLUES de votre direction
           </div>
         )}

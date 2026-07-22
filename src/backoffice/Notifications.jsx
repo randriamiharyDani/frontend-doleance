@@ -95,22 +95,22 @@ function Notifications() {
       case 'modification_profil':
         return <UserIcon className="h-5 w-5 text-purple-500" />;
       default:
-        return <BellIcon className="h-5 w-5 text-gray-500" />;
+        return <BellIcon className="h-5 w-5 text-gray-500 dark:text-gray-400" />;
     }
   };
 
   const getNotificationColor = (type) => {
     switch(type) {
       case 'nouvelle_doleance':
-        return 'bg-blue-50 border-blue-200';
+        return 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800';
       case 'modification_utilisateur':
-        return 'bg-green-50 border-green-200';
+        return 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800';
       case 'reset_password':
-        return 'bg-orange-50 border-orange-200';
+        return 'bg-orange-50 border-orange-200 dark:bg-orange-900/20 dark:border-orange-800';
       case 'modification_profil':
-        return 'bg-purple-50 border-purple-200';
+        return 'bg-purple-50 border-purple-200 dark:bg-purple-900/20 dark:border-purple-800';
       default:
-        return 'bg-gray-50 border-gray-200';
+        return 'bg-gray-50 border-gray-200 dark:bg-slate-900 dark:border-slate-700';
     }
   };
 
@@ -129,8 +129,8 @@ function Notifications() {
       {/* En-tête */}
       <div className="flex justify-between items-center mb-6">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800">Notifications</h1>
-          <p className="text-gray-600 text-sm mt-1">
+          <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Notifications</h1>
+          <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">
             Suivez les activités importantes
           </p>
         </div>
@@ -149,28 +149,28 @@ function Notifications() {
 
       {/* Statistiques */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-6">
-        <div className="bg-white rounded-lg shadow-md p-3 sm:p-4">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-3 sm:p-4">
           <div className="flex items-center justify-between gap-2">
             <div>
-              <p className="text-[10px] sm:text-sm text-gray-500">Total</p>
+              <p className="text-[10px] sm:text-sm text-gray-500 dark:text-gray-400">Total</p>
               <p className="text-lg sm:text-2xl font-bold text-blue-600">{notifications.length}</p>
             </div>
             <BellIcon className="h-6 w-6 sm:h-8 sm:w-8 text-blue-500 flex-shrink-0" />
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-md p-3 sm:p-4">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-3 sm:p-4">
           <div className="flex items-center justify-between gap-2">
             <div>
-              <p className="text-[10px] sm:text-sm text-gray-500">Non lues</p>
+              <p className="text-[10px] sm:text-sm text-gray-500 dark:text-gray-400">Non lues</p>
               <p className="text-lg sm:text-2xl font-bold text-yellow-600">{unreadCount}</p>
             </div>
             <ExclamationTriangleIcon className="h-6 w-6 sm:h-8 sm:w-8 text-yellow-500 flex-shrink-0" />
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-md p-3 sm:p-4">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-3 sm:p-4">
           <div className="flex items-center justify-between gap-2">
             <div>
-              <p className="text-[10px] sm:text-sm text-gray-500">Nouvelles doléances</p>
+              <p className="text-[10px] sm:text-sm text-gray-500 dark:text-gray-400">Nouvelles doléances</p>
               <p className="text-lg sm:text-2xl font-bold text-green-600">
                 {notifications.filter(n => n.type === 'nouvelle_doleance').length}
               </p>
@@ -178,10 +178,10 @@ function Notifications() {
             <DocumentTextIcon className="h-6 w-6 sm:h-8 sm:w-8 text-green-500 flex-shrink-0" />
           </div>
         </div>
-        <div className="bg-white rounded-lg shadow-md p-3 sm:p-4">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-3 sm:p-4">
           <div className="flex items-center justify-between gap-2">
             <div>
-              <p className="text-[10px] sm:text-sm text-gray-500">Modifications</p>
+              <p className="text-[10px] sm:text-sm text-gray-500 dark:text-gray-400">Modifications</p>
               <p className="text-lg sm:text-2xl font-bold text-purple-600">
                 {notifications.filter(n => n.type === 'modification_utilisateur' || n.type === 'reset_password').length}
               </p>
@@ -192,41 +192,41 @@ function Notifications() {
       </div>
 
       {/* Liste des notifications */}
-      <div className="bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 bg-gray-50">
-          <h2 className="text-base sm:text-lg font-semibold text-gray-800">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden">
+        <div className="px-4 sm:px-6 py-3 sm:py-4 border-b border-gray-200 dark:border-slate-700 bg-gray-50 dark:bg-slate-900">
+          <h2 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-100">
             Historique des notifications
           </h2>
         </div>
         
         {notifications.length === 0 ? (
           <div className="text-center py-12">
-            <BellIcon className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 mb-2">Aucune notification</h3>
-            <p className="text-gray-500">Vous n'avez aucune notification pour le moment</p>
+            <BellIcon className="h-16 w-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
+            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">Aucune notification</h3>
+            <p className="text-gray-500 dark:text-gray-400">Vous n'avez aucune notification pour le moment</p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-200">
+          <div className="divide-y divide-gray-200 dark:divide-slate-700">
             {notifications.map((notif) => (
               <div 
                 key={notif.id_notification} 
-                className={`p-4 hover:bg-gray-50 transition-colors ${!notif.lu ? 'bg-blue-50' : ''} ${getNotificationColor(notif.type)}`}
+                className={`p-4 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors ${!notif.lu ? 'bg-blue-50 dark:bg-blue-900/20' : ''} ${getNotificationColor(notif.type)}`}
               >
                 <div className="flex justify-between items-start">
                   <div className="flex-1 cursor-pointer" onClick={() => viewDetails(notif)}>
                     <div className="flex items-center gap-2 mb-1">
                       {getNotificationIcon(notif.type)}
-                      <h3 className={`font-semibold ${!notif.lu ? 'text-blue-800' : 'text-gray-800'}`}>
+                      <h3 className={`font-semibold ${!notif.lu ? 'text-blue-800 dark:text-blue-300' : 'text-gray-800 dark:text-gray-100'}`}>
                         {notif.titre}
                       </h3>
                       {!notif.lu && (
-                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                        <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300">
                           Nouveau
                         </span>
                       )}
                     </div>
-                    <p className="text-gray-600 text-sm">{notif.message}</p>
-                    <p className="text-xs text-gray-400 mt-2">
+                    <p className="text-gray-600 dark:text-gray-300 text-sm">{notif.message}</p>
+                    <p className="text-xs text-gray-400 dark:text-gray-500 mt-2">
                       {new Date(notif.date_notification).toLocaleString('fr-FR', {
                         day: '2-digit',
                         month: '2-digit',
@@ -236,7 +236,7 @@ function Notifications() {
                       })}
                     </p>
                     {notif.details && (
-                      <div className="mt-2 text-xs text-gray-500 bg-gray-50 p-2 rounded">
+                      <div className="mt-2 text-xs text-gray-500 dark:text-gray-400 bg-gray-50 dark:bg-slate-900 p-2 rounded">
                         {notif.details}
                       </div>
                     )}
@@ -245,7 +245,7 @@ function Notifications() {
                     {!notif.lu && (
                       <button
                         onClick={() => markAsRead(notif.id_notification)}
-                        className="p-1 text-blue-600 hover:bg-blue-50 rounded"
+                        className="p-1 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded"
                         title="Marquer comme lu"
                       >
                         <CheckCircleIcon className="h-5 w-5" />
@@ -253,7 +253,7 @@ function Notifications() {
                     )}
                     <button
                       onClick={() => deleteNotification(notif.id_notification)}
-                      className="p-1 text-red-600 hover:bg-red-50 rounded"
+                      className="p-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded"
                       title="Supprimer"
                     >
                       <XMarkIcon className="h-5 w-5" />
@@ -269,17 +269,17 @@ function Notifications() {
       {/* Modal de détails */}
       {showModal && selectedNotification && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
-          <div className="relative bg-white rounded-lg shadow-xl max-w-lg w-full">
-            <div className="flex justify-between items-center p-4 border-b">
+          <div className="relative bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-lg w-full">
+            <div className="flex justify-between items-center p-4 border-b dark:border-slate-700">
               <div className="flex items-center gap-2">
                 {getNotificationIcon(selectedNotification.type)}
-                <h3 className="text-lg font-semibold text-gray-900">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
                   {selectedNotification.titre}
                 </h3>
               </div>
               <button
                 onClick={() => setShowModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
               >
                 <XMarkIcon className="h-6 w-6" />
               </button>
@@ -287,27 +287,27 @@ function Notifications() {
             
             <div className="p-6">
               <div className="mb-4">
-                <p className="text-gray-700 whitespace-pre-wrap">
+                <p className="text-gray-700 dark:text-gray-200 whitespace-pre-wrap">
                   {selectedNotification.message}
                 </p>
               </div>
               
               {selectedNotification.details && (
-                <div className="mb-4 p-3 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-500">
+                <div className="mb-4 p-3 bg-gray-50 dark:bg-slate-900 rounded-lg">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
                     <span className="font-medium">Détails :</span><br />
                     {selectedNotification.details}
                   </p>
                 </div>
               )}
               
-              <div className="flex justify-between items-center text-xs text-gray-400">
+              <div className="flex justify-between items-center text-xs text-gray-400 dark:text-gray-500">
                 <span>Reçu le : {new Date(selectedNotification.date_notification).toLocaleString('fr-FR')}</span>
                 <span>Statut : {selectedNotification.lu ? 'Lu' : 'Non lu'}</span>
               </div>
             </div>
             
-            <div className="flex justify-end p-4 border-t">
+            <div className="flex justify-end p-4 border-t dark:border-slate-700">
               <button
                 onClick={() => setShowModal(false)}
                 className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"

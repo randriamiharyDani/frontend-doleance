@@ -111,12 +111,12 @@ function Dashboard() {
   }
 
   return (
-    <div className="px-3 sm:px-4 md:px-6 bg-gray-50">
+    <div className="px-3 sm:px-4 md:px-6 bg-gray-50 dark:bg-slate-900">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-3">
         <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800">Tableau de bord</h1>
-          <p className="text-sm sm:text-base text-gray-500 mt-1">
-            Bienvenue, <span className="font-medium text-gray-700">{user?.prenom || ''} {user?.nom || ''}</span>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100">Tableau de bord</h1>
+          <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mt-1">
+            Bienvenue, <span className="font-medium text-gray-700 dark:text-gray-200">{user?.prenom || ''} {user?.nom || ''}</span>
           </p>
         </div>
         <button onClick={() => fetchAll(false)} disabled={refreshing}
@@ -132,9 +132,9 @@ function Dashboard() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
         <InfoCard title="Catégories disponibles" value={categoriesCount} subtitle="Types de doléances"
-          icon={TagIcon} iconBg="bg-blue-50" iconColor="text-blue-500" borderClass="border-blue-100" error={errors.categories} />
+          icon={TagIcon} iconBg="bg-blue-50 dark:bg-blue-900/20" iconColor="text-blue-500 dark:text-blue-400" borderClass="border-blue-100 dark:border-blue-900/30" error={errors.categories} />
         <InfoCard title="Niveaux de priorité" value={prioritesCount} subtitle="De basse à urgente"
-          icon={ExclamationTriangleIcon} iconBg="bg-orange-50" iconColor="text-orange-500" borderClass="border-orange-100" />
+          icon={ExclamationTriangleIcon} iconBg="bg-orange-50 dark:bg-orange-900/20" iconColor="text-orange-500 dark:text-orange-400" borderClass="border-orange-100 dark:border-orange-900/30" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">

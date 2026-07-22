@@ -9,17 +9,17 @@ function Pagination({ page, pages, onPageChange }) {
       <button
         onClick={() => onPageChange(page - 1)}
         disabled={page === 1}
-        className="px-2 sm:px-4 py-1.5 sm:py-2 border rounded-lg disabled:opacity-50 hover:bg-gray-50 transition-colors text-sm"
+        className="px-2 sm:px-4 py-1.5 sm:py-2 border border-gray-300 dark:border-slate-600 rounded-lg disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors text-sm text-gray-700 dark:text-gray-300"
       >
         <ChevronLeftIcon className="h-3 w-3 sm:h-4 sm:w-4" />
       </button>
-      <span className="px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-600">
+      <span className="px-2 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm text-gray-600 dark:text-gray-400">
         {page} / {pages}
       </span>
       <button
         onClick={() => onPageChange(page + 1)}
         disabled={page === pages}
-        className="px-2 sm:px-4 py-1.5 sm:py-2 border rounded-lg disabled:opacity-50 hover:bg-gray-50 transition-colors text-sm"
+        className="px-2 sm:px-4 py-1.5 sm:py-2 border border-gray-300 dark:border-slate-600 rounded-lg disabled:opacity-50 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors text-sm text-gray-700 dark:text-gray-300"
       >
         <ChevronRightIcon className="h-3 w-3 sm:h-4 sm:w-4" />
       </button>

@@ -160,7 +160,6 @@ function DirectionDetail() {
     }
   };
 
-  // Fonction pour récupérer le mot de passe d'un agent
   const fetchAgentPassword = async (agentId) => {
     try {
       const response = await api.get(`/users/${agentId}/password`);
@@ -177,7 +176,6 @@ function DirectionDetail() {
     }
   };
 
-  // Fonction pour copier le mot de passe dans le presse-papiers
   const copyPasswordToClipboard = (password) => {
     navigator.clipboard.writeText(password).then(() => {
       toast.success('Mot de passe copié dans le presse-papiers');
@@ -186,7 +184,6 @@ function DirectionDetail() {
     });
   };
 
-  // Fonction pour basculer l'affichage du mot de passe
   const togglePasswordVisibility = (agentId) => {
     if (showPasswordForAgent === agentId) {
       setShowPasswordForAgent(null);
@@ -206,7 +203,7 @@ function DirectionDetail() {
   if (!direction) {
     return (
       <div className="text-center py-12">
-        <p className="text-gray-500">Direction non trouvée</p>
+        <p className="text-gray-500 dark:text-gray-400">Direction non trouvée</p>
         <button onClick={() => navigate('/backoffice/directions')} className="mt-4 px-4 py-2 bg-blue-600 text-white rounded-lg">
           Retour
         </button>
@@ -216,26 +213,26 @@ function DirectionDetail() {
 
   return (
     <div className="max-auto">
-      <button onClick={() => navigate('/backoffice/directions')} className="mb-4 flex items-center text-gray-600 hover:text-gray-800">
+      <button onClick={() => navigate('/backoffice/directions')} className="mb-4 flex items-center text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100">
         <ArrowLeftIcon className="h-5 w-5 mr-2" />
         Retour aux directions
       </button>
 
       {/* En-tête */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6 mb-6">
         <div className="flex justify-between items-start">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <BuildingOfficeIcon className="h-8 w-8 text-blue-600" />
-              <h1 className="text-2xl font-bold text-gray-800">{direction.nom_direction}</h1>
+              <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{direction.nom_direction}</h1>
               {direction.categorie && (
-                <span className="inline-block px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-600 ml-2">
+                <span className="inline-block px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-600 ml-2 dark:bg-slate-700 dark:text-gray-300">
                   {direction.categorie}
                 </span>
               )}
             </div>
-            <p className="text-gray-600 mt-3">{direction.description || 'Aucune description'}</p>
-            <div className="flex flex-wrap gap-4 mt-3 text-sm text-gray-500">
+            <p className="text-gray-600 dark:text-gray-300 mt-3">{direction.description || 'Aucune description'}</p>
+            <div className="flex flex-wrap gap-4 mt-3 text-sm text-gray-500 dark:text-gray-400">
               {direction.email && (
                 <span>📧 {direction.email}</span>
               )}
@@ -268,71 +265,71 @@ function DirectionDetail() {
 
       {/* Statistiques */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
-        <div className="bg-white rounded-lg shadow-md p-4">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-4">
           <UserGroupIcon className="h-8 w-8 text-blue-500 mb-2" />
-          <p className="text-2xl font-bold text-gray-800">{direction.agents?.length || 0}</p>
-          <p className="text-sm text-gray-500">Agents</p>
+          <p className="text-2xl font-bold text-gray-800 dark:text-gray-100">{direction.agents?.length || 0}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Agents</p>
         </div>
-        <div className="bg-white rounded-lg shadow-md p-4">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-4">
           <DocumentTextIcon className="h-8 w-8 text-yellow-500 mb-2" />
-          <p className="text-2xl font-bold text-gray-800">{direction.stats?.total_doleances || 0}</p>
-          <p className="text-sm text-gray-500">Doléances totales</p>
+          <p className="text-2xl font-bold text-gray-800 dark:text-gray-100">{direction.stats?.total_doleances || 0}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Doléances totales</p>
         </div>
-        <div className="bg-white rounded-lg shadow-md p-4">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-4">
           <DocumentTextIcon className="h-8 w-8 text-green-500 mb-2" />
-          <p className="text-2xl font-bold text-gray-800">{direction.stats?.doleances_traitees || 0}</p>
-          <p className="text-sm text-gray-500">Doléances traitées</p>
+          <p className="text-2xl font-bold text-gray-800 dark:text-gray-100">{direction.stats?.doleances_traitees || 0}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Doléances traitées</p>
         </div>
-        <div className="bg-white rounded-lg shadow-md p-4">
+        <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-4">
           <DocumentTextIcon className="h-8 w-8 text-orange-500 mb-2" />
-          <p className="text-2xl font-bold text-gray-800">{direction.stats?.doleances_en_cours || 0}</p>
-          <p className="text-sm text-gray-500">Doléances en cours</p>
+          <p className="text-2xl font-bold text-gray-800 dark:text-gray-100">{direction.stats?.doleances_en_cours || 0}</p>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Doléances en cours</p>
         </div>
       </div>
 
-      {/* Doléances de la direction */}
-      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
-        <h2 className="text-lg font-semibold mb-4">Doléances de la direction</h2>
+      {/* Doleances de la direction */}
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6 mb-6">
+        <h2 className="text-lg font-semibold mb-4 dark:text-gray-100">Doleances de la direction</h2>
         {direction.doleances && direction.doleances.length > 0 ? (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+              <thead className="bg-gray-50 dark:bg-slate-900">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Citoyen</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Catégorie</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Date</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Description</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Citoyen</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Categorie</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Statut</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Date</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
                 {direction.doleances.slice(0, 10).map((doleance) => (
-                  <tr key={doleance.id_doleance} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm text-gray-900 line-clamp-2">
+                  <tr key={doleance.id_doleance} className="hover:bg-gray-50 dark:hover:bg-slate-700">
+                    <td className="px-4 py-3 text-sm text-gray-900 dark:text-gray-100 line-clamp-2">
                       {doleance.description}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-500">
+                    <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
                       {doleance.citoyen_prenom} {doleance.citoyen_nom}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-500">
+                    <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
                       {doleance.nom_categorie}
                     </td>
                     <td className="px-4 py-3 text-sm">
                       <span className={`px-2 py-1 text-xs rounded-full ${
                         doleance.nom_statut === 'traitee' || doleance.nom_statut === 'resolue' || doleance.nom_statut === 'cloturee' 
-                          ? 'bg-green-100 text-green-700' 
+                          ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-300' 
                           : doleance.nom_statut === 'transferee' 
-                            ? 'bg-purple-100 text-purple-700'
+                            ? 'bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300'
                             : doleance.nom_statut === 'urgente'
-                              ? 'bg-red-100 text-red-700'
+                              ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
                               : doleance.nom_statut === 'rejetee'
-                                ? 'bg-red-100 text-red-700'
-                                : 'bg-yellow-100 text-yellow-700'
+                                ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-300'
+                                : 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300'
                       }`}>
                         {doleance.nom_statut || 'En attente'}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-500">
+                    <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
                       {doleance.date_creation ? new Date(doleance.date_creation).toLocaleDateString() : 'N/A'}
                     </td>
                   </tr>
@@ -340,51 +337,51 @@ function DirectionDetail() {
               </tbody>
             </table>
             {direction.doleances.length > 10 && (
-              <div className="text-center text-sm text-gray-400 mt-3">
-                + {direction.doleances.length - 10} autres doléances
+              <div className="text-center text-sm text-gray-400 dark:text-gray-500 mt-3">
+                + {direction.doleances.length - 10} autres doleances
               </div>
             )}
           </div>
         ) : (
-          <p className="text-gray-500 text-center py-8">Aucune doléance pour cette direction</p>
+          <p className="text-gray-500 dark:text-gray-400 text-center py-8">Aucune doleance pour cette direction</p>
         )}
       </div>
 
       {/* Agents de la direction avec mots de passe */}
-      <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-lg font-semibold mb-4">Agents de la direction</h2>
+      <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
+        <h2 className="text-lg font-semibold mb-4 dark:text-gray-100">Agents de la direction</h2>
         {direction.agents && direction.agents.length > 0 ? (
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+            <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
+              <thead className="bg-gray-50 dark:bg-slate-900">
                 <tr>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Agent</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Email</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Rôle</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Téléphone</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Mot de passe</th>
-                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Agent</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Email</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Role</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Telephone</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Mot de passe</th>
+                  <th className="px-4 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Action</th>
                 </tr>
               </thead>
-              <tbody className="bg-white divide-y divide-gray-200">
+              <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
                 {direction.agents.map((agent) => (
-                  <tr key={agent.id_utilisateur} className="hover:bg-gray-50">
-                    <td className="px-4 py-3 text-sm font-medium text-gray-900">
+                  <tr key={agent.id_utilisateur} className="hover:bg-gray-50 dark:hover:bg-slate-700">
+                    <td className="px-4 py-3 text-sm font-medium text-gray-900 dark:text-gray-100">
                       {agent.prenom} {agent.nom}
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-500">{agent.email}</td>
-                    <td className="px-4 py-3 text-sm text-gray-500">
-                      <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700">
+                    <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{agent.email}</td>
+                    <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">
+                      <span className="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
                         {agent.nom_role}
                       </span>
                     </td>
-                    <td className="px-4 py-3 text-sm text-gray-500">{agent.telephone || '-'}</td>
+                    <td className="px-4 py-3 text-sm text-gray-500 dark:text-gray-400">{agent.telephone || '-'}</td>
                     <td className="px-4 py-3 text-sm">
                       <div className="flex items-center gap-2">
                         {showPasswordForAgent === agent.id_utilisateur ? (
-                          <div className="flex items-center gap-2 bg-gray-50 px-2 py-1 rounded-lg border border-gray-200">
+                          <div className="flex items-center gap-2 bg-gray-50 dark:bg-slate-700 px-2 py-1 rounded-lg border border-gray-200 dark:border-slate-600">
                             <KeyIcon className="h-4 w-4 text-yellow-600" />
-                            <span className="font-mono text-sm text-gray-700">
+                            <span className="font-mono text-sm text-gray-700 dark:text-gray-200">
                               {agentPasswords[agent.id_utilisateur] || '••••••••'}
                             </span>
                             <button
@@ -396,11 +393,11 @@ function DirectionDetail() {
                             </button>
                           </div>
                         ) : (
-                          <span className="text-gray-400">••••••••</span>
+                          <span className="text-gray-400 dark:text-gray-500">••••••••</span>
                         )}
                         <button
                           onClick={() => togglePasswordVisibility(agent.id_utilisateur)}
-                          className="text-gray-500 hover:text-gray-700 transition-colors"
+                          className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 transition-colors"
                           title={showPasswordForAgent === agent.id_utilisateur ? "Masquer" : "Afficher le mot de passe"}
                         >
                           {showPasswordForAgent === agent.id_utilisateur ? (
@@ -425,29 +422,29 @@ function DirectionDetail() {
             </table>
           </div>
         ) : (
-          <p className="text-gray-500 text-center py-8">Aucun agent assigné à cette direction</p>
+          <p className="text-gray-500 dark:text-gray-400 text-center py-8">Aucun agent assigné à cette direction</p>
         )}
       </div>
 
       {/* Modal d'assignation */}
       {showAssignModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
-          <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+          <div className="relative bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">Assigner un agent</h3>
-              <button onClick={() => setShowAssignModal(false)} className="text-gray-400 hover:text-gray-600">
+              <h3 className="text-lg font-semibold dark:text-gray-100">Assigner un agent</h3>
+              <button onClick={() => setShowAssignModal(false)} className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
                 <XMarkIcon className="h-6 w-6" />
               </button>
             </div>
             
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                 Sélectionner un agent
               </label>
               <select
                 value={selectedAgent}
                 onChange={(e) => setSelectedAgent(e.target.value)}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-800 dark:text-white"
               >
                 <option value="">Choisir un agent</option>
                 {unassignedAgents.map(agent => (
@@ -464,7 +461,7 @@ function DirectionDetail() {
             </div>
             
             <div className="flex justify-end gap-3">
-              <button onClick={() => setShowAssignModal(false)} className="px-4 py-2 border rounded-lg hover:bg-gray-50">
+              <button onClick={() => setShowAssignModal(false)} className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700">
                 Annuler
               </button>
               <button
@@ -482,34 +479,34 @@ function DirectionDetail() {
       {/* Modal de modification de direction */}
       {showEditDirectionModal && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
-          <div className="relative bg-white rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
+          <div className="relative bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-md w-full mx-4 p-6">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold">Modifier la direction</h3>
-              <button onClick={() => setShowEditDirectionModal(false)} className="text-gray-400 hover:text-gray-600">
+              <h3 className="text-lg font-semibold dark:text-gray-100">Modifier la direction</h3>
+              <button onClick={() => setShowEditDirectionModal(false)} className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
                 <XMarkIcon className="h-6 w-6" />
               </button>
             </div>
             
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                 Nom de la direction *
               </label>
               <input
                 type="text"
                 value={editDirectionData.nom_direction}
                 onChange={(e) => setEditDirectionData({...editDirectionData, nom_direction: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-800 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
               />
             </div>
             
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
-                Catégorie
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                Categorie
               </label>
               <select
                 value={editDirectionData.categorie}
                 onChange={(e) => setEditDirectionData({...editDirectionData, categorie: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-800 dark:text-white"
               >
                 <option value="">Sélectionner une catégorie</option>
                 {categories.map(cat => (
@@ -519,60 +516,60 @@ function DirectionDetail() {
             </div>
             
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                 Description
               </label>
               <textarea
                 value={editDirectionData.description}
                 onChange={(e) => setEditDirectionData({...editDirectionData, description: e.target.value})}
                 rows="3"
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-800 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 placeholder="Description de la direction..."
               />
             </div>
 
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                   Email
                 </label>
                 <input
                   type="email"
                   value={editDirectionData.email}
                   onChange={(e) => setEditDirectionData({...editDirectionData, email: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-800 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   placeholder="exemple@domaine.com"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Téléphone
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                  Telephone
                 </label>
                 <input
                   type="tel"
                   value={editDirectionData.telephone}
                   onChange={(e) => setEditDirectionData({...editDirectionData, telephone: e.target.value})}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-800 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                   placeholder="01 23 45 67 89"
                 />
               </div>
             </div>
 
             <div className="mb-4">
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
                 Responsable
               </label>
               <input
                 type="text"
                 value={editDirectionData.responsable}
                 onChange={(e) => setEditDirectionData({...editDirectionData, responsable: e.target.value})}
-                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-800 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
                 placeholder="Nom du responsable"
               />
             </div>
             
             <div className="flex justify-end gap-3">
-              <button onClick={() => setShowEditDirectionModal(false)} className="px-4 py-2 border rounded-lg hover:bg-gray-50">
+              <button onClick={() => setShowEditDirectionModal(false)} className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700">
                 Annuler
               </button>
               <button

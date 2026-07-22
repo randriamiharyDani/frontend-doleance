@@ -63,7 +63,7 @@ function Login() {
   };
 
   return (
-    <div className="cua-login min-h-screen flex bg-[#F8FAFC]">
+    <div className="cua-login min-h-screen flex bg-[#F8FAFC] dark:bg-slate-900">
   
       {/* ============ Partie gauche — identité institutionnelle ============ */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-[#0F172A]">
@@ -139,7 +139,7 @@ function Login() {
       {/* ============ Partie droite — formulaire de connexion ============ */}
       <div className="w-full lg:w-1/2 flex items-center justify-center p-6 sm:p-10 relative">
         {/* Fond subtil sur mobile / desktop */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#F8FAFC] via-white to-[#F1F5F9] -z-10" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#F8FAFC] via-white to-[#F1F5F9] dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 -z-10" />
         <div className="cua-orb-slow absolute top-10 right-10 w-64 h-64 rounded-full bg-[#D4AF37]/[0.06] blur-3xl -z-10" />
 
         <div className="cua-anim-1 w-full max-w-md">
@@ -153,14 +153,14 @@ function Login() {
                   className="w-11 h-11 object-contain"
                 />
               </div>
-              <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full bg-[#D4AF37] flex items-center justify-center shadow ring-4 ring-white">
+              <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full bg-[#D4AF37] flex items-center justify-center shadow ring-4 ring-white dark:ring-slate-800">
                 <BuildingLibraryIcon className="w-3.5 h-3.5 text-[#0F172A]" />
               </div>
             </div>
           </div>
 
           {/* Carte de connexion */}
-          <div className="cua-card bg-white/90 rounded-2xl shadow-[0_20px_60px_-15px_rgba(15,23,42,0.25)] border border-slate-100 p-8 sm:p-10 relative overflow-hidden">
+          <div className="cua-card bg-white/90 dark:bg-slate-800/90 rounded-2xl shadow-[0_20px_60px_-15px_rgba(15,23,42,0.25)] border border-slate-100 dark:border-slate-700 p-8 sm:p-10 relative overflow-hidden">
             {/* Liseré doré supérieur */}
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0F172A] via-[#D4AF37] to-[#0F172A]" />
 
@@ -175,16 +175,16 @@ function Login() {
                       className="w-11 h-11 object-contain"
                     />
                   </div>
-                  <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full bg-[#D4AF37] flex items-center justify-center shadow ring-4 ring-white">
+                  <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full bg-[#D4AF37] flex items-center justify-center shadow ring-4 ring-white dark:ring-slate-800">
                     <BuildingLibraryIcon className="w-3.5 h-3.5 text-[#0F172A]" />
                   </div>
                 </div>
               </div>
 
-              <h1 className="cua-display text-2xl font-semibold text-[#0F172A]">
+              <h1 className="cua-display text-2xl font-semibold text-[#0F172A] dark:text-white">
                 Connexion Agent Municipal
               </h1>
-              <p className="text-slate-500 text-sm mt-2">
+              <p className="text-slate-500 dark:text-slate-400 text-sm mt-2">
                 Accédez à votre espace professionnel
               </p>
 
@@ -196,9 +196,9 @@ function Login() {
 
             {/* Message d'erreur */}
             {error && (
-              <div className="cua-error mb-5 flex items-start gap-2.5 rounded-xl bg-red-50 border border-red-100 px-4 py-3">
-                <ExclamationTriangleIcon className="w-5 h-5 text-red-500 flex-shrink-0 mt-0.5" />
-                <p className="text-sm text-red-700 leading-snug">{error}</p>
+              <div className="cua-error mb-5 flex items-start gap-2.5 rounded-xl bg-red-50 dark:bg-red-900/20 border border-red-100 px-4 py-3">
+                <ExclamationTriangleIcon className="w-5 h-5 text-red-500 dark:text-red-400 flex-shrink-0 mt-0.5" />
+                <p className="text-sm text-red-700 dark:text-red-400 leading-snug">{error}</p>
               </div>
             )}
 
@@ -207,13 +207,13 @@ function Login() {
               <div className="mb-5">
                 <label
                   htmlFor="cua-email"
-                  className="block text-sm font-semibold text-slate-700 mb-2"
+                  className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2"
                 >
                   Email professionnel
                 </label>
 
-                <div className="cua-input relative rounded-xl border border-slate-200 bg-slate-50 transition-all duration-200">
-                  <EnvelopeIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <div className="cua-input relative rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 transition-all duration-200">
+                  <EnvelopeIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
                   <input
                     id="cua-email"
                     type="email"
@@ -224,7 +224,7 @@ function Login() {
                       if (error) setError("");
                     }}
                     placeholder="agent@antananarivo.mg"
-                    className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-transparent outline-none text-slate-800 placeholder:text-slate-400 text-sm"
+                    className="w-full pl-11 pr-4 py-3.5 rounded-xl bg-transparent outline-none text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm"
                     required
                   />
                 </div>
@@ -234,13 +234,13 @@ function Login() {
               <div className="mb-2">
                 <label
                   htmlFor="cua-password"
-                  className="block text-sm font-semibold text-slate-700 mb-2"
+                  className="block text-sm font-semibold text-slate-700 dark:text-slate-200 mb-2"
                 >
                   Mot de passe
                 </label>
 
-                <div className="cua-input relative rounded-xl border border-slate-200 bg-slate-50 transition-all duration-200">
-                  <LockClosedIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" />
+                <div className="cua-input relative rounded-xl border border-slate-200 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 transition-all duration-200">
+                  <LockClosedIcon className="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500" />
                   <input
                     id="cua-password"
                     type={showPassword ? "text" : "password"}
@@ -251,13 +251,13 @@ function Login() {
                       if (error) setError("");
                     }}
                     placeholder="Votre mot de passe"
-                    className="w-full pl-11 pr-11 py-3.5 rounded-xl bg-transparent outline-none text-slate-800 placeholder:text-slate-400 text-sm"
+                    className="w-full pl-11 pr-11 py-3.5 rounded-xl bg-transparent outline-none text-slate-800 dark:text-slate-100 placeholder:text-slate-400 dark:placeholder:text-slate-500 text-sm"
                     required
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
-                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-[#1E3A8A] transition-colors"
+                    className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-[#1E3A8A] transition-colors"
                     aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
                   >
                     {showPassword ? (
@@ -320,7 +320,7 @@ function Login() {
             <div className="mt-6 text-center">
               <Link
                 to="/deposer-doleance"
-                className="text-sm text-slate-500 hover:text-[#1E3A8A] transition-colors inline-flex items-center gap-1.5"
+                className="text-sm text-slate-500 dark:text-slate-400 hover:text-[#1E3A8A] transition-colors inline-flex items-center gap-1.5"
               >
                 <span aria-hidden>←</span> Retour à l'espace citoyen
               </Link>
@@ -328,13 +328,13 @@ function Login() {
           </div>
 
           {/* Footer sécurité */}
-          <div className="mt-6 flex items-center justify-center gap-2 text-slate-400">
+          <div className="mt-6 flex items-center justify-center gap-2 text-slate-400 dark:text-slate-500">
             <ShieldCheckIcon className="w-4 h-4 text-[#D4AF37]" />
             <p className="text-xs">
               Plateforme sécurisée — Commune Urbaine d'Antananarivo
             </p>
           </div>
-          <p className="text-center text-[11px] text-slate-300 mt-1">
+          <p className="text-center text-[11px] text-slate-300 dark:text-slate-600 mt-1">
             Version 2.0
           </p>
         </div>

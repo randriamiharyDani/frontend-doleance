@@ -7,7 +7,7 @@ function LoadingSpinner({ text = 'Chargement...', size = 'lg' }) {
     <div className="flex justify-center items-center py-12">
       <div className="text-center">
         <div className={`animate-spin rounded-full border-b-2 border-blue-600 mx-auto ${sizeClasses[size] || sizeClasses.lg}`}></div>
-        {text && <p className="mt-4 text-gray-600 text-sm">{text}</p>}
+        {text && <p className="mt-4 text-gray-600 dark:text-gray-400 text-sm">{text}</p>}
       </div>
     </div>
   );

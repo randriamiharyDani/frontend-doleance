@@ -11,7 +11,7 @@ function StatutModal({ isOpen, onClose, onConfirm, statuts, selectedValue, onVal
       size="max-w-md"
       footer={
         <>
-          <button onClick={onClose} className="px-4 py-2 border rounded-lg hover:bg-gray-100 transition-colors">
+          <button onClick={onClose} className="px-4 py-2 border rounded-lg hover:bg-gray-100 dark:hover:bg-slate-600 transition-colors">
             Annuler
           </button>
           <button onClick={onConfirm} className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors">
@@ -23,7 +23,7 @@ function StatutModal({ isOpen, onClose, onConfirm, statuts, selectedValue, onVal
       <select
         value={selectedValue}
         onChange={(e) => onValueChange(e.target.value)}
-        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
+        className="w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 outline-none dark:bg-slate-700 dark:border-slate-600 dark:text-white"
       >
         {statuts.map(stat => (
           <option key={stat.id_statut} value={stat.id_statut}>{stat.nom_statut}</option>
