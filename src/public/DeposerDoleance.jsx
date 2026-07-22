@@ -189,6 +189,7 @@ function DeposerDoleance() {
   const fileInputRef = useRef(null);
   const searchTimeoutRef = useRef(null);
   const [dragOver, setDragOver] = useState(false);
+  const [savedDirection, setSavedDirection] = useState(null);
 
   const arrondissementCoords = {
     "Antananarivo Renivohitra": [-18.91, 47.525],
@@ -254,6 +255,7 @@ function DeposerDoleance() {
       desc: cat.description,
       icon: iconMap[cat.icone] || iconMap["road"],
       gradient: gradientMap[cat.couleur] || "from-slate-500 to-slate-700",
+      nom_direction: cat.nom_direction || null,
     }));
 
   const autreCategorie = mappedCategories.find((c) =>
@@ -521,6 +523,8 @@ function DeposerDoleance() {
         response.data.data?.reference || response.data.reference;
       const doleanceId =
         response.data.data?.id_doleance || response.data.id_doleance;
+      const nomDirection = response.data.data?.nom_direction || null;
+      setSavedDirection(nomDirection);
 
       let uploadOk = true;
       if (files.length > 0 && doleanceId) {
@@ -554,16 +558,20 @@ function DeposerDoleance() {
               {reference}
             </span>
           </p>
+          {nomDirection && (
+            <p className="text-sm text-emerald-600 font-medium">
+              Transmis à: {nomDirection}
+            </p>
+          )}
         </div>,
         { duration: 8000 },
       );
 
       setShowReferenceModal(true);
       setTimeout(() => {
-        if (showReferenceModal) {
-          setShowReferenceModal(false);
-          navigate(`/suivi-doleance/${reference}`);
-        }
+        setShowReferenceModal(false);
+        setSavedDirection(null);
+        navigate(`/suivi-doleance/${reference}`);
       }, 5000);
 
       setFormData({
@@ -891,6 +899,22 @@ function DeposerDoleance() {
                 />
               )}
             </div>
+
+            {selectedCategory && (() => {
+              const selectedCat = mappedCategories.find((c) => c.id === selectedCategory);
+              if (!selectedCat?.nom_direction) return null;
+              return (
+                <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-xl px-4 py-2.5 mb-3">
+                  <svg className="w-4 h-4 text-[#1E3A8A] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                  </svg>
+                  <span className="text-xs sm:text-sm text-[#1E3A8A] font-semibold">
+                    Direction concernée : {selectedCat.nom_direction}
+                  </span>
+                </div>
+              );
+            })()}
+
             <p className="italic text-blue-600 text-xs my-3">
               *__________Si vous ne trouvez pas de catégorie correspondante,
               veuillez décrire votre problème ci-dessous.
@@ -1692,6 +1716,11 @@ function DeposerDoleance() {
                   {savedReference}
                 </span>
               </div>
+              {savedDirection && (
+                <p className="text-sm text-emerald-600 font-semibold mb-4">
+                  Transmis à : {savedDirection}
+                </p>
+              )}
               <div className="flex gap-3 justify-center">
                 <button
                   onClick={() => {

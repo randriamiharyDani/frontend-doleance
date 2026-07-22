@@ -54,6 +54,7 @@ function Categories() {
     nom_malgache: '',
     description: '',
     direction_concernee: '',
+    id_direction: '',
     couleur: '#3B82F6',
     icone: '',
     module: 'CUA',
@@ -107,6 +108,7 @@ function Categories() {
       nom_malgache: '',
       description: '',
       direction_concernee: '',
+      id_direction: '',
       couleur: '#3B82F6',
       icone: '',
       module: activeTab,
@@ -122,6 +124,7 @@ function Categories() {
       nom_malgache: cat.nom_malgache || '',
       description: cat.description || '',
       direction_concernee: cat.direction_concernee || '',
+      id_direction: cat.id_direction || '',
       couleur: cat.couleur || '#3B82F6',
       icone: cat.icone || '',
       module: cat.module || activeTab,
@@ -335,13 +338,21 @@ function Categories() {
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Direction/Service concerné</label>
                 <select
-                  value={formData.direction_concernee}
-                  onChange={(e) => setFormData({ ...formData, direction_concernee: e.target.value })}
+                  value={formData.id_direction || ''}
+                  onChange={(e) => {
+                    const selectedId = e.target.value;
+                    const selectedDir = directions.find(d => String(d.id_direction) === selectedId);
+                    setFormData({
+                      ...formData,
+                      id_direction: selectedId || '',
+                      direction_concernee: selectedDir ? selectedDir.nom_direction : '',
+                    });
+                  }}
                   className="w-full px-3 py-2 border border-gray-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
                 >
-                  <option value="">Aucune direction</option>
+                  <option value="">Aucune direction (Autre / Hafa)</option>
                   {directions.map((dir) => (
-                    <option key={dir.id_direction} value={dir.nom_direction}>
+                    <option key={dir.id_direction} value={dir.id_direction}>
                       {dir.nom_direction}
                     </option>
                   ))}
