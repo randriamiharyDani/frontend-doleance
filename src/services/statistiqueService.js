@@ -1,9 +1,11 @@
 import api from './api';
 
 const statistiqueService = {
-  getDashboardStats: async () => {
+  getDashboardStats: async (idCategorie = null) => {
     try {
-      const response = await api.get('/statistiques/dashboard');
+      const params = {};
+      if (idCategorie) params.id_categorie = idCategorie;
+      const response = await api.get('/statistiques/dashboard', { params });
       return { success: true, data: response.data.data || response.data };
     } catch (error) {
       return { success: false, data: { total: 0, enCours: 0, resolues: 0, urgentes: 0 } };

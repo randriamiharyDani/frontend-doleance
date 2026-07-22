@@ -288,7 +288,12 @@ function DeposerDoleance() {
 
   const handleSelectCategory = (id) => {
     setSelectedCategory(id);
-    setFormData((prev) => ({ ...prev, id_categorie: String(id) }));
+    const cat = mappedCategories.find((c) => c.id === id);
+    setFormData((prev) => ({
+      ...prev,
+      id_categorie: String(id),
+      titre: cat ? cat.label : prev.titre,
+    }));
   };
 
   const handleChange = (e) => {
@@ -469,6 +474,7 @@ function DeposerDoleance() {
     try {
       const dataToSend = {
         ...formData,
+        module,
         contact: formData.email || formData.telephone,
         adresse_citoyen: formData.adresse_citoyen || null,
         telephone_citoyen: formData.telephone || null,
@@ -708,16 +714,17 @@ function DeposerDoleance() {
           box-shadow: 0 4px 16px -4px rgba(15, 23, 42, 0.08);
         }
         .cua-doleance .cua-field {
+          border-color: #D4AF37;
           transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
         }
         .cua-doleance .cua-field:focus {
-          border-color: #D4AF37;
-          box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.12);
+          border-color: #B8960E;
+          box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15);
           background-color: #ffffff;
         }
         .cua-doleance .cua-field-wrap:focus-within {
-          border-color: #D4AF37 !important;
-          box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.12);
+          border-color: #B8960E !important;
+          box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15);
         }
         .cua-doleance .cua-btn-primary {
           background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 60%, #2E4FA3 100%);
@@ -881,6 +888,7 @@ function DeposerDoleance() {
         )}
 
         {/* Titre */}
+        {module && (
         <div className="cua-section rounded-2xl p-5 mt-4 mb-6 cua-anim">
           <div className="flex items-center gap-2 mb-4">
             <svg
@@ -909,6 +917,63 @@ function DeposerDoleance() {
             className="cua-field w-full border-2 border-slate-100 rounded-xl px-5 py-4 text-sm font-medium text-slate-800 outline-none placeholder:text-slate-400"
             required
           />
+        </div>
+        )}
+
+        {/* Description */}
+        <div className="cua-section rounded-2xl p-5 mb-6 cua-anim">
+          <div className="flex items-center gap-2 mb-1">
+            <svg
+              className="w-5 h-5 text-[#1E3A8A]"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
+              />
+            </svg>
+            <h2 className="text-[16px]  font-bold text-[#0F172A]">
+              Description du problème
+            </h2>
+          </div>
+          <p className="text-sm text-slate-400 mb-4 ml-7">
+            Décrivez le problème en quelques phrases pour aider les équipes à
+            intervenir
+          </p>
+          <textarea
+            name="description"
+            value={formData.description}
+            onChange={handleChange}
+            rows={5}
+            placeholder="Décrivez le problème que vous avez constaté..."
+            className="cua-field w-full border-2 border-slate-100 rounded-xl px-5 py-4 text-sm text-slate-800 outline-none resize-y placeholder:text-slate-400"
+            required
+          />
+          <div className="flex justify-between items-center mt-2">
+            <p className="text-xs text-slate-400">
+              <svg
+                className="w-3.5 h-3.5 inline mr-1 text-emerald-600"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
+                />
+              </svg>
+              Données confidentielles
+            </p>
+            <span className="text-xs text-slate-400">
+              {charsCount} / 1000 caractères
+            </span>
+          </div>
         </div>
 
         {/* Localisation & Adresse (fusionné) */}
@@ -1411,61 +1476,7 @@ function DeposerDoleance() {
           )}
         </div>
 
-        {/* Description */}
-        <div className="cua-section rounded-2xl p-5 mb-6 cua-anim">
-          <div className="flex items-center gap-2 mb-1">
-            <svg
-              className="w-5 h-5 text-[#1E3A8A]"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-              />
-            </svg>
-            <h2 className="text-[16px]  font-bold text-[#0F172A]">
-              Description du problème
-            </h2>
-          </div>
-          <p className="text-sm text-slate-400 mb-4 ml-7">
-            Décrivez le problème en quelques phrases pour aider les équipes à
-            intervenir
-          </p>
-          <textarea
-            name="description"
-            value={formData.description}
-            onChange={handleChange}
-            rows={5}
-            placeholder="Décrivez le problème que vous avez constaté..."
-            className="cua-field w-full border-2 border-slate-100 rounded-xl px-5 py-4 text-sm text-slate-800 outline-none resize-y placeholder:text-slate-400"
-            required
-          />
-          <div className="flex justify-between items-center mt-2">
-            <p className="text-xs text-slate-400">
-              <svg
-                className="w-3.5 h-3.5 inline mr-1 text-emerald-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                />
-              </svg>
-              Données confidentielles
-            </p>
-            <span className="text-xs text-slate-400">
-              {charsCount} / 1000 caractères
-            </span>
-          </div>
-        </div>
+
 
         {/* User Info Section */}
         <div className="cua-section rounded-2xl p-5 mb-6 cua-anim">

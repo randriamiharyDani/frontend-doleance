@@ -26,14 +26,15 @@ function Dashboard() {
   const [categoriesCount, setCategoriesCount] = useState(0);
   const [prioritesCount, setPrioritesCount] = useState(0);
   const [errors, setErrors] = useState({ monthly: false, categories: false, status: false, recent: false });
+  const [selectedCategoryId, setSelectedCategoryId] = useState(null);
 
   const sortAlpha = (data, key = 'nom_categorie') => {
     if (!Array.isArray(data)) return [];
     return [...data].sort((a, b) => (a[key] || '').localeCompare(b[key] || '', 'fr'));
   };
 
-  const fetchStats = useCallback(async () => {
-    const result = await statistiqueService.getDashboardStats();
+  const fetchStats = useCallback(async (idCategorie = null) => {
+    const result = await statistiqueService.getDashboardStats(idCategorie);
     if (result?.success) setStats(result.data);
     else toast.error('Erreur chargement statistiques');
   }, []);
@@ -76,14 +77,19 @@ function Dashboard() {
     setPrioritesCount(prioRes?.data?.length || 0);
   }, []);
 
+  const handleCategorySelect = useCallback(async (categoryId) => {
+    setSelectedCategoryId(categoryId);
+    await fetchStats(categoryId);
+  }, [fetchStats]);
+
   const fetchAll = useCallback(async (showLoading = true) => {
     if (showLoading) setLoading(true); else setRefreshing(true);
     await Promise.allSettled([
-      fetchStats(), fetchRecentDoleances(), fetchMonthlyStats(),
+      fetchStats(selectedCategoryId), fetchRecentDoleances(), fetchMonthlyStats(),
       fetchStatsByCategory(), fetchStatsByStatus(), fetchFiltersCount()
     ]);
     setLoading(false); setRefreshing(false);
-  }, [fetchStats, fetchRecentDoleances, fetchMonthlyStats, fetchStatsByCategory, fetchStatsByStatus, fetchFiltersCount]);
+  }, [fetchStats, selectedCategoryId, fetchRecentDoleances, fetchMonthlyStats, fetchStatsByCategory, fetchStatsByStatus, fetchFiltersCount]);
 
   useEffect(() => { fetchAll(true); }, [fetchAll]);
 
@@ -134,7 +140,7 @@ function Dashboard() {
         <StatusPieChart data={statsByStatus} error={errors.status} />
       </div>
 
-      <CategoryBar data={statsByCategory} error={errors.categories} />
+      <CategoryBar data={statsByCategory} error={errors.categories} selectedId={selectedCategoryId} onSelect={handleCategorySelect} />
 
       <div className="mt-6 sm:mt-8">
         <RecentDoleancesTable doleances={recentDoleances} error={errors.recent} />

@@ -31,6 +31,37 @@ function BackofficeLayout() {
   const [openMenus, setOpenMenus] = useState({});
   const [isCurrentUserOnline, setIsCurrentUserOnline] = useState(false);
 
+  useEffect(() => {
+    const checkScreenSize = () => {
+      const mobile = window.innerWidth < 1024;
+      setIsMobile(mobile);
+      if (!mobile) {
+        setSidebarOpen(false);
+      }
+    };
+    checkScreenSize();
+    window.addEventListener("resize", checkScreenSize);
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
+
+  // Vérifier si l'utilisateur actuel est en ligne
+  useEffect(() => {
+    if (user?.id) {
+      const checkOnline = () => {
+        setIsCurrentUserOnline(socket.isUserOnline(user.id));
+      };
+      checkOnline();
+      socket.setOnlineUsersCallback(checkOnline);
+      return () => socket.setOnlineUsersCallback(null);
+    }
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (isMobile) {
+      setSidebarOpen(false);
+    }
+  }, [location.pathname, isMobile]);
+
   // Auth guard : redirection si non connecté
   if (!loading && !user) {
     return <Navigate to="/login" replace />;
@@ -65,37 +96,6 @@ function BackofficeLayout() {
   if (!isSuperAdmin && superAdminOnlyRoutes.some(route => location.pathname.startsWith(route))) {
     return <Navigate to="/backoffice/dashboard" replace />;
   }
-
-  useEffect(() => {
-    const checkScreenSize = () => {
-      const mobile = window.innerWidth < 1024;
-      setIsMobile(mobile);
-      if (!mobile) {
-        setSidebarOpen(false);
-      }
-    };
-    checkScreenSize();
-    window.addEventListener("resize", checkScreenSize);
-    return () => window.removeEventListener("resize", checkScreenSize);
-  }, []);
-
-  // Vérifier si l'utilisateur actuel est en ligne
-  useEffect(() => {
-    if (user?.id) {
-      const checkOnline = () => {
-        setIsCurrentUserOnline(socket.isUserOnline(user.id));
-      };
-      checkOnline();
-      socket.setOnlineUsersCallback(checkOnline);
-      return () => socket.setOnlineUsersCallback(null);
-    }
-  }, [user?.id]);
-
-  useEffect(() => {
-    if (isMobile) {
-      setSidebarOpen(false);
-    }
-  }, [location.pathname, isMobile]);
 
   // const isActive = (path) => {
   //   return (

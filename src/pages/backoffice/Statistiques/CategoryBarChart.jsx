@@ -1,6 +1,6 @@
 import React from 'react';
 import {
-  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell
 } from 'recharts';
 
 const CustomTooltip = ({ active, payload, label }) => {
@@ -36,7 +36,11 @@ function CategoryBarChart({ data }) {
             <XAxis type="number" stroke="#6B7280" fontSize={12} />
             <YAxis type="category" dataKey="nom_categorie" stroke="#6B7280" fontSize={11} width={80} />
             <Tooltip content={<CustomTooltip />} />
-            <Bar dataKey="count" fill="#3B82F6" name="Nombre" radius={[0, 4, 4, 0]} />
+            <Bar dataKey="count" name="Nombre" radius={[0, 4, 4, 0]}>
+              {data.map((entry, index) => (
+                <Cell key={index} fill={entry.couleur || '#3B82F6'} />
+              ))}
+            </Bar>
           </BarChart>
         </ResponsiveContainer>
       </div>
