@@ -88,7 +88,8 @@ function DraggableMarker({ position, setPosition, onPositionChange }) {
 
   useMapEvents({
     click(e) {
-      setPosition(e.latlng);
+      const pos = [e.latlng.lat, e.latlng.lng];
+      setPosition(pos);
       if (onPositionChange) onPositionChange(e.latlng);
     },
   });
@@ -102,8 +103,10 @@ function DraggableMarker({ position, setPosition, onPositionChange }) {
         dragend() {
           const marker = markerRef.current;
           if (marker) {
-            setPosition(marker.getLatLng());
-            if (onPositionChange) onPositionChange(marker.getLatLng());
+            const ll = marker.getLatLng();
+            const pos = [ll.lat, ll.lng];
+            setPosition(pos);
+            if (onPositionChange) onPositionChange(ll);
           }
         },
       }}
@@ -287,8 +290,8 @@ function DeposerDoleance() {
     try {
       const [categoriesRes, quartiersRes, assignedRes, geojsonRes] =
         await Promise.all([
-          api.get(`/categories?module=${module}`),
-          api.get("/doleances/quartiers"),
+          api.get(`/categories?module=${module}`).catch(() => ({ data: [] })),
+          api.get("/doleances/quartiers").catch(() => ({ data: [] })),
           api
             .get("/doleances/public/assigned-locations")
             .catch(() => ({ data: { data: [] } })),
