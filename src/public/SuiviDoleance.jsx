@@ -16,6 +16,8 @@ import {
   InformationCircleIcon,
   ShieldCheckIcon,
   PhotoIcon,
+  PaperAirplaneIcon,
+  BuildingOfficeIcon,
 } from '@heroicons/react/24/outline';
 
 
@@ -28,6 +30,11 @@ function SuiviDoleance() {
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [lightboxImage, setLightboxImage] = useState(null);
+
+  const [reponseIdentifiant, setReponseIdentifiant] = useState('');
+  const [reponseMessage, setReponseMessage] = useState('');
+  const [sendingReponse, setSendingReponse] = useState(false);
+  const [reponseEnvoyee, setReponseEnvoyee] = useState(false);
 
   const handleSearch = async (e) => {
     e.preventDefault();
@@ -58,6 +65,31 @@ function SuiviDoleance() {
       toast.error(t('tracking.notFound'));
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleCitizenReponse = async (e) => {
+    e.preventDefault();
+    if (!reponseIdentifiant.trim() || !reponseMessage.trim()) {
+      toast.error(t('tracking.fillAllFields'));
+      return;
+    }
+    setSendingReponse(true);
+    try {
+      const response = await api.post(`/doleances/public/${searchRef}/reponse`, {
+        identifiant_citoyen: reponseIdentifiant.trim(),
+        message: reponseMessage.trim()
+      });
+      if (response.data?.success) {
+        toast.success(t('tracking.responseSent'));
+        setReponseMessage('');
+        setReponseEnvoyee(true);
+        handleSearch(e);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || t('tracking.responseError'));
+    } finally {
+      setSendingReponse(false);
     }
   };
 
@@ -283,6 +315,23 @@ function SuiviDoleance() {
                       </div>
                     </div>
 
+                    {/* Direction concernée */}
+                    {doleance.nom_direction && doleance.nom_direction !== 'Non assignée' && (
+                      <div className={`flex items-start gap-3 p-2 sm:p-3 rounded-lg border-l-4 border-[#D4AF37] ${
+                        darkMode ? 'bg-gray-700' : 'bg-slate-50'
+                      }`}>
+                        <BuildingOfficeIcon className={`h-4 w-4 sm:h-5 sm:w-5 mt-0.5 ${darkMode ? 'text-[#D4AF37]' : 'text-[#1E3A8A]'}`} />
+                        <div>
+                          <p className={`text-xs font-semibold ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+                            {t('tracking.concernedDirection')}
+                          </p>
+                          <p className={`font-medium text-sm sm:text-base ${darkMode ? 'text-gray-200' : 'text-slate-800'}`}>
+                            {doleance.nom_direction}
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Lieu */}
                     {(doleance.lieu_exact || doleance.nom_quartier) && (
                       <div className={`flex items-start gap-3 p-2 sm:p-3 rounded-lg border-l-4 border-[#D4AF37] sm:col-span-2 ${
@@ -418,16 +467,26 @@ function SuiviDoleance() {
                       </h3>
                       <div className="space-y-3 sm:space-y-4">
                         {doleance.reponses.map((rep, index) => (
-                          <div key={index} className={`rounded-lg p-3 sm:p-4 border-l-4 border-[#D4AF37] shadow-sm ${
+                          <div key={index} className={`rounded-lg p-3 sm:p-4 border-l-4 shadow-sm ${
+                            rep.type_auteur === 'citoyen'
+                              ? 'border-emerald-500'
+                              : 'border-[#D4AF37]'
+                          } ${
                             darkMode ? 'bg-gray-700' : 'bg-[#1E3A8A]/[0.04]'
                           }`}>
                             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2 mb-2">
                               <div className="flex items-center gap-2">
-                                <div className="w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center shadow-md flex-shrink-0 bg-gradient-to-br from-[#0F172A] to-[#1E3A8A]">
-                                  <span className="text-white text-xs sm:text-sm font-bold">🏛️</span>
+                                <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-full flex items-center justify-center shadow-md flex-shrink-0 ${
+                                  rep.type_auteur === 'citoyen'
+                                    ? 'bg-gradient-to-br from-emerald-500 to-emerald-700'
+                                    : 'bg-gradient-to-br from-[#0F172A] to-[#1E3A8A]'
+                                }`}>
+                                  <span className="text-white text-xs sm:text-sm font-bold">
+                                    {rep.type_auteur === 'citoyen' ? '👤' : '🏛️'}
+                                  </span>
                                 </div>
                                 <span className={`font-semibold text-xs sm:text-sm ${darkMode ? 'text-gray-200' : 'text-slate-700'}`}>
-                                  {t('tracking.municipalService')}
+                                  {rep.auteur || (rep.type_auteur === 'citoyen' ? t('tracking.citizen') : t('tracking.municipalService'))}
                                 </span>
                               </div>
                               <span className={`text-xs font-medium ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>
@@ -442,6 +501,70 @@ function SuiviDoleance() {
                       </div>
                     </div>
                   )}
+
+                  {/* Formulaire de réponse du citoyen */}
+                  <div>
+                    <h3 className={`font-semibold mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base ${
+                      darkMode ? 'text-white' : 'text-[#1E3A8A]'
+                    }`}>
+                      <div className="cua-gold-bar w-1 h-5 sm:h-6 rounded-full"></div>
+                      <PaperAirplaneIcon className={`h-4 w-4 sm:h-5 sm:w-5 ${darkMode ? 'text-[#D4AF37]' : 'text-[#1E3A8A]'}`} />
+                      {t('tracking.replyToMunicipality')}
+                    </h3>
+
+                    {reponseEnvoyee ? (
+                      <div className={`rounded-lg p-4 text-center border-l-4 border-emerald-500 ${
+                        darkMode ? 'bg-gray-700' : 'bg-emerald-50'
+                      }`}>
+                        <CheckCircleIcon className="h-8 w-8 text-emerald-500 mx-auto mb-2" />
+                        <p className={`font-medium text-sm sm:text-base ${darkMode ? 'text-gray-200' : 'text-slate-700'}`}>
+                          {t('tracking.responseConfirmed')}
+                        </p>
+                      </div>
+                    ) : (
+                      <form onSubmit={handleCitizenReponse} className="space-y-3">
+                        <div>
+                          <label className={`block text-xs font-semibold mb-1 ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+                            {t('tracking.citizenId')}
+                          </label>
+                          <input
+                            type="text"
+                            value={reponseIdentifiant}
+                            onChange={(e) => setReponseIdentifiant(e.target.value)}
+                            placeholder={t('tracking.citizenIdPlaceholder')}
+                            className={`cua-field w-full px-3 py-2 border-2 rounded-xl focus:outline-none transition-all text-sm ${
+                              darkMode
+                                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                                : 'bg-slate-50 border-slate-200 text-slate-900'
+                            }`}
+                          />
+                        </div>
+                        <div>
+                          <label className={`block text-xs font-semibold mb-1 ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+                            {t('tracking.yourMessage')}
+                          </label>
+                          <textarea
+                            value={reponseMessage}
+                            onChange={(e) => setReponseMessage(e.target.value)}
+                            rows="3"
+                            placeholder={t('tracking.messagePlaceholder')}
+                            className={`cua-field w-full px-3 py-2 border-2 rounded-xl focus:outline-none transition-all text-sm ${
+                              darkMode
+                                ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
+                                : 'bg-slate-50 border-slate-200 text-slate-900'
+                            }`}
+                          />
+                        </div>
+                        <button
+                          type="submit"
+                          disabled={sendingReponse || !reponseIdentifiant.trim() || !reponseMessage.trim()}
+                          className="cua-btn-primary px-6 py-2 font-semibold rounded-xl disabled:opacity-50 shadow-md text-sm text-white"
+                        >
+                          {sendingReponse ? t('tracking.sending') : t('tracking.sendResponse')}
+                        </button>
+                      </form>
+                    )}
+                  </div>
                 </div>
               </div>
             ) : (

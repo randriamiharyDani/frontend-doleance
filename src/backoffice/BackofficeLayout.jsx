@@ -281,7 +281,7 @@ function BackofficeLayout() {
       }`}
     >
       <PlusCircleIcon className="h-5 w-5" />
-      Ajouter doléance
+      Doléance téléphonique
     </Link>
   )}
 

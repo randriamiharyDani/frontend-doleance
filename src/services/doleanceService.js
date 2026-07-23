@@ -61,6 +61,15 @@ const doleanceService = {
     }
   },
 
+  addReponseCitoyen: async (reference, identifiant_citoyen, message) => {
+    try {
+      const response = await api.post(`/doleances/public/${reference}/reponse`, { identifiant_citoyen, message });
+      return { success: true, data: response.data };
+    } catch (error) {
+      return { success: false, message: error.response?.data?.message };
+    }
+  },
+
   assigner: async (id, id_utilisateur, commentaire = null) => {
     try {
       const response = await api.post(`/doleances/${id}/assigner`, { id_utilisateur, commentaire });

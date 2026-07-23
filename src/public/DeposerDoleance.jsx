@@ -230,6 +230,23 @@ function DeposerDoleance() {
   }, [t, module]);
 
   useEffect(() => {
+    if (!module) return;
+    const interval = setInterval(() => {
+      api.get(`/categories?module=${module}`)
+        .then((res) => {
+          const cats = res.data?.data || res.data || [];
+          setCategoriesData((prev) => {
+            const prevJson = JSON.stringify(prev);
+            const nextJson = JSON.stringify(cats);
+            return prevJson === nextJson ? prev : cats;
+          });
+        })
+        .catch(() => {});
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [module]);
+
+  useEffect(() => {
     const urls = files.map((file) => {
       if (file.type.startsWith("image/")) return URL.createObjectURL(file);
       return null;
@@ -827,7 +844,7 @@ function DeposerDoleance() {
           </span>
           Signaler un problème
         </h1>
-        <p className=" text-slate-500 mt-1.5 ml-[44px] sm:ml-[52px] ">
+        <p className=" text-slate-500 mt-1.5 ml-[10px] sm:ml-[10px] ">
           Vous avez constaté un problème ? Signalez-le à la Commune Urbaine
           d'Antananarivo pour un traitement rapide.
         </p>
@@ -841,6 +858,7 @@ function DeposerDoleance() {
         <div className="mb-1">
           <h2 className="block text-[16px] font-bold text-[#0F172A]">
             Type de situation
+            <span className="ml-1 text-sm font-normal text-red-500">*</span>
             <span className="ml-1 text-sm font-medium text-gray-500">
               (à choisir)
             </span>
@@ -900,20 +918,33 @@ function DeposerDoleance() {
               )}
             </div>
 
-            {selectedCategory && (() => {
-              const selectedCat = mappedCategories.find((c) => c.id === selectedCategory);
-              if (!selectedCat?.nom_direction) return null;
-              return (
-                <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-xl px-4 py-2.5 mb-3">
-                  <svg className="w-4 h-4 text-[#1E3A8A] shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                  </svg>
-                  <span className="text-xs sm:text-sm text-[#1E3A8A] font-semibold">
-                    Direction concernée : {selectedCat.nom_direction}
-                  </span>
-                </div>
-              );
-            })()}
+            {selectedCategory &&
+              (() => {
+                const selectedCat = mappedCategories.find(
+                  (c) => c.id === selectedCategory,
+                );
+                if (!selectedCat?.nom_direction) return null;
+                return (
+                  <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-xl px-4 py-2.5 mb-3  my-5 ">
+                    <svg
+                      className="w-4 h-4 text-[#1E3A8A] shrink-0"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor"
+                      strokeWidth={2}
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
+                      />
+                    </svg>
+                    <span className="text-xs sm:text-sm text-[#1E3A8A] font-semibold">
+                      Direction concernée : {selectedCat.nom_direction}
+                    </span>
+                  </div>
+                );
+              })()}
 
             <p className="italic text-blue-600 text-xs my-3">
               *__________Si vous ne trouvez pas de catégorie correspondante,
@@ -947,6 +978,7 @@ function DeposerDoleance() {
               </svg>
               <h2 className="text-[16px]  font-bold text-[#0F172A]">
                 Titre du problème
+                <span className="ml-1 text-sm font-normal text-red-500">*</span>
               </h2>
             </div>
             <input
@@ -1040,6 +1072,7 @@ function DeposerDoleance() {
             </svg>
             <h2 className="text-[16px]  font-bold text-[#0F172A]">
               Localisation & adresse
+              <span className="ml-1 text-sm font-normal text-red-500">*</span>
             </h2>
           </div>
 
@@ -1297,9 +1330,7 @@ function DeposerDoleance() {
                 d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"
               />
             </svg>
-            <h2 className="text-[16px]  font-bold text-[#0F172A]">
-              Suggestions
-            </h2>
+            <h2 className="text-[16px]  font-bold text-[#0F172A]">Opinion</h2>
           </div>
           <p className="text-sm text-slate-400 mb-4 ml-7">
             Proposez des idées pour résoudre le problème (optionnel)
@@ -1535,6 +1566,7 @@ function DeposerDoleance() {
             </svg>
             <h2 className="text-[16px]  font-bold text-[#0F172A]">
               Vos informations
+              <span className="ml-1 text-sm font-normal text-red-500">*</span>
             </h2>
           </div>
 
@@ -1570,6 +1602,7 @@ function DeposerDoleance() {
             <div>
               <label className="block text-xs font-bold text-slate-600 mb-1.5">
                 Email
+                <span className="text-[#D4AF37]">*</span>
               </label>
               <input
                 type="email"
@@ -1578,6 +1611,7 @@ function DeposerDoleance() {
                 onChange={handleChange}
                 className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50"
                 placeholder="exemple@email.com"
+                
               />
             </div>
             <div>

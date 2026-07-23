@@ -198,14 +198,20 @@ function DoleanceDetail() {
             {doleance.reponses && doleance.reponses.length > 0 ? (
               <div className="space-y-4 max-h-96 overflow-y-auto mb-6">
                 {doleance.reponses.map((rep) => (
-                  <div key={rep.id_reponse} className="border-l-4 border-blue-500 pl-4">
+                  <div key={rep.id_reponse} className={`border-l-4 pl-4 ${
+                    rep.type_auteur === 'citoyen' ? 'border-emerald-500' : 'border-blue-500'
+                  }`}>
                     <div className="flex justify-between items-start mb-2">
                       <div className="flex items-center">
                         <UserCircleIcon className="h-5 w-5 text-gray-400 dark:text-gray-500 mr-2" />
                         <span className="font-medium">
-                          {rep.prenom} {rep.nom}
-                          <span className="ml-2 text-xs text-gray-400 dark:text-gray-500">
-                            Agent
+                          {rep.auteur || (rep.type_auteur === 'citoyen' ? 'Citoyen' : 'Agent')}
+                          <span className={`ml-2 text-xs px-1.5 py-0.5 rounded-full ${
+                            rep.type_auteur === 'citoyen'
+                              ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-900/30 dark:text-emerald-300'
+                              : 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300'
+                          }`}>
+                            {rep.type_auteur === 'citoyen' ? 'Citoyen' : 'Agent'}
                           </span>
                         </span>
                       </div>
