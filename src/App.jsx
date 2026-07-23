@@ -3,7 +3,6 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider } from './contexts/AuthContext';
 import { ThemeProvider } from './contexts/ThemeContext';
-import { LanguageProvider } from './contexts/LanguageContext';
 import { StatsProvider } from './contexts/StatsContext';
 
 // Layout public
@@ -35,6 +34,7 @@ import Historique from './backoffice/Historique';
 import AjouterDoleance from './backoffice/AjouterDoleance';
 import Corbeille from './backoffice/Corbeille';
 import Categories from './backoffice/Categories';
+import PrivateRoute from './components/PrivateRoute';
 
 function AppRoutes() {
   return (
@@ -50,15 +50,15 @@ function AppRoutes() {
       <Route path="/toutes-doleances" element={<PublicLayout><ToutesDoleances /></PublicLayout>} />
       
       {/* Routes back-office */}
-      <Route path="/backoffice" element={<BackofficeLayout />}>
+      <Route path="/backoffice" element={<PrivateRoute><BackofficeLayout /></PrivateRoute>}>
         <Route index element={<Navigate to="/backoffice/dashboard" replace />} />
         <Route path="dashboard" element={<Dashboard />} />
         <Route path="doleances" element={<Doleances />} />
         <Route path="doleances/:id" element={<DoleanceDetail />} />
         <Route path="profile" element={<Profile />} />
         <Route path="notifications" element={<Notifications />} />
-        <Route path="users" element={<Users />} />
-        <Route path="roles" element={<Roles />} />
+        <Route path="users" element={<PrivateRoute allowedRoles={['administrateur_systeme']}><Users /></PrivateRoute>} />
+        <Route path="roles" element={<PrivateRoute allowedRoles={['administrateur_systeme']}><Roles /></PrivateRoute>} />
         <Route path="statistiques" element={<Statistiques />} />
         <Route path="historique" element={<Historique />} />
         <Route path="directions" element={<Directions />} />
@@ -66,7 +66,7 @@ function AppRoutes() {
         <Route path="transfert" element={<Transfert />} />
         <Route path="ajouter-doleance" element={<AjouterDoleance />} />
         <Route path="settings" element={<Settings />} />
-        <Route path="corbeille" element={<Corbeille />} />
+        <Route path="corbeille" element={<PrivateRoute allowedRoles={['administrateur_systeme']}><Corbeille /></PrivateRoute>} />
         <Route path="categories" element={<Categories />} />
 
       </Route>
@@ -81,35 +81,33 @@ function App() {
   return (
     <AuthProvider>
       <ThemeProvider>
-        <LanguageProvider>
-          <StatsProvider>
-            <AppRoutes />
-            <Toaster 
-              position="top-right"
-              toastOptions={{
+        <StatsProvider>
+          <AppRoutes />
+          <Toaster 
+            position="top-right"
+            toastOptions={{
+              duration: 4000,
+              style: {
+                background: '#363636',
+                color: '#fff',
+              },
+              success: {
+                duration: 3000,
+                iconTheme: {
+                  primary: '#10B981',
+                  secondary: '#fff',
+                },
+              },
+              error: {
                 duration: 4000,
-                style: {
-                  background: '#363636',
-                  color: '#fff',
+                iconTheme: {
+                  primary: '#EF4444',
+                  secondary: '#fff',
                 },
-                success: {
-                  duration: 3000,
-                  iconTheme: {
-                    primary: '#10B981',
-                    secondary: '#fff',
-                  },
-                },
-                error: {
-                  duration: 4000,
-                  iconTheme: {
-                    primary: '#EF4444',
-                    secondary: '#fff',
-                  },
-                },
-              }}
-            />
-          </StatsProvider>
-        </LanguageProvider>
+              },
+            }}
+          />
+        </StatsProvider>
       </ThemeProvider>
     </AuthProvider>
   );

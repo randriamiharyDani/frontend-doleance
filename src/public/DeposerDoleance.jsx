@@ -303,16 +303,8 @@ function DeposerDoleance() {
         geojsonRes.data || { type: "FeatureCollection", features: [] },
       );
 
-      const defaultCat = catsData.find((c) =>
-        c.nom_categorie?.includes("Autre"),
-      );
-      if (defaultCat) {
-        setSelectedCategory(defaultCat.id_categorie);
-        setFormData((prev) => ({
-          ...prev,
-          id_categorie: String(defaultCat.id_categorie),
-        }));
-      }
+      setSelectedCategory(null);
+      setFormData((prev) => ({ ...prev, id_categorie: "" }));
 
       setArrondissements([
         t("districts.district1"),
@@ -845,8 +837,7 @@ function DeposerDoleance() {
           Signaler un problème
         </h1>
         <p className=" text-slate-500 mt-1.5 ml-[10px] sm:ml-[10px] ">
-          Vous avez constaté un problème ? Signalez-le à la Commune Urbaine
-          d'Antananarivo pour un traitement rapide.
+          Traitement des signalements et des doléances des citoyens
         </p>
         <p className="inline-flex items-center rounded-xl border border-yellow-400 bg-yellow-100 mt-5 px-4 py-2 text-[13px] font-medium text-yellow-800 w-fit">
           📋 Veuillez remplir le formulaire ci-dessous.
