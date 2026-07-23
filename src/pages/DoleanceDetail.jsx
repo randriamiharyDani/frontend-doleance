@@ -147,24 +147,45 @@ function DoleanceDetail() {
                   Photos du problème ({doleance.pieces_jointes.length})
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
-                  {doleance.pieces_jointes.map((piece, index) => (
+                  {doleance.pieces_jointes.map((piece, index) => {
+                    const ext = piece.nom_fichier?.split('.').pop()?.toLowerCase();
+                    const isVideo = ['mp4', 'mov', 'avi', 'mkv', 'webm'].includes(ext);
+                    const isPdf = ext === 'pdf';
+                    return (
                     <div
                       key={index}
-                      onClick={() => setLightboxImage(piece.url)}
+                      onClick={() => isVideo || isPdf ? null : setLightboxImage(piece.url)}
                       className="group relative aspect-square rounded-xl overflow-hidden border-2 border-gray-200 dark:border-slate-600 hover:border-blue-500 cursor-pointer transition-all duration-200"
                     >
-                      <img
-                        src={piece.url}
-                        alt={piece.nom_fichier}
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                        loading="lazy"
-                      />
+                      {isVideo && piece.url ? (
+                        <div className="w-full h-full bg-slate-900 flex items-center justify-center relative">
+                          <video src={piece.url} className="w-full h-full object-cover" preload="metadata" muted />
+                          <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                            <div className="w-10 h-10 bg-white/80 rounded-full flex items-center justify-center">
+                              <svg className="w-5 h-5 text-purple-600 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                            </div>
+                          </div>
+                        </div>
+                      ) : isPdf ? (
+                        <div className="w-full h-full bg-red-50 dark:bg-red-900/10 flex flex-col items-center justify-center">
+                          <DocumentIcon className="h-10 w-10 text-red-400 mb-1" />
+                          <span className="text-xs font-bold text-red-500 dark:text-red-400 uppercase">PDF</span>
+                        </div>
+                      ) : (
+                        <img
+                          src={piece.url}
+                          alt={piece.nom_fichier}
+                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          loading="lazy"
+                        />
+                      )}
                       <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                       <div className="absolute bottom-0 left-0 right-0 px-2 py-1.5 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                         <p className="text-[10px] font-medium text-gray-700 dark:text-gray-200 truncate">{piece.nom_fichier}</p>
                       </div>
                     </div>
-                  ))}
+                    );
+                  })}
                 </div>
               </div>
             )}

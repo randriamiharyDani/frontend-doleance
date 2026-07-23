@@ -232,7 +232,8 @@ function DeposerDoleance() {
   useEffect(() => {
     if (!module) return;
     const interval = setInterval(() => {
-      api.get(`/categories?module=${module}`)
+      api
+        .get(`/categories?module=${module}`)
         .then((res) => {
           const cats = res.data?.data || res.data || [];
           setCategoriesData((prev) => {
@@ -339,6 +340,12 @@ function DeposerDoleance() {
     }
   };
 
+  const allowedMimeTypes = [
+    'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
+    'video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/x-matroska',
+    'application/pdf'
+  ];
+
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     const maxSize = 50 * 1024 * 1024;
@@ -348,8 +355,8 @@ function DeposerDoleance() {
     selectedFiles.forEach((file) => {
       if (file.size > maxSize) {
         errors.push(`${file.name} ${t("messages.fileTooBig")}`);
-      } else if (!file.type.startsWith("image/")) {
-        errors.push(`${file.name} - Seules les images sont acceptées`);
+      } else if (!allowedMimeTypes.includes(file.type)) {
+        errors.push(`${file.name} - Type non autorisé. Formats acceptés : images, vidéos (MP4, MOV, AVI, MKV), PDF`);
       } else {
         validFiles.push(file);
       }
@@ -389,8 +396,8 @@ function DeposerDoleance() {
       droppedFiles.forEach((file) => {
         if (file.size > maxSize) {
           errors.push(`${file.name} ${t("messages.fileTooBig")}`);
-        } else if (!file.type.startsWith("image/")) {
-          errors.push(`${file.name} - Seules les images sont acceptées`);
+        } else if (!allowedMimeTypes.includes(file.type)) {
+          errors.push(`${file.name} - Type non autorisé. Formats acceptés : images, vidéos (MP4, MOV, AVI, MKV), PDF`);
         } else {
           validFiles.push(file);
         }
@@ -839,6 +846,14 @@ function DeposerDoleance() {
         <p className=" text-slate-500 mt-1.5 ml-[10px] sm:ml-[10px] ">
           Traitement des signalements et des doléances des citoyens
         </p>
+
+        <div className="bg-blue-50 border-l-4 border-blue-700 rounded-lg p-4  mt-5">
+          <p className="text-sm text-slate-600 leading-relaxed">
+            Décrivez clairement votre doléance en précisant le lieu, le problème
+            rencontré et les détails nécessaires pour faciliter son traitement.
+          </p>
+        </div>
+
         <p className="inline-flex items-center rounded-xl border border-yellow-400 bg-yellow-100 mt-5 px-4 py-2 text-[13px] font-medium text-yellow-800 w-fit">
           📋 Veuillez remplir le formulaire ci-dessous.
         </p>
@@ -1446,7 +1461,7 @@ function DeposerDoleance() {
             <input
               ref={fileInputRef}
               type="file"
-              accept="image/jpeg,image/png,image/gif,image/webp"
+              accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,video/mp4,video/quicktime,video/x-msvideo,video/x-matroska,application/pdf"
               multiple
               onChange={handleFileChange}
               className="hidden"
@@ -1602,7 +1617,6 @@ function DeposerDoleance() {
                 onChange={handleChange}
                 className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50"
                 placeholder="exemple@email.com"
-                
               />
             </div>
             <div>

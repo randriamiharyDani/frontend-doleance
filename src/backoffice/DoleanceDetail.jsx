@@ -328,6 +328,8 @@ function DoleanceDetail() {
     );
   }
 
+  const displayPieces = piecesJointes.length > 0 ? piecesJointes : (doleance?.pieces_jointes || []);
+
   return (
     <div>
       {/* Bouton retour */}
@@ -416,7 +418,7 @@ function DoleanceDetail() {
               </h3>
               <div className="flex items-center gap-3">
                 <span className="text-sm text-gray-500 dark:text-gray-400">
-                  {piecesJointes.length} fichier(s)
+                  {displayPieces.length} fichier(s)
                 </span>
                 <input
                   ref={fileInputRef}
@@ -450,16 +452,18 @@ function DoleanceDetail() {
               <div className="flex justify-center py-8">
                 <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
               </div>
-            ) : piecesJointes.length === 0 ? (
+            ) : displayPieces.length === 0 ? (
               <div className="text-center py-8 text-gray-500 dark:text-gray-400">
                 <DocumentDuplicateIcon className="h-12 w-12 mx-auto mb-2 text-gray-300 dark:text-gray-600" />
                 <p>Aucune pièce jointe pour cette doléance</p>
               </div>
             ) : (
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                {piecesJointes.map((file, index) => {
+                {displayPieces.map((file, index) => {
                   const ext = file.nom_fichier?.split('.').pop()?.toLowerCase();
                   const isImage = ['jpg', 'jpeg', 'png', 'gif', 'webp', 'bmp'].includes(ext);
+                  const isVideo = ['mp4', 'mov', 'avi', 'mkv', 'webm', 'wmv'].includes(ext);
+                  const isPdf = ext === 'pdf';
                   return (
                     <div 
                       key={index} 
@@ -474,6 +478,28 @@ function DoleanceDetail() {
                           <div className="absolute inset-0 bg-black/0 group-hover:bg-black/20 transition-colors flex items-center justify-center">
                             <PhotoIcon className="h-8 w-8 text-white opacity-0 group-hover:opacity-100 transition-opacity drop-shadow-lg" />
                           </div>
+                        </div>
+                      ) : isVideo && file.url ? (
+                        <div className="aspect-square cursor-pointer relative group" onClick={() => {
+                          setSelectedPiece(file);
+                          setShowPiecesModal(true);
+                        }}>
+                          <video src={file.url} className="w-full h-full object-cover" preload="metadata" muted />
+                          <div className="absolute inset-0 bg-black/20 flex items-center justify-center">
+                            <div className="w-12 h-12 bg-white/80 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                              <svg className="w-6 h-6 text-purple-600 ml-0.5" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M8 5v14l11-7z" />
+                              </svg>
+                            </div>
+                          </div>
+                        </div>
+                      ) : isPdf && file.url ? (
+                        <div className="aspect-square cursor-pointer flex flex-col items-center justify-center bg-red-50 dark:bg-red-900/10 group" onClick={() => {
+                          setSelectedPiece(file);
+                          setShowPiecesModal(true);
+                        }}>
+                          <DocumentTextIcon className="h-12 w-12 text-red-400 dark:text-red-500 mb-2 group-hover:scale-110 transition-transform" />
+                          <span className="text-xs font-bold text-red-500 dark:text-red-400 uppercase">PDF</span>
                         </div>
                       ) : (
                         <div className="aspect-square flex items-center justify-center bg-gray-50 dark:bg-slate-900 cursor-pointer" onClick={() => {

@@ -867,28 +867,49 @@ function ToutesDoleances() {
                     Photos du problème ({modalPieces.length})
                   </h4>
                   <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-                    {modalPieces.map((piece, index) => (
+                    {modalPieces.map((piece, index) => {
+                      const ext = piece.nom_fichier?.split('.').pop()?.toLowerCase();
+                      const isVideo = ['mp4', 'mov', 'avi', 'mkv', 'webm'].includes(ext);
+                      const isPdf = ext === 'pdf';
+                      return (
                       <div
                         key={index}
-                        onClick={() => setLightboxImage(piece.url)}
+                        onClick={() => isVideo || isPdf ? null : setLightboxImage(piece.url)}
                         className={`group relative aspect-square rounded-xl overflow-hidden border-2 cursor-pointer transition-all duration-200 ${
                           darkMode
                             ? 'border-gray-600 hover:border-yellow-500'
                             : 'border-gray-200 hover:border-yellow-500'
                         }`}
                       >
-                        <img
-                          src={piece.url}
-                          alt={piece.nom_fichier}
-                          className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                          loading="lazy"
-                        />
+                        {isVideo && piece.url ? (
+                          <div className="w-full h-full bg-slate-900 flex items-center justify-center relative">
+                            <video src={piece.url} className="w-full h-full object-cover" preload="metadata" muted />
+                            <div className="absolute inset-0 bg-black/30 flex items-center justify-center">
+                              <div className="w-10 h-10 bg-white/80 rounded-full flex items-center justify-center">
+                                <svg className="w-5 h-5 text-purple-600 ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
+                              </div>
+                            </div>
+                          </div>
+                        ) : isPdf ? (
+                          <div className="w-full h-full bg-red-50 dark:bg-red-900/10 flex flex-col items-center justify-center">
+                            <svg className="h-10 w-10 text-red-400 mb-1" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" /></svg>
+                            <span className="text-xs font-bold text-red-500 dark:text-red-400 uppercase">PDF</span>
+                          </div>
+                        ) : (
+                          <img
+                            src={piece.url}
+                            alt={piece.nom_fichier}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                            loading="lazy"
+                          />
+                        )}
                         <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                         <div className="absolute bottom-0 left-0 right-0 px-2 py-1.5 bg-white/90 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
                           <p className="text-[10px] font-medium text-gray-700 truncate">{piece.nom_fichier}</p>
                         </div>
                       </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 </div>
               ) : null}

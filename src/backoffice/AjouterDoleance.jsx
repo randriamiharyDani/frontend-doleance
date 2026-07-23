@@ -76,6 +76,12 @@ function AjouterDoleance() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   }, []);
 
+  const allowedMimeTypes = [
+    'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
+    'video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/x-matroska',
+    'application/pdf'
+  ];
+
   const handleFileChange = (e) => {
     const selectedFiles = Array.from(e.target.files);
     const maxSize = 50 * 1024 * 1024;
@@ -85,8 +91,8 @@ function AjouterDoleance() {
     selectedFiles.forEach((file) => {
       if (file.size > maxSize) {
         errors.push(`${file.name} est trop volumineux (max 50 Mo)`);
-      } else if (!file.type.startsWith('image/')) {
-        errors.push(`${file.name} - Seules les images sont acceptées`);
+      } else if (!allowedMimeTypes.includes(file.type)) {
+        errors.push(`${file.name} - Type non autorisé. Formats acceptés : images, vidéos (MP4, MOV, AVI, MKV), PDF`);
       } else {
         validFiles.push(file);
       }
@@ -112,8 +118,8 @@ function AjouterDoleance() {
     droppedFiles.forEach((file) => {
       if (file.size > maxSize) {
         errors.push(`${file.name} est trop volumineux (max 50 Mo)`);
-      } else if (!file.type.startsWith('image/')) {
-        errors.push(`${file.name} - Seules les images sont acceptées`);
+      } else if (!allowedMimeTypes.includes(file.type)) {
+        errors.push(`${file.name} - Type non autorisé. Formats acceptés : images, vidéos (MP4, MOV, AVI, MKV), PDF`);
       } else {
         validFiles.push(file);
       }
@@ -429,7 +435,7 @@ function AjouterDoleance() {
               ref={fileInputRef}
               type="file"
               multiple
-              accept="image/*"
+              accept="image/jpeg,image/jpg,image/png,image/gif,image/webp,video/mp4,video/quicktime,video/x-msvideo,video/x-matroska,application/pdf"
               onChange={handleFileChange}
               className="hidden"
             />
