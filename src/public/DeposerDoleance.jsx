@@ -341,9 +341,16 @@ function DeposerDoleance() {
   };
 
   const allowedMimeTypes = [
-    'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
-    'video/mp4', 'video/quicktime', 'video/x-msvideo', 'video/x-matroska',
-    'application/pdf'
+    "image/jpeg",
+    "image/jpg",
+    "image/png",
+    "image/gif",
+    "image/webp",
+    "video/mp4",
+    "video/quicktime",
+    "video/x-msvideo",
+    "video/x-matroska",
+    "application/pdf",
   ];
 
   const handleFileChange = (e) => {
@@ -356,7 +363,9 @@ function DeposerDoleance() {
       if (file.size > maxSize) {
         errors.push(`${file.name} ${t("messages.fileTooBig")}`);
       } else if (!allowedMimeTypes.includes(file.type)) {
-        errors.push(`${file.name} - Type non autorisé. Formats acceptés : images, vidéos (MP4, MOV, AVI, MKV), PDF`);
+        errors.push(
+          `${file.name} - Type non autorisé. Formats acceptés : images, vidéos (MP4, MOV, AVI, MKV), PDF`,
+        );
       } else {
         validFiles.push(file);
       }
@@ -397,7 +406,9 @@ function DeposerDoleance() {
         if (file.size > maxSize) {
           errors.push(`${file.name} ${t("messages.fileTooBig")}`);
         } else if (!allowedMimeTypes.includes(file.type)) {
-          errors.push(`${file.name} - Type non autorisé. Formats acceptés : images, vidéos (MP4, MOV, AVI, MKV), PDF`);
+          errors.push(
+            `${file.name} - Type non autorisé. Formats acceptés : images, vidéos (MP4, MOV, AVI, MKV), PDF`,
+          );
         } else {
           validFiles.push(file);
         }
@@ -1336,7 +1347,7 @@ function DeposerDoleance() {
                 d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"
               />
             </svg>
-            <h2 className="text-[16px]  font-bold text-[#0F172A]">Opinion</h2>
+            <h2 className="text-[16px]  font-bold text-[#0F172A]">Suggestion <span className="text-[#D4AF37] text-[11.5px]"> (optionnelle)</span></h2>
           </div>
           <p className="text-sm text-slate-400 mb-4 ml-7">
             Proposez des idées pour résoudre le problème (optionnel)
@@ -1608,7 +1619,7 @@ function DeposerDoleance() {
             <div>
               <label className="block text-xs font-bold text-slate-600 mb-1.5">
                 Email
-                <span className="text-[#D4AF37]">*</span>
+                {/* <span className="text-[#D4AF37]">*</span> */}
               </label>
               <input
                 type="email"
@@ -1622,6 +1633,7 @@ function DeposerDoleance() {
             <div>
               <label className="block text-xs font-bold text-slate-600 mb-1.5">
                 Téléphone
+                <span className="text-[#D4AF37]">*</span>
               </label>
               <input
                 type="tel"
@@ -1629,15 +1641,16 @@ function DeposerDoleance() {
                 value={formData.telephone}
                 onChange={handleChange}
                 className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50"
-                placeholder="034 12 345 67"
+                placeholder="034 00 000 00"
               />
             </div>
             <p className="col-span-1 sm:col-span-2 text-xs text-slate-400 -mt-1 sm:-mt-2">
-              Email ou téléphone requis pour recevoir le suivi
+              Saisir votre email pour le suivi
             </p>
+
             <div className="col-span-1 sm:col-span-2">
               <label className="block text-xs font-bold text-slate-600 mb-1.5">
-                Votre adresse
+                Votre adresse<span className="text-[#D4AF37]"> (optionnelle)</span>
               </label>
               <input
                 type="text"
@@ -1645,7 +1658,7 @@ function DeposerDoleance() {
                 value={formData.adresse_citoyen}
                 onChange={handleChange}
                 className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50"
-                placeholder="Votre adresse personnelle (optionnelle)"
+                placeholder="Votre adresse personnelle "
               />
             </div>
           </div>

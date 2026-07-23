@@ -47,12 +47,31 @@ const STATUS_LABELS = {
   urgente: 'Urgente',
 };
 
+function normalizeStatut(nomStatut) {
+  if (!nomStatut) return 'en_cours';
+  const n = nomStatut.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z]/g, '');
+  if (n === 'transferee') return 'transferee';
+  if (n === 'enattente') return 'en_attente';
+  if (n === 'ennouvelle' || n === 'nouvelle') return 'en_attente';
+  if (n === 'en traitement' || n === 'entraitement') return 'en_cours';
+  if (n === 'assigne' || n === 'assignee') return 'en_cours';
+  if (n === 'traitee' || n === 'traite') return 'traitee';
+  if (n === 'resolue' || n === 'resolu') return 'resolue';
+  if (n === 'cloturee' || n === 'cloture') return 'cloturee';
+  if (n === 'rejetee' || n === 'rejete') return 'rejetee';
+  if (n === 'urgente' || n === 'urgent') return 'urgente';
+  return n;
+}
+
 function StatusPill({ statut }) {
-  const s = STATUS_STYLES[statut] || STATUS_STYLES.cloturee;
+  const key = normalizeStatut(statut);
+  const s = STATUS_STYLES[key] || STATUS_STYLES.cloturee;
   return (
     <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ring-1 ${s.bg} ${s.text} ${s.ring}`}>
       <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
-      {STATUS_LABELS[statut] || statut}
+      {STATUS_LABELS[key] || statut}
     </span>
   );
 }
@@ -170,12 +189,13 @@ function Transfert() {
 
   const calculateStatsFromData = () => {
     const total = doleances.length;
-    const enAttente = doleances.filter((d) => d.nom_statut === 'en_attente').length;
-    const enCours = doleances.filter((d) => d.nom_statut === 'en_cours').length;
-    const resolues = doleances.filter(
-      (d) => d.nom_statut === 'traitee' || d.nom_statut === 'resolue' || d.nom_statut === 'cloturee'
-    ).length;
-    const transferts = doleances.filter((d) => d.nom_statut === 'transferee').length;
+    const enAttente = doleances.filter((d) => normalizeStatut(d.nom_statut) === 'en_attente').length;
+    const enCours = doleances.filter((d) => normalizeStatut(d.nom_statut) === 'en_cours').length;
+    const resolues = doleances.filter((d) => {
+      const s = normalizeStatut(d.nom_statut);
+      return s === 'traitee' || s === 'resolue' || s === 'cloturee';
+    }).length;
+    const transferts = doleances.filter((d) => normalizeStatut(d.nom_statut) === 'transferee').length;
     setStatsTotals({ total, enAttente, enCours, resolues, transferts });
   };
 
@@ -295,8 +315,10 @@ function Transfert() {
     return cat?.nom_categorie || 'Non catégorisée';
   };
 
-  const canTransfer = (statut) =>
-    statut !== 'transferee' && statut !== 'traitee' && statut !== 'resolue' && statut !== 'cloturee' && statut !== 'urgente';
+  const canTransfer = (statut) => {
+    const s = normalizeStatut(statut);
+    return s !== 'transferee' && s !== 'traitee' && s !== 'resolue' && s !== 'cloturee' && s !== 'urgente' && s !== 'rejetee';
+  };
 
   const refreshData = () => {
     fetchStats();
@@ -538,7 +560,7 @@ function Transfert() {
                           <td className="px-4 py-2.5 whitespace-nowrap text-right">
                             <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-lg text-[10px] font-semibold">
                               <CheckCircleIcon className="h-3 w-3" />
-                              {doleance.nom_statut === 'transferee' ? 'Transférée' : 'Traitée'}
+                              {normalizeStatut(doleance.nom_statut) === 'transferee' ? 'Transférée' : 'Traitée'}
                             </span>
                           </td>
                         </tr>
