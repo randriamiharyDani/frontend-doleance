@@ -38,9 +38,7 @@ const COLOR_OPTIONS = [
   { value: '#E91E63', label: 'Rose vif' },
   { value: '#4CAF50', label: 'Vert foncé' },
 ];
-// function Direction(){
 
-// }
 function Categories() {
   const [activeTab, setActiveTab] = useState('CUA');
   const [categories, setCategories] = useState([]);
@@ -62,6 +60,7 @@ function Categories() {
   });
   const [saving, setSaving] = useState(false);
   const [directions, setDirections] = useState([]);
+  const [togglingId, setTogglingId] = useState(null);
 
   const tabs = [
     { key: 'CUA', label: 'Catégories CUA' },
@@ -95,7 +94,7 @@ function Categories() {
   }, []);
 
   const filtered = categories.filter((c) =>
-    !search || 
+    !search ||
     (c.nom_categorie || '').toLowerCase().includes(search.toLowerCase()) ||
     (c.nom_malgache || '').toLowerCase().includes(search.toLowerCase()) ||
     (c.direction_concernee || '').toLowerCase().includes(search.toLowerCase())
@@ -168,15 +167,29 @@ function Categories() {
     }
   };
 
+  // La catégorie n'est jamais retirée de la liste : on bascule uniquement
+  // son statut actif/inactif, et l'affichage la grise (masquage visuel).
   const toggleActif = async (cat) => {
     const newVal = cat.actif ? 0 : 1;
+    setTogglingId(cat.id_categorie);
+
+    // Mise à jour optimiste pour un retour visuel immédiat
+    setCategories((prev) =>
+      prev.map((c) => (c.id_categorie === cat.id_categorie ? { ...c, actif: newVal } : c))
+    );
+
     const result = await doleanceService.updateCategory(cat.id_categorie, { ...cat, actif: newVal });
+
     if (result.success) {
-      toast.success(newVal ? 'Catégorie activée' : 'Catégorie désactivée');
-      fetchCategories();
+      toast.success(newVal ? 'Catégorie activée' : 'Catégorie désactivée (masquée)');
     } else {
+      // rollback si l'API échoue
+      setCategories((prev) =>
+        prev.map((c) => (c.id_categorie === cat.id_categorie ? { ...c, actif: cat.actif } : c))
+      );
       toast.error(result.message || 'Erreur');
     }
+    setTogglingId(null);
   };
 
   return (
@@ -245,55 +258,87 @@ function Categories() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
-                {filtered.map((cat) => (
-                  <tr key={cat.id_categorie} className="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        {cat.couleur && (
-                          <span className="w-3 h-3 rounded-full flex-shrink-0" style={{ backgroundColor: cat.couleur }} />
-                        )}
-                        <span className="font-medium text-gray-800 dark:text-gray-100">{cat.nom_categorie}</span>
-                      </div>
-                    </td>
-                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300">{cat.nom_malgache || '-'}</td>
-                    <td className="px-4 py-3 text-gray-600 dark:text-gray-300 hidden sm:table-cell">{cat.direction_concernee || '-'}</td>
-                    <td className="px-4 py-3 text-gray-500 dark:text-gray-400 hidden md:table-cell max-w-xs truncate">
-                      {cat.description || '-'}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <button
-                        onClick={() => toggleActif(cat)}
-                        className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${
-                          cat.actif ? 'bg-green-500' : 'bg-gray-300 dark:bg-slate-600'
-                        }`}
-                      >
-                        <span
-                          className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${
-                            cat.actif ? 'translate-x-[18px]' : 'translate-x-1'
+                {filtered.map((cat) => {
+                  const isInactive = !cat.actif;
+                  return (
+                    <tr
+                      key={cat.id_categorie}
+                      className={`transition-colors ${
+                        isInactive
+                          ? 'bg-gray-50/70 dark:bg-slate-800/40 opacity-60 hover:opacity-100'
+                          : 'hover:bg-gray-50 dark:hover:bg-slate-700/50'
+                      }`}
+                    >
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          {cat.couleur && (
+                            <span
+                              className="w-3 h-3 rounded-full flex-shrink-0"
+                              style={{ backgroundColor: cat.couleur, filter: isInactive ? 'grayscale(1)' : 'none' }}
+                            />
+                          )}
+                          <span
+                            className={`font-medium ${
+                              isInactive
+                                ? 'text-gray-400 dark:text-gray-500 line-through decoration-1'
+                                : 'text-gray-800 dark:text-gray-100'
+                            }`}
+                          >
+                            {cat.nom_categorie}
+                          </span>
+                          {isInactive && (
+                            <span className="text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-gray-200 dark:bg-slate-600 text-gray-500 dark:text-gray-300">
+                              Masquée
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className={`px-4 py-3 ${isInactive ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600 dark:text-gray-300'}`}>
+                        {cat.nom_malgache || '-'}
+                      </td>
+                      <td className={`px-4 py-3 hidden sm:table-cell ${isInactive ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600 dark:text-gray-300'}`}>
+                        {cat.direction_concernee || '-'}
+                      </td>
+                      <td className={`px-4 py-3 hidden md:table-cell max-w-xs truncate ${isInactive ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500 dark:text-gray-400'}`}>
+                        {cat.description || '-'}
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <button
+                          onClick={() => toggleActif(cat)}
+                          disabled={togglingId === cat.id_categorie}
+                          title={cat.actif ? 'Désactiver (masquer)' : 'Activer'}
+                          className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors disabled:opacity-50 ${
+                            cat.actif ? 'bg-green-500' : 'bg-gray-300 dark:bg-slate-600'
                           }`}
-                        />
-                      </button>
-                    </td>
-                    <td className="px-4 py-3 text-right">
-                      <div className="flex items-center justify-end gap-1">
-                        <button
-                          onClick={() => openEdit(cat)}
-                          className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
-                          title="Modifier"
                         >
-                          <PencilIcon className="h-4 w-4" />
+                          <span
+                            className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${
+                              cat.actif ? 'translate-x-[18px]' : 'translate-x-1'
+                            }`}
+                          />
                         </button>
-                        <button
-                          onClick={() => setShowDeleteConfirm(cat)}
-                          className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
-                          title="Supprimer"
-                        >
-                          <TrashIcon className="h-4 w-4" />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => openEdit(cat)}
+                            className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
+                            title="Modifier"
+                          >
+                            <PencilIcon className="h-4 w-4" />
+                          </button>
+                          <button
+                            onClick={() => setShowDeleteConfirm(cat)}
+                            className="p-1.5 text-gray-400 dark:text-gray-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                            title="Supprimer"
+                          >
+                            <TrashIcon className="h-4 w-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>

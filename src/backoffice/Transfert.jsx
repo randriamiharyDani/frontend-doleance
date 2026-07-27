@@ -370,7 +370,7 @@ function Transfert() {
       </div>
 
       {/* Statistiques */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
+      {/* <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
         <StatCard
           label="Total"
           value={statsTotals.total}
@@ -401,7 +401,29 @@ function Transfert() {
           icon={CheckBadgeIcon}
           accent={{ bg: 'bg-emerald-50 dark:bg-emerald-900/30', bgSolid: 'bg-emerald-400', text: 'text-emerald-600' }}
         />
-      </div>
+      </div> */}
+
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
+  <StatCard
+    label="Total"
+    value={statsTotals.total}
+    icon={InboxIcon}
+    accent={{ bg: 'bg-slate-100 dark:bg-slate-700', bgSolid: 'bg-slate-400', text: 'text-slate-600 dark:text-slate-300' }}
+  />
+  <StatCard
+    label="En cours"
+    value={statsTotals.enCours}
+    icon={ArrowTrendingUpIcon}
+    accent={{ bg: 'bg-blue-50 dark:bg-blue-900/30', bgSolid: 'bg-[#1E3A8A]', text: 'text-[#1E3A8A]' }}
+  />
+  <StatCard
+    label="Résolues"
+    value={statsTotals.resolues}
+    icon={CheckBadgeIcon}
+    accent={{ bg: 'bg-emerald-50 dark:bg-emerald-900/30', bgSolid: 'bg-emerald-400', text: 'text-emerald-600' }}
+  />
+</div>
+
 
       {/* Filtres */}
       {showFilters && (
