@@ -129,9 +129,9 @@ function CategoryCard({ cat, selected, onClick }) {
       onClick={() => onClick(cat.id)}
       className={`cua-card-tap flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-5 rounded-xl sm:rounded-2xl text-center cursor-pointer transition-all duration-200 border ${
         selected
-          ? "border-[#D4AF37] shadow-lg shadow-[#D4AF37]/20 scale-[1.02] bg-[#D4AF37]/[0.06]"
-          : "border-transparent hover:border-slate-200 hover:shadow-md"
-      } bg-white shadow-sm hover:-translate-y-1`}
+          ? "border-[#D4AF37] shadow-lg shadow-[#D4AF37]/20 scale-[1.02] bg-[#D4AF37]/[0.06] dark:bg-[#D4AF37]/[0.1]"
+          : "border-transparent hover:border-slate-200 dark:hover:border-slate-600 hover:shadow-md"
+      } bg-white dark:bg-slate-800 shadow-sm hover:-translate-y-1`}
     >
       <div
         className={`w-10 h-10 sm:w-13 sm:h-13 rounded-xl sm:rounded-2xl flex items-center justify-center text-white text-base sm:text-xl bg-gradient-to-br ${cat.gradient} shadow-md`}
@@ -147,10 +147,10 @@ function CategoryCard({ cat, selected, onClick }) {
         </svg>
       </div>
       <div>
-        <p className="text-xs sm:text-sm font-bold text-slate-800">
+        <p className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200">
           {cat.label}
         </p>
-        <p className="text-[10px] sm:text-[11px] text-slate-400 mt-0.5 hidden sm:block">
+        <p className="text-[10px] sm:text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 hidden sm:block">
           {cat.desc}
         </p>
       </div>
@@ -367,7 +367,7 @@ function DeposerDoleance() {
         errors.push(`${file.name} ${t("messages.fileTooBig")}`);
       } else if (!allowedMimeTypes.includes(file.type)) {
         errors.push(
-          `${file.name} - Type non autorisé. Formats acceptés : images, vidéos (MP4, MOV, AVI, MKV), PDF`,
+          `${file.name} - ${t("deposerMessages.invalidFileType")}`,
         );
       } else {
         validFiles.push(file);
@@ -487,7 +487,7 @@ function DeposerDoleance() {
         if (contactType === "email") setEmailSent(true);
         else setSmsSent(true);
         setReferenceSent(true);
-        toast.success(`Reference ${reference} envoyee a ${contact}`, {
+        toast.success(`${t("messages.referenceSent")} ${reference} ${t("messages.referenceSentTo")} ${contact}`, {
           duration: 6000,
         });
       } else {
@@ -506,7 +506,7 @@ function DeposerDoleance() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!formData.email && !formData.telephone) {
-      toast.error("Email ou telephone requis");
+      toast.error(t("deposerMessages.emailOrPhoneRequired"));
       return;
     }
     if (
@@ -519,7 +519,7 @@ function DeposerDoleance() {
       return;
     }
     if (!formData.id_categorie) {
-      toast.error("Veuillez sélectionner une catégorie");
+      toast.error(t("deposerMessages.selectCategory"));
       return;
     }
     if (formData.telephone) {
@@ -581,16 +581,16 @@ function DeposerDoleance() {
 
       toast.success(
         <div className="flex flex-col gap-1">
-          <p className="font-bold">Signalement envoye avec succes !</p>
+          <p className="font-bold">{t("deposerMessages.reportSuccess")}</p>
           <p className="text-sm">
-            Reference:{" "}
+            {t("deposerMessages.refLabel")}{" "}
             <span className="font-mono font-bold text-[#1E3A8A]">
               {reference}
             </span>
           </p>
           {nomDirection && (
             <p className="text-sm text-emerald-600 font-medium">
-              Transmis à: {nomDirection}
+              {t("deposerMessages.forwardedTo")} {nomDirection}
             </p>
           )}
         </div>,
@@ -670,7 +670,7 @@ function DeposerDoleance() {
   const handleLocateMe = () => {
     if (!navigator.geolocation) {
       toast.error(
-        "La géolocalisation n'est pas supportée par votre navigateur",
+        t("deposerMessages.geoNotSupported"),
       );
       return;
     }
@@ -687,11 +687,11 @@ function DeposerDoleance() {
           );
           const data = await res.json();
           fillFromNominatim(data);
-          toast.success("Position trouvée !");
+          toast.success(t("deposerMessages.locationFound"));
         } catch (err) {
           console.error("Erreur reverse geocoding:", err);
           toast.error(
-            "Position obtenue, mais erreur lors de la récupération de l'adresse",
+            t("deposerMessages.locationError"),
           );
         } finally {
           setIsLocating(false);
@@ -701,16 +701,16 @@ function DeposerDoleance() {
         setIsLocating(false);
         if (err.code === err.PERMISSION_DENIED) {
           toast.error(
-            "Autorisation de localisation refusée. Veuillez activer les permissions de localisation dans votre navigateur.",
+            t("deposerMessages.locationDenied"),
           );
         } else if (err.code === err.POSITION_UNAVAILABLE) {
           toast.error(
-            "Position non disponible. Vérifiez que le GPS est activé.",
+            t("deposerMessages.locationUnavailable"),
           );
         } else if (err.code === err.TIMEOUT) {
-          toast.error("La demande de localisation a expiré. Réessayez.");
+          toast.error(t("deposerMessages.locationTimeout"));
         } else {
-          toast.error("Erreur lors de la géolocalisation. Réessayez.");
+          toast.error(t("deposerMessages.locationErrorGeneric"));
         }
       },
       { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
@@ -766,7 +766,7 @@ function DeposerDoleance() {
   const charsCount = formData.description.length;
 
   return (
-    <div className="cua-doleance shadow-2xl p-5 rounded-2xl">
+    <div className="cua-doleance shadow-2xl p-5 rounded-2xl bg-white dark:bg-slate-900">
       <style>{`
         .cua-doleance { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
         .cua-doleance .cua-display { font-family: 'Fraunces', ui-serif, Georgia, serif; }
@@ -779,6 +779,15 @@ function DeposerDoleance() {
         .cua-doleance .cua-section:hover {
           box-shadow: 0 4px 16px -4px rgba(15, 23, 42, 0.08);
         }
+        .dark .cua-doleance .cua-section {
+          background: #1e293b;
+          border-color: #334155;
+          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        .dark .cua-doleance .cua-section:hover {
+          box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.3);
+        }
+
         .cua-doleance .cua-field {
           border-color: #D1D5DB;
           transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
@@ -788,10 +797,33 @@ function DeposerDoleance() {
           box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15);
           background-color: #ffffff;
         }
+        .dark .cua-doleance .cua-field {
+          border-color: #475569;
+          background-color: #0f172a;
+          color: #e2e8f0;
+        }
+        .dark .cua-doleance .cua-field:focus {
+          border-color: #60a5fa;
+          box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.25);
+          background-color: #1e293b;
+        }
+        .dark .cua-doleance .cua-field::placeholder {
+          color: #64748b;
+        }
+
         .cua-doleance .cua-field-wrap:focus-within {
           border-color: #135ecf !important;
           box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15);
         }
+        .dark .cua-doleance .cua-field-wrap {
+          background-color: #0f172a;
+          border-color: #334155;
+        }
+        .dark .cua-doleance .cua-field-wrap:focus-within {
+          border-color: #60a5fa !important;
+          box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.25);
+        }
+
         .cua-doleance .cua-btn-primary {
           background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 60%, #2E4FA3 100%);
           transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
@@ -800,6 +832,10 @@ function DeposerDoleance() {
           filter: brightness(1.08);
           transform: translateY(-1px);
         }
+        .dark .cua-doleance .cua-btn-primary {
+          background: linear-gradient(135deg, #1e293b 0%, #1e40af 60%, #3b82f6 100%);
+        }
+
         .cua-doleance .cua-btn-submit {
           background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 55%, #2E4FA3 100%);
           box-shadow: 0 10px 30px -8px rgba(15, 23, 42, 0.45);
@@ -807,11 +843,36 @@ function DeposerDoleance() {
         .cua-doleance .cua-btn-submit:hover:not(:disabled) {
           box-shadow: 0 14px 36px -8px rgba(15, 23, 42, 0.55);
         }
+        .dark .cua-doleance .cua-btn-submit {
+          background: linear-gradient(135deg, #0f172a 0%, #1e40af 55%, #3b82f6 100%);
+          box-shadow: 0 10px 30px -8px rgba(59, 130, 246, 0.3);
+        }
+        .dark .cua-doleance .cua-btn-submit:hover:not(:disabled) {
+          box-shadow: 0 14px 36px -8px rgba(59, 130, 246, 0.4);
+        }
+
         .cua-doleance .cua-card-tap { will-change: transform; }
+        .dark .cua-doleance .cua-card-tap {
+          background: #1e293b;
+          border-color: #334155;
+        }
+        .dark .cua-doleance .cua-card-tap:hover {
+          border-color: #475569;
+        }
+
         .cua-doleance .cua-dropzone.drag {
           border-color: #D4AF37;
           background-color: rgba(212, 175, 55, 0.06);
         }
+        .dark .cua-doleance .cua-dropzone {
+          border-color: #475569;
+          background-color: #0f172a;
+        }
+        .dark .cua-doleance .cua-dropzone:hover {
+          border-color: #D4AF37;
+          background-color: rgba(212, 175, 55, 0.08);
+        }
+
         .cua-doleance .cua-gold-dot {
           background: radial-gradient(circle, #D4AF37 0%, transparent 70%);
         }
@@ -836,10 +897,10 @@ function DeposerDoleance() {
             }`}
           >
             <ShieldCheckIcon className="w-3.5 h-3.5" />
-            Commune Urbaine d'Antananarivo
+            {t("deposer.communeTitle")}
           </span>
         </div>
-        <h1 className="cua-display text-2xl sm:text-2xl font-semibold text-[#0F172A] flex items-center gap-2 sm:gap-3">
+        <h1 className="cua-display text-2xl sm:text-2xl font-semibold text-[#0F172A] dark:text-slate-100 flex items-center gap-2 sm:gap-3">
           <span className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#0F172A] to-[#1E3A8A] flex items-center justify-center text-white shadow-md shadow-[#0F172A]/20 flex-shrink-0">
             <svg
               className="w-4 h-4 sm:w-5 sm:h-5"
@@ -855,32 +916,31 @@ function DeposerDoleance() {
               />
             </svg>
           </span>
-          Signaler un problème
+          {t("deposer.pageTitle")}
         </h1>
-        <p className=" text-slate-500 mt-1.5 ml-[10px] sm:ml-[10px] ">
-          Traitement des signalements et des doléances des citoyens
+        <p className=" text-slate-500 dark:text-slate-400 mt-1.5 ml-[10px] sm:ml-[10px] ">
+          {t("deposer.pageSubtitle")}
         </p>
 
-        <div className="bg-blue-50 border-l-4 border-blue-700 rounded-lg p-4  mt-5">
-          <p className="text-sm text-slate-600 leading-relaxed">
-            Décrivez clairement votre doléance en précisant le lieu, le problème
-            rencontré et les détails nécessaires pour faciliter son traitement.
+        <div className="bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-700 dark:border-blue-400 rounded-lg p-4  mt-5">
+          <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
+            {t("deposer.instructionBox")}
           </p>
         </div>
 
-        <p className="inline-flex items-center rounded-xl border border-yellow-400 bg-yellow-100 mt-5 px-4 py-2 text-[13px] font-medium text-yellow-800 w-fit">
-          📋 Veuillez remplir le formulaire ci-dessous.
+        <p className="inline-flex items-center rounded-xl border border-yellow-400 dark:border-yellow-600 bg-yellow-100 dark:bg-yellow-900/30 mt-5 px-4 py-2 text-[13px] font-medium text-yellow-800 dark:text-yellow-300 w-fit">
+          {t("deposer.fillForm")}
         </p>
       </div>
 
       <form onSubmit={handleSubmit}>
         {/* Type d'entité */}
         <div className="mb-1">
-          <h2 className="block text-[16px] font-bold text-[#0F172A]">
-            Type de situation
+            <h2 className="block text-[16px] font-bold text-[#0F172A] dark:text-slate-100">
+            {t("deposer.typeSituation")}
             <span className="ml-1 text-sm font-normal text-red-500">*</span>
             <span className="ml-1 text-sm font-medium text-gray-500">
-              (à choisir)
+              {t("deposer.toChoose")}
             </span>
           </h2>
           <div className="flex gap-3">
@@ -889,24 +949,24 @@ function DeposerDoleance() {
               onClick={() => setModule("CUA")}
               className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold border transition-all ${
                 module === "CUA"
-                  ? "border-blue-600 bg-blue-50 text-blue-700 shadow-sm"
-                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+                  ? "border-blue-600 bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 shadow-sm"
+                  : "border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-500"
               }`}
             >
               <span className="block text-base">🏛️</span>
-              <span>Commune Urbaine (CUA)</span>
+              <span>{t("deposer.communeCUA")}</span>
             </button>
             <button
               type="button"
               onClick={() => setModule("Sapeurs-Pompiers")}
               className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold border transition-all ${
                 module === "Sapeurs-Pompiers"
-                  ? "border-red-600 bg-red-50 text-red-700 shadow-sm"
-                  : "border-slate-200 bg-white text-slate-600 hover:border-slate-300"
+                  ? "border-red-600 bg-red-50 dark:bg-red-900/40 text-red-700 dark:text-red-300 shadow-sm"
+                  : "border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-500"
               }`}
             >
               <span className="block text-base">🚒</span>
-              <span>Sapeurs-Pompiers</span>
+              <span>{t("deposer.sapeursPompiers")}</span>
             </button>
           </div>
         </div>
@@ -914,9 +974,8 @@ function DeposerDoleance() {
         {/* Categories */}
         {module && mappedCategories.length > 0 && (
           <>
-            <p className="italic text-blue-600 text-xs my-3">
-              *__________Si vous trouvez une catégorie correspondante, cochez-la
-              s'il vous plaît.
+            <p className="italic text-blue-600 dark:text-blue-400 text-xs my-3">
+              {t("deposer.categoryHint1")}
             </p>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -945,7 +1004,7 @@ function DeposerDoleance() {
                 );
                 if (!selectedCat?.nom_direction) return null;
                 return (
-                  <div className="flex items-center gap-2 bg-blue-50 border border-blue-200 rounded-xl px-4 py-2.5 mb-3  my-5 ">
+                  <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-xl px-4 py-2.5 mb-3  my-5 ">
                     <svg
                       className="w-4 h-4 text-[#1E3A8A] shrink-0"
                       fill="none"
@@ -959,23 +1018,22 @@ function DeposerDoleance() {
                         d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
                       />
                     </svg>
-                    <span className="text-xs sm:text-sm text-[#1E3A8A] font-semibold">
-                      Direction concernée : {selectedCat.nom_direction}
+                    <span className="text-xs sm:text-sm text-[#1E3A8A] dark:text-blue-300 font-semibold">
+                      {t("deposer.directionLabel")} {selectedCat.nom_direction}
                     </span>
                   </div>
                 );
               })()}
 
-            <p className="italic text-blue-600 text-xs my-3">
-              *__________Si vous ne trouvez pas de catégorie correspondante,
-              veuillez décrire votre problème ci-dessous.
+            <p className="italic text-blue-600 dark:text-blue-400 text-xs my-3">
+              {t("deposer.categoryHint2")}
             </p>
           </>
         )}
 
         {module && mappedCategories.length === 0 && (
-          <p className="text-slate-400 text-sm text-center mb-2 py-4">
-            Aucune catégorie disponible
+          <p className="text-slate-400 dark:text-slate-500 text-sm text-center mb-2 py-4">
+            {t("deposer.noCategory")}
           </p>
         )}
 
@@ -996,8 +1054,8 @@ function DeposerDoleance() {
                   d="M3.75 9h16.5m-16.5 6.75h16.5"
                 />
               </svg>
-              <h2 className="text-[16px]  font-bold text-[#0F172A]">
-                Titre du problème
+              <h2 className="text-[16px]  font-bold text-[#0F172A] dark:text-slate-100">
+                {t("deposer.titleProblem")}
                 <span className="ml-1 text-sm font-normal text-red-500">*</span>
               </h2>
             </div>
@@ -1006,8 +1064,8 @@ function DeposerDoleance() {
               name="titre"
               value={formData.titre}
               onChange={handleChange}
-              placeholder="Ex : Nid-de-poule dangereux Rue de la Liberté"
-              className="cua-field w-full border  rounded-xl px-5 py-4 text-sm font-medium text-slate-800 outline-none placeholder:text-slate-400"
+              placeholder={t("deposer.titlePlaceholder")}
+              className="cua-field w-full border  rounded-xl px-5 py-4 text-sm font-medium text-slate-800 dark:text-slate-200 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
               required
             />
           </div>
@@ -1029,25 +1087,24 @@ function DeposerDoleance() {
                 d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
               />
             </svg>
-            <h2 className="text-[16px]  font-bold text-[#0F172A]">
-              Description du problème
+            <h2 className="text-[16px]  font-bold text-[#0F172A] dark:text-slate-100">
+              {t("deposer.descriptionProblem")}
             </h2>
           </div>
-          <p className="text-sm text-slate-400 mb-4 ml-7">
-            Décrivez le problème en quelques phrases pour aider les équipes à
-            intervenir
+          <p className="text-sm text-slate-400 dark:text-slate-500 mb-4 ml-7">
+            {t("deposer.descriptionHelp")}
           </p>
           <textarea
             name="description"
             value={formData.description}
             onChange={handleChange}
             rows={5}
-            placeholder="Décrivez le problème que vous avez constaté..."
-            className="cua-field w-full border  rounded-xl px-5 py-4 text-sm text-slate-800 outline-none resize-y placeholder:text-slate-400"
+            placeholder={t("deposer.descriptionPlaceholder")}
+            className="cua-field w-full border  rounded-xl px-5 py-4 text-sm text-slate-800 dark:text-slate-200 outline-none resize-y placeholder:text-slate-400 dark:placeholder:text-slate-500"
             required
           />
           <div className="flex justify-between items-center mt-2">
-            <p className="text-xs text-slate-400">
+              <p className="text-xs text-slate-400 dark:text-slate-500">
               <svg
                 className="w-3.5 h-3.5 inline mr-1 text-emerald-600"
                 fill="none"
@@ -1061,10 +1118,10 @@ function DeposerDoleance() {
                   d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
                 />
               </svg>
-              Données confidentielles
+              {t("deposer.confidentialData")}
             </p>
-            <span className="text-xs text-slate-400">
-              {charsCount} / 1000 caractères
+            <span className="text-xs text-slate-400 dark:text-slate-500">
+              {charsCount} / 1000 {t("deposer.characters")}
             </span>
           </div>
         </div>
@@ -1090,8 +1147,8 @@ function DeposerDoleance() {
                 d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
               />
             </svg>
-            <h2 className="text-[16px]  font-bold text-[#0F172A]">
-              Localisation & adresse
+            <h2 className="text-[16px]  font-bold text-[#0F172A] dark:text-slate-100">
+              {t("deposer.locationTitle")}
               <span className="ml-1 text-sm font-normal text-red-500">*</span>
             </h2>
           </div>
@@ -1100,7 +1157,7 @@ function DeposerDoleance() {
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-3 relative">
             <form
               onSubmit={handleSearchAddress}
-              className="cua-field-wrap flex-1 flex items-center gap-3 bg-slate-50 rounded-xl px-4 border border-transparent transition-all relative order-2 sm:order-1"
+              className="cua-field-wrap flex-1 flex items-center gap-3 bg-slate-50 dark:bg-slate-800 rounded-xl px-4 border border-transparent transition-all relative order-2 sm:order-1"
             >
               <svg
                 className="w-4 h-4 text-slate-400 flex-shrink-0"
@@ -1123,28 +1180,28 @@ function DeposerDoleance() {
                   searchAddress.length >= 3 && setShowSuggestions(true)
                 }
                 onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
-                placeholder="Rechercher une adresse, un quartier..."
-                className="flex-1 bg-transparent py-2.5 sm:py-3 text-sm font-medium text-slate-800 outline-none placeholder:text-slate-400 min-w-0"
+                placeholder={t("deposer.searchPlaceholder")}
+                className="flex-1 bg-transparent py-2.5 sm:py-3 text-sm font-medium text-slate-800 dark:text-slate-200 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 min-w-0"
               />
               {isSearching && (
                 <div className="w-4 h-4 border border-slate-300 border-t-[#1E3A8A] rounded-full animate-spin flex-shrink-0" />
               )}
               <button
                 type="submit"
-                className="text-xs font-semibold text-[#1E3A8A] hover:text-[#0F172A] py-1 px-2 rounded-lg hover:bg-[#1E3A8A]/5 transition-all flex-shrink-0"
+                className="text-xs font-semibold text-[#1E3A8A] dark:text-blue-400 hover:text-[#0F172A] dark:hover:text-blue-300 py-1 px-2 rounded-lg hover:bg-[#1E3A8A]/5 dark:hover:bg-blue-400/10 transition-all flex-shrink-0"
               >
-                Chercher
+                {t("deposer.searchBtn")}
               </button>
 
               {/* Dropdown de suggestions */}
               {showSuggestions && suggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-white rounded-xl shadow-lg border  z-[1001] max-h-60 overflow-y-auto">
+                <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-slate-800 rounded-xl shadow-lg border dark:border-slate-600 z-[1001] max-h-60 overflow-y-auto">
                   {suggestions.map((item, i) => (
                     <button
                       key={i}
                       type="button"
                       onClick={() => handleSelectSuggestion(item)}
-                      className="w-full text-left px-4 py-2.5 text-sm text-slate-700 hover:bg-[#D4AF37]/10 transition-colors border-b border-slate-50 last:border-0"
+                      className="w-full text-left px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-[#D4AF37]/10 transition-colors border-b border-slate-50 dark:border-slate-700 last:border-0"
                     >
                       {item.display_name}
                     </button>
@@ -1181,7 +1238,7 @@ function DeposerDoleance() {
                   />
                 </svg>
               )}
-              <span className="hidden sm:inline">Me localiser</span>
+              <span className="hidden sm:inline">{t("deposer.locateMe")}</span>
               <span className="sm:hidden">
                 <svg
                   className="w-4 h-4"
@@ -1206,7 +1263,7 @@ function DeposerDoleance() {
           </div>
 
           {/* Carte */}
-          <div className="h-64 sm:h-96 rounded-xl overflow-hidden border border-slate-200 relative z-0 mb-4">
+          <div className="h-64 sm:h-96 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-600 relative z-0 mb-4">
             <MapContainer
               center={mapPosition}
               zoom={14}
@@ -1276,9 +1333,9 @@ function DeposerDoleance() {
                       <div className="text-xs">
                         <p className="font-bold">{d.titre}</p>
                         <p className="text-slate-500">{d.nom_categorie}</p>
-                        <p className="text-slate-400">Ref: {d.reference}</p>
+                        <p className="text-slate-400">{t("deposer.refLabel")} {d.reference}</p>
                         <p className="text-emerald-600 font-semibold mt-1">
-                          Assignée
+                          {t("deposer.assigned")}
                         </p>
                       </div>
                     </Popup>
@@ -1304,30 +1361,29 @@ function DeposerDoleance() {
                   d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
                 />
               </svg>
-              Cliquez ou déplacez le marqueur pour ajuster
+              {t("deposer.mapHint")}
             </div>
           </div>
 
           {/* Champs adresse - modifiables manuellement même après auto-remplissage */}
           <div className="grid grid-cols-2 gap-4">
             <div className="col-span-2">
-              <label className="block text-xs font-bold text-slate-600 mb-1.5">
-                Lieu exact{" "}
-                <span className="text-slate-400 font-normal">(optionnel)</span>
+              <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5">
+                {t("deposer.exactLocation")}{" "}
+                <span className="text-slate-400 dark:text-slate-500 font-normal">{t("deposer.optional")}</span>
               </label>
               <input
                 type="text"
                 name="lieu_exact"
                 value={formData.lieu_exact}
                 onChange={handleChange}
-                placeholder="Entrez ou modifiez le lieu exact"
-                className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50"
+                placeholder={t("deposer.exactLocationPlaceholder")}
+                className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200"
               />
               {assignedDoleances.length > 0 && (
-                <p className="text-xs text-slate-400 mt-1.5 flex items-center gap-1.5">
+                <p className="text-xs text-slate-400 dark:text-slate-500 mt-1.5 flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-[#D4AF37] flex-shrink-0" />
-                  Les points dorés sur la carte montrent les signalements déjà
-                  assignés
+                  {t("deposer.assignedMarkers")}
                 </p>
               )}
             </div>
@@ -1350,18 +1406,18 @@ function DeposerDoleance() {
                 d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"
               />
             </svg>
-            <h2 className="text-[16px]  font-bold text-[#0F172A]">Suggestion <span className="text-[#D4AF37] text-[11.5px]"> (optionnelle)</span></h2>
+            <h2 className="text-[16px]  font-bold text-[#0F172A] dark:text-slate-100">{t("deposer.suggestionTitle")} <span className="text-[#D4AF37] text-[11.5px]"> {t("deposer.optionalFemale")}</span></h2>
           </div>
-          <p className="text-sm text-slate-400 mb-4 ml-7">
-            Proposez des idées pour résoudre le problème (optionnel)
+          <p className="text-sm text-slate-400 dark:text-slate-500 mb-4 ml-7">
+            {t("deposer.suggestionHelp")}
           </p>
           <textarea
             name="suggestions"
             value={formData.suggestions}
             onChange={handleChange}
             rows={3}
-            placeholder="Ex : Il faudrait installer un ralentisseur et refaire le revêtement de la route..."
-            className="cua-field w-full border  rounded-xl px-5 py-4 text-sm text-slate-800 outline-none resize-y placeholder:text-slate-400"
+            placeholder={t("deposer.suggestionPlaceholder")}
+            className="cua-field w-full border  rounded-xl px-5 py-4 text-sm text-slate-800 dark:text-slate-200 outline-none resize-y placeholder:text-slate-400 dark:placeholder:text-slate-500"
           />
         </div>
 
@@ -1382,41 +1438,40 @@ function DeposerDoleance() {
                 d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
               />
             </svg>
-            <h2 className="text-[16px]  font-bold text-[#0F172A]">
-              Ajouter des photos
+            <h2 className="text-[16px]  font-bold text-[#0F172A] dark:text-slate-100">
+              {t("deposer.addPhotos")}
             </h2>
           </div>
-          <p className="text-sm text-slate-400 mb-4 ml-7">
-            Montrez le problème avec des photos prises sur place (optionnel mais
-            recommandé)
+          <p className="text-sm text-slate-400 dark:text-slate-500 mb-4 ml-7">
+            {t("deposer.photosHelp")}
           </p>
 
           <div className="flex gap-2 sm:gap-3 mb-4 overflow-x-auto pb-2 -mx-5 px-5">
             {[
               {
-                label: "Nid-de-poule",
+                label: t("deposer.examplePothole"),
                 icon: "M13.5 4L5.25 12.25l4.5 4.5L18 8.5",
                 color: "from-rose-400 to-orange-400",
               },
               {
-                label: "Déchet sauvage",
+                label: t("deposer.exampleWaste"),
                 icon: "M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16",
                 color: "from-emerald-400 to-teal-500",
               },
               {
-                label: "Lampadaire",
+                label: t("deposer.exampleLamp"),
                 icon: "M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z",
                 color: "from-amber-400 to-[#D4AF37]",
               },
               {
-                label: "Espace vert",
+                label: t("deposer.exampleGreenSpace"),
                 icon: "M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5",
                 color: "from-green-500 to-emerald-700",
               },
             ].map((ex, i) => (
               <div
                 key={i}
-                className="w-24 sm:w-28 h-16 sm:h-20 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-center flex-shrink-0 relative overflow-hidden"
+                className="w-24 sm:w-28 h-16 sm:h-20 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 flex items-center justify-center flex-shrink-0 relative overflow-hidden"
               >
                 <div
                   className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br ${ex.color} flex items-center justify-center`}
@@ -1466,11 +1521,11 @@ function DeposerDoleance() {
                 d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
               />
             </svg>
-            <p className="text-sm font-bold text-slate-700 mb-1">
-              Glissez-déposez vos photos ici
+            <p className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">
+              {t("deposer.dragDrop")}
             </p>
-            <p className="text-xs text-slate-400">
-              ou cliquez pour parcourir (JPG, PNG, WebP, GIF — max 50 Mo)
+            <p className="text-xs text-slate-400 dark:text-slate-500">
+              {t("deposer.browseFiles")}
             </p>
             <input
               ref={fileInputRef}
@@ -1484,14 +1539,14 @@ function DeposerDoleance() {
 
           {files.length > 0 && (
             <div className="mt-4">
-              <p className="text-sm font-semibold text-slate-700 mb-3">
-                {files.length} photo(s) sélectionnée(s) — aperçu avant envoi
+              <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-3">
+                {files.length} {t("deposer.photosSelected")}
               </p>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                 {files.map((file, i) => (
                   <div
                     key={i}
-                    className="group relative rounded-xl overflow-hidden border  hover:border-[#D4AF37] transition-all duration-200 bg-slate-50 aspect-square"
+                    className="group relative rounded-xl overflow-hidden border  hover:border-[#D4AF37] transition-all duration-200 bg-slate-50 dark:bg-slate-800 aspect-square"
                   >
                     {filePreviews[i] ? (
                       <img
@@ -1536,8 +1591,8 @@ function DeposerDoleance() {
                         />
                       </svg>
                     </button>
-                    <div className="absolute bottom-0 left-0 right-0 px-2 py-1.5 bg-white/90 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                      <p className="text-[10px] font-medium text-slate-700 truncate">
+                    <div className="absolute bottom-0 left-0 right-0 px-2 py-1.5 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                      <p className="text-[10px] font-medium text-slate-700 dark:text-slate-300 truncate">
                         {file.name}
                       </p>
                       <p className="text-[9px] text-slate-400">
@@ -1553,17 +1608,17 @@ function DeposerDoleance() {
           {uploading && (
             <div className="mt-4">
               <div className="flex items-center gap-3">
-                <div className="flex-1 h-2 bg-slate-100 rounded-full overflow-hidden">
+                <div className="flex-1 h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
                   <div
                     className="h-full bg-gradient-to-r from-[#1E3A8A] to-[#D4AF37] rounded-full transition-all duration-300"
                     style={{ width: `${uploadProgress}%` }}
                   ></div>
                 </div>
-                <span className="text-xs font-medium text-slate-500">
+                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
                   {uploadProgress}%
                 </span>
               </div>
-              <p className="text-xs text-slate-400 mt-1">Upload en cours...</p>
+              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{t("deposer.uploadProgress")}</p>
             </div>
           )}
         </div>
@@ -1584,15 +1639,15 @@ function DeposerDoleance() {
                 d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
               />
             </svg>
-            <h2 className="text-[16px]  font-bold text-[#0F172A]">
-              Vos informations
+            <h2 className="text-[16px]  font-bold text-[#0F172A] dark:text-slate-100">
+              {t("form.yourInfo")}
               <span className="ml-1 text-sm font-normal text-red-500">*</span>
             </h2>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1.5">
+              <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5">
                 Nom <span className="text-[#D4AF37]">*</span>
               </label>
               <input
@@ -1600,13 +1655,13 @@ function DeposerDoleance() {
                 name="nom_citoyen"
                 value={formData.nom_citoyen}
                 onChange={handleChange}
-                className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50"
-                placeholder="Votre nom"
+                className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200"
+                placeholder={t("deposer.namePlaceholder")}
                 required
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1.5">
+              <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5">
                 Prénom <span className="text-[#D4AF37]">*</span>
               </label>
               <input
@@ -1614,13 +1669,13 @@ function DeposerDoleance() {
                 name="prenom_citoyen"
                 value={formData.prenom_citoyen}
                 onChange={handleChange}
-                className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50"
-                placeholder="Votre prénom"
+                className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200"
+                placeholder={t("deposer.firstNamePlaceholder")}
                 required
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1.5">
+              <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5">
                 Email
                 {/* <span className="text-[#D4AF37]">*</span> */}
               </label>
@@ -1629,12 +1684,12 @@ function DeposerDoleance() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50"
+                className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200"
                 placeholder="exemple@email.com"
               />
             </div>
             <div>
-              <label className="block text-xs font-bold text-slate-600 mb-1.5">
+              <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5">
                 Téléphone
                 <span className="text-[#D4AF37]">*</span>
               </label>
@@ -1643,25 +1698,25 @@ function DeposerDoleance() {
                 name="telephone"
                 value={formData.telephone}
                 onChange={handleChange}
-                className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50"
+                className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200"
                 placeholder="034 00 000 00"
               />
             </div>
-            <p className="col-span-1 sm:col-span-2 text-xs text-slate-400 -mt-1 sm:-mt-2">
-              Saisir votre email pour le suivi
+            <p className="col-span-1 sm:col-span-2 text-xs text-slate-400 dark:text-slate-500 -mt-1 sm:-mt-2">
+              {t("deposer.emailHint")}
             </p>
 
             <div className="col-span-1 sm:col-span-2">
-              <label className="block text-xs font-bold text-slate-600 mb-1.5">
-                Votre adresse<span className="text-[#D4AF37]"> (optionnelle)</span>
+              <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5">
+                {t("deposer.addressOptional")}<span className="text-[#D4AF37]"> {t("deposer.optionalFemale")}</span>
               </label>
               <input
                 type="text"
                 name="adresse_citoyen"
                 value={formData.adresse_citoyen}
                 onChange={handleChange}
-                className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50"
-                placeholder="Votre adresse personnelle "
+                className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200"
+                placeholder={t("deposer.addressPlaceholder")}
               />
             </div>
           </div>
@@ -1684,9 +1739,9 @@ function DeposerDoleance() {
               />
             </svg>
             <span className="hidden sm:inline">
-              Vos informations restent confidentielles
+              {t("deposer.confidentialInfo")}
             </span>
-            <span className="sm:hidden">Informations confidentielles</span>
+            <span className="sm:hidden">{t("deposer.confidentialInfoShort")}</span>
           </p>
           <button
             type="submit"
@@ -1715,7 +1770,7 @@ function DeposerDoleance() {
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   />
                 </svg>
-                {uploading ? "Upload..." : "Envoi..."}
+                {uploading ? t("deposer.uploading") : t("deposer.sending")}
               </span>
             ) : (
               <>
@@ -1732,7 +1787,7 @@ function DeposerDoleance() {
                     d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
                   />
                 </svg>
-                Envoyer mon signalement
+                {t("deposer.sendReport")}
               </>
             )}
           </button>
@@ -1742,7 +1797,7 @@ function DeposerDoleance() {
       {/* Reference Modal */}
       {showReferenceModal && (
         <div className="fixed inset-0 bg-[#0F172A]/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full mx-auto p-6 border  relative overflow-hidden">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full mx-auto p-6 border dark:border-slate-600 relative overflow-hidden">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0F172A] via-[#D4AF37] to-[#0F172A]" />
             <div className="text-center">
               <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center mb-4 shadow-lg">
@@ -1760,31 +1815,31 @@ function DeposerDoleance() {
                   />
                 </svg>
               </div>
-              <h3 className="cua-display text-xl font-semibold text-[#0F172A] mb-2">
-                Signalement envoyé !
+              <h3 className="cua-display text-xl font-semibold text-[#0F172A] dark:text-slate-100 mb-2">
+                {t("deposer.reportSent")}
               </h3>
-              <p className="text-sm text-slate-500 mb-4">
-                Votre référence de suivi :
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+                {t("deposer.trackingRef")}
               </p>
-              <div className="bg-slate-50 rounded-xl px-4 py-3 mb-4 border ">
+              <div className="bg-slate-50 dark:bg-slate-700 rounded-xl px-4 py-3 mb-4 border dark:border-slate-600">
                 <span className="text-2xl font-mono font-bold text-[#1E3A8A] tracking-wider">
                   {savedReference}
                 </span>
               </div>
               {savedDirection && (
                 <p className="text-sm text-emerald-600 font-semibold mb-4">
-                  Transmis à : {savedDirection}
+                  {t("deposer.forwardedTo")} {savedDirection}
                 </p>
               )}
               <div className="flex gap-3 justify-center">
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText(savedReference);
-                    toast.success("Référence copiée !");
+                    toast.success(t("deposer.copySuccess"));
                   }}
-                  className="px-5 py-2.5 bg-slate-100 text-slate-700 rounded-xl text-sm font-bold hover:bg-slate-200 transition-all"
+                  className="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-600 transition-all"
                 >
-                  Copier
+                  {t("deposer.copy")}
                 </button>
                 <button
                   onClick={() => {
@@ -1793,7 +1848,7 @@ function DeposerDoleance() {
                   }}
                   className="cua-btn-primary px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all"
                 >
-                  Suivre mon signalement
+                  {t("deposer.trackReport")}
                 </button>
               </div>
             </div>

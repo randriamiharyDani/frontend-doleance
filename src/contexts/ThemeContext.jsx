@@ -18,8 +18,8 @@ export const ThemeProvider = ({ children }) => {
     if (savedTheme) {
       return savedTheme === 'dark';
     }
-    // Vérifier la préférence du système
-    return window.matchMedia('(prefers-color-scheme: dark)').matches;
+    // Par défaut : mode clair (light)
+    return false;
   });
 
   // Appliquer le thème au document
