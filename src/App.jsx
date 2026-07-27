@@ -34,6 +34,8 @@ import Historique from './backoffice/Historique';
 import AjouterDoleance from './backoffice/AjouterDoleance';
 import Corbeille from './backoffice/Corbeille';
 import Categories from './backoffice/Categories';
+import Messages from './backoffice/Messages';
+import { ChatProvider } from './contexts/ChatContext';
 import PrivateRoute from './components/PrivateRoute';
 
 function AppRoutes() {
@@ -68,6 +70,7 @@ function AppRoutes() {
         <Route path="settings" element={<Settings />} />
         <Route path="corbeille" element={<PrivateRoute allowedRoles={['administrateur_systeme']}><Corbeille /></PrivateRoute>} />
         <Route path="categories" element={<Categories />} />
+        <Route path="messages" element={<ChatProvider><Messages /></ChatProvider>} />
 
       </Route>
       

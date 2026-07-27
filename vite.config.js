@@ -29,7 +29,6 @@ export default defineConfig({
       }
     }
   },
-  // Configuration pour permettre JSX dans les fichiers .js
   esbuild: {
     loader: 'jsx',
     include: /src\/.*\.(js|jsx|ts|tsx)$/,

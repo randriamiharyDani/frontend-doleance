@@ -18,6 +18,7 @@ import {
   ClockIcon,
   TrashIcon,
   TagIcon,
+  ChatBubbleLeftRightIcon,
 } from "@heroicons/react/24/outline";
 import Navbar from "../components/backoffice/Navbar";
 
@@ -129,6 +130,7 @@ function BackofficeLayout() {
       href: "/backoffice/doleances",
       icon: DocumentTextIcon,
     },
+    { name: "Messages", href: "/backoffice/messages", icon: ChatBubbleLeftRightIcon },
     ...(isAdmin ? [
       { name: "Transfert", href: "/backoffice/transfert", icon: ArrowPathIcon },
     ] : []),
@@ -237,7 +239,7 @@ function BackofficeLayout() {
         </div>
 
         {/* Navigation */}
-   <nav className="p-3 pb-20">
+    <nav className="p-3 pb-20">
   <div className="space-y-1">
     {navigation.map((item) => (
       <Link
@@ -479,7 +481,7 @@ function BackofficeLayout() {
 
 
 
-</nav>
+    </nav>
 
         {/* Footer */}
         {/* Infos utilisateur */}
@@ -513,10 +515,10 @@ function BackofficeLayout() {
       </aside>
 
       {/* Contenu principal */}
-      <div className="lg:pl-72 min-h-screen flex flex-col">
+      <div className="lg:pl-72 h-screen flex flex-col overflow-hidden">
         <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        <main className="flex-1 p-3 sm:p-4 md:p-6 lg:p-8">
-          <div className="max-w-full overflow-x-auto">
+        <main className="flex-1 overflow-hidden flex flex-col">
+          <div className="flex-1 overflow-auto p-1 sm:p-2 md:p-2 lg:p-4">
             <Outlet />
           </div>
         </main>

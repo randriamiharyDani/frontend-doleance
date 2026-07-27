@@ -333,7 +333,7 @@
   },
   "deposer": {
     "communeTitle": "Commune Urbaine d'Antananarivo",
-    "pageTitle": "Tatitra olana",
+    "pageTitle": "Manao tatitra momba ny olana",
     "pageSubtitle": "Fikarakarana ny fampahafantarana sy ny fitarainan'ny olom-pirenena",
     "instructionBox": "Lazao mazava tsara ny fitarainanao amin'ny filazana ny toerana, ny olana niainana, ary ny antsipiriany ilaina ho fanamorana ny fitsaboana azy.",
     "fillForm": "📋 Fenoy ny fototra ampitana ao ambany.",
@@ -409,5 +409,11 @@
     "reportSuccess": "Lahatsoratra nalefa tamin'ny fomba mahomby!",
     "refLabel": "Laharan-kitokisana :",
     "forwardedTo": "Alefa any amin'ny"
+  },
+  "chat": {
+   
+  },
+  "header" :{
+    "bigtitle" : "Fampahafantarana" 
   }
 }

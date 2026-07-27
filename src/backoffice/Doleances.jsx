@@ -264,7 +264,7 @@ function Doleances() {
               isAdminOrAgentCentral={isAdminOrAgentCentral}
               canTraiter={canTraiter}
               onView={openDetailsModal}
-              onDelete={confirmDelete}
+              // onDelete={confirmDelete}
               onPriorite={openPrioriteModal}
               onReponse={openReponseModal}
               onStatut={openStatutModal}
@@ -289,12 +289,12 @@ function Doleances() {
         loadingPieces={loadingPieces}
       />
 
-      <DeleteConfirmModal
+      {/* <DeleteConfirmModal
         isOpen={showDeleteConfirm}
         onClose={() => { setShowDeleteConfirm(false); setDoleanceToDelete(null); }}
         onConfirm={handleDelete}
         doleance={doleanceToDelete}
-      />
+      /> */}
 
       <PrioriteModal
         isOpen={showPrioriteModal}

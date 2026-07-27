@@ -11,7 +11,8 @@ import {
   XMarkIcon,
   ArrowPathIcon,
   CogIcon,
-  ArrowRightOnRectangleIcon
+  ArrowRightOnRectangleIcon,
+  ChatBubbleLeftRightIcon
 } from '@heroicons/react/24/outline';
 
 function Sidebar({ sidebarOpen, setSidebarOpen }) {
@@ -36,6 +37,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const navigation = [
     { name: 'Tableau de bord', href: '/backoffice/dashboard', icon: HomeIcon },
     { name: 'Doléances', href: '/backoffice/doleances', icon: DocumentTextIcon },
+    { name: 'Messages', href: '/backoffice/messages', icon: ChatBubbleLeftRightIcon },
     { name: 'Transfert', href: '/backoffice/transfert', icon: ArrowPathIcon },
     { name: 'Directions', href: '/backoffice/directions', icon: BuildingOfficeIcon },
     { name: 'Utilisateurs', href: '/backoffice/users', icon: UserGroupIcon },

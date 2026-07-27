@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import toast from 'react-hot-toast';
+import { useAuth } from '../contexts/AuthContext';
 import { useStatsRefresh } from '../contexts/StatsContext';
 import {
   BuildingOfficeIcon,
@@ -17,7 +18,7 @@ import {
   PhoneIcon,
   EyeIcon,
   ChatBubbleLeftRightIcon,
-  PaperAirplaneIcon,
+  ArrowUturnLeftIcon,
   XMarkIcon,
   PencilIcon,
   ChevronDownIcon,
@@ -28,6 +29,7 @@ import {
 function DirectionDoleances() {
   const { id_direction } = useParams();
   const navigate = useNavigate();
+  const { user } = useAuth();
   const { notifyStatsChange } = useStatsRefresh();
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
@@ -43,6 +45,9 @@ function DirectionDoleances() {
   const [selectedDoleance, setSelectedDoleance] = useState(null);
   const [showReponseModal, setShowReponseModal] = useState(false);
   const [reponseText, setReponseText] = useState('');
+  const [showReturnModal, setShowReturnModal] = useState(false);
+  const [returnMotif, setReturnMotif] = useState('');
+  const [doleanceToReturn, setDoleanceToReturn] = useState(null);
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState({
     statut: '',
@@ -52,6 +57,9 @@ function DirectionDoleances() {
   const [categories, setCategories] = useState([]);
   const [statuts, setStatuts] = useState([]);
   const [expandedDoleance, setExpandedDoleance] = useState(null);
+
+  const userRole = user?.role || user?.nom_role;
+  const isAgentCentralOrAdmin = ['administrateur_systeme', 'agent_central', 'administrateur'].includes(userRole);
 
   useEffect(() => {
     fetchDirectionDetails();
@@ -139,6 +147,39 @@ function DirectionDoleances() {
     setSelectedDoleance(doleance);
     setReponseText('');
     setShowReponseModal(true);
+  };
+
+  const openReturnModal = (doleance) => {
+    setDoleanceToReturn(doleance);
+    setReturnMotif('');
+    setShowReturnModal(true);
+  };
+
+  const handleRetourner = async (e) => {
+    e.preventDefault();
+    if (!doleanceToReturn) return;
+
+    setSending(true);
+    try {
+      const response = await api.post(`/doleances/${doleanceToReturn.id_doleance}/retourner`, {
+        motif: returnMotif
+      });
+      if (response.data.success) {
+        toast.success(response.data.message);
+        setShowReturnModal(false);
+        setDoleanceToReturn(null);
+        setReturnMotif('');
+        fetchDirectionDetails();
+        notifyStatsChange();
+      } else {
+        toast.error(response.data.message || 'Erreur lors du retour');
+      }
+    } catch (error) {
+      console.error('Erreur retour:', error);
+      toast.error(error.response?.data?.message || 'Erreur lors du retour de la doléance');
+    } finally {
+      setSending(false);
+    }
   };
 
   const getStatusBadge = (statut, couleur) => {
@@ -446,33 +487,45 @@ function DirectionDoleances() {
                         
                         {/* Boutons d'action */}
                         <div className="flex flex-wrap gap-2 mt-4">
-                          <button
-                            onClick={() => openReponseModal(doleance)}
-                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
-                          >
-                            <ChatBubbleLeftRightIcon className="h-4 w-4" />
-                            Répondre
-                          </button>
-                          
-                          <select
-                            onChange={(e) => handleChangerStatut(doleance.id_doleance, e.target.value)}
-                            value={doleance.id_statut}
-                            className="px-3 py-1.5 border dark:border-slate-600 rounded-lg text-sm"
-                          >
-                            {statuts.map(s => (
-                              <option key={s.id_statut} value={s.id_statut}>
-                                {s.nom_statut}
-                              </option>
-                            ))}
-                          </select>
-                          
                           <Link
                             to={`/backoffice/doleances/${doleance.id_doleance}`}
                             className="inline-flex items-center gap-1 px-3 py-1.5 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
                           >
                             <EyeIcon className="h-4 w-4" />
-                            Voir détails
+                            Voir
                           </Link>
+
+                          {isAgentCentralOrAdmin ? (
+                            <>
+                              <button
+                                onClick={() => openReponseModal(doleance)}
+                                className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
+                              >
+                                <ChatBubbleLeftRightIcon className="h-4 w-4" />
+                                Répondre
+                              </button>
+                              
+                              <select
+                                onChange={(e) => handleChangerStatut(doleance.id_doleance, e.target.value)}
+                                value={doleance.id_statut}
+                                className="px-3 py-1.5 border dark:border-slate-600 rounded-lg text-sm"
+                              >
+                                {statuts.map(s => (
+                                  <option key={s.id_statut} value={s.id_statut}>
+                                    {s.nom_statut}
+                                  </option>
+                                ))}
+                              </select>
+                            </>
+                          ) : (
+                            <button
+                              onClick={() => openReturnModal(doleance)}
+                              className="inline-flex items-center gap-1 px-3 py-1.5 bg-orange-500 text-white text-sm rounded-lg hover:bg-orange-600 transition-colors"
+                            >
+                              <ArrowUturnLeftIcon className="h-4 w-4" />
+                              Retourner la doléance
+                            </button>
+                          )}
                         </div>
                       </div>
                     </div>
@@ -647,6 +700,76 @@ function DirectionDoleances() {
                 </div>
               </form>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal retourner la doléance */}
+      {showReturnModal && doleanceToReturn && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+          <div className="bg-white dark:bg-slate-800 rounded-xl max-w-md w-full p-6 shadow-2xl">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-bold text-gray-800 dark:text-white">Retourner la doléance</h3>
+              <button
+                onClick={() => setShowReturnModal(false)}
+                className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+              >
+                <XMarkIcon className="h-5 w-5" />
+              </button>
+            </div>
+
+            <div className="mb-4 p-3 bg-gray-50 dark:bg-slate-900 rounded-lg">
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Réf. <span className="font-mono font-bold text-blue-600">{doleanceToReturn.reference}</span>
+              </p>
+              <p className="text-sm font-medium text-gray-700 dark:text-gray-200 mt-1">{doleanceToReturn.titre}</p>
+            </div>
+
+            <p className="text-sm text-gray-600 dark:text-gray-300 mb-4">
+              Cette doléance sera retournée à l'agent central pour réassignation.
+            </p>
+
+            <form onSubmit={handleRetourner}>
+              <div className="mb-4">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">
+                  Motif du retour
+                </label>
+                <textarea
+                  value={returnMotif}
+                  onChange={(e) => setReturnMotif(e.target.value)}
+                  rows="3"
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500 dark:bg-slate-900"
+                  placeholder="Précisez la raison du retour..."
+                />
+              </div>
+
+              <div className="flex justify-end gap-3">
+                <button
+                  type="button"
+                  onClick={() => setShowReturnModal(false)}
+                  className="px-4 py-2 border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 text-gray-700 dark:text-gray-300"
+                >
+                  Annuler
+                </button>
+                <button
+                  type="submit"
+                  disabled={sending}
+                  className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-50 flex items-center gap-2"
+                >
+                  {sending ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
+                      Retour...
+                    </>
+                  ) : (
+                    <>
+                      <ArrowUturnLeftIcon className="h-4 w-4" />
+                      Retourner
+                    </>
+                  )}
+                </button>
+              </div>
+            </form>
           </div>
         </div>
       )}

@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   UserIcon, PhoneIcon, EnvelopeIcon, FolderIcon,
-  CalendarIcon, MapPinIcon, PencilIcon, TrashIcon,
+  CalendarIcon, MapPinIcon, PencilIcon,
   ChatBubbleLeftRightIcon, ArrowPathIcon, EyeIcon
 } from '@heroicons/react/24/outline';
 import StatusBadge from '../../../components/common/StatusBadge';
@@ -111,15 +111,6 @@ function DoleanceCard({
                 title="Changer la priorité"
               >
                 <PencilIcon className="h-4 w-4 sm:h-5 sm:w-5" />
-              </button>
-            )}
-            {isAdminOrAgentCentral && (
-              <button
-                onClick={() => onDelete(doleance)}
-                className="p-1.5 sm:p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors"
-                title="Supprimer"
-              >
-                <TrashIcon className="h-4 w-4 sm:h-5 sm:w-5" />
               </button>
             )}
             {userCanAct && (
