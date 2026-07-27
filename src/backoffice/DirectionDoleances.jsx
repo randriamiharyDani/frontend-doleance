@@ -23,7 +23,8 @@ import {
   PencilIcon,
   ChevronDownIcon,
   ChevronUpIcon,
-  FunnelIcon
+  FunnelIcon,
+  PaperAirplaneIcon
 } from '@heroicons/react/24/outline';
 
 function DirectionDoleances() {
@@ -495,38 +496,48 @@ function DirectionDoleances() {
                             Voir
                           </Link>
 
-                          {isAgentCentralOrAdmin ? (
-                            <>
-                              <button
-                                onClick={() => openReponseModal(doleance)}
-                                className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
-                              >
-                                <ChatBubbleLeftRightIcon className="h-4 w-4" />
-                                Répondre
-                              </button>
-                              
-                              <select
-                                onChange={(e) => handleChangerStatut(doleance.id_doleance, e.target.value)}
-                                value={doleance.id_statut}
-                                className="px-3 py-1.5 border dark:border-slate-600 rounded-lg text-sm"
-                              >
-                                {statuts.map(s => (
-                                  <option key={s.id_statut} value={s.id_statut}>
-                                    {s.nom_statut}
-                                  </option>
-                                ))}
-                              </select>
-                            </>
-                          ) : (
+                          <button
+                            onClick={() => openReponseModal(doleance)}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 bg-green-600 text-white text-sm rounded-lg hover:bg-green-700 transition-colors"
+                          >
+                            <ChatBubbleLeftRightIcon className="h-4 w-4" />
+                            Répondre
+                          </button>
+
+                          <select
+                            onChange={(e) => handleChangerStatut(doleance.id_doleance, e.target.value)}
+                            value={doleance.id_statut}
+                            className="px-3 py-1.5 border dark:border-slate-600 rounded-lg text-sm bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-200"
+                          >
+                            {statuts.map(s => (
+                              <option key={s.id_statut} value={s.id_statut}>
+                                {s.nom_statut}
+                              </option>
+                            ))}
+                          </select>
+
+                          {!isAgentCentralOrAdmin && (
                             <button
                               onClick={() => openReturnModal(doleance)}
                               className="inline-flex items-center gap-1 px-3 py-1.5 bg-orange-500 text-white text-sm rounded-lg hover:bg-orange-600 transition-colors"
                             >
                               <ArrowUturnLeftIcon className="h-4 w-4" />
-                              Retourner la doléance
+                              Retourner
                             </button>
                           )}
                         </div>
+
+                        {/* Motif de transfert */}
+                        {doleance.motif_transfert && (
+                          <div className="mt-3 p-2.5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 rounded-lg">
+                            <p className="text-xs font-semibold text-amber-700 dark:text-amber-400 mb-0.5">
+                              Motif du transfert :
+                            </p>
+                            <p className="text-sm text-amber-800 dark:text-amber-300">
+                              {doleance.motif_transfert}
+                            </p>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>

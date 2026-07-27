@@ -16,7 +16,7 @@ import {
 
 function PublicLayout({ children }) {
   const { darkMode, toggleDarkMode } = useTheme();
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -33,12 +33,12 @@ function PublicLayout({ children }) {
 
   const navItems = [
     {
-      label: "Déposer une doléance",
+      label: t("nav.submit"),
       path: "/deposer-doleance",
       icon: DocumentTextIcon,
     },
     {
-      label: "Suivi des doléances",
+      label: t("nav.track"),
       path: "/suivi-doleance",
       icon: MagnifyingGlassIcon,
     },
@@ -150,7 +150,7 @@ function PublicLayout({ children }) {
                       darkMode ? "text-white" : "text-[#0F172A]"
                     }`}
                   >
-                    Signalement
+                     {t("hero.title")}
                   </h1>
                   <p
                     className={`text-[13px] font-medium -mt-0.5 tracking-wide ${
@@ -300,7 +300,7 @@ function PublicLayout({ children }) {
                 <span
                   className={`text-xs font-medium ${darkMode ? "text-slate-400" : "text-slate-500"}`}
                 >
-                  Langue :
+                  {t("language.language")} :
                 </span>
                 <div
                   className={`flex items-center rounded-lg overflow-hidden border ${
@@ -397,7 +397,7 @@ function PublicLayout({ children }) {
                   }`}
                 >
                   <ShieldCheckIcon className="w-3.5 h-3.5 text-[#D4AF37]" />©{" "}
-                  {new Date().getFullYear()} Tous droits réservés
+                  {new Date().getFullYear()} {t("footer.rights")}
                 </p>
               </div>
             </div>

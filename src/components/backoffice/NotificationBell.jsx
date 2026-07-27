@@ -121,6 +121,9 @@ function NotificationBell() {
   const getNotifIcon = (type) => {
     switch (type) {
       case 'nouvelle_doleance': return '📋';
+      case 'transfert_doleance': return '🔀';
+      case 'retour_doleance': return '↩️';
+      case 'changement_statut': return '🔄';
       case 'modification_utilisateur': return '👤';
       case 'reset_password': return '🔑';
       default: return '🔔';

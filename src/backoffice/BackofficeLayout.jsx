@@ -525,7 +525,7 @@ function BackofficeLayout() {
       </div>
 
       {/* Floating Corbeille Button - Super Admin only */}
-      {isSuperAdmin && (
+      {/* {isSuperAdmin && (
         <button
           onClick={() => navigate("/backoffice/corbeille")}
           title="Corbeille"
@@ -540,7 +540,7 @@ function BackofficeLayout() {
             Corbeille
           </span>
         </button>
-      )}
+      )} */}
     </div>
   );
 }

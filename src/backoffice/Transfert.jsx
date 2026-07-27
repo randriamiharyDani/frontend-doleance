@@ -555,7 +555,7 @@ function Transfert() {
                   {doleancestransferts.length > 0 && (
                     <>
                       <tr>
-                        <td colSpan="7" className="px-4 py-2 bg-slate-50/70 dark:bg-slate-900/50 text-center text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">
+                        <td colSpan="8" className="px-4 py-2 bg-slate-50/70 dark:bg-slate-900/50 text-center text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">
                           Déjà transférées ou traitées
                         </td>
                       </tr>
@@ -578,6 +578,13 @@ function Transfert() {
                           </td>
                           <td className="px-4 py-2.5 whitespace-nowrap text-slate-400 dark:text-slate-500 text-sm hidden xl:table-cell">
                             {doleance.nom_direction || '—'}
+                          </td>
+                          <td className="px-4 py-2.5 text-slate-400 dark:text-slate-500 max-w-[200px] text-sm hidden lg:table-cell">
+                            {doleance.motif_transfert ? (
+                              <span className="italic text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-md" title={doleance.motif_transfert}>
+                                {doleance.motif_transfert.length > 40 ? doleance.motif_transfert.substring(0, 40) + '…' : doleance.motif_transfert}
+                              </span>
+                            ) : '—'}
                           </td>
                           <td className="px-4 py-2.5 whitespace-nowrap text-right">
                             <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-lg text-[10px] font-semibold">
@@ -628,6 +635,11 @@ function Transfert() {
                         <StatusPill statut={doleance.nom_statut} />
                       </div>
                       <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{doleance.titre}</p>
+                      {doleance.motif_transfert && (
+                        <p className="text-xs italic text-amber-600 dark:text-amber-400 mt-1.5 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded-md">
+                          Motif : {doleance.motif_transfert}
+                        </p>
+                      )}
                     </div>
                   ))}
                 </>

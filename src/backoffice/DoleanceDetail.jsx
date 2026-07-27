@@ -437,6 +437,19 @@ function DoleanceDetail() {
                 Assigné à : {doleance.assignee_nom}
               </div>
             )}
+
+            {doleance.motif_transfert && (
+              <div className="mt-3 pt-3 border-t dark:border-slate-700">
+                <div className="p-3 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 rounded-lg">
+                  <p className="text-xs font-semibold text-amber-700 dark:text-amber-400 mb-0.5">
+                    Motif du transfert :
+                  </p>
+                  <p className="text-sm text-amber-800 dark:text-amber-300">
+                    {doleance.motif_transfert}
+                  </p>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Section Pièces jointes */}
@@ -715,11 +728,11 @@ function DoleanceDetail() {
           <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
             <h3 className="text-lg font-semibold mb-4">Actions</h3>
             <div className="space-y-3">
-              {isAdminOrOperator ? (
+              {(isAdminOrOperator || isDirectionAgent) && (
                 <>
                   <select
                     onChange={(e) => handleUpdateStatut(e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:border-blue-500"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:border-blue-500 bg-white dark:bg-slate-700 text-gray-700 dark:text-gray-200"
                     defaultValue=""
                   >
                     <option value="" disabled>Changer le statut</option>
@@ -738,24 +751,16 @@ function DoleanceDetail() {
                     Répondre au citoyen
                   </button>
                 </>
-              ) : isDirectionAgent ? (
-                <>
-                  <button
-                    onClick={() => navigate('/backoffice/messages')}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-                  >
-                    <ChatBubbleLeftRightIcon className="h-5 w-5" />
-                    Message
-                  </button>
-                  <button
-                    onClick={() => setShowReturnModal(true)}
-                    className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
-                  >
-                    <ArrowUturnLeftIcon className="h-5 w-5" />
-                    Retourner la doléance
-                  </button>
-                </>
-              ) : null}
+              )}
+              {isDirectionAgent && (
+                <button
+                  onClick={() => setShowReturnModal(true)}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+                >
+                  <ArrowUturnLeftIcon className="h-5 w-5" />
+                  Retourner la doléance
+                </button>
+              )}
             </div>
           </div>
 
