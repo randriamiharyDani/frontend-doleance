@@ -1,8 +1,7 @@
 // src/config/socket.js
 import io from 'socket.io-client';
 
-const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000/api';
-// const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://192.168.99.134:5000/api';
+const SOCKET_URL = import.meta.env.VITE_SOCKET_URL || 'http://localhost:5000';
 
 class SocketManager {
   constructor() {

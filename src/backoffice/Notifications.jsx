@@ -9,7 +9,10 @@ import {
   KeyIcon,
   ExclamationTriangleIcon,
   XMarkIcon,
-  EyeIcon
+  EyeIcon,
+  ArrowRightIcon,
+  ArrowUturnLeftIcon,
+  ArrowPathIcon
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 
@@ -88,6 +91,12 @@ function Notifications() {
     switch(type) {
       case 'nouvelle_doleance':
         return <DocumentTextIcon className="h-5 w-5 text-blue-500" />;
+      case 'transfert_doleance':
+        return <ArrowRightIcon className="h-5 w-5 text-amber-500" />;
+      case 'retour_doleance':
+        return <ArrowUturnLeftIcon className="h-5 w-5 text-orange-500" />;
+      case 'changement_statut':
+        return <ArrowPathIcon className="h-5 w-5 text-cyan-500" />;
       case 'modification_utilisateur':
         return <UserIcon className="h-5 w-5 text-green-500" />;
       case 'reset_password':
@@ -103,6 +112,12 @@ function Notifications() {
     switch(type) {
       case 'nouvelle_doleance':
         return 'bg-blue-50 border-blue-200 dark:bg-blue-900/20 dark:border-blue-800';
+      case 'transfert_doleance':
+        return 'bg-amber-50 border-amber-200 dark:bg-amber-900/20 dark:border-amber-800';
+      case 'retour_doleance':
+        return 'bg-orange-50 border-orange-200 dark:bg-orange-900/20 dark:border-orange-800';
+      case 'changement_statut':
+        return 'bg-cyan-50 border-cyan-200 dark:bg-cyan-900/20 dark:border-cyan-800';
       case 'modification_utilisateur':
         return 'bg-green-50 border-green-200 dark:bg-green-900/20 dark:border-green-800';
       case 'reset_password':
