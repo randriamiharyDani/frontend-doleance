@@ -196,7 +196,7 @@ function Corbeille() {
           {selectedIds.length > 0 && (
             <button
               onClick={() => setShowEmptyModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-red-600 text-white text-sm font-medium rounded-xl hover:bg-red-700 transition-colors shadow-sm"
+              className="btn-danger btn-md"
             >
               <TrashIcon className="h-4 w-4" />
               Supprimer ({selectedIds.length})
@@ -204,18 +204,14 @@ function Corbeille() {
           )}
           <button
             onClick={() => { setSelectAll(!selectAll); }}
-            className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl border transition-colors ${
-              selectAll
-                ? 'bg-red-50 border-red-300 text-red-700 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400'
-                : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700'
-            }`}
+            className={`btn-secondary btn-md ${selectAll ? 'ring-2 ring-red-500 border-red-300' : ''}`}
           >
             {selectAll ? 'Tout désélectionner' : 'Tout sélectionner'}
           </button>
           {selectedIds.length === 0 && doleances.length > 0 && (
             <button
               onClick={() => setShowEmptyModal(true)}
-              className="inline-flex items-center gap-2 px-4 py-2.5 bg-red-600 text-white text-sm font-medium rounded-xl hover:bg-red-700 transition-colors shadow-sm"
+              className="btn-danger btn-md"
             >
               <TrashIcon className="h-4 w-4" />
               Vider la corbeille
@@ -225,82 +221,80 @@ function Corbeille() {
       </div>
 
       {/* Search & Filters */}
-      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 p-4">
-        <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
-          <div className="relative flex-1">
-            <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400" />
-            <input
-              type="text"
-              placeholder="Rechercher par référence, titre ou citoyen..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500 transition-colors"
-            />
-          </div>
-          <button
-            type="button"
-            onClick={() => setShowFilters(!showFilters)}
-            className={`inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium rounded-xl border transition-colors ${
-              showFilters
-                ? 'bg-red-50 border-red-300 text-red-700 dark:bg-red-900/20 dark:border-red-800 dark:text-red-400'
-                : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50 dark:bg-slate-800 dark:border-slate-600 dark:text-slate-300 dark:hover:bg-slate-700'
-            }`}
-          >
-            <FunnelIcon className="h-4 w-4" />
-            Filtres
-          </button>
-          <button
-            type="submit"
-            className="inline-flex items-center gap-2 px-4 py-2.5 bg-red-600 text-white text-sm font-medium rounded-xl hover:bg-red-700 transition-colors shadow-sm"
-          >
-            <MagnifyingGlassIcon className="h-4 w-4" />
-            Rechercher
-          </button>
-        </form>
+      <div className="card">
+        <div className="card-body">
+          <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3">
+            <div className="relative flex-1">
+              <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+              <input
+                type="text"
+                placeholder="Rechercher par référence, titre ou citoyen..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="input pl-10"
+              />
+            </div>
+            <button
+              type="button"
+              onClick={() => setShowFilters(!showFilters)}
+              className={`btn-secondary btn-md ${showFilters ? 'ring-2 ring-red-500' : ''}`}
+            >
+              <FunnelIcon className="h-4 w-4" />
+              Filtres
+            </button>
+            <button
+              type="submit"
+              className="btn-danger btn-md"
+            >
+              <MagnifyingGlassIcon className="h-4 w-4" />
+              Rechercher
+            </button>
+          </form>
 
-        {showFilters && (
-          <div className="mt-4 pt-4 border-t border-gray-200 dark:border-slate-700 grid grid-cols-1 sm:grid-cols-3 gap-3">
-            <div>
-              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Direction</label>
-              <select
-                value={selectedDirection}
-                onChange={(e) => { setSelectedDirection(e.target.value); setPagination(prev => ({ ...prev, page: 1 })); }}
-                className="w-full px-3 py-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
-              >
-                <option value="">Toutes les directions</option>
-                {directions.map((d) => (
-                  <option key={d.id_direction} value={d.id_direction}>{d.nom_direction}</option>
-                ))}
-              </select>
+          {showFilters && (
+            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-slate-700 grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label className="label">Direction</label>
+                <select
+                  value={selectedDirection}
+                  onChange={(e) => { setSelectedDirection(e.target.value); setPagination(prev => ({ ...prev, page: 1 })); }}
+                  className="input"
+                >
+                  <option value="">Toutes les directions</option>
+                  {directions.map((d) => (
+                    <option key={d.id_direction} value={d.id_direction}>{d.nom_direction}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="label">Date suppression (début)</label>
+                <input
+                  type="date"
+                  value={dateFrom}
+                  onChange={(e) => { setDateFrom(e.target.value); setPagination(prev => ({ ...prev, page: 1 })); }}
+                  className="input"
+                />
+              </div>
+              <div>
+                <label className="label">Date suppression (fin)</label>
+                <input
+                  type="date"
+                  value={dateTo}
+                  onChange={(e) => { setDateTo(e.target.value); setPagination(prev => ({ ...prev, page: 1 })); }}
+                  className="input"
+                />
+              </div>
+              <div className="sm:col-span-3">
+                <button
+                  onClick={handleReset}
+                  className="text-sm text-red-600 hover:text-red-700 dark:text-red-400 font-medium"
+                >
+                  Réinitialiser les filtres
+                </button>
+              </div>
             </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Date suppression (début)</label>
-              <input
-                type="date"
-                value={dateFrom}
-                onChange={(e) => { setDateFrom(e.target.value); setPagination(prev => ({ ...prev, page: 1 })); }}
-                className="w-full px-3 py-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-medium text-gray-500 dark:text-gray-400 mb-1">Date suppression (fin)</label>
-              <input
-                type="date"
-                value={dateTo}
-                onChange={(e) => { setDateTo(e.target.value); setPagination(prev => ({ ...prev, page: 1 })); }}
-                className="w-full px-3 py-2 rounded-xl border border-gray-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-gray-900 dark:text-white text-sm focus:ring-2 focus:ring-red-500 focus:border-red-500"
-              />
-            </div>
-            <div className="sm:col-span-3">
-              <button
-                onClick={handleReset}
-                className="text-sm text-red-600 hover:text-red-700 dark:text-red-400 font-medium"
-              >
-                Réinitialiser les filtres
-              </button>
-            </div>
-          </div>
-        )}
+          )}
+        </div>
       </div>
 
       {/* Table */}
@@ -315,10 +309,10 @@ function Corbeille() {
       ) : (
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700">
-              <thead className="bg-gray-50 dark:bg-slate-900/50">
+            <table className="table">
+              <thead>
                 <tr>
-                  <th className="px-4 py-3 text-left">
+                  <th className="w-10">
                     <input
                       type="checkbox"
                       checked={selectAll}
@@ -326,30 +320,16 @@ function Corbeille() {
                       className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500"
                     />
                   </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Référence
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Titre
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Citoyen
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Direction
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Statut
-                  </th>
-                  <th className="px-4 py-3 text-left text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Date suppression
-                  </th>
-                  <th className="px-4 py-3 text-center text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider">
-                    Actions
-                  </th>
+                  <th>Référence</th>
+                  <th>Titre</th>
+                  <th>Citoyen</th>
+                  <th>Direction</th>
+                  <th>Statut</th>
+                  <th>Date suppression</th>
+                  <th className="text-center">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-slate-700/50">
+              <tbody>
                 {doleances.map((doleance) => (
                   <tr
                     key={doleance.id_doleance}
@@ -357,7 +337,7 @@ function Corbeille() {
                       selectedIds.includes(doleance.id_doleance) ? 'bg-red-50/50 dark:bg-red-900/10' : ''
                     }`}
                   >
-                    <td className="px-4 py-3">
+                    <td>
                       <input
                         type="checkbox"
                         checked={selectedIds.includes(doleance.id_doleance)}
@@ -365,27 +345,23 @@ function Corbeille() {
                         className="h-4 w-4 rounded border-gray-300 text-red-600 focus:ring-red-500"
                       />
                     </td>
-                    <td className="px-4 py-3">
+                    <td>
                       <span className="inline-flex items-center px-2.5 py-0.5 rounded-lg text-xs font-mono font-semibold bg-gray-100 dark:bg-slate-700 text-gray-800 dark:text-gray-200">
                         {doleance.reference}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
+                    <td>
                       <span className="text-sm text-gray-900 dark:text-white font-medium line-clamp-1">
                         {doleance.titre}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
-                      <span className="text-sm text-gray-600 dark:text-gray-300">
-                        {doleance.citoyen_nom || '-'}
-                      </span>
+                    <td className="text-sm text-gray-500 dark:text-gray-400">
+                      {doleance.citoyen_nom || '-'}
                     </td>
-                    <td className="px-4 py-3">
-                      <span className="text-sm text-gray-600 dark:text-gray-300">
-                        {doleance.nom_direction || '-'}
-                      </span>
+                    <td className="text-sm text-gray-500 dark:text-gray-400">
+                      {doleance.nom_direction || '-'}
                     </td>
-                    <td className="px-4 py-3">
+                    <td>
                       <span
                         className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium"
                         style={{
@@ -396,12 +372,10 @@ function Corbeille() {
                         {doleance.nom_statut || '-'}
                       </span>
                     </td>
-                    <td className="px-4 py-3">
-                      <span className="text-xs text-gray-500 dark:text-gray-400">
-                        {formatDate(doleance.date_suppression)}
-                      </span>
+                    <td className="text-xs text-gray-400 dark:text-gray-500">
+                      {formatDate(doleance.date_suppression)}
                     </td>
-                    <td className="px-4 py-3">
+                    <td>
                       <div className="flex items-center justify-center gap-1">
                         <button
                           onClick={() => openRestoreModal(doleance)}
@@ -441,20 +415,20 @@ function Corbeille() {
             </div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Restaurer la doléance</h3>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-6">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
             Voulez-vous restaurer la doléance <strong className="text-gray-900 dark:text-white">{doleanceToRestore?.reference}</strong> ?
             Elle sera remise dans la liste principale.
           </p>
           <div className="flex justify-end gap-3">
             <button
               onClick={() => { setShowRestoreModal(false); setDoleanceToRestore(null); }}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+              className="btn-secondary btn-sm"
             >
               Annuler
             </button>
             <button
               onClick={handleRestore}
-              className="px-4 py-2 text-sm font-medium text-white bg-green-600 rounded-xl hover:bg-green-700 transition-colors shadow-sm"
+              className="btn-primary btn-sm bg-green-600 hover:bg-green-700"
             >
               Restaurer
             </button>
@@ -469,23 +443,23 @@ function Corbeille() {
             </div>
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Suppression définitive</h3>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
             Voulez-vous supprimer <strong className="text-gray-900 dark:text-white">{doleanceToDelete?.reference}</strong> définitivement ?
           </p>
-          <p className="text-xs text-red-600 dark:text-red-400 mb-6 flex items-center gap-1">
+          <p className="text-xs text-red-500 dark:text-red-400 mb-6 flex items-center gap-1">
             <ExclamationTriangleIcon className="h-3.5 w-3.5" />
             Cette action est irréversible. Toutes les données associées seront perdues.
           </p>
           <div className="flex justify-end gap-3">
             <button
               onClick={() => { setShowDeleteModal(false); setDoleanceToDelete(null); }}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+              className="btn-secondary btn-sm"
             >
               Annuler
             </button>
             <button
               onClick={handlePermanentDelete}
-              className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition-colors shadow-sm"
+              className="btn-danger btn-sm"
             >
               Supprimer définitivement
             </button>
@@ -502,26 +476,26 @@ function Corbeille() {
               {selectedIds.length > 0 ? `Supprimer ${selectedIds.length} doléance(s) ?` : 'Vider la corbeille ?'}
             </h3>
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
+          <p className="text-sm text-gray-500 dark:text-gray-400 mb-2">
             {selectedIds.length > 0
               ? `Vous êtes sur le point de supprimer définitivement ${selectedIds.length} doléance(s) sélectionnée(s).`
               : 'Vous êtes sur le point de supprimer définitivement toutes les doléances de la corbeille.'
             }
           </p>
-          <p className="text-xs text-red-600 dark:text-red-400 mb-6 flex items-center gap-1">
+          <p className="text-xs text-red-500 dark:text-red-400 mb-6 flex items-center gap-1">
             <ExclamationTriangleIcon className="h-3.5 w-3.5" />
             Cette action est irréversible. Toutes les données seront perdues.
           </p>
           <div className="flex justify-end gap-3">
             <button
               onClick={() => setShowEmptyModal(false)}
-              className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-slate-700 rounded-xl hover:bg-gray-200 dark:hover:bg-slate-600 transition-colors"
+              className="btn-secondary btn-sm"
             >
               Annuler
             </button>
             <button
               onClick={handleEmptyTrash}
-              className="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-xl hover:bg-red-700 transition-colors shadow-sm"
+              className="btn-danger btn-sm"
             >
               Supprimer définitivement
             </button>

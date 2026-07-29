@@ -3,11 +3,11 @@ import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import socket from '../config/socket';
 import toast from 'react-hot-toast';
-import { 
-  UserPlusIcon, 
-  TrashIcon, 
-  PencilIcon, 
-  CheckCircleIcon, 
+import {
+  UserPlusIcon,
+  TrashIcon,
+  PencilIcon,
+  CheckCircleIcon,
   XCircleIcon,
   EyeIcon,
   EyeSlashIcon,
@@ -22,7 +22,8 @@ import {
   UserGroupIcon,
   SparklesIcon,
   StarIcon,
-  AcademicCapIcon
+  AcademicCapIcon,
+  XMarkIcon,
 } from '@heroicons/react/24/outline';
 
 function Users() {
@@ -457,143 +458,143 @@ function Users() {
   }
 
   return (
-    <div className="p-3 md:p-4 lg:p-6">
+    <div className="space-y-6">
       {/* En-tête */}
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-4 md:mb-6">
-        <div className="w-full sm:w-auto">
-          <h1 className="text-xl md:text-2xl font-bold text-gray-800 dark:text-gray-100">Gestion des utilisateurs</h1>
-          <p className="text-gray-600 dark:text-gray-300 text-sm">Consulter et gérer les comptes agents</p>
-          <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs dark:bg-purple-900/30 dark:text-purple-300">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Gestion des utilisateurs</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400">Consulter et gérer les comptes agents</p>
+          <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300">
             <ShieldCheckIcon className="h-3 w-3" />
-            Accès réservé à l'administrateur système
+            Accès réservé
           </div>
         </div>
-        <div className="flex gap-2 w-full sm:w-auto">
+        <div className="flex gap-3">
           <button
             onClick={fetchDirections}
-            className="bg-gray-500 text-white px-3 py-2 rounded-lg hover:bg-gray-600 flex items-center gap-2 text-sm flex-1 sm:flex-none justify-center"
+            className="btn-secondary btn-md"
             title="Rafraîchir les directions"
           >
             <ArrowPathIcon className="h-4 w-4" />
             <span className="hidden sm:inline">Rafraîchir</span>
-            <span className="sm:hidden">↻</span>
           </button>
           <button
             onClick={() => setShowModal(true)}
-            className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 text-sm flex-1 sm:flex-none justify-center"
+            className="btn-primary btn-md"
           >
             <UserPlusIcon className="h-4 w-4" />
             <span className="hidden sm:inline">Nouvel utilisateur</span>
-            <span className="sm:hidden">Ajouter</span>
           </button>
         </div>
       </div>
 
-      {/* Statistiques - Version responsive */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 md:gap-4 mb-4 md:mb-6">
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-md border border-gray-100 dark:border-slate-700 p-3 md:p-4 transition-all duration-200 hover:-translate-y-0.5 relative overflow-hidden">
-          <span className="absolute left-0 top-0 h-full w-1 bg-blue-500" />
+      {/* Statistiques */}
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="stat-card">
+          <span className="absolute left-0 top-0 h-full w-1 bg-blue-500 rounded-r" />
           <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Total agents</p>
-          <p className="text-xl md:text-2xl font-bold text-blue-600 tabular-nums mt-1">
+          <p className="text-2xl font-bold text-blue-600 tabular-nums mt-1">
             {filteredUsers.length}
           </p>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-md border border-gray-100 dark:border-slate-700 p-3 md:p-4 transition-all duration-200 hover:-translate-y-0.5 relative overflow-hidden">
-          <span className="absolute left-0 top-0 h-full w-1 bg-purple-500" />
+        <div className="stat-card">
+          <span className="absolute left-0 top-0 h-full w-1 bg-purple-500 rounded-r" />
           <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Administrateurs</p>
-          <p className="text-xl md:text-2xl font-bold text-purple-600 tabular-nums mt-1">
+          <p className="text-2xl font-bold text-purple-600 tabular-nums mt-1">
             {filteredUsers.filter(u => u.role_nom === 'administrateur_systeme' || u.role_nom === 'administrateur').length}
           </p>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-md border border-gray-100 dark:border-slate-700 p-3 md:p-4 transition-all duration-200 hover:-translate-y-0.5 relative overflow-hidden">
-          <span className="absolute left-0 top-0 h-full w-1 bg-green-500" />
+        <div className="stat-card">
+          <span className="absolute left-0 top-0 h-full w-1 bg-green-500 rounded-r" />
           <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Directeurs</p>
-          <p className="text-xl md:text-2xl font-bold text-green-600 tabular-nums mt-1">
+          <p className="text-2xl font-bold text-green-600 tabular-nums mt-1">
             {filteredUsers.filter(u => u.role_nom === 'directeur').length}
           </p>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm hover:shadow-md border border-gray-100 dark:border-slate-700 p-3 md:p-4 transition-all duration-200 hover:-translate-y-0.5 relative overflow-hidden">
-          <span className="absolute left-0 top-0 h-full w-1 bg-emerald-500" />
+        <div className="stat-card">
+          <span className="absolute left-0 top-0 h-full w-1 bg-emerald-500 rounded-r" />
           <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Agents actifs</p>
-          <p className="text-xl md:text-2xl font-bold text-emerald-600 tabular-nums mt-1">
+          <p className="text-2xl font-bold text-emerald-600 tabular-nums mt-1">
             {filteredUsers.filter(u => u.actif === 1).length}
           </p>
         </div>
       </div>
 
-      {/* Filtres - Version compacte */}
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-2 md:p-3 mb-4 md:mb-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 md:gap-3">
-          <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Rechercher</label>
-            <input
-              type="text"
-              placeholder="Nom, prénom ou email..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-800 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
-            />
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Filtrer par rôle</label>
-            <select
-              value={filterRole}
-              onChange={(e) => setFilterRole(e.target.value)}
-              className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-800 dark:text-white"
-            >
-              <option value="all">Tous les rôles</option>
-              {availableRolesForForm.map(role => (
-                <option key={role.id_role} value={role.nom_role}>
-                  {getRoleLabel(role.nom_role)}
-                </option>
-              ))}
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">Catégorie</label>
-            <select
-              value={selectedDirectionCategorie}
-              onChange={(e) => setSelectedDirectionCategorie(e.target.value)}
-              className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-800 dark:text-white"
-            >
-              <option value="all">Toutes les catégories</option>
-              {directionCategories.map(cat => (
-                <option key={cat} value={cat}>{cat}</option>
-              ))}
-            </select>
+      {/* Filtres */}
+      <div className="card">
+        <div className="card-body">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+            <div>
+              <label className="label">Rechercher</label>
+              <input
+                type="text"
+                placeholder="Nom, prénom ou email..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="input"
+              />
+            </div>
+            <div>
+              <label className="label">Filtrer par rôle</label>
+              <select
+                value={filterRole}
+                onChange={(e) => setFilterRole(e.target.value)}
+                className="input"
+              >
+                <option value="all">Tous les rôles</option>
+                {availableRolesForForm.map(role => (
+                  <option key={role.id_role} value={role.nom_role}>
+                    {getRoleLabel(role.nom_role)}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div>
+              <label className="label">Catégorie</label>
+              <select
+                value={selectedDirectionCategorie}
+                onChange={(e) => setSelectedDirectionCategorie(e.target.value)}
+                className="input"
+              >
+                <option value="all">Toutes les catégories</option>
+                {directionCategories.map(cat => (
+                  <option key={cat} value={cat}>{cat}</option>
+                ))}
+              </select>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Tableau avec overflow et taille adaptée */}
-      <div className="bg-white dark:bg-slate-800 rounded-lg shadow overflow-hidden">
+      {/* Tableau */}
+      <div className="card overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200 dark:divide-slate-700 text-sm">
-            <thead className="bg-gray-50 dark:bg-slate-900">
+          <table className="table">
+            <thead>
               <tr>
-                <th className="px-2 md:px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Agent</th>
-                <th className="px-2 md:px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden sm:table-cell">Email</th>
-                <th className="px-2 md:px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden md:table-cell">Téléphone</th>
-                <th className="px-2 md:px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Fonction</th>
-                <th className="px-2 md:px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden lg:table-cell">Direction</th>
-                <th className="px-2 md:px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase hidden xl:table-cell">Catégorie</th>
-                <th className="px-2 md:px-3 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">En ligne</th>
-                <th className="px-2 md:px-3 py-2 text-right text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Actions</th>
+                <th className="px-3 py-3">Agent</th>
+                <th className="px-3 py-3 hidden sm:table-cell">Email</th>
+                <th className="px-3 py-3 hidden md:table-cell">Téléphone</th>
+                <th className="px-3 py-3">Fonction</th>
+                <th className="px-3 py-3 hidden lg:table-cell">Direction</th>
+                <th className="px-3 py-3 hidden xl:table-cell">Catégorie</th>
+                <th className="px-3 py-3">En ligne</th>
+                <th className="px-3 py-3 text-right">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-slate-800 divide-y divide-gray-200 dark:divide-slate-700">
+            <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
               {filteredUsers.map((user) => (
-                <tr key={user.id_utilisateur} className="hover:bg-gray-50 dark:hover:bg-slate-700">
-                  <td className="px-2 md:px-3 py-2 whitespace-nowrap">
+                <tr key={user.id_utilisateur} className="hover:bg-gray-50 dark:hover:bg-slate-700/50 transition-colors">
+                  <td className="px-3 py-3 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="flex-shrink-0 h-7 w-7 md:h-8 md:w-8 bg-gray-100 dark:bg-slate-700 rounded-full flex items-center justify-center border border-gray-200 dark:border-slate-600">
+                      <div className="flex-shrink-0 h-8 w-8 bg-gray-100 dark:bg-slate-700 rounded-full flex items-center justify-center border border-gray-200 dark:border-slate-600">
                         {getRoleIcon(user.role_nom)}
                       </div>
-                      <div className="ml-2 min-w-0">
-                        <div className="text-xs md:text-sm font-medium text-gray-900 dark:text-gray-100 truncate max-w-[80px] sm:max-w-[120px]">
+                      <div className="ml-3 min-w-0">
+                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100 truncate max-w-[120px]">
                           {user.prenom} {user.nom}
                         </div>
                         <div className="text-xs text-gray-500 dark:text-gray-400 flex items-center gap-1 sm:hidden">
@@ -603,51 +604,51 @@ function Users() {
                       </div>
                     </div>
                   </td>
-                  <td className="px-2 md:px-3 py-2 text-xs text-gray-500 dark:text-gray-400 max-w-[120px] truncate hidden sm:table-cell">
-                    <div className="flex items-center gap-1">
-                      <EnvelopeIcon className="h-3 w-3 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+                  <td className="px-3 py-3 text-sm text-gray-500 dark:text-gray-400 max-w-[160px] truncate hidden sm:table-cell">
+                    <div className="flex items-center gap-1.5">
+                      <EnvelopeIcon className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500 flex-shrink-0" />
                       <span className="truncate">{user.email}</span>
                     </div>
                   </td>
-                  <td className="px-2 md:px-3 py-2 text-xs text-gray-500 dark:text-gray-400 hidden md:table-cell">
-                    <div className="flex items-center gap-1">
-                      <PhoneIcon className="h-3 w-3 text-gray-400 dark:text-gray-500 flex-shrink-0" />
+                  <td className="px-3 py-3 text-sm text-gray-500 dark:text-gray-400 hidden md:table-cell">
+                    <div className="flex items-center gap-1.5">
+                      <PhoneIcon className="h-3.5 w-3.5 text-gray-400 dark:text-gray-500 flex-shrink-0" />
                       <span>{user.telephone || '-'}</span>
                     </div>
                   </td>
-                  <td className="px-2 md:px-3 py-2 whitespace-nowrap">
-                    <span className={`px-1.5 md:px-2 py-0.5 text-[10px] md:text-xs rounded-full border ${getRoleBadge(user.role_nom)}`}>
+                  <td className="px-3 py-3 whitespace-nowrap">
+                    <span className={`badge ${getRoleBadge(user.role_nom)}`}>
                       {getRoleLabel(user.role_nom)}
                     </span>
                   </td>
-                  <td className="px-2 md:px-3 py-2 text-xs text-gray-500 dark:text-gray-400 max-w-[100px] truncate hidden lg:table-cell">
+                  <td className="px-3 py-3 text-sm text-gray-500 dark:text-gray-400 max-w-[140px] truncate hidden lg:table-cell">
                     {user.nom_direction || '-'}
                   </td>
-                  <td className="px-2 md:px-3 py-2 whitespace-nowrap hidden xl:table-cell">
-                    <span className={`px-1.5 md:px-2 py-0.5 text-[10px] md:text-xs rounded-full border ${getCategorieColor(getDirectionCategorie(user.id_direction))}`}>
+                  <td className="px-3 py-3 whitespace-nowrap hidden xl:table-cell">
+                    <span className={`badge ${getCategorieColor(getDirectionCategorie(user.id_direction))}`}>
                       {getDirectionCategorie(user.id_direction)}
                     </span>
                   </td>
-                  <td className="px-2 md:px-3 py-2 whitespace-nowrap">
+                  <td className="px-3 py-3 whitespace-nowrap">
                     <div className="flex items-center gap-1.5">
-                      <span className={`h-2.5 w-2.5 rounded-full ${isUserOnline(user.id_utilisateur) ? 'bg-green-500 animate-pulse' : 'bg-gray-400 dark:bg-gray-500'}`} />
-                      <span className={`text-[10px] md:text-xs ${isUserOnline(user.id_utilisateur) ? 'text-green-600' : 'text-gray-500 dark:text-gray-400'}`}>
+                      <span className={`h-2 w-2 rounded-full ${isUserOnline(user.id_utilisateur) ? 'bg-green-500 animate-pulse' : 'bg-gray-400 dark:bg-gray-500'}`} />
+                      <span className={`text-xs ${isUserOnline(user.id_utilisateur) ? 'text-green-600 dark:text-green-400' : 'text-gray-500 dark:text-gray-400'}`}>
                         {isUserOnline(user.id_utilisateur) ? 'En ligne' : 'Hors ligne'}
                       </span>
                     </div>
                   </td>
-                  <td className="px-2 md:px-3 py-2 whitespace-nowrap text-right">
-                    <div className="flex items-center justify-end gap-0.5 md:gap-1">
+                  <td className="px-3 py-3 whitespace-nowrap text-right">
+                    <div className="flex items-center justify-end gap-1">
                       <button
                         onClick={() => handleToggleActif(user.id_utilisateur, user.actif)}
-                        className={`p-1 rounded-lg transition-colors ${user.actif ? 'text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30' : 'text-green-600 hover:bg-green-50 dark:hover:bg-green-900/30'}`}
+                        className={`p-1.5 rounded-lg transition-colors ${user.actif ? 'text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30' : 'text-green-500 hover:bg-green-50 dark:hover:bg-green-900/30'}`}
                         title={user.actif ? 'Désactiver' : 'Activer'}
                       >
                         {user.actif ? <XCircleIcon className="h-4 w-4" /> : <CheckCircleIcon className="h-4 w-4" />}
                       </button>
                       <button
                         onClick={() => handleEdit(user)}
-                        className="p-1 text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
+                        className="p-1.5 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
                         title="Modifier"
                       >
                         <PencilIcon className="h-4 w-4" />
@@ -655,7 +656,7 @@ function Users() {
                       {user.id_utilisateur !== currentUser?.id && (
                         <button
                           onClick={() => confirmDelete(user)}
-                          className="p-1 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
+                          className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
                           title="Supprimer"
                         >
                           <TrashIcon className="h-4 w-4" />
@@ -677,28 +678,28 @@ function Users() {
         )}
       </div>
 
-      {/* Modales - restent identiques */}
+      {/* Modals */}
       {showDeleteConfirm && userToDelete && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
-          <div className="relative bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-md w-full mx-4 p-4">
-            <div className="text-center">
-              <div className="mx-auto flex items-center justify-center h-10 w-10 rounded-full bg-red-100 dark:bg-red-900/30 mb-3">
-                <ExclamationTriangleIcon className="h-5 w-5 text-red-600" />
+        <div className="modal-overlay">
+          <div className="modal-content-custom max-w-md">
+            <div className="p-6 text-center">
+              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900/30 mb-4">
+                <ExclamationTriangleIcon className="h-6 w-6 text-red-600" />
               </div>
-              <h3 className="text-md font-medium text-gray-900 dark:text-gray-100 mb-2">Confirmation</h3>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
+              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">Confirmation</h3>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-4">
                 Supprimer <span className="font-semibold">{userToDelete.prenom} {userToDelete.nom}</span> ?
               </p>
-              <div className="flex justify-center gap-2">
+              <div className="flex justify-center gap-3">
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="px-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700"
+                  className="btn-secondary btn-md"
                 >
                   Annuler
                 </button>
                 <button
                   onClick={handleDelete}
-                  className="px-3 py-1.5 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
+                  className="btn-danger btn-md"
                 >
                   Supprimer
                 </button>
@@ -709,22 +710,24 @@ function Users() {
       )}
 
       {showModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
-          <div className="relative bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white dark:bg-slate-800 flex justify-between items-center p-4 border-b dark:border-slate-700">
+        <div className="modal-overlay">
+          <div className="modal-content-custom max-w-2xl">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-gray-200 dark:border-slate-700">
               <div className="flex items-center gap-2">
                 <UserPlusIcon className="h-5 w-5 text-blue-600" />
-                <h3 className="text-md font-semibold dark:text-gray-100">
-                  {editingUser ? 'Modifier l\'agent' : 'Ajouter un agent'}
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                  {editingUser ? "Modifier l'agent" : 'Ajouter un agent'}
                 </h3>
               </div>
-              <button onClick={closeModal} className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">✕</button>
+              <button onClick={closeModal} className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 p-1 rounded-lg hover:bg-gray-100 dark:hover:bg-slate-700">
+                <XMarkIcon className="h-5 w-5" />
+              </button>
             </div>
-            
-            <form onSubmit={handleSubmit} className="p-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+
+            <form onSubmit={handleSubmit} className="p-5 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">
+                  <label className="label">
                     <span className="flex items-center gap-1">
                       <UserIcon className="h-3 w-3" />
                       Nom *
@@ -734,13 +737,13 @@ function Users() {
                     type="text"
                     value={formData.nom}
                     onChange={(e) => setFormData({...formData, nom: e.target.value})}
-                    className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-800 dark:text-white"
+                    className="input"
                     required
                   />
                 </div>
-                
+
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">
+                  <label className="label">
                     <span className="flex items-center gap-1">
                       <UserIcon className="h-3 w-3" />
                       Prénom *
@@ -750,13 +753,13 @@ function Users() {
                     type="text"
                     value={formData.prenom}
                     onChange={(e) => setFormData({...formData, prenom: e.target.value})}
-                    className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-800 dark:text-white"
+                    className="input"
                     required
                   />
                 </div>
-                
+
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">
+                  <label className="label">
                     <span className="flex items-center gap-1">
                       <EnvelopeIcon className="h-3 w-3" />
                       Email *
@@ -766,13 +769,13 @@ function Users() {
                     type="email"
                     value={formData.email}
                     onChange={(e) => setFormData({...formData, email: e.target.value})}
-                    className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-800 dark:text-white"
+                    className="input"
                     required
                   />
                 </div>
-                
+
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">
+                  <label className="label">
                     <span className="flex items-center gap-1">
                       <PhoneIcon className="h-3 w-3" />
                       Téléphone
@@ -782,13 +785,13 @@ function Users() {
                     type="tel"
                     value={formData.telephone}
                     onChange={(e) => setFormData({...formData, telephone: e.target.value})}
-                    className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-800 dark:text-white"
+                    className="input"
                   />
                 </div>
-                
+
                 {!editingUser && (
                   <div>
-                    <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">
+                    <label className="label">
                       <span className="flex items-center gap-1">
                         <ShieldCheckIcon className="h-3 w-3" />
                         Mot de passe *
@@ -799,22 +802,22 @@ function Users() {
                         type={showPassword ? 'text' : 'password'}
                         value={formData.password}
                         onChange={(e) => setFormData({...formData, password: e.target.value})}
-                        className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg pr-8 bg-white dark:bg-slate-700 text-gray-800 dark:text-white"
+                        className="input pr-10"
                         required
                       />
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-2 top-1/2 transform -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
                       >
                         {showPassword ? <EyeSlashIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
                       </button>
                     </div>
                   </div>
                 )}
-                
+
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">
+                  <label className="label">
                     <span className="flex items-center gap-1">
                       <BriefcaseIcon className="h-3 w-3" />
                       Fonction *
@@ -823,7 +826,7 @@ function Users() {
                   <select
                     value={formData.id_role}
                     onChange={(e) => setFormData({...formData, id_role: e.target.value})}
-                    className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-800 dark:text-white"
+                    className="input"
                     required
                   >
                     <option value="">Sélectionner</option>
@@ -834,9 +837,9 @@ function Users() {
                     ))}
                   </select>
                 </div>
-                
+
                 <div>
-                  <label className="block text-xs font-medium text-gray-700 dark:text-gray-200 mb-1">
+                  <label className="label">
                     <span className="flex items-center gap-1">
                       <BuildingOfficeIcon className="h-3 w-3" />
                       Direction
@@ -845,7 +848,7 @@ function Users() {
                   <select
                     value={formData.id_direction}
                     onChange={(e) => setFormData({...formData, id_direction: e.target.value})}
-                    className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg bg-white dark:bg-slate-700 text-gray-800 dark:text-white"
+                    className="input"
                   >
                     <option value="">Aucune</option>
                     {filteredDirections.map(dir => (
@@ -856,20 +859,20 @@ function Users() {
                   </select>
                 </div>
               </div>
-              
-              <div className="flex justify-end gap-2 mt-4 pt-3 border-t dark:border-slate-700">
-                <button type="button" onClick={closeModal} className="px-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700">
+
+              <div className="flex justify-end gap-3 pt-4 border-t border-gray-200 dark:border-slate-700">
+                <button type="button" onClick={closeModal} className="btn-secondary btn-md">
                   Annuler
                 </button>
-                <button type="submit" className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2">
+                <button type="submit" disabled={loading} className="btn-primary btn-md">
                   {editingUser ? (
                     <>
-                      <PencilIcon className="h-3 w-3" />
+                      <PencilIcon className="h-4 w-4" />
                       Modifier
                     </>
                   ) : (
                     <>
-                      <UserPlusIcon className="h-3 w-3" />
+                      <UserPlusIcon className="h-4 w-4" />
                       Créer
                     </>
                   )}

@@ -518,7 +518,7 @@ function BackofficeLayout() {
       <div className="lg:pl-72 h-screen flex flex-col overflow-hidden">
         <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
         <main className="flex-1 overflow-hidden flex flex-col">
-          <div className="flex-1 overflow-auto p-1 sm:p-2 md:p-2 lg:p-4">
+          <div className="flex-1 overflow-auto p-4 sm:p-6">
             <Outlet />
           </div>
         </main>

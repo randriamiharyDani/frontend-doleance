@@ -129,38 +129,38 @@ function Dashboard() {
   }
 
   return (
-    <div className="px-3 sm:px-4 md:px-6 bg-gray-50 dark:bg-slate-900">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-3">
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 dark:text-gray-100">Tableau de bord</h1>
-          <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mt-1">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Tableau de bord</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Bienvenue, <span className="font-medium text-gray-700 dark:text-gray-200">{user?.prenom || ''} {user?.nom || ''}</span>
           </p>
         </div>
         <button onClick={() => fetchAll(false)} disabled={refreshing}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 text-sm font-medium">
+          className="btn-primary btn-md">
           <ArrowPathIcon className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
           {refreshing ? 'Rafraîchissement...' : 'Rafraîchir'}
         </button>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         {statsCards.map((stat, i) => <StatCard key={i} {...stat} />)}
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-6 mb-6 sm:mb-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <InfoCard title="Catégories disponibles" value={categoriesCount} subtitle="Types de doléances"
           icon={TagIcon} iconBg="bg-blue-50 dark:bg-blue-900/20" iconColor="text-blue-500 dark:text-blue-400" borderClass="border-blue-100 dark:border-blue-900/30" error={errors.categories} />
         <InfoCard title="Niveaux de priorité" value={prioritesCount} subtitle="De basse à urgente"
           icon={ExclamationTriangleIcon} iconBg="bg-orange-50 dark:bg-orange-900/20" iconColor="text-orange-500 dark:text-orange-400" borderClass="border-orange-100 dark:border-orange-900/30" />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <EvolutionChart data={monthlyStats} error={errors.monthly} />
         <StatusPieChart data={statsByStatus} error={errors.status} />
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
         <CategoryBar data={statsByCategory} error={errors.categories} selectedId={selectedCategoryId} onSelect={handleCategorySelect} />
         <DirectionBar data={statsByDirection} error={errors.direction} />
       </div>

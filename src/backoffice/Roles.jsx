@@ -490,19 +490,19 @@ function Roles() {
   }
 
   return (
-    <div className="p-4 md:p-6">
-      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Gestion des rôles</h1>
-          <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">Gérez les rôles et permissions des utilisateurs selon l'organigramme</p>
-          <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs dark:bg-purple-900/30 dark:text-purple-300">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Gestion des rôles</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Gérez les rôles et permissions des utilisateurs selon l'organigramme</p>
+          <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300">
             <ShieldCheckIcon className="h-3 w-3" />
-            Accès réservé à l'administrateur système
+            Accès réservé
           </div>
         </div>
         <button
           onClick={() => setShowModal(true)}
-          className="bg-blue-600 text-white px-3 py-2 rounded-lg hover:bg-blue-700 flex items-center gap-2 text-sm"
+          className="btn-primary btn-md"
         >
           <PlusIcon className="h-4 w-4" />
           <span className="hidden sm:inline">Nouveau rôle</span>
@@ -511,30 +511,30 @@ function Roles() {
       </div>
 
       {/* Statistiques */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
-        <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-3">
-          <UserGroupIcon className="h-6 w-6 text-blue-500 mb-1" />
-          <p className="text-xl font-bold text-gray-800 dark:text-gray-100">{roles.length}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">Total des rôles</p>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        <div className="stat-card">
+          <UserGroupIcon className="h-6 w-6 text-blue-500 mb-2" />
+          <p className="text-2xl font-bold text-gray-900 dark:text-white">{roles.length}</p>
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Total des rôles</p>
         </div>
-        <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-3">
-          <ShieldCheckIcon className="h-6 w-6 text-purple-500 mb-1" />
-          <p className="text-xl font-bold text-gray-800 dark:text-gray-100">
+        <div className="stat-card">
+          <ShieldCheckIcon className="h-6 w-6 text-purple-500 mb-2" />
+          <p className="text-2xl font-bold text-gray-900 dark:text-white">
             {roles.filter(r => r.nom_role === 'administrateur_systeme').length}
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">Administrateurs système</p>
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Administrateurs système</p>
         </div>
-        <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-3">
-          <UserIcon className="h-6 w-6 text-blue-500 mb-1" />
-          <p className="text-xl font-bold text-gray-800 dark:text-gray-100">{totalAgents}</p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">Total des agents</p>
+        <div className="stat-card">
+          <UserIcon className="h-6 w-6 text-blue-500 mb-2" />
+          <p className="text-2xl font-bold text-gray-900 dark:text-white">{totalAgents}</p>
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Total des agents</p>
         </div>
-        <div className="bg-white dark:bg-slate-800 rounded-lg shadow p-3">
-          <UserPlusIcon className="h-6 w-6 text-green-500 mb-1" />
-          <p className="text-xl font-bold text-gray-800 dark:text-gray-100">
+        <div className="stat-card">
+          <UserPlusIcon className="h-6 w-6 text-green-500 mb-2" />
+          <p className="text-2xl font-bold text-gray-900 dark:text-white">
             {users.filter(u => u.actif === 1 && u.role_nom !== 'citoyen').length}
           </p>
-          <p className="text-xs text-gray-500 dark:text-gray-400">Agents actifs</p>
+          <p className="text-xs font-medium text-gray-500 dark:text-gray-400">Agents actifs</p>
         </div>
       </div>
 
@@ -544,20 +544,18 @@ function Roles() {
           const roleDef = rolesDefinition.find(r => r.nom === role.nom_role);
           const permissionItems = renderPermissions(role.permissions);
           const agentCount = roleStats[role.nom_role] || 0;
-          
+
           return (
-            <div key={role.id_role} className="bg-white dark:bg-slate-800 rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-              <div className="p-4">
+            <div key={role.id_role} className="card-hover">
+              <div className="p-5">
                 <div className="flex items-center justify-between mb-3">
-                  <div className="flex items-center gap-2">
-                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-lg flex items-center justify-center text-white">
-                      <div className="text-xl">
-                        {getRoleIcon(role.nom_role)}
-                      </div>
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl flex items-center justify-center text-white shadow-sm">
+                      {getRoleIcon(role.nom_role)}
                     </div>
                     <div>
-                      <h3 className="text-md font-semibold text-gray-800 dark:text-gray-100">{getRoleLabel(role.nom_role)}</h3>
-                      <span className={`inline-block px-2 py-0.5 text-xs rounded-full ${getRoleBadge(role.nom_role)}`}>
+                      <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{getRoleLabel(role.nom_role)}</h3>
+                      <span className={`badge ${getRoleBadge(role.nom_role)} mt-0.5`}>
                         {role.nom_role}
                       </span>
                     </div>
@@ -565,7 +563,7 @@ function Roles() {
                   <div className="flex gap-1">
                     <button
                       onClick={() => handleEdit(role)}
-                      className="text-blue-600 hover:text-blue-800 dark:hover:text-blue-400 p-1"
+                      className="p-1.5 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors"
                       title="Modifier"
                     >
                       <PencilIcon className="h-4 w-4" />
@@ -573,7 +571,7 @@ function Roles() {
                     {!['administrateur_systeme', 'maire', 'agent_central', 'directeur', 'chef_service', 'agent', 'secretaire_general'].includes(role.nom_role) && (
                       <button
                         onClick={() => confirmDelete(role)}
-                        className="text-red-600 hover:text-red-800 dark:hover:text-red-400 p-1"
+                        className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/30 rounded-lg transition-colors"
                         title="Supprimer"
                       >
                         <TrashIcon className="h-4 w-4" />
@@ -581,25 +579,24 @@ function Roles() {
                     )}
                   </div>
                 </div>
-                
-                <p className="text-gray-600 dark:text-gray-300 text-xs mb-3">
+
+                <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
                   {roleDef?.description || role.description || 'Description non définie'}
                 </p>
-                
-                {/* Nombre d'agents avec ce rôle */}
-                <div className="flex items-center gap-2 mb-3 text-xs">
-                  <UserIcon className="h-4 w-4 text-gray-400 dark:text-gray-500" />
-                  <span className="text-gray-600 dark:text-gray-300">
-                    <span className="font-semibold text-gray-800 dark:text-gray-100">{agentCount}</span> agent{agentCount > 1 ? 's' : ''} avec ce rôle
+
+                <div className="flex items-center gap-2 mb-3 text-xs text-gray-500 dark:text-gray-400">
+                  <UserIcon className="h-4 w-4" />
+                  <span>
+                    <span className="font-semibold text-gray-700 dark:text-gray-200">{agentCount}</span> agent{agentCount > 1 ? 's' : ''} avec ce rôle
                   </span>
                 </div>
-                
-                <div className="border-t dark:border-slate-700 pt-3">
-                  <p className="text-xs text-gray-500 dark:text-gray-400 mb-1">Permissions :</p>
-                  <div className="flex flex-wrap gap-1">
+
+                <div className="border-t border-gray-100 dark:border-slate-700 pt-3">
+                  <p className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-2">Permissions :</p>
+                  <div className="flex flex-wrap gap-1.5">
                     {permissionItems.length > 0 ? (
                       permissionItems.slice(0, 4).map((item, idx) => (
-                        <span key={idx} className="text-xs bg-gray-100 text-gray-600 px-1.5 py-0.5 rounded-full dark:bg-slate-700 dark:text-gray-300">
+                        <span key={idx} className="badge bg-gray-100 text-gray-600 dark:bg-slate-700 dark:text-gray-300">
                           {item.permission}
                         </span>
                       ))
@@ -619,10 +616,10 @@ function Roles() {
 
       {/* Modal d'ajout/modification */}
       {showModal && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center p-4">
-          <div className="relative bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            <div className="sticky top-0 bg-white dark:bg-slate-800 flex justify-between items-center p-4 border-b dark:border-slate-700">
-              <h3 className="text-md font-semibold dark:text-gray-100">
+        <div className="modal-overlay">
+          <div className="modal-content-custom max-w-2xl">
+            <div className="sticky top-0 bg-white dark:bg-slate-800 flex justify-between items-center p-4 border-b border-gray-200 dark:border-slate-700 rounded-t-xl">
+              <h3 className="text-md font-semibold text-gray-900 dark:text-white">
                 {editingRole ? 'Modifier le rôle' : 'Ajouter un rôle'}
               </h3>
               <button onClick={closeModal} className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
@@ -631,14 +628,14 @@ function Roles() {
             </div>
             
             <form onSubmit={handleSubmit} className="p-4">
-              <div className="space-y-3">
+              <div className="space-y-4">
                 <div>
-                  <label className="block text-xs font-medium mb-1 dark:text-gray-200">Nom du rôle *</label>
+                  <label className="label">Nom du rôle *</label>
                   <input
                     type="text"
                     value={formData.nom_role}
                     onChange={(e) => setFormData({...formData, nom_role: e.target.value})}
-                    className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-800 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                    className="input"
                     placeholder="ex: agent_qualifie"
                     required
                     disabled={editingRole && ['administrateur_systeme', 'maire', 'agent_central', 'directeur', 'chef_service', 'agent', 'secretaire_general'].includes(editingRole.nom_role)}
@@ -647,21 +644,21 @@ function Roles() {
                 </div>
                 
                 <div>
-                  <label className="block text-xs font-medium mb-1 dark:text-gray-200">Description</label>
+                  <label className="label">Description</label>
                   <textarea
                     value={formData.description}
                     onChange={(e) => setFormData({...formData, description: e.target.value})}
                     rows="2"
-                    className="w-full px-2 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white dark:bg-slate-700 text-gray-800 dark:text-white placeholder:text-gray-400 dark:placeholder:text-gray-500"
+                    className="input"
                     placeholder="Description des responsabilités du rôle..."
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-xs font-medium mb-2 dark:text-gray-200">Permissions</label>
-                  <div className="space-y-3 max-h-80 overflow-y-auto border border-gray-300 dark:border-slate-600 rounded-lg p-3">
+                  <label className="label">Permissions</label>
+                  <div className="space-y-3 max-h-80 overflow-y-auto border border-gray-200 dark:border-slate-600 rounded-xl p-3">
                     {Object.entries(availablePermissions).map(([category, data]) => (
-                      <div key={category} className="border-b dark:border-slate-600 pb-2 last:border-0">
+                      <div key={category} className="border-b border-gray-100 dark:border-slate-600 pb-2 last:border-0">
                         <div className="flex items-center gap-2 mb-1">
                           <span className="text-gray-500 dark:text-gray-400">{data.icon}</span>
                           <h4 className="font-semibold text-gray-700 dark:text-gray-200 text-sm">{data.label}</h4>
@@ -685,11 +682,11 @@ function Roles() {
                 </div>
               </div>
               
-              <div className="flex justify-end gap-2 mt-4 pt-3 border-t dark:border-slate-700">
-                <button type="button" onClick={closeModal} className="px-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700">
+              <div className="flex justify-end gap-2 mt-4 pt-3 border-t border-gray-200 dark:border-slate-700">
+                <button type="button" onClick={closeModal} className="btn-secondary btn-sm">
                   Annuler
                 </button>
-                <button type="submit" className="px-3 py-1.5 text-sm bg-blue-600 text-white rounded-lg hover:bg-blue-700">
+                <button type="submit" className="btn-primary btn-sm">
                   {editingRole ? 'Modifier' : 'Créer'}
                 </button>
               </div>
@@ -700,29 +697,29 @@ function Roles() {
 
       {/* Modal de confirmation de suppression */}
       {showDeleteConfirm && roleToDelete && (
-        <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50 flex items-center justify-center">
-          <div className="relative bg-white dark:bg-slate-800 rounded-lg shadow-xl max-w-md w-full mx-4 p-4">
-            <div className="text-center">
+        <div className="modal-overlay">
+          <div className="modal-content-custom max-w-md">
+            <div className="text-center p-6">
               <div className="mx-auto flex items-center justify-center h-10 w-10 rounded-full bg-red-100 dark:bg-red-900/30 mb-3">
                 <TrashIcon className="h-5 w-5 text-red-600" />
               </div>
-              <h3 className="text-md font-medium text-gray-900 dark:text-gray-100 mb-2">Confirmation</h3>
+              <h3 className="text-md font-medium text-gray-900 dark:text-white mb-2">Confirmation</h3>
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-3">
                 Supprimer le rôle <span className="font-semibold">{getRoleLabel(roleToDelete.nom_role)}</span> ?
               </p>
-              <p className="text-xs text-red-500 mb-3">
+              <p className="text-xs text-red-500 mb-4">
                 Les utilisateurs avec ce rôle perdront leurs permissions.
               </p>
               <div className="flex justify-center gap-2">
                 <button
                   onClick={() => setShowDeleteConfirm(false)}
-                  className="px-3 py-1.5 text-sm border border-gray-300 dark:border-slate-600 rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700"
+                  className="btn-secondary btn-sm"
                 >
                   Annuler
                 </button>
                 <button
                   onClick={handleDelete}
-                  className="px-3 py-1.5 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700"
+                  className="btn-danger btn-sm"
                 >
                   Supprimer
                 </button>

@@ -193,12 +193,15 @@ function Categories() {
   };
 
   return (
-    <div className="max-auto mx-auto">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
-        <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Gestion des catégories</h1>
+    <div className="space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Gestion des catégories</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Gérez les catégories de doléances</p>
+        </div>
         <button
           onClick={openAdd}
-          className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 text-sm font-medium"
+          className="btn-primary btn-md"
         >
           <PlusIcon className="h-4 w-4" />
           Ajouter
@@ -206,7 +209,7 @@ function Categories() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 mb-6 bg-gray-100 dark:bg-slate-700 rounded-xl p-1">
+      <div className="flex gap-1 bg-gray-100 dark:bg-slate-700 rounded-xl p-1">
         {tabs.map((tab) => (
           <button
             key={tab.key}
@@ -214,7 +217,7 @@ function Categories() {
             className={`flex-1 px-4 py-2.5 rounded-lg text-sm font-medium transition-all ${
               activeTab === tab.key
                 ? 'bg-white dark:bg-slate-800 text-blue-700 shadow-sm'
-                : 'text-gray-600 dark:text-gray-300 hover:text-gray-800 dark:hover:text-gray-100'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300'
             }`}
           >
             {tab.label}
@@ -223,41 +226,41 @@ function Categories() {
       </div>
 
       {/* Search */}
-      <div className="relative mb-4">
+      <div className="relative">
         <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400 dark:text-gray-500" />
         <input
           type="text"
           placeholder="Rechercher..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-9 pr-4 py-2 border border-gray-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="input pl-9"
         />
       </div>
 
       {/* Table */}
-      <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden">
+      <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm border border-gray-200 dark:border-slate-700 overflow-hidden">
         {loading ? (
           <div className="flex justify-center py-12">
             <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600" />
           </div>
         ) : filtered.length === 0 ? (
-          <div className="text-center py-12 text-gray-500 dark:text-gray-400 text-sm">
+          <div className="text-center py-12 text-gray-400 dark:text-gray-500 text-sm">
             Aucune catégorie trouvée
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-gray-50 dark:bg-slate-700 border-b border-gray-200 dark:border-slate-600">
+            <table className="table">
+              <thead>
                 <tr>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600 dark:text-gray-300">Nom français</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600 dark:text-gray-300">Traduction malgache</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600 dark:text-gray-300 hidden sm:table-cell">Direction concernée</th>
-                  <th className="text-left px-4 py-3 font-medium text-gray-600 dark:text-gray-300 hidden md:table-cell">Description</th>
-                  <th className="text-center px-4 py-3 font-medium text-gray-600 dark:text-gray-300">Actif</th>
-                  <th className="text-right px-4 py-3 font-medium text-gray-600 dark:text-gray-300">Actions</th>
+                  <th>Nom français</th>
+                  <th>Traduction malgache</th>
+                  <th className="hidden sm:table-cell">Direction concernée</th>
+                  <th className="hidden md:table-cell">Description</th>
+                  <th className="text-center">Actif</th>
+                  <th className="text-right">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-100 dark:divide-slate-700">
+              <tbody>
                 {filtered.map((cat) => {
                   const isInactive = !cat.actif;
                   return (
@@ -269,7 +272,7 @@ function Categories() {
                           : 'hover:bg-gray-50 dark:hover:bg-slate-700/50'
                       }`}
                     >
-                      <td className="px-4 py-3">
+                      <td>
                         <div className="flex items-center gap-2">
                           {cat.couleur && (
                             <span
@@ -277,32 +280,26 @@ function Categories() {
                               style={{ backgroundColor: cat.couleur, filter: isInactive ? 'grayscale(1)' : 'none' }}
                             />
                           )}
-                          <span
-                            className={`font-medium ${
-                              isInactive
-                                ? 'text-gray-400 dark:text-gray-500 line-through decoration-1'
-                                : 'text-gray-800 dark:text-gray-100'
-                            }`}
-                          >
+                          <span className={`font-medium ${isInactive ? 'text-gray-400 dark:text-gray-500 line-through decoration-1' : 'text-gray-900 dark:text-white'}`}>
                             {cat.nom_categorie}
                           </span>
                           {isInactive && (
-                            <span className="text-[10px] font-semibold uppercase tracking-wide px-1.5 py-0.5 rounded bg-gray-200 dark:bg-slate-600 text-gray-500 dark:text-gray-300">
+                            <span className="badge bg-gray-200 text-gray-500 dark:bg-slate-600 dark:text-gray-300">
                               Masquée
                             </span>
                           )}
                         </div>
                       </td>
-                      <td className={`px-4 py-3 ${isInactive ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600 dark:text-gray-300'}`}>
+                      <td className={isInactive ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600 dark:text-gray-300'}>
                         {cat.nom_malgache || '-'}
                       </td>
-                      <td className={`px-4 py-3 hidden sm:table-cell ${isInactive ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600 dark:text-gray-300'}`}>
+                      <td className={`hidden sm:table-cell ${isInactive ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600 dark:text-gray-300'}`}>
                         {cat.direction_concernee || '-'}
                       </td>
-                      <td className={`px-4 py-3 hidden md:table-cell max-w-xs truncate ${isInactive ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500 dark:text-gray-400'}`}>
+                      <td className={`hidden md:table-cell max-w-xs truncate ${isInactive ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500 dark:text-gray-400'}`}>
                         {cat.description || '-'}
                       </td>
-                      <td className="px-4 py-3 text-center">
+                      <td className="text-center">
                         <button
                           onClick={() => toggleActif(cat)}
                           disabled={togglingId === cat.id_categorie}
@@ -318,7 +315,7 @@ function Categories() {
                           />
                         </button>
                       </td>
-                      <td className="px-4 py-3 text-right">
+                      <td className="text-right">
                         <div className="flex items-center justify-end gap-1">
                           <button
                             onClick={() => openEdit(cat)}
@@ -347,10 +344,10 @@ function Categories() {
 
       {/* Add/Edit Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+        <div className="modal-overlay">
+          <div className="modal-content-custom max-w-lg">
             <div className="flex items-center justify-between p-5 border-b border-gray-200 dark:border-slate-600">
-              <h2 className="text-lg font-bold text-gray-800 dark:text-gray-100">
+              <h2 className="text-lg font-bold text-gray-900 dark:text-white">
                 {editing ? 'Modifier la catégorie' : 'Nouvelle catégorie'}
               </h2>
               <button onClick={() => setShowModal(false)} className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300">
@@ -360,28 +357,28 @@ function Categories() {
             <form onSubmit={handleSave} className="p-5 space-y-4">
               <input type="hidden" name="module" value={activeTab} />
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Nom français *</label>
+                <label className="label">Nom français *</label>
                 <input
                   type="text"
                   required
                   value={formData.nom_categorie}
                   onChange={(e) => setFormData({ ...formData, nom_categorie: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="input"
                   placeholder="Ex: Voirie"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Traduction malgache</label>
+                <label className="label">Traduction malgache</label>
                 <input
                   type="text"
                   value={formData.nom_malgache}
                   onChange={(e) => setFormData({ ...formData, nom_malgache: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="input"
                   placeholder="Ex: Lalana"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Direction/Service concerné</label>
+                <label className="label">Direction/Service concerné</label>
                 <select
                   value={formData.id_direction || ''}
                   onChange={(e) => {
@@ -393,7 +390,7 @@ function Categories() {
                       direction_concernee: selectedDir ? selectedDir.nom_direction : '',
                     });
                   }}
-                  className="w-full px-3 py-2 border border-gray-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="input"
                 >
                   <option value="">Aucune direction (Autre / Hafa)</option>
                   {directions.map((dir) => (
@@ -404,18 +401,18 @@ function Categories() {
                 </select>
               </div>
               <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Description</label>
+                <label className="label">Description</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  className="input"
                   placeholder="Description de la catégorie"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Couleur</label>
+                  <label className="label">Couleur</label>
                   <div className="flex items-center gap-2">
                     <input
                       type="color"
@@ -426,7 +423,7 @@ function Categories() {
                     <select
                       value={formData.couleur || '#3B82F6'}
                       onChange={(e) => setFormData({ ...formData, couleur: e.target.value })}
-                      className="flex-1 px-3 py-2 border border-gray-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      className="input flex-1"
                     >
                       {COLOR_OPTIONS.map((c) => (
                         <option key={c.value} value={c.value}>{c.label}</option>
@@ -435,11 +432,11 @@ function Categories() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Icône</label>
+                  <label className="label">Icône</label>
                   <select
                     value={formData.icone}
                     onChange={(e) => setFormData({ ...formData, icone: e.target.value })}
-                    className="w-full px-3 py-2 border border-gray-200 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    className="input"
                   >
                     <option value="">Sélectionner</option>
                     {ICON_OPTIONS.map((ic) => (
@@ -454,7 +451,7 @@ function Categories() {
                   id="actif"
                   checked={formData.actif !== 0}
                   onChange={(e) => setFormData({ ...formData, actif: e.target.checked ? 1 : 0 })}
-                  className="rounded border-gray-300"
+                  className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
                 />
                 <label htmlFor="actif" className="text-sm text-gray-700 dark:text-gray-200">Catégorie active</label>
               </div>
@@ -462,14 +459,14 @@ function Categories() {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                  className="btn-secondary btn-sm"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors disabled:opacity-50"
+                  className="btn-primary btn-sm"
                 >
                   {saving ? 'Enregistrement...' : editing ? 'Modifier' : 'Créer'}
                 </button>
@@ -481,28 +478,31 @@ function Categories() {
 
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-xl shadow-xl w-full max-w-md p-6">
-            <h3 className="text-lg font-bold text-gray-800 dark:text-gray-100 mb-2">Confirmer la suppression</h3>
-            <p className="text-sm text-gray-600 dark:text-gray-300 mb-1">
+        <div className="modal-overlay">
+          <div className="modal-content-custom max-w-md p-6 text-center">
+            <div className="mx-auto flex items-center justify-center h-10 w-10 rounded-full bg-red-100 dark:bg-red-900/30 mb-3">
+              <TrashIcon className="h-5 w-5 text-red-600" />
+            </div>
+            <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">Confirmer la suppression</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400 mb-1">
               Êtes-vous sûr de vouloir supprimer la catégorie :
             </p>
-            <p className="text-sm font-semibold text-gray-800 dark:text-gray-100 mb-4">
+            <p className="text-sm font-semibold text-gray-900 dark:text-white mb-4">
               « {showDeleteConfirm.nom_categorie} » ?
             </p>
-            <p className="text-xs text-red-600 mb-4">
+            <p className="text-xs text-red-500 mb-4">
               Les doléances liées à cette catégorie ne seront pas supprimées.
             </p>
-            <div className="flex justify-end gap-3">
+            <div className="flex justify-center gap-3">
               <button
                 onClick={() => setShowDeleteConfirm(null)}
-                className="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                className="btn-secondary btn-sm"
               >
                 Annuler
               </button>
               <button
                 onClick={() => handleDelete(showDeleteConfirm.id_categorie)}
-                className="px-4 py-2 text-sm font-medium text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors"
+                className="btn-danger btn-sm"
               >
                 Supprimer
               </button>

@@ -48,9 +48,9 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
   return (
     <nav className={`no-print sticky top-0 z-20 transition-all duration-300 ${
       scrolled ? 'shadow-lg' : 'shadow-md'
-    } ${darkMode ? 'bg-slate-800' : 'bg-white'}`}>
-      <div className="px-3 sm:px-4 md:px-6">
-        <div className="flex justify-between items-center h-14 sm:h-16">
+    } ${darkMode ? 'bg-slate-800/95 backdrop-blur-sm' : 'bg-white/95 backdrop-blur-sm'}`}>
+      <div className="px-4 sm:px-6">
+        <div className="flex justify-between items-center h-16">
           {/* Bouton menu mobile */}
           <button
             onClick={() => setSidebarOpen(!sidebarOpen)}

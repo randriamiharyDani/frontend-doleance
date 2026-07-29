@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import * as XLSX from 'xlsx';
 import StatsCards from '../pages/backoffice/Statistiques/StatsCards';
 import EvolutionAreaChart from '../pages/backoffice/Statistiques/EvolutionAreaChart';
-import CategoryBarChart from '../pages/backoffice/Statistiques/CategoryBarChart';
+import EvolutionBarChart from '../pages/backoffice/Statistiques/EvolutionBarChart';
 import StatusDonutChart from '../pages/backoffice/Statistiques/StatusDonutChart';
 import SatisfactionCard from '../pages/backoffice/Statistiques/SatisfactionCard';
 
@@ -167,29 +167,26 @@ function Statistiques() {
   }
 
   return (
-    <div className="space-y-6 bg-gray-50 dark:bg-slate-900 min-h-screen">
+    <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] dark:text-white tracking-tight">Statistiques</h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-1">Analyse des doléances et performances</p>
-          <div className="mt-2 inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-700 rounded-full text-xs border border-blue-100">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Statistiques</h1>
+          <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">Analyse des doléances et performances</p>
+          <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
             <ChartBarIcon className="h-3 w-3" />
             {isAdmin ? 'Vue administrateur' : isDirector ? 'Vue direction' : 'Vue générale'}
           </div>
         </div>
         <div className="flex gap-2 flex-wrap">
-          <select value={period} onChange={(e) => setPeriod(e.target.value)}
-            className="px-3 py-2 border border-gray-200 rounded-lg focus:outline-none focus:border-blue-500 text-sm bg-white dark:bg-slate-700 dark:border-slate-600 dark:text-white">
+          <select value={period} onChange={(e) => setPeriod(e.target.value)} className="input">
             <option value="week">7 derniers jours</option>
             <option value="month">30 derniers jours</option>
             <option value="year">12 derniers mois</option>
           </select>
-          <button onClick={exportToExcel} disabled={exporting}
-            className="px-4 py-2 bg-emerald-600 text-white rounded-lg hover:bg-emerald-700 flex items-center gap-2 disabled:opacity-50 text-sm">
+          <button onClick={exportToExcel} disabled={exporting} className="btn-secondary btn-md bg-emerald-600 text-white hover:bg-emerald-700">
             <ArrowDownTrayIcon className="h-4 w-4" /> {exporting ? 'Export...' : 'Excel'}
           </button>
-          <button onClick={exportToCSV} disabled={exporting}
-            className="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 flex items-center gap-2 disabled:opacity-50 text-sm">
+          <button onClick={exportToCSV} disabled={exporting} className="btn-secondary btn-md">
             <ArrowDownTrayIcon className="h-4 w-4" /> {exporting ? 'Export...' : 'CSV'}
           </button>
         </div>
@@ -197,19 +194,19 @@ function Statistiques() {
 
       <StatsCards stats={dashboardStats} />
 
-      {chartReady && evolutionData.length > 0 && <EvolutionAreaChart data={evolutionData} isAdmin={isAdmin} />}
+      {chartReady && statsByCategory.length > 0 && <EvolutionAreaChart data={statsByCategory} isAdmin={isAdmin} />}
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {chartReady && statsByCategory.length > 0 && <CategoryBarChart data={statsByCategory} />}
+        {chartReady && evolutionData.length > 0 && <EvolutionBarChart data={evolutionData} />}
         {chartReady && statsByStatus.length > 0 && <StatusDonutChart data={statsByStatus} />}
       </div>
 
       {satisfactionRate && <SatisfactionCard data={satisfactionRate} />}
 
-      {chartReady && evolutionData.length === 0 && statsByCategory.length === 0 && statsByStatus.length === 0 && (
-        <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 p-12 text-center">
+      {chartReady && statsByCategory.length === 0 && evolutionData.length === 0 && statsByStatus.length === 0 && (
+        <div className="card p-12 text-center">
           <ChartBarIcon className="h-16 w-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-          <h3 className="text-lg font-medium text-gray-800 dark:text-gray-100 mb-2">Aucune donnée disponible</h3>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Aucune donnée disponible</h3>
           <p className="text-gray-500 dark:text-gray-400">Les statistiques seront disponibles lorsque des doléances seront déposées.</p>
         </div>
       )}
