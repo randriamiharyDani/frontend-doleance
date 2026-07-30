@@ -175,8 +175,8 @@ function SuiviDoleance() {
             <ShieldCheckIcon className="w-3.5 h-3.5" />
             Commune Urbaine d'Antananarivo
           </span>
-          <h1 className={`cua-display text-2xl sm:text-xl md:text-3xl font-semibold mb-2 ${
-            darkMode ? 'text-white' : 'text-[#1E3A8A]'
+          <h1 className={`cua-display font-semibold text-[#0F172A] dark:text-slate-100 ${
+            darkMode ? 'text-white' : 'text-[#0F172A]'
           }`}>
             {t('tracking.title')}
           </h1>

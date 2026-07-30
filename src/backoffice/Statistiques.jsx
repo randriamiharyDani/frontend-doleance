@@ -98,31 +98,53 @@ function Statistiques() {
 
   const buildCSV = useCallback(() => {
     const s = exportSections;
-    let csv = "Rapport des Statistiques CUA\n";
-    csv += `Généré le ${new Date().toLocaleString('fr-FR')}\n\n`;
+    const sep = ';';
+    const eol = '\r\n';
+    const now = new Date();
+    const dateStr = `${String(now.getDate()).padStart(2,'0')}/${String(now.getMonth()+1).padStart(2,'0')}/${now.getFullYear()}`;
+    let csv = '';
+
+    csv += `"Rapport des Statistiques — Commune Urbaine d'Antananarivo"${eol}`;
+    csv += `"Exporté le ${dateStr}"${eol}${eol}`;
 
     if (s.resume) {
-      csv += "RÉSUMÉ GÉNÉRAL\nIndicateur;Valeur\n";
-      csv += `Total doléances;${dashboardStats.total || 0}\nEn cours;${dashboardStats.enCours || 0}\nRésolues;${dashboardStats.resolues || 0}\nUrgentes;${dashboardStats.urgentes || 0}\n\n`;
+      csv += `"RÉSUMÉ GÉNÉRAL"${eol}`;
+      csv += `"Indicateur"${sep}"Valeur"${eol}`;
+      csv += `"Total doléances"${sep}${dashboardStats.total || 0}${eol}`;
+      csv += `"En cours"${sep}${dashboardStats.enCours || 0}${eol}`;
+      csv += `"Résolues"${sep}${dashboardStats.resolues || 0}${eol}`;
+      csv += `"Urgentes"${sep}${dashboardStats.urgentes || 0}${eol}${eol}`;
     }
     if (s.categories && statsByCategory.length > 0) {
-      csv += "PAR CATÉGORIE\nCatégorie;Nombre;Pourcentage\n";
-      statsByCategory.forEach(c => { csv += `${c.nom_categorie};${c.count || 0};${c.percentage || 0}\n`; });
-      csv += "\n";
+      csv += `"PAR CATÉGORIE"${eol}`;
+      csv += `"Catégorie"${sep}"Nombre"${sep}"Pourcentage (%)"${eol}`;
+      statsByCategory.forEach(c => {
+        csv += `"${(c.nom_categorie || '').replace(/"/g,'""')}"${sep}${c.count || 0}${sep}${c.percentage || 0}${eol}`;
+      });
+      csv += eol;
     }
     if (s.statuts && statsByStatus.length > 0) {
-      csv += "PAR STATUT\nStatut;Nombre;Pourcentage\n";
-      statsByStatus.forEach(st => { csv += `${st.nom_statut};${st.count || 0};${st.percentage || 0}\n`; });
-      csv += "\n";
+      csv += `"PAR STATUT"${eol}`;
+      csv += `"Statut"${sep}"Nombre"${sep}"Pourcentage (%)"${eol}`;
+      statsByStatus.forEach(st => {
+        csv += `"${(st.nom_statut || '').replace(/"/g,'""')}"${sep}${st.count || 0}${sep}${st.percentage || 0}${eol}`;
+      });
+      csv += eol;
     }
     if (s.evolution && evolutionData.length > 0) {
-      csv += "ÉVOLUTION\nPériode;Total;Résolues;Urgentes\n";
-      evolutionData.forEach(e => { csv += `${e.periode};${e.total || 0};${e.resolues || 0};${e.urgentes || 0}\n`; });
-      csv += "\n";
+      csv += `"ÉVOLUTION"${eol}`;
+      csv += `"Période"${sep}"Total"${sep}"Résolues"${sep}"Urgentes"${eol}`;
+      evolutionData.forEach(e => {
+        csv += `"${(e.periode || '').replace(/"/g,'""')}"${sep}${e.total || 0}${sep}${e.resolues || 0}${sep}${e.urgentes || 0}${eol}`;
+      });
+      csv += eol;
     }
     if (s.satisfaction && satisfactionRate?.total_avis > 0) {
-      csv += "SATISFACTION\nIndicateur;Valeur\n";
-      csv += `Taux;${satisfactionRate.taux_satisfaction || 0}%\nNote;${satisfactionRate.note_moyenne || 0}/5\nAvis;${satisfactionRate.total_avis || 0}\n`;
+      csv += `"SATISFACTION"${eol}`;
+      csv += `"Indicateur"${sep}"Valeur"${eol}`;
+      csv += `"Taux de satisfaction"${sep}${satisfactionRate.taux_satisfaction || 0}%${eol}`;
+      csv += `"Note moyenne"${sep}${satisfactionRate.note_moyenne || 0}/5${eol}`;
+      csv += `"Nombre d'avis"${sep}${satisfactionRate.total_avis || 0}${eol}`;
     }
     return csv;
   }, [exportSections, dashboardStats, statsByCategory, statsByStatus, evolutionData, satisfactionRate]);
@@ -152,34 +174,66 @@ function Statistiques() {
     const s = exportSections;
     const wb = XLSX.utils.book_new();
 
+    const colW = (w) => ({ wch: w });
+
     if (s.resume) {
-      const summary = [
-        ['RAPPORT STATISTIQUES CUA'], [`Généré le ${new Date().toLocaleString('fr-FR')}`], [],
-        ['RÉSUMÉ GÉNÉRAL'], ['Indicateur', 'Valeur'],
+      const data = [
+        ["Rapport des Statistiques — Commune Urbaine d'Antananarivo"],
+        [`Exporté le ${String(new Date().getDate()).padStart(2,'0')}/${String(new Date().getMonth()+1).padStart(2,'0')}/${new Date().getFullYear()}`],
+        [],
+        ['RÉSUMÉ GÉNÉRAL'],
+        ['Indicateur', 'Valeur'],
         ['Total doléances', dashboardStats.total || 0],
         ['En cours', dashboardStats.enCours || 0],
         ['Résolues', dashboardStats.resolues || 0],
         ['Urgentes', dashboardStats.urgentes || 0]
       ];
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(summary), 'Résumé');
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      ws['!cols'] = [colW(40), colW(18)];
+      ws['!merges'] = [
+        { s: { r: 0, c: 0 }, e: { r: 0, c: 1 } },
+        { s: { r: 1, c: 0 }, e: { r: 1, c: 1 } }
+      ];
+      ws['!rows'] = [{ hpt: 30 }, { hpt: 20 }, { hpt: 10 }, { hpt: 20 }];
+      XLSX.utils.book_append_sheet(wb, ws, 'Résumé');
     }
     if (s.categories && statsByCategory.length > 0) {
-      const catData = [['Catégorie', 'Nombre', 'Pourcentage (%)']];
-      statsByCategory.forEach(c => catData.push([c.nom_categorie, c.count || 0, c.percentage || 0]));
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['PAR CATÉGORIE'], [], ...catData]), 'Catégories');
+      const data = [['Catégorie', 'Nombre', 'Pourcentage (%)']];
+      statsByCategory.forEach(c => data.push([c.nom_categorie, c.count || 0, c.percentage || 0]));
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      ws['!cols'] = [colW(34), colW(14), colW(20)];
+      XLSX.utils.book_append_sheet(wb, ws, 'Catégories');
     }
     if (s.statuts && statsByStatus.length > 0) {
-      const stData = [['Statut', 'Nombre', 'Pourcentage (%)']];
-      statsByStatus.forEach(st => stData.push([st.nom_statut, st.count || 0, st.percentage || 0]));
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['PAR STATUT'], [], ...stData]), 'Statuts');
+      const data = [['Statut', 'Nombre', 'Pourcentage (%)']];
+      statsByStatus.forEach(st => data.push([st.nom_statut, st.count || 0, st.percentage || 0]));
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      ws['!cols'] = [colW(24), colW(14), colW(20)];
+      XLSX.utils.book_append_sheet(wb, ws, 'Statuts');
     }
     if (s.evolution && evolutionData.length > 0) {
-      const evData = [['Période', 'Total', 'Résolues', 'Urgentes']];
-      evolutionData.forEach(e => evData.push([e.periode, e.total || 0, e.resolues || 0, e.urgentes || 0]));
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet([['ÉVOLUTION'], [], ...evData]), 'Évolution');
+      const data = [['Période', 'Total', 'Résolues', 'Urgentes']];
+      evolutionData.forEach(e => data.push([e.periode, e.total || 0, e.resolues || 0, e.urgentes || 0]));
+      const ws = XLSX.utils.aoa_to_sheet(data);
+      ws['!cols'] = [colW(18), colW(12), colW(14), colW(14)];
+      XLSX.utils.book_append_sheet(wb, ws, 'Évolution');
+    }
+    if (s.satisfaction && satisfactionRate?.total_avis > 0) {
+      const wsData = [
+        ['SATISFACTION'],
+        [],
+        ['Indicateur', 'Valeur'],
+        ['Taux de satisfaction', `${satisfactionRate.taux_satisfaction || 0}%`],
+        ['Note moyenne', `${satisfactionRate.note_moyenne || 0}/5`],
+        [`Nombre d'avis`, satisfactionRate.total_avis || 0]
+      ];
+      const ws = XLSX.utils.aoa_to_sheet(wsData);
+      ws['!cols'] = [colW(30), colW(18)];
+      ws['!merges'] = [{ s: { r: 0, c: 0 }, e: { r: 0, c: 1 } }];
+      XLSX.utils.book_append_sheet(wb, ws, 'Satisfaction');
     }
     return wb;
-  }, [exportSections, dashboardStats, statsByCategory, statsByStatus, evolutionData]);
+  }, [exportSections, dashboardStats, statsByCategory, statsByStatus, evolutionData, satisfactionRate]);
 
   const exportToExcel = useCallback(() => {
     setExporting('excel');

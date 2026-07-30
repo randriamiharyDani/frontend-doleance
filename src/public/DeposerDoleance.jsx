@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import React, { useState, useEffect, useCallback, useRef, useMemo, useId } from "react";
 import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../contexts/ThemeContext";
@@ -119,6 +119,7 @@ const ICONS = {
 
 // Anneau de progression circulaire avec pourcentage au centre
 function CircularProgress({ value, size = 48, stroke = 4 }) {
+  const gradientId = useId();
   const radius = (size - stroke) / 2;
   const circumference = 2 * Math.PI * radius;
   const offset = circumference - (Math.min(100, Math.max(0, value)) / 100) * circumference;
@@ -140,14 +141,14 @@ function CircularProgress({ value, size = 48, stroke = 4 }) {
           r={radius}
           strokeWidth={stroke}
           fill="none"
-          stroke="url(#cuaProgressGradient)"
+          stroke={`url(#${gradientId})`}
           strokeDasharray={circumference}
           strokeDashoffset={offset}
           strokeLinecap="round"
           style={{ transition: "stroke-dashoffset 0.4s cubic-bezier(0.16,1,0.3,1)" }}
         />
         <defs>
-          <linearGradient id="cuaProgressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+          <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stopColor="#1E3A8A" />
             <stop offset="100%" stopColor="#D4AF37" />
           </linearGradient>
@@ -251,7 +252,7 @@ function ModuleCard({ active, onClick, emoji, label, activeClasses }) {
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`flex-1 flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-bold border transition-all duration-200
+      className={`flex-1 flex flex-col items-center justify-center gap-1.5 px-4 py-4 rounded-xl text-sm font-bold border transition-all duration-200 relative
         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]/50
         ${
           active
@@ -259,9 +260,9 @@ function ModuleCard({ active, onClick, emoji, label, activeClasses }) {
             : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-500 hover:-translate-y-0.5"
         }`}
     >
-      <span className="text-xl leading-none">{emoji}</span>
-      <span>{label}</span>
-      {active && <Icon path={ICONS.check} className="w-4 h-4 ml-auto" strokeWidth={3} />}
+      <span className="text-2xl leading-none">{emoji}</span>
+      <span className="text-center">{label}</span>
+      {active && <Icon path={ICONS.check} className="w-4 h-4 absolute top-2 right-2" strokeWidth={3} />}
     </button>
   );
 }
@@ -932,8 +933,28 @@ function DeposerDoleance() {
         @media (prefers-reduced-motion: reduce) { .cua-doleance .cua-anim { animation: none !important; } }
       `}</style>
 
+      {/* Barre de progression sticky (reste visible pendant le scroll, sous le header fixe) */}
+      <div className="sticky top-[64px] z-30 -mx-4 sm:-mx-6 px-4 sm:px-6 pt-3 pb-2 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-100 dark:border-slate-800 mb-4">
+        <div className="flex items-center gap-3">
+          <CircularProgress value={completion} size={40} stroke={4} />
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between gap-2 mb-1">
+              <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+                {t("deposer.pageTitle")}
+              </span>
+              <span className="text-[11px] font-bold text-[#1E3A8A] dark:text-blue-400 tabular-nums">
+                {completion}%
+              </span>
+            </div>
+            <div className="h-1.5 w-full rounded-full cua-progress-track overflow-hidden">
+              <div className="h-full cua-progress-bar rounded-full" style={{ width: `${completion}%` }} />
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Header */}
-      <div className="sm:mb-4 cua-anim flex flex-col">
+      <div className="cua-anim flex flex-col">
         <div className="text-center">
           <span
             className={`inline-flex items-center justify-center gap-1.5 text-[11px] uppercase tracking-[0.2em] font-semibold mb-3 ${
@@ -944,23 +965,15 @@ function DeposerDoleance() {
             {t("deposer.communeTitle")}
           </span>
         </div>
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center gap-3">
           <h1 className="cua-display text-2xl font-semibold text-[#0F172A] dark:text-slate-100 flex items-center gap-2 sm:gap-3">
             <span className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#0F172A] to-[#1E3A8A] flex items-center justify-center text-white shadow-md shadow-[#0F172A]/20 flex-shrink-0">
               <Icon path={ICONS.info} className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={2.5} />
             </span>
             {t("deposer.pageTitle")}
           </h1>
-          <CircularProgress value={completion} />
         </div>
         <p className="text-slate-500 dark:text-slate-400 mt-1.5 ml-[10px]">{t("deposer.pageSubtitle")}</p>
-
-        {/* Barre de progression du formulaire */}
-        <div className="mt-4" aria-hidden="true">
-          <div className="h-1.5 w-full rounded-full cua-progress-track overflow-hidden">
-            <div className="h-full cua-progress-bar rounded-full" style={{ width: `${completion}%` }} />
-          </div>
-        </div>
 
         <div className="bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-700 dark:border-blue-400 rounded-lg p-4 mt-5">
           <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{t("deposer.instructionBox")}</p>
@@ -974,13 +987,13 @@ function DeposerDoleance() {
       <form onSubmit={handleSubmit} noValidate>
         {/* 1. Type d'entité */}
         <Section step={1} iconPath={ICONS.building} title={t("deposer.typeSituation")} required tag={t("deposer.toChoose")}>
-          <div className="flex gap-3">
+          <div className="flex gap-3 text-center">
             <ModuleCard
               active={module === "CUA"}
               onClick={() => setModule("CUA")}
               emoji="🏛️"
               label={t("deposer.communeCUA")}
-              activeClasses="border-blue-600 bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 shadow-sm"
+              activeClasses="border-blue-600 bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 shadow-sm "
             />
             <ModuleCard
               active={module === "Sapeurs-Pompiers"}
@@ -997,7 +1010,7 @@ function DeposerDoleance() {
           <div className="mb-5 cua-anim">
             <div className="flex items-center gap-2 mb-3 px-1">
               <StepBadge n={2} />
-              <p className="text-sm font-bold text-[#0F172A] dark:text-slate-100">
+              <p className="text-[13px] font-bold text-[#0F172A] dark:text-slate-100">
                 {t("deposer.categoryHint1")}
               </p>
             </div>
@@ -1025,7 +1038,7 @@ function DeposerDoleance() {
                 );
               })()}
 
-            <p className="italic text-blue-600 dark:text-blue-400 text-xs mt-3 px-1">{t("deposer.categoryHint2")}</p>
+            <p className="text-[13px] font-bold text-[#0F172A] dark:text-slate-100 mt-3">{t("deposer.categoryHint2")}</p>
           </div>
         )}
 
@@ -1322,17 +1335,11 @@ function DeposerDoleance() {
           )}
 
           {uploading && (
-            <div className="mt-4">
-              <div className="flex items-center gap-3">
-                <div className="flex-1 h-2 bg-slate-100 dark:bg-slate-700 rounded-full overflow-hidden">
-                  <div
-                    className="h-full bg-gradient-to-r from-[#1E3A8A] to-[#D4AF37] rounded-full transition-all duration-300"
-                    style={{ width: `${uploadProgress}%` }}
-                  />
-                </div>
-                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{uploadProgress}%</span>
+            <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#0F172A]/60 backdrop-blur-sm">
+              <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-8 flex flex-col items-center gap-4 border dark:border-slate-600">
+                <CircularProgress value={uploadProgress} size={80} stroke={6} />
+                <p className="text-sm font-medium text-slate-600 dark:text-slate-300">{t("deposer.uploadProgress")}</p>
               </div>
-              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{t("deposer.uploadProgress")}</p>
             </div>
           )}
         </Section>
