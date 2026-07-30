@@ -51,6 +51,7 @@ function Categories() {
     nom_categorie: '',
     nom_malgache: '',
     description: '',
+    description_malagasy: '',
     direction_concernee: '',
     id_direction: '',
     couleur: '#3B82F6',
@@ -106,6 +107,7 @@ function Categories() {
       nom_categorie: '',
       nom_malgache: '',
       description: '',
+      description_malagasy: '',
       direction_concernee: '',
       id_direction: '',
       couleur: '#3B82F6',
@@ -122,6 +124,7 @@ function Categories() {
       nom_categorie: cat.nom_categorie || '',
       nom_malgache: cat.nom_malgache || '',
       description: cat.description || '',
+      description_malagasy: cat.description_malagasy || '',
       direction_concernee: cat.direction_concernee || '',
       id_direction: cat.id_direction || '',
       couleur: cat.couleur || '#3B82F6',
@@ -256,6 +259,7 @@ function Categories() {
                   <th>Traduction malgache</th>
                   <th className="hidden sm:table-cell">Direction concernée</th>
                   <th className="hidden md:table-cell">Description</th>
+                  <th className="hidden lg:table-cell">Description malgache</th>
                   <th className="text-center">Actif</th>
                   <th className="text-right">Actions</th>
                 </tr>
@@ -298,6 +302,9 @@ function Categories() {
                       </td>
                       <td className={`hidden md:table-cell max-w-xs truncate ${isInactive ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500 dark:text-gray-400'}`}>
                         {cat.description || '-'}
+                      </td>
+                      <td className={`hidden lg:table-cell max-w-xs truncate ${isInactive ? 'text-gray-400 dark:text-gray-500' : 'text-gray-500 dark:text-gray-400'}`}>
+                        {cat.description_malagasy || '-'}
                       </td>
                       <td className="text-center">
                         <button
@@ -401,13 +408,23 @@ function Categories() {
                 </select>
               </div>
               <div>
-                <label className="label">Description</label>
+                <label className="label">Description (français)</label>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
                   className="input"
-                  placeholder="Description de la catégorie"
+                  placeholder="Description en français"
+                />
+              </div>
+              <div>
+                <label className="label">Description malgache</label>
+                <textarea
+                  value={formData.description_malagasy}
+                  onChange={(e) => setFormData({ ...formData, description_malagasy: e.target.value })}
+                  rows={3}
+                  className="input"
+                  placeholder="Famaritana amin'ny teny malagasy"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">

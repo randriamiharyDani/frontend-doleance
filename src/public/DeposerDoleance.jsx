@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useCallback, useRef } from "react";
-import { useNavigate, Link } from "react-router-dom";
+import React, { useState, useEffect, useCallback, useRef, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { useTheme } from "../contexts/ThemeContext";
 import api from "../services/api";
@@ -29,11 +29,13 @@ const DefaultIcon = L.icon({
 });
 L.Marker.prototype.options.icon = DefaultIcon;
 
-// Palette institutionnelle CUA : navy #0F172A, bleu #1E3A8A, or #D4AF37
-// Chaque catégorie garde une couleur distincte (code couleur fonctionnel),
-// harmonisée en tons plus sourds pour rester cohérente avec l'identité de la commune.
+// ============================================================================
+// DESIGN SYSTEM — thème institutionnel CUA (bleu / jaune-or)
+// navy #0F172A · blue #1E3A8A · gold #D4AF37
+// Toutes les icônes, boutons, champs et cartes partagent les mêmes tokens
+// (rayon, ombre, transitions) pour une cohérence visuelle totale.
+// ============================================================================
 
-// Mapping des icônes DB vers des SVG paths
 const iconMap = {
   road: "M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7",
   lightbulb:
@@ -64,7 +66,6 @@ const iconMap = {
     "M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
 };
 
-// Mapping des couleurs DB vers des gradients Tailwind
 const gradientMap = {
   "#2196F3": "from-blue-500 to-blue-600",
   "#FFC107": "from-amber-400 to-[#D4AF37]",
@@ -82,6 +83,188 @@ const gradientMap = {
   "#EC4899": "from-pink-400 to-pink-600",
   "#6B7280": "from-gray-500 to-slate-600",
 };
+
+// ---------------------------------------------------------------------------
+// Primitives UI partagées
+// ---------------------------------------------------------------------------
+
+function Icon({ path, className = "w-5 h-5", strokeWidth = 2 }) {
+  const paths = Array.isArray(path) ? path : [path];
+  return (
+    <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={strokeWidth}>
+      {paths.map((d, i) => (
+        <path key={i} strokeLinecap="round" strokeLinejoin="round" d={d} />
+      ))}
+    </svg>
+  );
+}
+
+const ICONS = {
+  info: "M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z",
+  list: "M3.75 9h16.5m-16.5 6.75h16.5",
+  edit: "M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10",
+  pin: ["M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z", "M15 11a3 3 0 11-6 0 3 3 0 016 0z"],
+  sparkle: "M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z",
+  camera: "M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z",
+  user: "M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z",
+  shield: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
+  search: "M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z",
+  upload: "M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5",
+  check: "M4.5 12.75l6 6 9-13.5",
+  close: "M6 18L18 6M6 6l12 12",
+  send: "M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5",
+  building: "M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4",
+  file: "M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z",
+};
+
+// Anneau de progression circulaire avec pourcentage au centre
+function CircularProgress({ value, size = 48, stroke = 4 }) {
+  const radius = (size - stroke) / 2;
+  const circumference = 2 * Math.PI * radius;
+  const offset = circumference - (Math.min(100, Math.max(0, value)) / 100) * circumference;
+
+  return (
+    <div className="relative flex-shrink-0" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="-rotate-90">
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          strokeWidth={stroke}
+          fill="none"
+          className="stroke-slate-200 dark:stroke-slate-700"
+        />
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          strokeWidth={stroke}
+          fill="none"
+          stroke="url(#cuaProgressGradient)"
+          strokeDasharray={circumference}
+          strokeDashoffset={offset}
+          strokeLinecap="round"
+          style={{ transition: "stroke-dashoffset 0.4s cubic-bezier(0.16,1,0.3,1)" }}
+        />
+        <defs>
+          <linearGradient id="cuaProgressGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#1E3A8A" />
+            <stop offset="100%" stopColor="#D4AF37" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <span className="absolute inset-0 flex items-center justify-center text-[11px] font-bold text-[#0F172A] dark:text-slate-100 tabular-nums">
+        {value}%
+      </span>
+    </div>
+  );
+}
+
+// Badge numéroté d'étape — donne une hiérarchie de lecture claire au formulaire
+function StepBadge({ n }) {
+  return (
+    <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#1E3A8A]/10 dark:bg-blue-400/15 text-[11px] font-bold text-[#1E3A8A] dark:text-blue-300">
+      {n}
+    </span>
+  );
+}
+
+// En-tête de section standardisé (icône + titre + requis + badge optionnel)
+function Section({ step, iconPath, title, required, tag, hint, children, className = "" }) {
+  return (
+    <div className={`cua-section rounded-2xl p-5 mb-5 cua-anim ${className}`}>
+      <div className="flex flex-wrap items-center gap-2 mb-1">
+        {step && <StepBadge n={step} />}
+        <Icon path={iconPath} className="w-5 h-5 text-[#1E3A8A] dark:text-blue-400" />
+        <h2 className="text-[15px] sm:text-[16px] font-bold text-[#0F172A] dark:text-slate-100">
+          {title}
+          {required && <span className="ml-1 text-sm font-normal text-red-500">*</span>}
+        </h2>
+        {tag && (
+          <span className="text-[10.5px] font-semibold text-[#D4AF37] bg-[#D4AF37]/10 px-2 py-0.5 rounded-full">
+            {tag}
+          </span>
+        )}
+      </div>
+      {hint && <p className="text-sm text-slate-400 dark:text-slate-500 mb-4 ml-8">{hint}</p>}
+      {children}
+    </div>
+  );
+}
+
+// Champ de formulaire standardisé avec label / requis / aide
+function Field({ id, label, required, optional, children }) {
+  return (
+    <div>
+      {label && (
+        <label htmlFor={id} className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5">
+          {label} {required && <span className="text-[#D4AF37]">*</span>}
+          {optional && <span className="text-slate-400 dark:text-slate-500 font-normal ml-1">{optional}</span>}
+        </label>
+      )}
+      {children}
+    </div>
+  );
+}
+
+function CategoryCard({ cat, selected, onClick }) {
+  return (
+    <button
+      type="button"
+      onClick={() => onClick(cat.id)}
+      aria-pressed={selected}
+      className={`cua-card-tap group relative flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-5 rounded-xl sm:rounded-2xl text-center cursor-pointer
+        transition-all duration-200 ease-out border
+        bg-white dark:bg-slate-800
+        hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]/50
+        ${
+          selected
+            ? "border-[#D4AF37] shadow-lg shadow-[#D4AF37]/20 scale-[1.02] bg-[#D4AF37]/[0.06] dark:bg-[#D4AF37]/[0.1]"
+            : "border-slate-200 dark:border-slate-700 shadow-sm hover:border-[#D4AF37]/40 hover:shadow-md"
+        }`}
+    >
+      {selected && (
+        <span className="absolute top-2 right-2 flex h-4 w-4 items-center justify-center rounded-full bg-[#D4AF37] text-white shadow-sm sm:h-5 sm:w-5">
+          <Icon path={ICONS.check} className="h-2.5 w-2.5 sm:h-3 sm:w-3" strokeWidth={3} />
+        </span>
+      )}
+      <div
+        className={`w-10 h-10 sm:w-13 sm:h-13 rounded-xl sm:rounded-2xl flex items-center justify-center text-white
+          bg-gradient-to-br ${cat.gradient} shadow-md transition-transform duration-200 group-hover:scale-105`}
+      >
+        <Icon path={cat.icon} className="w-5 h-5 sm:w-6 sm:h-6" />
+      </div>
+      <div>
+        <p className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200">{cat.label}</p>
+        <p className="text-[10px] sm:text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 hidden sm:block">
+          {cat.desc}
+        </p>
+      </div>
+    </button>
+  );
+}
+
+// Sélecteur de type d'entité (carte-radio) — cohérent avec le style CategoryCard
+function ModuleCard({ active, onClick, emoji, label, activeClasses }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={active}
+      className={`flex-1 flex items-center gap-3 px-4 py-3.5 rounded-xl text-sm font-bold border transition-all duration-200
+        focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]/50
+        ${
+          active
+            ? activeClasses
+            : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-500 hover:-translate-y-0.5"
+        }`}
+    >
+      <span className="text-xl leading-none">{emoji}</span>
+      <span>{label}</span>
+      {active && <Icon path={ICONS.check} className="w-4 h-4 ml-auto" strokeWidth={3} />}
+    </button>
+  );
+}
 
 function DraggableMarker({ position, setPosition, onPositionChange }) {
   const markerRef = useRef(null);
@@ -122,44 +305,8 @@ function MapView({ center }) {
   return null;
 }
 
-function CategoryCard({ cat, selected, onClick }) {
-  return (
-    <button
-      type="button"
-      onClick={() => onClick(cat.id)}
-      className={`cua-card-tap flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-5 rounded-xl sm:rounded-2xl text-center cursor-pointer transition-all duration-200 border ${
-        selected
-          ? "border-[#D4AF37] shadow-lg shadow-[#D4AF37]/20 scale-[1.02] bg-[#D4AF37]/[0.06] dark:bg-[#D4AF37]/[0.1]"
-          : "border-transparent hover:border-slate-200 dark:hover:border-slate-600 hover:shadow-md"
-      } bg-white dark:bg-slate-800 shadow-sm hover:-translate-y-1`}
-    >
-      <div
-        className={`w-10 h-10 sm:w-13 sm:h-13 rounded-xl sm:rounded-2xl flex items-center justify-center text-white text-base sm:text-xl bg-gradient-to-br ${cat.gradient} shadow-md`}
-      >
-        <svg
-          className="w-5 h-5 sm:w-6 sm:h-6"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-          strokeWidth={2}
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d={cat.icon} />
-        </svg>
-      </div>
-      <div>
-        <p className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200">
-          {cat.label}
-        </p>
-        <p className="text-[10px] sm:text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 hidden sm:block">
-          {cat.desc}
-        </p>
-      </div>
-    </button>
-  );
-}
-
 function DeposerDoleance() {
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const { darkMode } = useTheme();
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
@@ -263,7 +410,7 @@ function DeposerDoleance() {
       });
   }, [files]);
 
-  // Mapper les catégories DB au format attendu par CategoryCard
+  const currentLang = i18n.language?.startsWith("mg") ? "mg" : "fr";
   const mappedCategories = [...categoriesData]
     .sort((a, b) => {
       if (a.nom_categorie?.includes("Autre")) return 1;
@@ -272,40 +419,35 @@ function DeposerDoleance() {
     })
     .map((cat) => ({
       id: cat.id_categorie,
-      label: cat.nom_categorie,
-      desc: cat.description,
+      label: currentLang === "mg" && cat.nom_malgache ? cat.nom_malgache : cat.nom_categorie,
+      desc: currentLang === "mg" && cat.description_malagasy ? cat.description_malagasy : cat.description,
       icon: iconMap[cat.icone] || iconMap["road"],
       gradient: gradientMap[cat.couleur] || "from-slate-500 to-slate-700",
       nom_direction: cat.nom_direction || null,
     }));
 
   const autreCategorie = mappedCategories.find((c) =>
-    c.label?.includes("Autre"),
+    categoriesData.find((cd) => cd.id_categorie === c.id)?.nom_categorie?.includes("Autre"),
   );
   const otherCategories = mappedCategories.filter(
-    (c) => !c.label?.includes("Autre"),
+    (c) => !categoriesData.find((cd) => cd.id_categorie === c.id)?.nom_categorie?.includes("Autre"),
   );
 
   const fetchData = async () => {
     try {
-      const [categoriesRes, quartiersRes, assignedRes, geojsonRes] =
-        await Promise.all([
-          api.get(`/categories?module=${module}`).catch(() => ({ data: [] })),
-          api.get("/doleances/quartiers").catch(() => ({ data: [] })),
-          api
-            .get("/doleances/public/assigned-locations")
-            .catch(() => ({ data: { data: [] } })),
-          api.get("/doleances/quartiers/geojson").catch(() => ({
-            data: { type: "FeatureCollection", features: [] },
-          })),
-        ]);
+      const [categoriesRes, quartiersRes, assignedRes, geojsonRes] = await Promise.all([
+        api.get(`/categories?module=${module}`).catch(() => ({ data: [] })),
+        api.get("/doleances/quartiers").catch(() => ({ data: [] })),
+        api.get("/doleances/public/assigned-locations").catch(() => ({ data: { data: [] } })),
+        api.get("/doleances/quartiers/geojson").catch(() => ({
+          data: { type: "FeatureCollection", features: [] },
+        })),
+      ]);
       const catsData = categoriesRes.data?.data || categoriesRes.data || [];
       setCategoriesData(catsData);
       setQuartiers(quartiersRes.data?.data || quartiersRes.data || []);
       setAssignedDoleances(assignedRes.data?.data || assignedRes.data || []);
-      setQuartierGeoJSON(
-        geojsonRes.data || { type: "FeatureCollection", features: [] },
-      );
+      setQuartierGeoJSON(geojsonRes.data || { type: "FeatureCollection", features: [] });
 
       setSelectedCategory(null);
       setFormData((prev) => ({ ...prev, id_categorie: "" }));
@@ -327,7 +469,8 @@ function DeposerDoleance() {
   const handleSelectCategory = (id) => {
     setSelectedCategory(id);
     const cat = mappedCategories.find((c) => c.id === id);
-    const isAutre = cat?.label?.includes("Autre");
+    const originalCat = categoriesData.find((cd) => cd.id_categorie === id);
+    const isAutre = originalCat?.nom_categorie?.includes("Autre");
     setFormData((prev) => ({
       ...prev,
       id_categorie: String(id),
@@ -366,9 +509,7 @@ function DeposerDoleance() {
       if (file.size > maxSize) {
         errors.push(`${file.name} ${t("messages.fileTooBig")}`);
       } else if (!allowedMimeTypes.includes(file.type)) {
-        errors.push(
-          `${file.name} - ${t("deposerMessages.invalidFileType")}`,
-        );
+        errors.push(`${file.name} - ${t("deposerMessages.invalidFileType")}`);
       } else {
         validFiles.push(file);
       }
@@ -383,8 +524,7 @@ function DeposerDoleance() {
     e.target.value = "";
   };
 
-  const removeFile = (index) =>
-    setFiles((prev) => prev.filter((_, i) => i !== index));
+  const removeFile = (index) => setFiles((prev) => prev.filter((_, i) => i !== index));
 
   const handleDragOver = useCallback((e) => {
     e.preventDefault();
@@ -409,9 +549,7 @@ function DeposerDoleance() {
         if (file.size > maxSize) {
           errors.push(`${file.name} ${t("messages.fileTooBig")}`);
         } else if (!allowedMimeTypes.includes(file.type)) {
-          errors.push(
-            `${file.name} - Type non autorisé. Formats acceptés : images, vidéos (MP4, MOV, AVI, MKV), PDF`,
-          );
+          errors.push(`${file.name} - Type non autorisé. Formats acceptés : images, vidéos (MP4, MOV, AVI, MKV), PDF`);
         } else {
           validFiles.push(file);
         }
@@ -435,25 +573,18 @@ function DeposerDoleance() {
     files.forEach((file) => formDataFiles.append("files", file));
     formDataFiles.append("doleance_id", doleanceId);
     try {
-      const uploadResponse = await api.post(
-        "/doleances/public/upload",
-        formDataFiles,
-        {
-          headers: { "Content-Type": undefined },
-          onUploadProgress: (progressEvent) => {
-            setUploadProgress(
-              Math.round((progressEvent.loaded * 100) / progressEvent.total),
-            );
-          },
+      const uploadResponse = await api.post("/doleances/public/upload", formDataFiles, {
+        headers: { "Content-Type": undefined },
+        onUploadProgress: (progressEvent) => {
+          setUploadProgress(Math.round((progressEvent.loaded * 100) / progressEvent.total));
         },
-      );
+      });
       if (!uploadResponse.data?.success) {
         throw new Error(uploadResponse.data?.message || "Upload failed");
       }
     } catch (error) {
       console.error("Erreur upload:", error);
-      const msg =
-        error.response?.data?.message || error.message || t("errors.generic");
+      const msg = error.response?.data?.message || error.message || t("errors.generic");
       toast.error(msg);
       throw error;
     } finally {
@@ -462,27 +593,14 @@ function DeposerDoleance() {
     }
   };
 
-  const sendReferenceAuto = async (
-    reference,
-    contact,
-    contactType,
-    nom,
-    prenom,
-    titre,
-  ) => {
+  const sendReferenceAuto = async (reference, contact, contactType, nom, prenom, titre) => {
     if (!contact || !reference) return;
     setSendingReference(true);
     setSendError(null);
     setEmailSent(false);
     setSmsSent(false);
     try {
-      const result = await EmailService.sendReference(
-        contact,
-        reference,
-        nom || "Citoyen",
-        prenom || "",
-        titre || "Doleance",
-      );
+      const result = await EmailService.sendReference(contact, reference, nom || "Citoyen", prenom || "", titre || "Doleance");
       if (result.success) {
         if (contactType === "email") setEmailSent(true);
         else setSmsSent(true);
@@ -509,12 +627,7 @@ function DeposerDoleance() {
       toast.error(t("deposerMessages.emailOrPhoneRequired"));
       return;
     }
-    if (
-      !formData.nom_citoyen ||
-      !formData.prenom_citoyen ||
-      !formData.titre ||
-      !formData.description
-    ) {
+    if (!formData.nom_citoyen || !formData.prenom_citoyen || !formData.titre || !formData.description) {
       toast.error(t("messages.pleaseFillRequired"));
       return;
     }
@@ -542,17 +655,15 @@ function DeposerDoleance() {
         latitude: mapPosition[0],
         longitude: mapPosition[1],
         lieu_exact:
-          locationName ||
-          formData.lieu_exact ||
-          `${mapPosition[0].toFixed(4)}, ${mapPosition[1].toFixed(4)}`,
-        description: `${formData.description}\n\nLocalisation: ${locationName || `${mapPosition[0].toFixed(4)}, ${mapPosition[1].toFixed(4)}`}\nSuggestions: ${formData.suggestions || "Aucune suggestion"}`,
+          locationName || formData.lieu_exact || `${mapPosition[0].toFixed(4)}, ${mapPosition[1].toFixed(4)}`,
+        description: `${formData.description}\n\nLocalisation: ${
+          locationName || `${mapPosition[0].toFixed(4)}, ${mapPosition[1].toFixed(4)}`
+        }\nSuggestions: ${formData.suggestions || "Aucune suggestion"}`,
       };
 
       const response = await api.post("/doleances", dataToSend);
-      const reference =
-        response.data.data?.reference || response.data.reference;
-      const doleanceId =
-        response.data.data?.id_doleance || response.data.id_doleance;
+      const reference = response.data.data?.reference || response.data.reference;
+      const doleanceId = response.data.data?.id_doleance || response.data.id_doleance;
       const nomDirection = response.data.data?.nom_direction || null;
       setSavedDirection(nomDirection);
 
@@ -569,14 +680,7 @@ function DeposerDoleance() {
       const contactInfo = formData.email || formData.telephone;
       const contactType = formData.email ? "email" : "phone";
       if (contactInfo && reference) {
-        await sendReferenceAuto(
-          reference,
-          contactInfo,
-          contactType,
-          formData.nom_citoyen,
-          formData.prenom_citoyen,
-          formData.titre,
-        );
+        await sendReferenceAuto(reference, contactInfo, contactType, formData.nom_citoyen, formData.prenom_citoyen, formData.titre);
       }
 
       toast.success(
@@ -584,9 +688,7 @@ function DeposerDoleance() {
           <p className="font-bold">{t("deposerMessages.reportSuccess")}</p>
           <p className="text-sm">
             {t("deposerMessages.refLabel")}{" "}
-            <span className="font-mono font-bold text-[#1E3A8A]">
-              {reference}
-            </span>
+            <span className="font-mono font-bold text-[#1E3A8A]">{reference}</span>
           </p>
           {nomDirection && (
             <p className="text-sm text-emerald-600 font-medium">
@@ -615,9 +717,7 @@ function DeposerDoleance() {
         arrondissement: "",
         titre: "",
         description: "",
-        id_categorie: mappedCategories[0]?.id
-          ? String(mappedCategories[0].id)
-          : "",
+        id_categorie: mappedCategories[0]?.id ? String(mappedCategories[0].id) : "",
         id_quartier: "",
         lieu_exact: "",
         suggestions: "",
@@ -642,36 +742,25 @@ function DeposerDoleance() {
     return (bytes / (1024 * 1024)).toFixed(1) + " MB";
   };
 
-  // Remplit le formulaire à partir d'un résultat Nominatim
   const fillFromNominatim = (data) => {
     const addr = data.address || {};
     const quartierNom = addr.suburb || addr.neighbourhood || addr.quarter || "";
-
-    // Essaie de matcher le quartier trouvé avec la liste existante
-    const matchedQuartier = quartiers.find(
-      (q) => q.nom_quartier.toLowerCase() === quartierNom.toLowerCase(),
-    );
+    const matchedQuartier = quartiers.find((q) => q.nom_quartier.toLowerCase() === quartierNom.toLowerCase());
 
     setFormData((prev) => ({
       ...prev,
-      arrondissement:
-        addr.city_district || addr.district || prev.arrondissement,
-      id_quartier: matchedQuartier
-        ? matchedQuartier.id_quartier
-        : prev.id_quartier,
-      fokontany: prev.fokontany, // pas dispo via OSM, reste manuel
+      arrondissement: addr.city_district || addr.district || prev.arrondissement,
+      id_quartier: matchedQuartier ? matchedQuartier.id_quartier : prev.id_quartier,
+      fokontany: prev.fokontany,
       lieu_exact: data.display_name || prev.lieu_exact,
     }));
 
     setSearchAddress(data.display_name || "");
   };
 
-  // Bouton "Me localiser"
   const handleLocateMe = () => {
     if (!navigator.geolocation) {
-      toast.error(
-        t("deposerMessages.geoNotSupported"),
-      );
+      toast.error(t("deposerMessages.geoNotSupported"));
       return;
     }
     setIsLocating(true);
@@ -690,9 +779,7 @@ function DeposerDoleance() {
           toast.success(t("deposerMessages.locationFound"));
         } catch (err) {
           console.error("Erreur reverse geocoding:", err);
-          toast.error(
-            t("deposerMessages.locationError"),
-          );
+          toast.error(t("deposerMessages.locationError"));
         } finally {
           setIsLocating(false);
         }
@@ -700,13 +787,9 @@ function DeposerDoleance() {
       (err) => {
         setIsLocating(false);
         if (err.code === err.PERMISSION_DENIED) {
-          toast.error(
-            t("deposerMessages.locationDenied"),
-          );
+          toast.error(t("deposerMessages.locationDenied"));
         } else if (err.code === err.POSITION_UNAVAILABLE) {
-          toast.error(
-            t("deposerMessages.locationUnavailable"),
-          );
+          toast.error(t("deposerMessages.locationUnavailable"));
         } else if (err.code === err.TIMEOUT) {
           toast.error(t("deposerMessages.locationTimeout"));
         } else {
@@ -717,7 +800,6 @@ function DeposerDoleance() {
     );
   };
 
-  // Recherche avec suggestions (debounce 400ms)
   const handleSearchInputChange = (e) => {
     const value = e.target.value;
     setSearchAddress(value);
@@ -747,7 +829,6 @@ function DeposerDoleance() {
     }, 400);
   };
 
-  // Clic sur une suggestion
   const handleSelectSuggestion = (item) => {
     setMapPosition([parseFloat(item.lat), parseFloat(item.lon)]);
     fillFromNominatim(item);
@@ -755,7 +836,6 @@ function DeposerDoleance() {
     setShowSuggestions(false);
   };
 
-  // Recherche via Entrée / bouton "Chercher" (prend la 1ère suggestion dispo)
   const handleSearchAddress = async (e) => {
     e.preventDefault();
     if (suggestions.length > 0) {
@@ -765,131 +845,95 @@ function DeposerDoleance() {
 
   const charsCount = formData.description.length;
 
+  // Progression indicative du formulaire (repère visuel, non bloquant)
+  const completion = useMemo(() => {
+    const requiredOk = [
+      !!module,
+      !!formData.id_categorie,
+      !!formData.titre,
+      !!formData.description,
+      !!formData.nom_citoyen,
+      !!formData.prenom_citoyen,
+      !!(formData.email || formData.telephone),
+    ];
+    const done = requiredOk.filter(Boolean).length;
+    return Math.round((done / requiredOk.length) * 100);
+  }, [module, formData]);
+
+  const photoExamples = [
+    { label: t("deposer.examplePothole"), icon: "M13.5 4L5.25 12.25l4.5 4.5L18 8.5", color: "from-rose-400 to-orange-400" },
+    { label: t("deposer.exampleWaste"), icon: iconMap.trash, color: "from-emerald-400 to-teal-500" },
+    { label: t("deposer.exampleLamp"), icon: iconMap.lightbulb, color: "from-amber-400 to-[#D4AF37]" },
+    { label: t("deposer.exampleGreenSpace"), icon: "M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5", color: "from-green-500 to-emerald-700" },
+  ];
+
   return (
-    <div className="cua-doleance shadow-2xl p-5 rounded-2xl bg-white dark:bg-slate-900">
+    <div className="cua-doleance shadow-2xl p-4 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 mx-auto">
       <style>{`
-        .cua-doleance { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; }
+        .cua-doleance { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; --cua-navy:#0F172A; --cua-blue:#1E3A8A; --cua-blue-light:#2E4FA3; --cua-gold:#D4AF37; --cua-gold-dark:#B8860B; }
         .cua-doleance .cua-display { font-family: 'Fraunces', ui-serif, Georgia, serif; }
 
         .cua-doleance .cua-section {
           background: #ffffff;
           border: 1px solid #F1F5F9;
           box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+          transition: box-shadow 0.2s ease, border-color 0.2s ease;
         }
-        .cua-doleance .cua-section:hover {
-          box-shadow: 0 4px 16px -4px rgba(15, 23, 42, 0.08);
-        }
-        .dark .cua-doleance .cua-section {
-          background: #1e293b;
-          border-color: #334155;
-          box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
-        }
-        .dark .cua-doleance .cua-section:hover {
-          box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.3);
-        }
+        .cua-doleance .cua-section:hover { box-shadow: 0 4px 16px -4px rgba(15, 23, 42, 0.08); }
+        .dark .cua-doleance .cua-section { background: #1e293b; border-color: #334155; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); }
+        .dark .cua-doleance .cua-section:hover { box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.3); }
 
         .cua-doleance .cua-field {
           border-color: #D1D5DB;
           transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
         }
         .cua-doleance .cua-field:focus {
-          border-color: #135ecf;
+          border-color: var(--cua-blue-light);
           box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15);
           background-color: #ffffff;
         }
-        .dark .cua-doleance .cua-field {
-          border-color: #475569;
-          background-color: #0f172a;
-          color: #e2e8f0;
-        }
-        .dark .cua-doleance .cua-field:focus {
-          border-color: #60a5fa;
-          box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.25);
-          background-color: #1e293b;
-        }
-        .dark .cua-doleance .cua-field::placeholder {
-          color: #64748b;
-        }
+        .dark .cua-doleance .cua-field { border-color: #475569; background-color: #0f172a; color: #e2e8f0; }
+        .dark .cua-doleance .cua-field:focus { border-color: #60a5fa; box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.25); background-color: #1e293b; }
+        .dark .cua-doleance .cua-field::placeholder { color: #64748b; }
 
-        .cua-doleance .cua-field-wrap:focus-within {
-          border-color: #135ecf !important;
-          box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15);
-        }
-        .dark .cua-doleance .cua-field-wrap {
-          background-color: #0f172a;
-          border-color: #334155;
-        }
-        .dark .cua-doleance .cua-field-wrap:focus-within {
-          border-color: #60a5fa !important;
-          box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.25);
-        }
+        .cua-doleance .cua-field-wrap:focus-within { border-color: var(--cua-blue-light) !important; box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15); }
+        .dark .cua-doleance .cua-field-wrap { background-color: #0f172a; border-color: #334155; }
+        .dark .cua-doleance .cua-field-wrap:focus-within { border-color: #60a5fa !important; box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.25); }
 
         .cua-doleance .cua-btn-primary {
-          background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 60%, #2E4FA3 100%);
+          background: linear-gradient(135deg, var(--cua-navy) 0%, var(--cua-blue) 60%, var(--cua-blue-light) 100%);
           transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
         }
-        .cua-doleance .cua-btn-primary:hover:not(:disabled) {
-          filter: brightness(1.08);
-          transform: translateY(-1px);
-        }
-        .dark .cua-doleance .cua-btn-primary {
-          background: linear-gradient(135deg, #1e293b 0%, #1e40af 60%, #3b82f6 100%);
-        }
+        .cua-doleance .cua-btn-primary:hover:not(:disabled) { filter: brightness(1.08); transform: translateY(-1px); }
+        .dark .cua-doleance .cua-btn-primary { background: linear-gradient(135deg, #1e293b 0%, #1e40af 60%, #3b82f6 100%); }
 
         .cua-doleance .cua-btn-submit {
-          background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 55%, #2E4FA3 100%);
+          background: linear-gradient(135deg, var(--cua-navy) 0%, var(--cua-blue) 55%, var(--cua-blue-light) 100%);
           box-shadow: 0 10px 30px -8px rgba(15, 23, 42, 0.45);
         }
-        .cua-doleance .cua-btn-submit:hover:not(:disabled) {
-          box-shadow: 0 14px 36px -8px rgba(15, 23, 42, 0.55);
-        }
-        .dark .cua-doleance .cua-btn-submit {
-          background: linear-gradient(135deg, #0f172a 0%, #1e40af 55%, #3b82f6 100%);
-          box-shadow: 0 10px 30px -8px rgba(59, 130, 246, 0.3);
-        }
-        .dark .cua-doleance .cua-btn-submit:hover:not(:disabled) {
-          box-shadow: 0 14px 36px -8px rgba(59, 130, 246, 0.4);
-        }
+        .cua-doleance .cua-btn-submit:hover:not(:disabled) { box-shadow: 0 14px 36px -8px rgba(15, 23, 42, 0.55); }
+        .dark .cua-doleance .cua-btn-submit { background: linear-gradient(135deg, #0f172a 0%, #1e40af 55%, #3b82f6 100%); box-shadow: 0 10px 30px -8px rgba(59, 130, 246, 0.3); }
+        .dark .cua-doleance .cua-btn-submit:hover:not(:disabled) { box-shadow: 0 14px 36px -8px rgba(59, 130, 246, 0.4); }
 
         .cua-doleance .cua-card-tap { will-change: transform; }
-        .dark .cua-doleance .cua-card-tap {
-          background: #1e293b;
-          border-color: #334155;
-        }
-        .dark .cua-doleance .cua-card-tap:hover {
-          border-color: #475569;
-        }
+        .dark .cua-doleance .cua-card-tap { background: #1e293b; border-color: #334155; }
+        .dark .cua-doleance .cua-card-tap:hover { border-color: #475569; }
 
-        .cua-doleance .cua-dropzone.drag {
-          border-color: #D4AF37;
-          background-color: rgba(212, 175, 55, 0.06);
-        }
-        .dark .cua-doleance .cua-dropzone {
-          border-color: #475569;
-          background-color: #0f172a;
-        }
-        .dark .cua-doleance .cua-dropzone:hover {
-          border-color: #D4AF37;
-          background-color: rgba(212, 175, 55, 0.08);
-        }
+        .cua-doleance .cua-dropzone.drag { border-color: var(--cua-gold); background-color: rgba(212, 175, 55, 0.06); }
+        .dark .cua-doleance .cua-dropzone { border-color: #475569; background-color: #0f172a; }
+        .dark .cua-doleance .cua-dropzone:hover { border-color: var(--cua-gold); background-color: rgba(212, 175, 55, 0.08); }
 
-        .cua-doleance .cua-gold-dot {
-          background: radial-gradient(circle, #D4AF37 0%, transparent 70%);
-        }
+        .cua-doleance .cua-progress-track { background: #E2E8F0; }
+        .dark .cua-doleance .cua-progress-track { background: #334155; }
+        .cua-doleance .cua-progress-bar { background: linear-gradient(90deg, var(--cua-blue) 0%, var(--cua-gold) 100%); transition: width 0.4s cubic-bezier(0.16,1,0.3,1); }
 
-        @keyframes cuaFadeUp {
-          from { opacity: 0; transform: translateY(10px); }
-          to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes cuaFadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .cua-doleance .cua-anim { animation: cuaFadeUp 0.5s cubic-bezier(0.16,1,0.3,1) both; }
-
-        @media (prefers-reduced-motion: reduce) {
-          .cua-doleance .cua-anim { animation: none !important; }
-        }
+        @media (prefers-reduced-motion: reduce) { .cua-doleance .cua-anim { animation: none !important; } }
       `}</style>
 
       {/* Header */}
-      <div className=" sm:mb-4 cua-anim flex flex-col">
+      <div className="sm:mb-4 cua-anim flex flex-col">
         <div className="text-center">
           <span
             className={`inline-flex items-center justify-center gap-1.5 text-[11px] uppercase tracking-[0.2em] font-semibold mb-3 ${
@@ -900,32 +944,26 @@ function DeposerDoleance() {
             {t("deposer.communeTitle")}
           </span>
         </div>
-        <h1 className="cua-display text-2xl sm:text-2xl font-semibold text-[#0F172A] dark:text-slate-100 flex items-center gap-2 sm:gap-3">
-          <span className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#0F172A] to-[#1E3A8A] flex items-center justify-center text-white shadow-md shadow-[#0F172A]/20 flex-shrink-0">
-            <svg
-              className="w-4 h-4 sm:w-5 sm:h-5"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2.5}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-              />
-            </svg>
-          </span>
-          {t("deposer.pageTitle")}
-        </h1>
-        <p className=" text-slate-500 dark:text-slate-400 mt-1.5 ml-[10px] sm:ml-[10px] ">
-          {t("deposer.pageSubtitle")}
-        </p>
+        <div className="flex items-center justify-between gap-3">
+          <h1 className="cua-display text-2xl font-semibold text-[#0F172A] dark:text-slate-100 flex items-center gap-2 sm:gap-3">
+            <span className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#0F172A] to-[#1E3A8A] flex items-center justify-center text-white shadow-md shadow-[#0F172A]/20 flex-shrink-0">
+              <Icon path={ICONS.info} className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={2.5} />
+            </span>
+            {t("deposer.pageTitle")}
+          </h1>
+          <CircularProgress value={completion} />
+        </div>
+        <p className="text-slate-500 dark:text-slate-400 mt-1.5 ml-[10px]">{t("deposer.pageSubtitle")}</p>
 
-        <div className="bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-700 dark:border-blue-400 rounded-lg p-4  mt-5">
-          <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
-            {t("deposer.instructionBox")}
-          </p>
+        {/* Barre de progression du formulaire */}
+        <div className="mt-4" aria-hidden="true">
+          <div className="h-1.5 w-full rounded-full cua-progress-track overflow-hidden">
+            <div className="h-full cua-progress-bar rounded-full" style={{ width: `${completion}%` }} />
+          </div>
+        </div>
+
+        <div className="bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-700 dark:border-blue-400 rounded-lg p-4 mt-5">
+          <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{t("deposer.instructionBox")}</p>
         </div>
 
         <p className="inline-flex items-center rounded-xl border border-yellow-400 dark:border-yellow-600 bg-yellow-100 dark:bg-yellow-900/30 mt-5 px-4 py-2 text-[13px] font-medium text-yellow-800 dark:text-yellow-300 w-fit">
@@ -933,91 +971,53 @@ function DeposerDoleance() {
         </p>
       </div>
 
-      <form onSubmit={handleSubmit}>
-        {/* Type d'entité */}
-        <div className="mb-1">
-            <h2 className="block text-[16px] font-bold text-[#0F172A] dark:text-slate-100">
-            {t("deposer.typeSituation")}
-            <span className="ml-1 text-sm font-normal text-red-500">*</span>
-            <span className="ml-1 text-sm font-medium text-gray-500">
-              {t("deposer.toChoose")}
-            </span>
-          </h2>
+      <form onSubmit={handleSubmit} noValidate>
+        {/* 1. Type d'entité */}
+        <Section step={1} iconPath={ICONS.building} title={t("deposer.typeSituation")} required tag={t("deposer.toChoose")}>
           <div className="flex gap-3">
-            <button
-              type="button"
+            <ModuleCard
+              active={module === "CUA"}
               onClick={() => setModule("CUA")}
-              className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold border transition-all ${
-                module === "CUA"
-                  ? "border-blue-600 bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 shadow-sm"
-                  : "border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-500"
-              }`}
-            >
-              <span className="block text-base">🏛️</span>
-              <span>{t("deposer.communeCUA")}</span>
-            </button>
-            <button
-              type="button"
+              emoji="🏛️"
+              label={t("deposer.communeCUA")}
+              activeClasses="border-blue-600 bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 shadow-sm"
+            />
+            <ModuleCard
+              active={module === "Sapeurs-Pompiers"}
               onClick={() => setModule("Sapeurs-Pompiers")}
-              className={`flex-1 px-4 py-3 rounded-xl text-sm font-bold border transition-all ${
-                module === "Sapeurs-Pompiers"
-                  ? "border-red-600 bg-red-50 dark:bg-red-900/40 text-red-700 dark:text-red-300 shadow-sm"
-                  : "border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-500"
-              }`}
-            >
-              <span className="block text-base">🚒</span>
-              <span>{t("deposer.sapeursPompiers")}</span>
-            </button>
+              emoji="🚒"
+              label={t("deposer.sapeursPompiers")}
+              activeClasses="border-amber-500 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 shadow-sm"
+            />
           </div>
-        </div>
+        </Section>
 
-        {/* Categories */}
+        {/* 2. Catégories */}
         {module && mappedCategories.length > 0 && (
-          <>
-            <p className="italic text-blue-600 dark:text-blue-400 text-xs my-3">
-              {t("deposer.categoryHint1")}
-            </p>
+          <div className="mb-5 cua-anim">
+            <div className="flex items-center gap-2 mb-3 px-1">
+              <StepBadge n={2} />
+              <p className="text-sm font-bold text-[#0F172A] dark:text-slate-100">
+                {t("deposer.categoryHint1")}
+              </p>
+            </div>
 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
               {otherCategories.map((cat) => (
-                <CategoryCard
-                  key={cat.id}
-                  cat={cat}
-                  selected={selectedCategory === cat.id}
-                  onClick={handleSelectCategory}
-                />
+                <CategoryCard key={cat.id} cat={cat} selected={selectedCategory === cat.id} onClick={handleSelectCategory} />
               ))}
-
               {autreCategorie && (
-                <CategoryCard
-                  cat={autreCategorie}
-                  selected={selectedCategory === autreCategorie.id}
-                  onClick={handleSelectCategory}
-                />
+                <CategoryCard cat={autreCategorie} selected={selectedCategory === autreCategorie.id} onClick={handleSelectCategory} />
               )}
             </div>
 
             {selectedCategory &&
               (() => {
-                const selectedCat = mappedCategories.find(
-                  (c) => c.id === selectedCategory,
-                );
+                const selectedCat = mappedCategories.find((c) => c.id === selectedCategory);
                 if (!selectedCat?.nom_direction) return null;
                 return (
-                  <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-xl px-4 py-2.5 mb-3  my-5 ">
-                    <svg
-                      className="w-4 h-4 text-[#1E3A8A] shrink-0"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      strokeWidth={2}
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"
-                      />
-                    </svg>
+                  <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-xl px-4 py-2.5 mt-4">
+                    <Icon path={ICONS.building} className="w-4 h-4 text-[#1E3A8A] shrink-0" />
                     <span className="text-xs sm:text-sm text-[#1E3A8A] dark:text-blue-300 font-semibold">
                       {t("deposer.directionLabel")} {selectedCat.nom_direction}
                     </span>
@@ -1025,160 +1025,68 @@ function DeposerDoleance() {
                 );
               })()}
 
-            <p className="italic text-blue-600 dark:text-blue-400 text-xs my-3">
-              {t("deposer.categoryHint2")}
-            </p>
-          </>
+            <p className="italic text-blue-600 dark:text-blue-400 text-xs mt-3 px-1">{t("deposer.categoryHint2")}</p>
+          </div>
         )}
 
         {module && mappedCategories.length === 0 && (
-          <p className="text-slate-400 dark:text-slate-500 text-sm text-center mb-2 py-4">
-            {t("deposer.noCategory")}
-          </p>
+          <p className="text-slate-400 dark:text-slate-500 text-sm text-center mb-2 py-4">{t("deposer.noCategory")}</p>
         )}
 
-        {/* Titre */}
+        {/* 3. Titre */}
         {module && (
-          <div className="cua-section rounded-2xl p-5 mt-4 mb-6 cua-anim">
-            <div className="flex items-center gap-2 mb-4">
-              <svg
-                className="w-5 h-5 text-[#1E3A8A]"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M3.75 9h16.5m-16.5 6.75h16.5"
-                />
-              </svg>
-              <h2 className="text-[16px]  font-bold text-[#0F172A] dark:text-slate-100">
-                {t("deposer.titleProblem")}
-                <span className="ml-1 text-sm font-normal text-red-500">*</span>
-              </h2>
-            </div>
-            <input
-              type="text"
-              name="titre"
-              value={formData.titre}
-              onChange={handleChange}
-              placeholder={t("deposer.titlePlaceholder")}
-              className="cua-field w-full border  rounded-xl px-5 py-4 text-sm font-medium text-slate-800 dark:text-slate-200 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
-              required
-            />
-          </div>
+          <Section step={3} iconPath={ICONS.list} title={t("deposer.titleProblem")} required>
+            <Field id="titre">
+              <input
+                id="titre"
+                type="text"
+                name="titre"
+                value={formData.titre}
+                onChange={handleChange}
+                placeholder={t("deposer.titlePlaceholder")}
+                className="cua-field w-full border rounded-xl px-5 py-4 text-sm font-medium text-slate-800 dark:text-slate-200 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                required
+              />
+            </Field>
+          </Section>
         )}
 
-        {/* Description */}
-        <div className="cua-section rounded-2xl p-5 mb-6 cua-anim">
-          <div className="flex items-center gap-2 mb-1">
-            <svg
-              className="w-5 h-5 text-[#1E3A8A]"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10"
-              />
-            </svg>
-            <h2 className="text-[16px]  font-bold text-[#0F172A] dark:text-slate-100">
-              {t("deposer.descriptionProblem")}
-            </h2>
-          </div>
-          <p className="text-sm text-slate-400 dark:text-slate-500 mb-4 ml-7">
-            {t("deposer.descriptionHelp")}
-          </p>
+        {/* 4. Description */}
+        <Section step={4} iconPath={ICONS.edit} title={t("deposer.descriptionProblem")} hint={t("deposer.descriptionHelp")}>
           <textarea
+            id="description"
             name="description"
             value={formData.description}
             onChange={handleChange}
             rows={5}
             placeholder={t("deposer.descriptionPlaceholder")}
-            className="cua-field w-full border  rounded-xl px-5 py-4 text-sm text-slate-800 dark:text-slate-200 outline-none resize-y placeholder:text-slate-400 dark:placeholder:text-slate-500"
+            className="cua-field w-full border rounded-xl px-5 py-4 text-sm text-slate-800 dark:text-slate-200 outline-none resize-y placeholder:text-slate-400 dark:placeholder:text-slate-500"
             required
           />
           <div className="flex justify-between items-center mt-2">
-              <p className="text-xs text-slate-400 dark:text-slate-500">
-              <svg
-                className="w-3.5 h-3.5 inline mr-1 text-emerald-600"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                />
-              </svg>
+            <p className="text-xs text-slate-400 dark:text-slate-500 flex items-center gap-1">
+              <Icon path={ICONS.shield} className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
               {t("deposer.confidentialData")}
             </p>
-            <span className="text-xs text-slate-400 dark:text-slate-500">
+            <span className="text-xs text-slate-400 dark:text-slate-500 tabular-nums" aria-live="polite">
               {charsCount} / 1000 {t("deposer.characters")}
             </span>
           </div>
-        </div>
+        </Section>
 
-        {/* Localisation & Adresse (fusionné) */}
-        <div className="cua-section rounded-2xl p-5 mb-6 cua-anim">
-          <div className="flex items-center gap-2 mb-4">
-            <svg
-              className="w-5 h-5 text-[#1E3A8A]"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-              />
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-              />
-            </svg>
-            <h2 className="text-[16px]  font-bold text-[#0F172A] dark:text-slate-100">
-              {t("deposer.locationTitle")}
-              <span className="ml-1 text-sm font-normal text-red-500">*</span>
-            </h2>
-          </div>
-
-          {/* Barre de recherche + Me localiser */}
+        {/* 5. Localisation & Adresse */}
+        <Section step={5} iconPath={ICONS.pin} title={t("deposer.locationTitle")} required>
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-3 relative">
             <form
               onSubmit={handleSearchAddress}
               className="cua-field-wrap flex-1 flex items-center gap-3 bg-slate-50 dark:bg-slate-800 rounded-xl px-4 border border-transparent transition-all relative order-2 sm:order-1"
             >
-              <svg
-                className="w-4 h-4 text-slate-400 flex-shrink-0"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                />
-              </svg>
+              <Icon path={ICONS.search} className="w-4 h-4 text-slate-400 flex-shrink-0" />
               <input
                 type="text"
                 value={searchAddress}
                 onChange={handleSearchInputChange}
-                onFocus={() =>
-                  searchAddress.length >= 3 && setShowSuggestions(true)
-                }
+                onFocus={() => searchAddress.length >= 3 && setShowSuggestions(true)}
                 onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
                 placeholder={t("deposer.searchPlaceholder")}
                 className="flex-1 bg-transparent py-2.5 sm:py-3 text-sm font-medium text-slate-800 dark:text-slate-200 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 min-w-0"
@@ -1193,7 +1101,6 @@ function DeposerDoleance() {
                 {t("deposer.searchBtn")}
               </button>
 
-              {/* Dropdown de suggestions */}
               {showSuggestions && suggestions.length > 0 && (
                 <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-slate-800 rounded-xl shadow-lg border dark:border-slate-600 z-[1001] max-h-60 overflow-y-auto">
                   {suggestions.map((item, i) => (
@@ -1214,95 +1121,50 @@ function DeposerDoleance() {
               type="button"
               onClick={handleLocateMe}
               disabled={isLocating}
-              className="cua-btn-primary flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl text-sm font-bold text-white shadow-md disabled:opacity-60 order-1 sm:order-2"
+              className="cua-btn-primary flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl text-sm font-bold text-white shadow-md disabled:opacity-60 order-1 sm:order-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]/50"
             >
               {isLocating ? (
                 <div className="w-4 h-4 border border-white/40 border-t-white rounded-full animate-spin" />
               ) : (
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2.5}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
+                <Icon path={ICONS.pin} className="w-4 h-4" strokeWidth={2.5} />
               )}
               <span className="hidden sm:inline">{t("deposer.locateMe")}</span>
-              <span className="sm:hidden">
-                <svg
-                  className="w-4 h-4"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2.5}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                  />
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                </svg>
-              </span>
             </button>
           </div>
 
-          {/* Carte */}
           <div className="h-64 sm:h-96 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-600 relative z-0 mb-4">
-            <MapContainer
-              center={mapPosition}
-              zoom={14}
-              className="h-full w-full"
-              scrollWheelZoom={true}
-            >
+            <MapContainer center={mapPosition} zoom={14} className="h-full w-full" scrollWheelZoom={true}>
               <TileLayer
                 attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
-              {quartierGeoJSON &&
-                quartierGeoJSON.features &&
-                quartierGeoJSON.features.length > 0 && (
-                  <GeoJSON
-                    key={JSON.stringify(quartierGeoJSON)}
-                    data={quartierGeoJSON}
-                    style={(feature) => ({
-                      fillColor: "#D4AF37",
-                      weight: 2,
-                      opacity: 1,
-                      color: "#B8860B",
-                      dashArray: "3",
-                      fillOpacity: 0.15,
-                    })}
-                    onEachFeature={(feature, layer) => {
-                      if (feature.properties) {
-                        layer.bindPopup(
-                          `<div style="text-align:center"><b>${feature.properties.nom_quartier}</b><br/><span style="color:#666">${feature.properties.nom_arrondissement || ""}</span></div>`,
-                        );
-                        layer.on("mouseover", function () {
-                          this.setStyle({ fillOpacity: 0.4, weight: 3 });
-                        });
-                        layer.on("mouseout", function () {
-                          this.setStyle({ fillOpacity: 0.15, weight: 2 });
-                        });
-                      }
-                    }}
-                  />
-                )}
+              {quartierGeoJSON && quartierGeoJSON.features && quartierGeoJSON.features.length > 0 && (
+                <GeoJSON
+                  key={JSON.stringify(quartierGeoJSON)}
+                  data={quartierGeoJSON}
+                  style={() => ({
+                    fillColor: "#D4AF37",
+                    weight: 2,
+                    opacity: 1,
+                    color: "#B8860B",
+                    dashArray: "3",
+                    fillOpacity: 0.15,
+                  })}
+                  onEachFeature={(feature, layer) => {
+                    if (feature.properties) {
+                      layer.bindPopup(
+                        `<div style="text-align:center"><b>${feature.properties.nom_quartier}</b><br/><span style="color:#666">${feature.properties.nom_arrondissement || ""}</span></div>`,
+                      );
+                      layer.on("mouseover", function () {
+                        this.setStyle({ fillOpacity: 0.4, weight: 3 });
+                      });
+                      layer.on("mouseout", function () {
+                        this.setStyle({ fillOpacity: 0.15, weight: 2 });
+                      });
+                    }
+                  }}
+                />
+              )}
               <MapView center={mapPosition} />
               <DraggableMarker
                 position={mapPosition}
@@ -1310,9 +1172,7 @@ function DeposerDoleance() {
                 onPositionChange={(latlng) => {
                   setFormData((prev) => ({
                     ...prev,
-                    lieu_exact:
-                      prev.lieu_exact ||
-                      `${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}`,
+                    lieu_exact: prev.lieu_exact || `${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}`,
                   }));
                 }}
               />
@@ -1333,162 +1193,63 @@ function DeposerDoleance() {
                       <div className="text-xs">
                         <p className="font-bold">{d.titre}</p>
                         <p className="text-slate-500">{d.nom_categorie}</p>
-                        <p className="text-slate-400">{t("deposer.refLabel")} {d.reference}</p>
-                        <p className="text-emerald-600 font-semibold mt-1">
-                          {t("deposer.assigned")}
+                        <p className="text-slate-400">
+                          {t("deposer.refLabel")} {d.reference}
                         </p>
+                        <p className="text-emerald-600 font-semibold mt-1">{t("deposer.assigned")}</p>
                       </div>
                     </Popup>
                   </Marker>
                 ))}
             </MapContainer>
-            <div className="absolute bottom-3 left-3 z-[1000] bg-[#0F172A]/75 backdrop-blur-sm text-white text-xs font-medium px-3 py-1.5 rounded-full">
-              <svg
-                className="w-3 h-3 inline mr-1"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                strokeWidth={2}
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-                />
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-              </svg>
+            <div className="absolute bottom-3 left-3 z-[1000] bg-[#0F172A]/75 backdrop-blur-sm text-white text-xs font-medium px-3 py-1.5 rounded-full flex items-center gap-1">
+              <Icon path={ICONS.pin} className="w-3 h-3" />
               {t("deposer.mapHint")}
             </div>
           </div>
 
-          {/* Champs adresse - modifiables manuellement même après auto-remplissage */}
-          <div className="grid grid-cols-2 gap-4">
-            <div className="col-span-2">
-              <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5">
-                {t("deposer.exactLocation")}{" "}
-                <span className="text-slate-400 dark:text-slate-500 font-normal">{t("deposer.optional")}</span>
-              </label>
-              <input
-                type="text"
-                name="lieu_exact"
-                value={formData.lieu_exact}
-                onChange={handleChange}
-                placeholder={t("deposer.exactLocationPlaceholder")}
-                className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200"
-              />
-              {assignedDoleances.length > 0 && (
-                <p className="text-xs text-slate-400 dark:text-slate-500 mt-1.5 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-[#D4AF37] flex-shrink-0" />
-                  {t("deposer.assignedMarkers")}
-                </p>
-              )}
-            </div>
-          </div>
-        </div>
+          <Field id="lieu_exact" label={t("deposer.exactLocation")} optional={t("deposer.optional")}>
+            <input
+              id="lieu_exact"
+              type="text"
+              name="lieu_exact"
+              value={formData.lieu_exact}
+              onChange={handleChange}
+              placeholder={t("deposer.exactLocationPlaceholder")}
+              className="cua-field w-full border rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200"
+            />
+            {assignedDoleances.length > 0 && (
+              <p className="text-xs text-slate-400 dark:text-slate-500 mt-1.5 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-[#D4AF37] flex-shrink-0" />
+                {t("deposer.assignedMarkers")}
+              </p>
+            )}
+          </Field>
+        </Section>
 
-        {/* Suggestions */}
-        <div className="cua-section rounded-2xl p-5 mb-6 cua-anim">
-          <div className="flex items-center gap-2 mb-1">
-            <svg
-              className="w-5 h-5 text-[#1E3A8A]"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z"
-              />
-            </svg>
-            <h2 className="text-[16px]  font-bold text-[#0F172A] dark:text-slate-100">{t("deposer.suggestionTitle")} <span className="text-[#D4AF37] text-[11.5px]"> {t("deposer.optionalFemale")}</span></h2>
-          </div>
-          <p className="text-sm text-slate-400 dark:text-slate-500 mb-4 ml-7">
-            {t("deposer.suggestionHelp")}
-          </p>
+        {/* 6. Suggestions (optionnel) */}
+        <Section step={6} iconPath={ICONS.sparkle} title={t("deposer.suggestionTitle")} tag={t("deposer.optionalFemale")} hint={t("deposer.suggestionHelp")}>
           <textarea
+            id="suggestions"
             name="suggestions"
             value={formData.suggestions}
             onChange={handleChange}
             rows={3}
             placeholder={t("deposer.suggestionPlaceholder")}
-            className="cua-field w-full border  rounded-xl px-5 py-4 text-sm text-slate-800 dark:text-slate-200 outline-none resize-y placeholder:text-slate-400 dark:placeholder:text-slate-500"
+            className="cua-field w-full border rounded-xl px-5 py-4 text-sm text-slate-800 dark:text-slate-200 outline-none resize-y placeholder:text-slate-400 dark:placeholder:text-slate-500"
           />
-        </div>
+        </Section>
 
-        {/* Photos */}
-
-        <div className="cua-section rounded-2xl p-5 mb-6 cua-anim">
-          <div className="flex items-center gap-2 mb-1">
-            <svg
-              className="w-5 h-5 text-[#1E3A8A]"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
-              />
-            </svg>
-            <h2 className="text-[16px]  font-bold text-[#0F172A] dark:text-slate-100">
-              {t("deposer.addPhotos")}
-            </h2>
-          </div>
-          <p className="text-sm text-slate-400 dark:text-slate-500 mb-4 ml-7">
-            {t("deposer.photosHelp")}
-          </p>
-
+        {/* 7. Photos (optionnel) */}
+        <Section step={7} iconPath={ICONS.camera} title={t("deposer.addPhotos")} tag={t("deposer.optionalFemale")} hint={t("deposer.photosHelp")}>
           <div className="flex gap-2 sm:gap-3 mb-4 overflow-x-auto pb-2 -mx-5 px-5">
-            {[
-              {
-                label: t("deposer.examplePothole"),
-                icon: "M13.5 4L5.25 12.25l4.5 4.5L18 8.5",
-                color: "from-rose-400 to-orange-400",
-              },
-              {
-                label: t("deposer.exampleWaste"),
-                icon: "M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16",
-                color: "from-emerald-400 to-teal-500",
-              },
-              {
-                label: t("deposer.exampleLamp"),
-                icon: "M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z",
-                color: "from-amber-400 to-[#D4AF37]",
-              },
-              {
-                label: t("deposer.exampleGreenSpace"),
-                icon: "M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5",
-                color: "from-green-500 to-emerald-700",
-              },
-            ].map((ex, i) => (
+            {photoExamples.map((ex, i) => (
               <div
                 key={i}
                 className="w-24 sm:w-28 h-16 sm:h-20 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-600 flex items-center justify-center flex-shrink-0 relative overflow-hidden"
               >
-                <div
-                  className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br ${ex.color} flex items-center justify-center`}
-                >
-                  <svg
-                    className="w-4 h-4 sm:w-5 sm:h-5 text-white"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                    strokeWidth={2}
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d={ex.icon}
-                    />
-                  </svg>
+                <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-gradient-to-br ${ex.color} flex items-center justify-center`}>
+                  <Icon path={ex.icon} className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                 </div>
                 <span className="absolute bottom-0 left-0 right-0 bg-[#0F172A]/60 text-white text-[9px] font-medium text-center py-0.5 sm:py-1">
                   {ex.label}
@@ -1498,35 +1259,21 @@ function DeposerDoleance() {
           </div>
 
           <div
-            className={`cua-dropzone border border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
-              dragOver
-                ? "drag"
-                : "border-slate-300 hover:border-[#D4AF37] hover:bg-slate-50"
+            role="button"
+            tabIndex={0}
+            aria-label={t("deposer.dragDrop")}
+            className={`cua-dropzone border border-dashed rounded-xl p-8 text-center cursor-pointer transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]/50 ${
+              dragOver ? "drag" : "border-slate-300 hover:border-[#D4AF37] hover:bg-slate-50"
             }`}
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
             onClick={() => fileInputRef.current?.click()}
+            onKeyDown={(e) => e.key === "Enter" && fileInputRef.current?.click()}
           >
-            <svg
-              className="w-10 h-10 mx-auto text-[#1E3A8A] mb-3"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={1.5}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5"
-              />
-            </svg>
-            <p className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">
-              {t("deposer.dragDrop")}
-            </p>
-            <p className="text-xs text-slate-400 dark:text-slate-500">
-              {t("deposer.browseFiles")}
-            </p>
+            <Icon path={ICONS.upload} className="w-10 h-10 mx-auto text-[#1E3A8A] mb-3" strokeWidth={1.5} />
+            <p className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">{t("deposer.dragDrop")}</p>
+            <p className="text-xs text-slate-400 dark:text-slate-500">{t("deposer.browseFiles")}</p>
             <input
               ref={fileInputRef}
               type="file"
@@ -1546,58 +1293,27 @@ function DeposerDoleance() {
                 {files.map((file, i) => (
                   <div
                     key={i}
-                    className="group relative rounded-xl overflow-hidden border  hover:border-[#D4AF37] transition-all duration-200 bg-slate-50 dark:bg-slate-800 aspect-square"
+                    className="group relative rounded-xl overflow-hidden border hover:border-[#D4AF37] transition-all duration-200 bg-slate-50 dark:bg-slate-800 aspect-square"
                   >
                     {filePreviews[i] ? (
-                      <img
-                        src={filePreviews[i]}
-                        alt={file.name}
-                        className="w-full h-full object-cover"
-                      />
+                      <img src={filePreviews[i]} alt={file.name} className="w-full h-full object-cover" />
                     ) : (
                       <div className="w-full h-full flex items-center justify-center">
-                        <svg
-                          className="w-8 h-8 text-slate-300"
-                          fill="none"
-                          viewBox="0 0 24 24"
-                          stroke="currentColor"
-                          strokeWidth={1.5}
-                        >
-                          <path
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z"
-                          />
-                        </svg>
+                        <Icon path={ICONS.file} className="w-8 h-8 text-slate-300" strokeWidth={1.5} />
                       </div>
                     )}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
                     <button
                       type="button"
                       onClick={() => removeFile(i)}
+                      aria-label={t("deposer.removeFile") || "Retirer"}
                       className="absolute top-2 right-2 w-7 h-7 bg-white/90 hover:bg-rose-500 hover:text-white rounded-full flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-all duration-200"
                     >
-                      <svg
-                        className="w-4 h-4"
-                        fill="none"
-                        viewBox="0 0 24 24"
-                        stroke="currentColor"
-                        strokeWidth={2.5}
-                      >
-                        <path
-                          strokeLinecap="round"
-                          strokeLinejoin="round"
-                          d="M6 18L18 6M6 6l12 12"
-                        />
-                      </svg>
+                      <Icon path={ICONS.close} className="w-4 h-4" strokeWidth={2.5} />
                     </button>
                     <div className="absolute bottom-0 left-0 right-0 px-2 py-1.5 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                      <p className="text-[10px] font-medium text-slate-700 dark:text-slate-300 truncate">
-                        {file.name}
-                      </p>
-                      <p className="text-[9px] text-slate-400">
-                        {formatFileSize(file.size)}
-                      </p>
+                      <p className="text-[10px] font-medium text-slate-700 dark:text-slate-300 truncate">{file.name}</p>
+                      <p className="text-[9px] text-slate-400">{formatFileSize(file.size)}</p>
                     </div>
                   </div>
                 ))}
@@ -1612,158 +1328,98 @@ function DeposerDoleance() {
                   <div
                     className="h-full bg-gradient-to-r from-[#1E3A8A] to-[#D4AF37] rounded-full transition-all duration-300"
                     style={{ width: `${uploadProgress}%` }}
-                  ></div>
+                  />
                 </div>
-                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
-                  {uploadProgress}%
-                </span>
+                <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{uploadProgress}%</span>
               </div>
               <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">{t("deposer.uploadProgress")}</p>
             </div>
           )}
-        </div>
+        </Section>
 
-        {/* User Info Section */}
-        <div className="cua-section rounded-2xl p-5 mb-6 cua-anim">
-          <div className="flex items-center gap-2 mb-4">
-            <svg
-              className="w-5 h-5 text-[#1E3A8A]"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"
-              />
-            </svg>
-            <h2 className="text-[16px]  font-bold text-[#0F172A] dark:text-slate-100">
-              {t("form.yourInfo")}
-              <span className="ml-1 text-sm font-normal text-red-500">*</span>
-            </h2>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-4">
-            <div>
-              <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5">
-                Nom <span className="text-[#D4AF37]">*</span>
-              </label>
+        {/* 8. Coordonnées */}
+        <Section step={8} iconPath={ICONS.user} title={t("form.yourInfo")} required>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+            <Field id="nom_citoyen" label="Nom" required>
               <input
+                id="nom_citoyen"
                 type="text"
                 name="nom_citoyen"
                 value={formData.nom_citoyen}
                 onChange={handleChange}
-                className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200"
+                className="cua-field w-full border rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200"
                 placeholder={t("deposer.namePlaceholder")}
                 required
               />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5">
-                Prénom <span className="text-[#D4AF37]">*</span>
-              </label>
+            </Field>
+            <Field id="prenom_citoyen" label="Prénom" required>
               <input
+                id="prenom_citoyen"
                 type="text"
                 name="prenom_citoyen"
                 value={formData.prenom_citoyen}
                 onChange={handleChange}
-                className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200"
+                className="cua-field w-full border rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200"
                 placeholder={t("deposer.firstNamePlaceholder")}
                 required
               />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5">
-                Email
-                {/* <span className="text-[#D4AF37]">*</span> */}
-              </label>
+            </Field>
+            <Field id="email" label="Email">
               <input
+                id="email"
                 type="email"
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200"
+                className="cua-field w-full border rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200"
                 placeholder="exemple@email.com"
               />
-            </div>
-            <div>
-              <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5">
-                Téléphone
-                <span className="text-[#D4AF37]">*</span>
-              </label>
+            </Field>
+            <Field id="telephone" label="Téléphone" required>
               <input
+                id="telephone"
                 type="tel"
                 name="telephone"
                 value={formData.telephone}
                 onChange={handleChange}
-                className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200"
+                className="cua-field w-full border rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200"
                 placeholder="034 00 000 00"
               />
-            </div>
-            <p className="col-span-1 sm:col-span-2 text-xs text-slate-400 dark:text-slate-500 -mt-1 sm:-mt-2">
-              {t("deposer.emailHint")}
-            </p>
+            </Field>
+            <p className="col-span-1 sm:col-span-2 text-xs text-slate-400 dark:text-slate-500 -mt-1">{t("deposer.emailHint")}</p>
 
             <div className="col-span-1 sm:col-span-2">
-              <label className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5">
-                {t("deposer.addressOptional")}<span className="text-[#D4AF37]"> {t("deposer.optionalFemale")}</span>
-              </label>
-              <input
-                type="text"
-                name="adresse_citoyen"
-                value={formData.adresse_citoyen}
-                onChange={handleChange}
-                className="cua-field w-full border  rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200"
-                placeholder={t("deposer.addressPlaceholder")}
-              />
+              <Field id="adresse_citoyen" label={t("deposer.addressOptional")} optional={t("deposer.optionalFemale")}>
+                <input
+                  id="adresse_citoyen"
+                  type="text"
+                  name="adresse_citoyen"
+                  value={formData.adresse_citoyen}
+                  onChange={handleChange}
+                  className="cua-field w-full border rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200"
+                  placeholder={t("deposer.addressPlaceholder")}
+                />
+              </Field>
             </div>
           </div>
-        </div>
+        </Section>
 
         {/* Submit */}
-        <div className="flex flex-col sm:flex-row items-center justify-end gap-3 sm:gap-4 pt-2 pb-8 cua-anim">
-          <p className="text-xs sm:text-sm text-slate-400 order-2 sm:order-1">
-            <svg
-              className="w-3.5 h-3.5 sm:w-4 sm:h-4 inline mr-1 text-emerald-600"
-              fill="none"
-              viewBox="0 0 24 24"
-              stroke="currentColor"
-              strokeWidth={2}
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-              />
-            </svg>
-            <span className="hidden sm:inline">
-              {t("deposer.confidentialInfo")}
-            </span>
+        <div className="flex flex-col sm:flex-row items-center justify-end gap-3 sm:gap-4 pt-2 pb-2 cua-anim border-t border-slate-100 dark:border-slate-800 mt-2">
+          <p className="text-xs sm:text-sm text-slate-400 order-2 sm:order-1 flex items-center gap-1 pt-4">
+            <Icon path={ICONS.shield} className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 flex-shrink-0" />
+            <span className="hidden sm:inline">{t("deposer.confidentialInfo")}</span>
             <span className="sm:hidden">{t("deposer.confidentialInfoShort")}</span>
           </p>
           <button
             type="submit"
             disabled={loading || uploading}
-            className="cua-btn-submit flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-10 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-base sm:text-[16px]  font-bold text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 w-full sm:w-auto order-1 sm:order-2 hover:scale-[1.02] hover:-translate-y-0.5"
+            className="cua-btn-submit mt-4 flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-10 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-base sm:text-[16px] font-bold text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 w-full sm:w-auto order-1 sm:order-2 hover:scale-[1.02] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]/60"
           >
             {loading || uploading ? (
               <span className="flex items-center gap-2">
-                <svg
-                  className="animate-spin h-5 w-5"
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle
-                    className="opacity-25"
-                    cx="12"
-                    cy="12"
-                    r="10"
-                    stroke="currentColor"
-                    strokeWidth="4"
-                  />
+                <svg className="animate-spin h-5 w-5" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                   <path
                     className="opacity-75"
                     fill="currentColor"
@@ -1774,19 +1430,7 @@ function DeposerDoleance() {
               </span>
             ) : (
               <>
-                <svg
-                  className="w-4 h-4 sm:w-5 sm:h-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2.5}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5"
-                  />
-                </svg>
+                <Icon path={ICONS.send} className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={2.5} />
                 {t("deposer.sendReport")}
               </>
             )}
@@ -1796,35 +1440,17 @@ function DeposerDoleance() {
 
       {/* Reference Modal */}
       {showReferenceModal && (
-        <div className="fixed inset-0 bg-[#0F172A]/60 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full mx-auto p-6 border dark:border-slate-600 relative overflow-hidden">
+        <div className="fixed inset-0 bg-[#0F172A]/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full mx-auto p-6 border dark:border-slate-600 relative overflow-hidden cua-anim">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0F172A] via-[#D4AF37] to-[#0F172A]" />
             <div className="text-center">
               <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center mb-4 shadow-lg">
-                <svg
-                  className="w-8 h-8 text-white"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  strokeWidth={2.5}
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M4.5 12.75l6 6 9-13.5"
-                  />
-                </svg>
+                <Icon path={ICONS.check} className="w-8 h-8 text-white" strokeWidth={2.5} />
               </div>
-              <h3 className="cua-display text-xl font-semibold text-[#0F172A] dark:text-slate-100 mb-2">
-                {t("deposer.reportSent")}
-              </h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
-                {t("deposer.trackingRef")}
-              </p>
+              <h3 className="cua-display text-xl font-semibold text-[#0F172A] dark:text-slate-100 mb-2">{t("deposer.reportSent")}</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">{t("deposer.trackingRef")}</p>
               <div className="bg-slate-50 dark:bg-slate-700 rounded-xl px-4 py-3 mb-4 border dark:border-slate-600">
-                <span className="text-2xl font-mono font-bold text-[#1E3A8A] tracking-wider">
-                  {savedReference}
-                </span>
+                <span className="text-2xl font-mono font-bold text-[#1E3A8A] tracking-wider">{savedReference}</span>
               </div>
               {savedDirection && (
                 <p className="text-sm text-emerald-600 font-semibold mb-4">
