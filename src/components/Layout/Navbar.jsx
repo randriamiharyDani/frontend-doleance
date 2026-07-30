@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
+import notificationService from '../../services/notificationService';
 import {
   Bars3Icon,
   BellIcon,
@@ -18,22 +19,20 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
   const [unreadCount, setUnreadCount] = useState(0);
 
   useEffect(() => {
-    fetchNotifications();
-    // Rafraîchir les notifications toutes les 30 secondes
+    if (user) fetchNotifications();
     const interval = setInterval(fetchNotifications, 30000);
     return () => clearInterval(interval);
-  }, []);
+  }, [user]);
 
   const fetchNotifications = async () => {
     try {
-      // Simuler des notifications (à remplacer par votre API)
-      const mockNotifications = [
-        { id: 1, titre: 'Nouvelle doléance', message: 'Une nouvelle doléance a été déposée', lu: false, date: new Date() },
-        { id: 2, titre: 'Doléance mise à jour', message: 'Le statut de la doléance a changé', lu: true, date: new Date() },
-      ];
-      
-      setNotifications(mockNotifications);
-      setUnreadCount(mockNotifications.filter(n => !n.lu).length);
+      if (!user) { setNotifications([]); setUnreadCount(0); return; }
+      const result = await notificationService.getNotifications(1, 50);
+      if (result.success) {
+        const list = result.data.data?.notifications || result.data?.notifications || [];
+        setNotifications(list);
+        setUnreadCount(result.data.data?.non_lues || result.data?.non_lues || 0);
+      }
     } catch (error) {
       console.error('Erreur chargement notifications:', error);
     }
@@ -45,14 +44,16 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
   };
 
   const markAsRead = async (id) => {
+    await notificationService.markAsRead(id);
     setNotifications(notifications.map(n => 
-      n.id === id ? { ...n, lu: true } : n
+      n.id_notification === id ? { ...n, lu: 1 } : n
     ));
     setUnreadCount(prev => Math.max(0, prev - 1));
   };
 
   const markAllAsRead = async () => {
-    setNotifications(notifications.map(n => ({ ...n, lu: true })));
+    await notificationService.markAllAsRead();
+    setNotifications(notifications.map(n => ({ ...n, lu: 1 })));
     setUnreadCount(0);
   };
 
@@ -121,14 +122,14 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
                     ) : (
                       notifications.map(notif => (
                         <div
-                          key={notif.id}
+                          key={notif.id_notification}
                           className={`p-3 border-b hover:bg-gray-50 cursor-pointer ${!notif.lu ? 'bg-blue-50' : ''}`}
-                          onClick={() => markAsRead(notif.id)}
+                          onClick={() => markAsRead(notif.id_notification)}
                         >
                           <p className="text-sm font-medium text-gray-800">{notif.titre}</p>
                           <p className="text-xs text-gray-500 mt-1">{notif.message}</p>
                           <p className="text-xs text-gray-400 mt-1">
-                            {new Date(notif.date).toLocaleString('fr-FR')}
+                            {new Date(notif.date_notification).toLocaleString('fr-FR')}
                           </p>
                         </div>
                       ))

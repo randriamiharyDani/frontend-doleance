@@ -48,32 +48,6 @@ const notificationService = {
     }
   },
 
-  deleteAllRead: async () => {
-    try {
-      const response = await api.delete('/notifications/read');
-      return { success: true, data: response.data };
-    } catch (error) {
-      return { success: false };
-    }
-  },
-
-  getPreferences: async () => {
-    try {
-      const response = await api.get('/notifications/preferences');
-      return { success: true, data: response.data.data || response.data };
-    } catch (error) {
-      return { success: false, data: { email: true, push: true, sms: false } };
-    }
-  },
-
-  updatePreferences: async (preferences) => {
-    try {
-      const response = await api.put('/notifications/preferences', preferences);
-      return { success: true, data: response.data };
-    } catch (error) {
-      return { success: false, message: error.response?.data?.message };
-    }
-  }
 };
 
 export default notificationService;

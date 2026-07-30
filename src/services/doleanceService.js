@@ -234,45 +234,6 @@ const doleanceService = {
     }
   },
 
-  // ========== EXPORT ==========
-
-  exportDoleances: async (filters = {}, format = 'csv') => {
-    const ext = format === 'xlsx' ? 'xlsx' : 'csv';
-    const mime = format === 'xlsx'
-      ? 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-      : 'text/csv;charset=utf-8';
-    try {
-      const response = await api.post(`/doleances/export/${format}`, filters, {
-        responseType: 'blob'
-      });
-      const blob = new Blob([response.data], { type: mime });
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.setAttribute('download', `doleances_export.${ext}`);
-      document.body.appendChild(link);
-      link.click();
-      // Wait a tick then clean up (important for Firefox)
-      setTimeout(() => {
-        document.body.removeChild(link);
-        window.URL.revokeObjectURL(url);
-      }, 150);
-      return { success: true };
-    } catch (error) {
-      let message = 'Erreur lors de l\'export';
-      try {
-        if (error.response?.data instanceof Blob) {
-          const text = await error.response.data.text();
-          const parsed = JSON.parse(text);
-          message = parsed.message || message;
-        } else if (error.response?.data?.message) {
-          message = error.response.data.message;
-        }
-      } catch (_) {}
-      return { success: false, message };
-    }
-  },
-
   // ========== CORBEILLE ==========
 
   getTrashed: async (params = {}) => {

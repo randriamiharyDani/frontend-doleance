@@ -71,11 +71,9 @@ function Doleances() {
 
   const buildFullAddress = (d) => {
     const parts = [];
-    if (d.adresse_citoyen) parts.push(d.adresse_citoyen);
-    if (d.lot) parts.push(`Lot ${d.lot}`);
-    if (d.fokontany) parts.push(d.fokontany);
-    if (d.arrondissement) parts.push(d.arrondissement);
-    if (d.lieu_exact) parts.push(d.lieu_exact);
+    if (d.citoyen_adresse) parts.push(d.citoyen_adresse);
+    if (d.nom_quartier) parts.push(d.nom_quartier);
+    if (d.nom_arrondissement) parts.push(d.nom_arrondissement);
     return parts.join(', ');
   };
 

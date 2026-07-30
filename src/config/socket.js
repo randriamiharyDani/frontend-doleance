@@ -240,27 +240,6 @@ class SocketManager {
     }
   }
 
-  // ========== NOTIFICATIONS EN TEMPS RÉEL ==========
-  notifyNewDoleance(doleanceId, reference, titre) {
-    this.emit('new-doleance', { doleanceId, reference, titre });
-  }
-
-  notifyDoleanceUpdate(doleanceId, reference, titre) {
-    this.emit('doleance-updated', { doleanceId, reference, titre });
-  }
-
-  notifyTransfert(doleanceId, reference, direction) {
-    this.emit('doleance-transferred', { doleanceId, reference, direction });
-  }
-
-  notifyNewReponse(doleanceId, reference, message) {
-    this.emit('new-reponse', { doleanceId, reference, message });
-  }
-
-  notifyStatutChange(doleanceId, reference, oldStatut, newStatut) {
-    this.emit('statut-changed', { doleanceId, reference, oldStatut, newStatut });
-  }
-
   // ========== NOTIFICATIONS DE POINTAGE ==========
   notifyClockIn(userId, userName, time) {
     this.emit('clock-in', { userId, userName, time });
