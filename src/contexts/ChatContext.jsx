@@ -31,10 +31,12 @@ export const ChatProvider = ({ children }) => {
     try {
       const res = await chatService.getContacts();
       const data = res.data?.contacts || res.data || [];
-      setContacts(Array.isArray(data) ? data : []);
-      const total = Array.isArray(data)
-        ? data.reduce((sum, c) => sum + (c.unread_count || 0), 0)
-        : 0;
+      const enriched = Array.isArray(data) ? data.map(c => ({
+        ...c,
+        is_online: c.live_status === 'online' || c.is_online || c.online || false,
+      })) : [];
+      setContacts(enriched);
+      const total = enriched.reduce((sum, c) => sum + (c.unread_count || 0), 0);
       setUnreadTotal(total);
     } catch (err) {
       console.error('Failed to load contacts:', err);
@@ -165,6 +167,15 @@ export const ChatProvider = ({ children }) => {
       setIncomingCall(null);
     };
 
+    const handleOnlineUsersUpdate = (onlineUsersList) => {
+      const onlineIds = new Set(onlineUsersList.map(u => u.userId));
+      setContacts(prev => prev.map(c => ({
+        ...c,
+        is_online: onlineIds.has(c.id_utilisateur || c.id),
+      })));
+    };
+
+    socket.on('online-users-updated', handleOnlineUsersUpdate);
     socket.on('new-message', handleNewMessage);
     socket.on('chat-typing', handleTyping);
     socket.on('incoming-call', handleIncomingCall);
@@ -201,6 +212,7 @@ export const ChatProvider = ({ children }) => {
 
     return () => {
       if (s) s.off('connect', joinUserRoom);
+      socket.off('online-users-updated', handleOnlineUsersUpdate);
       socket.off('new-message', handleNewMessage);
       socket.off('chat-typing', handleTyping);
       socket.off('incoming-call', handleIncomingCall);

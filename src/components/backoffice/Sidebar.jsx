@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
+import socket from '../../config/socket';
 import {
   HomeIcon,
   DocumentTextIcon,
@@ -19,6 +20,19 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const { user, logout } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
+  const [isCurrentUserOnline, setIsCurrentUserOnline] = useState(false);
+
+  useEffect(() => {
+    const uid = user?.id_utilisateur || user?.id;
+    if (uid) {
+      const checkOnline = () => {
+        setIsCurrentUserOnline(socket.isUserOnline(uid));
+      };
+      checkOnline();
+      socket.setOnlineUsersCallback(checkOnline);
+      return () => socket.setOnlineUsersCallback(null);
+    }
+  }, [user?.id_utilisateur, user?.id]);
 
   const isActive = (path) => {
     return location.pathname === path || location.pathname.startsWith(path + '/');
@@ -37,12 +51,13 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const navigation = [
     { name: 'Tableau de bord', href: '/backoffice/dashboard', icon: HomeIcon },
     { name: 'Doléances', href: '/backoffice/doleances', icon: DocumentTextIcon },
-    { name: 'Messages', href: '/backoffice/messages', icon: ChatBubbleLeftRightIcon },
-    { name: 'Transfert', href: '/backoffice/transfert', icon: ArrowPathIcon },
     { name: 'Directions', href: '/backoffice/directions', icon: BuildingOfficeIcon },
     { name: 'Utilisateurs', href: '/backoffice/users', icon: UserGroupIcon },
     { name: 'Rôles', href: '/backoffice/roles', icon: ShieldCheckIcon },
     { name: 'Statistiques', href: '/backoffice/statistiques', icon: ChartBarIcon },
+    { name: 'Transfert', href: '/backoffice/transfert', icon: ArrowPathIcon },
+    { name: 'Messages', href: '/backoffice/messages', icon: ChatBubbleLeftRightIcon },
+
   ];
 
 return (
@@ -96,7 +111,7 @@ return (
                 {user?.prenom?.charAt(0)}{user?.nom?.charAt(0)}
               </span>
             </div>
-            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-emerald-400 rounded-full border-2 border-slate-900"></div>
+            <div className={`absolute -bottom-0.5 -right-0.5 w-3 h-3 rounded-full border-2 border-slate-900 ${isCurrentUserOnline ? 'bg-emerald-400' : 'bg-gray-400'}`}></div>
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-sm text-white font-medium truncate">

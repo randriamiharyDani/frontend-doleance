@@ -337,7 +337,7 @@ export default function Messages() {
             filteredContacts.map((contact) => {
               const contactId = contact.id_utilisateur || contact.id;
               const isActive = activeContact && (activeContact.id_utilisateur || activeContact.id) === contactId;
-              const isOnline = contact.is_online || contact.online;
+              const isOnline = contact.is_online || contact.online || contact.live_status === 'online';
               const unread = contact.unread_count || 0;
               const lastMsg = contact.last_message || contact.dernier_message || '';
               const lastTime = contact.last_message_time || contact.updated_at || '';
@@ -408,7 +408,7 @@ export default function Messages() {
               >
                 <ArrowLeftIcon className="w-5 h-5" />
               </button>
-              <UserAvatar user={activeContact} size="sm" online={activeContact.is_online || activeContact.online} />
+              <UserAvatar user={activeContact} size="sm" online={activeContact.is_online || activeContact.online || activeContact.live_status === 'online'} />
               <div className="flex-1 min-w-0">
                 <h3 className={`font-semibold text-sm truncate ${darkMode ? 'text-white' : 'text-slate-800'}`}>
                   {activeContact.prenom} {activeContact.nom}
@@ -416,7 +416,7 @@ export default function Messages() {
                 <p className={`text-xs ${darkMode ? 'text-slate-400' : 'text-gray-500'}`}>
                   {typingUsers[activeContact.id_utilisateur || activeContact.id]
                     ? t('chat.typing')
-                    : activeContact.is_online || activeContact.online
+                    : activeContact.is_online || activeContact.online || activeContact.live_status === 'online'
                       ? t('chat.online')
                       : t('chat.offline')}
                 </p>

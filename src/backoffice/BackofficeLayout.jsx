@@ -45,17 +45,18 @@ function BackofficeLayout() {
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
-  // Vérifier si l'utilisateur actuel est en ligne
+  const userId = user?.id_utilisateur || user?.id;
+
   useEffect(() => {
-    if (user?.id) {
+    if (userId) {
       const checkOnline = () => {
-        setIsCurrentUserOnline(socket.isUserOnline(user.id));
+        setIsCurrentUserOnline(socket.isUserOnline(userId));
       };
       checkOnline();
       socket.setOnlineUsersCallback(checkOnline);
       return () => socket.setOnlineUsersCallback(null);
     }
-  }, [user?.id]);
+  }, [userId]);
 
   useEffect(() => {
     if (isMobile) {
