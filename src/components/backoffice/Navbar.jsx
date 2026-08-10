@@ -13,6 +13,7 @@ import {
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import NotificationBell from './NotificationBell';
+import MessagesBell from './MessagesBell';
 
 function Navbar({ sidebarOpen, setSidebarOpen }) {
   const { user, logout } = useAuth();
@@ -90,6 +91,9 @@ function Navbar({ sidebarOpen, setSidebarOpen }) {
                 <MoonIcon className="h-4 w-4 sm:h-5 sm:w-5" />
               )}
             </button>
+
+            {/* Messages */}
+            <MessagesBell />
 
             {/* Notifications */}
             <NotificationBell />

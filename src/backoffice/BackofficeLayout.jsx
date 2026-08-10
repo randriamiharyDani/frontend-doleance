@@ -18,7 +18,6 @@ import {
   ClockIcon,
   TrashIcon,
   TagIcon,
-  ChatBubbleLeftRightIcon,
 } from "@heroicons/react/24/outline";
 import Navbar from "../components/backoffice/Navbar";
 
@@ -128,7 +127,6 @@ function BackofficeLayout() {
       href: "/backoffice/doleances",
       icon: DocumentTextIcon,
     },
-    { name: "Messages", href: "/backoffice/messages", icon: ChatBubbleLeftRightIcon },
     ...(hasPermission('doleances', 'transfer') ? [
       { name: "Transfert", href: "/backoffice/transfert", icon: ArrowPathIcon },
     ] : []),

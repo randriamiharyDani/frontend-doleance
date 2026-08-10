@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
@@ -65,6 +66,7 @@ export default function Messages() {
   const { t } = useTranslation();
   const { darkMode } = useTheme();
   const { user } = useAuth();
+  const [searchParams, setSearchParams] = useSearchParams();
   const {
     contacts,
     messages,
@@ -124,6 +126,18 @@ export default function Messages() {
       setShowMobileChat(true);
     }
   }, [activeContact]);
+
+  const contactParam = searchParams.get('contact');
+  useEffect(() => {
+    if (contactParam && contacts.length > 0) {
+      const target = contacts.find(c => String(c.id_utilisateur || c.id) === contactParam);
+      const activeId = activeContact ? String(activeContact.id_utilisateur || activeContact.id) : null;
+      if (target && activeId !== contactParam) {
+        selectContact(Number(contactParam));
+        setSearchParams({}, { replace: true });
+      }
+    }
+  }, [contactParam, contacts, activeContact, selectContact, setSearchParams]);
 
   const filteredContacts = contacts.filter(c => {
     if (!searchQuery) return true;
