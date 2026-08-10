@@ -16,7 +16,6 @@ import {
   MagnifyingGlassIcon,
   FunnelIcon,
   InboxIcon,
-  ArrowTrendingUpIcon,
   CheckBadgeIcon,
 } from '@heroicons/react/24/outline';
 
@@ -52,7 +51,7 @@ function normalizeStatut(nomStatut) {
   const n = nomStatut.toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
     .replace(/[^a-z]/g, '');
-  if (n === 'transferee') return 'transferee';
+  if (n === 'transferee' || n === 'transfert') return 'transferee';
   if (n === 'enattente') return 'en_attente';
   if (n === 'ennouvelle' || n === 'nouvelle') return 'en_attente';
   if (n === 'en traitement' || n === 'entraitement') return 'en_cours';
@@ -63,6 +62,17 @@ function normalizeStatut(nomStatut) {
   if (n === 'rejetee' || n === 'rejete') return 'rejetee';
   if (n === 'urgente' || n === 'urgent') return 'urgente';
   return n;
+}
+
+function getDisplayStatut(doleance) {
+  const s = normalizeStatut(doleance.nom_statut);
+  const isUrgent =
+    (doleance.nom_priorite || '').toLowerCase().includes('urgent') ||
+    Number(doleance.id_priorite) === 4;
+  if (isUrgent && !['transferee', 'traitee', 'resolue', 'cloturee', 'rejetee'].includes(s)) {
+    return 'urgente';
+  }
+  return s;
 }
 
 function StatusPill({ statut }) {
@@ -370,7 +380,8 @@ function Transfert() {
       </div>
 
       {/* Statistiques */}
-      {/* <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
+
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         <StatCard
           label="Total"
           value={statsTotals.total}
@@ -378,51 +389,24 @@ function Transfert() {
           accent={{ bg: 'bg-slate-100 dark:bg-slate-700', bgSolid: 'bg-slate-400', text: 'text-slate-600 dark:text-slate-300' }}
         />
         <StatCard
-          label="En attente"
-          value={statsTotals.enAttente}
-          icon={ClockIcon}
-          accent={{ bg: 'bg-amber-50 dark:bg-amber-900/30', bgSolid: 'bg-amber-400', text: 'text-amber-600' }}
-        />
-        <StatCard
-          label="En cours"
-          value={statsTotals.enCours}
-          icon={ArrowTrendingUpIcon}
-          accent={{ bg: 'bg-blue-50 dark:bg-blue-900/30', bgSolid: 'bg-[#1E3A8A]', text: 'text-[#1E3A8A]' }}
-        />
-        <StatCard
-          label="Transférées"
-          value={statsTotals.transferts}
-          icon={PaperAirplaneIcon}
-          accent={{ bg: 'bg-violet-50 dark:bg-violet-900/30', bgSolid: 'bg-violet-400', text: 'text-violet-600' }}
-        />
-        <StatCard
           label="Résolues"
           value={statsTotals.resolues}
           icon={CheckBadgeIcon}
           accent={{ bg: 'bg-emerald-50 dark:bg-emerald-900/30', bgSolid: 'bg-emerald-400', text: 'text-emerald-600' }}
         />
-      </div> */}
-
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
-  <StatCard
-    label="Total"
-    value={statsTotals.total}
-    icon={InboxIcon}
-    accent={{ bg: 'bg-slate-100 dark:bg-slate-700', bgSolid: 'bg-slate-400', text: 'text-slate-600 dark:text-slate-300' }}
-  />
-  <StatCard
-    label="En cours"
-    value={statsTotals.enCours}
-    icon={ArrowTrendingUpIcon}
-    accent={{ bg: 'bg-blue-50 dark:bg-blue-900/30', bgSolid: 'bg-[#1E3A8A]', text: 'text-[#1E3A8A]' }}
-  />
-  <StatCard
-    label="Résolues"
-    value={statsTotals.resolues}
-    icon={CheckBadgeIcon}
-    accent={{ bg: 'bg-emerald-50 dark:bg-emerald-900/30', bgSolid: 'bg-emerald-400', text: 'text-emerald-600' }}
-  />
-</div>
+          <StatCard
+            label="En attente"
+            value={statsTotals.enAttente}
+            icon={ClockIcon}
+            accent={{ bg: 'bg-amber-50 dark:bg-amber-900/30', bgSolid: 'bg-amber-400', text: 'text-amber-600' }}
+          />
+          <StatCard
+            label="Transférées"
+            value={statsTotals.transferts}
+            icon={PaperAirplaneIcon}
+            accent={{ bg: 'bg-violet-50 dark:bg-violet-900/30', bgSolid: 'bg-violet-500', text: 'text-violet-600' }}
+          />
+      </div>
 
 
       {/* Filtres */}
@@ -535,7 +519,7 @@ function Transfert() {
                         {doleance.titre}
                       </td>
                       <td className="px-4 py-3.5 whitespace-nowrap text-center">
-                        <StatusPill statut={doleance.nom_statut} />
+                        <StatusPill statut={getDisplayStatut(doleance)} />
                       </td>
                       <td className="px-4 py-3.5 whitespace-nowrap text-slate-500 dark:text-slate-400 text-sm hidden xl:table-cell">
                         {doleance.nom_direction || '—'}
@@ -574,7 +558,7 @@ function Transfert() {
                             {doleance.titre}
                           </td>
                           <td className="px-4 py-2.5 whitespace-nowrap text-center">
-                            <StatusPill statut={doleance.nom_statut} />
+                            <StatusPill statut={getDisplayStatut(doleance)} />
                           </td>
                           <td className="px-4 py-2.5 whitespace-nowrap text-slate-400 dark:text-slate-500 text-sm hidden xl:table-cell">
                             {doleance.nom_direction || '—'}
@@ -606,7 +590,7 @@ function Transfert() {
                 <div key={doleance.id_doleance} className="p-4">
                   <div className="flex items-start justify-between gap-2 mb-2">
                     <span className="font-mono font-bold text-[#1E3A8A] dark:text-blue-400 text-sm">{doleance.reference}</span>
-                    <StatusPill statut={doleance.nom_statut} />
+                    <StatusPill statut={getDisplayStatut(doleance)} />
                   </div>
                   <p className="text-sm font-semibold text-slate-800 dark:text-slate-100 mb-1">{doleance.titre}</p>
                   <p className="text-sm text-slate-400 dark:text-slate-500 mb-3">
@@ -632,7 +616,7 @@ function Transfert() {
                     <div key={doleance.id_doleance} className="p-4 bg-slate-50/30 dark:bg-slate-900/30">
                       <div className="flex items-start justify-between gap-2 mb-2">
                         <span className="font-mono font-semibold text-slate-400 dark:text-slate-500 text-sm">{doleance.reference}</span>
-                        <StatusPill statut={doleance.nom_statut} />
+                        <StatusPill statut={getDisplayStatut(doleance)} />
                       </div>
                       <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{doleance.titre}</p>
                       {doleance.motif_transfert && (

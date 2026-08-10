@@ -205,8 +205,8 @@ function DoleanceDetail() {
         toast.success(response.data.message);
         setShowReturnModal(false);
         setReturnMotif('');
-        fetchDoleance();
         notifyStatsChange();
+        navigate('/backoffice/doleances');
       }
     } catch (error) {
       toast.error(error.response?.data?.message || 'Erreur lors du retour');
