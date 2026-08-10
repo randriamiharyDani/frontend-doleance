@@ -114,7 +114,7 @@ export const ChatProvider = ({ children }) => {
     // Rejoindre la room socket de l'utilisateur (CRITIQUE pour recevoir les events)
     const joinUserRoom = () => {
       if (socket.isConnected()) {
-        socket.emit('chat-join', userId);
+        socket.emit('chat-join');
       }
     };
     joinUserRoom();

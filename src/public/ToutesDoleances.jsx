@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
+import { translateCategory } from '../i18n/category';
 import api from '../services/api';
 import { 
   MagnifyingGlassIcon, 
@@ -461,7 +462,7 @@ function ToutesDoleances() {
                 >
                   <option value="">{t('allComplaints.allCategories')}</option>
                   {categories.map(cat => (
-                    <option key={cat.id_categorie} value={cat.id_categorie}>{cat.nom_categorie}</option>
+                    <option key={cat.id_categorie} value={cat.id_categorie}>{translateCategory(cat.nom_categorie, t)}</option>
                   ))}
                 </select>
               </div>
@@ -652,7 +653,7 @@ function ToutesDoleances() {
                         <div className="flex flex-wrap gap-3 text-sm">
                           <span className={`inline-flex items-center gap-1 px-2 py-1 rounded-full text-xs font-medium ${getCategoryColor(doleance.nom_categorie)}`}>
                             <TagIcon className="h-3 w-3" />
-                            {doleance.nom_categorie || t('allComplaints.uncategorized')}
+                            {translateCategory(doleance.nom_categorie, t)}
                           </span>
                           
                           <span className={`flex items-center gap-1 ${
@@ -807,7 +808,7 @@ function ToutesDoleances() {
                     {t('allComplaints.category')}
                   </span>
                   <span className={darkMode ? 'text-gray-200' : 'text-gray-800'}>
-                    {selectedDoleance.nom_categorie || '-'}
+                    {translateCategory(selectedDoleance.nom_categorie, t) || '-'}
                   </span>
                 </div>
                 <div>

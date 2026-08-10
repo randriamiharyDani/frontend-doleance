@@ -33,7 +33,21 @@ export const AuthProvider = ({ children }) => {
           connectSocket(parsedUser, token);
           
           try {
-            await api.get('/auth/profile');
+            const profileRes = await api.get('/auth/profile');
+            const fresh = profileRes.data?.data;
+            if (fresh) {
+              const updatedUser = {
+                ...parsedUser,
+                ...fresh,
+                role: fresh.nom_role || fresh.role_nom || parsedUser.role,
+                nom_role: fresh.nom_role || parsedUser.nom_role,
+                role_nom: fresh.role_nom || parsedUser.role_nom,
+                permissions: fresh.permissions || parsedUser.permissions,
+                role_permissions: fresh.role_permissions || parsedUser.role_permissions,
+              };
+              localStorage.setItem('user', JSON.stringify(updatedUser));
+              setUser(updatedUser);
+            }
           } catch (error) {
             if (error.response?.status === 401) {
               logout(true);
@@ -88,8 +102,41 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  // Vérifie si l'utilisateur a une permission (module.action)
+  // Retourne true si le rôle a la permission OU est un rôle admin historique
+  const hasPermission = (module, action) => {
+    if (!user) return false;
+    const role = user.role || user.nom_role || user.role_nom;
+
+    const adminRoles = ['administrateur_systeme', 'administrateur', 'agent_central'];
+    if (adminRoles.includes(role)) return true;
+
+    let perms = user.permissions || user.role_permissions;
+    if (typeof perms === 'string') {
+      try {
+        perms = JSON.parse(perms);
+      } catch (e) {
+        return false;
+      }
+    }
+    if (!perms || typeof perms !== 'object') return false;
+
+    const allPerms = perms.all;
+    if (allPerms === true || allPerms === '*') return true;
+    if (Array.isArray(allPerms) && (allPerms.includes('*') || allPerms.includes(action))) {
+      return true;
+    }
+
+    const modulePerms = perms[module];
+    if (modulePerms === true || modulePerms === '*') return true;
+    if (Array.isArray(modulePerms)) {
+      return modulePerms.includes('*') || modulePerms.includes(action);
+    }
+    return false;
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, loading }}>
+    <AuthContext.Provider value={{ user, login, logout, loading, permissions: user?.permissions || user?.role_permissions || {}, hasPermission }}>
       {children}
     </AuthContext.Provider>
   );

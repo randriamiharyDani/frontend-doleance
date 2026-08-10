@@ -632,7 +632,11 @@ function DeposerDoleance() {
       toast.error(t("messages.pleaseFillRequired"));
       return;
     }
-    if (!formData.id_categorie) {
+    const autreCategoryId = autreCategorie ? String(autreCategorie.id) : "";
+    const categorySelected = !!formData.id_categorie;
+    const autoAssignAutre = !categorySelected && (!!formData.titre || !!formData.description) && !!autreCategoryId;
+    const effectiveCategoryId = categorySelected ? formData.id_categorie : autoAssignAutre ? autreCategoryId : "";
+    if (!effectiveCategoryId) {
       toast.error(t("deposerMessages.selectCategory"));
       return;
     }
@@ -648,6 +652,7 @@ function DeposerDoleance() {
     try {
       const dataToSend = {
         ...formData,
+        id_categorie: effectiveCategoryId,
         module,
         contact: formData.email || formData.telephone,
         adresse_citoyen: formData.adresse_citoyen || null,
@@ -848,9 +853,11 @@ function DeposerDoleance() {
 
   // Progression indicative du formulaire (repère visuel, non bloquant)
   const completion = useMemo(() => {
+    const categoryDone =
+      !!formData.id_categorie || (!!autreCategorie && (!!formData.titre || !!formData.description));
     const requiredOk = [
       !!module,
-      !!formData.id_categorie,
+      categoryDone,
       !!formData.titre,
       !!formData.description,
       !!formData.nom_citoyen,
@@ -859,7 +866,7 @@ function DeposerDoleance() {
     ];
     const done = requiredOk.filter(Boolean).length;
     return Math.round((done / requiredOk.length) * 100);
-  }, [module, formData]);
+  }, [module, formData, autreCategorie]);
 
   const photoExamples = [
     { label: t("deposer.examplePothole"), icon: "M13.5 4L5.25 12.25l4.5 4.5L18 8.5", color: "from-rose-400 to-orange-400" },

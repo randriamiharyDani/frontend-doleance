@@ -59,17 +59,17 @@ function AppRoutes() {
         <Route path="doleances/:id" element={<DoleanceDetail />} />
         <Route path="profile" element={<Profile />} />
         <Route path="notifications" element={<Notifications />} />
-        <Route path="users" element={<PrivateRoute allowedRoles={['administrateur_systeme']}><Users /></PrivateRoute>} />
-        <Route path="roles" element={<PrivateRoute allowedRoles={['administrateur_systeme']}><Roles /></PrivateRoute>} />
+        <Route path="users" element={<PrivateRoute allowedRoles={['administrateur_systeme']} allowedPermissions={[{ module: 'users', action: 'view' }]}><Users /></PrivateRoute>} />
+        <Route path="roles" element={<PrivateRoute allowedRoles={['administrateur_systeme']} allowedPermissions={[{ module: 'users', action: 'manage_roles' }]}><Roles /></PrivateRoute>} />
         <Route path="statistiques" element={<Statistiques />} />
         <Route path="historique" element={<Historique />} />
-        <Route path="directions" element={<Directions />} />
-        <Route path="direction/:id_direction" element={<DirectionDoleances />} />
-        <Route path="transfert" element={<Transfert />} />
-        <Route path="ajouter-doleance" element={<AjouterDoleance />} />
+        <Route path="directions" element={<PrivateRoute allowedPermissions={[{ module: 'directions', action: 'view_team' }]}><Directions /></PrivateRoute>} />
+        <Route path="direction/:id_direction" element={<PrivateRoute allowedPermissions={[{ module: 'directions', action: 'view_team' }]}><DirectionDoleances /></PrivateRoute>} />
+        <Route path="transfert" element={<PrivateRoute allowedPermissions={[{ module: 'doleances', action: 'transfer' }]}><Transfert /></PrivateRoute>} />
+        <Route path="ajouter-doleance" element={<PrivateRoute allowedPermissions={[{ module: 'doleances', action: 'create' }]}><AjouterDoleance /></PrivateRoute>} />
         <Route path="settings" element={<Settings />} />
         <Route path="corbeille" element={<PrivateRoute allowedRoles={['administrateur_systeme']}><Corbeille /></PrivateRoute>} />
-        <Route path="categories" element={<Categories />} />
+        <Route path="categories" element={<PrivateRoute allowedPermissions={[{ module: 'doleances', action: 'update' }]}><Categories /></PrivateRoute>} />
         <Route path="messages" element={<ChatProvider><Messages /></ChatProvider>} />
 
       </Route>

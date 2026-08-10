@@ -132,7 +132,7 @@ function Dashboard() {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Tableau de bord</h1>
+          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">Tableau de bord</h1>
           <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
             Bienvenue, <span className="font-medium text-gray-700 dark:text-gray-200">{user?.prenom || ''} {user?.nom || ''}</span>
           </p>

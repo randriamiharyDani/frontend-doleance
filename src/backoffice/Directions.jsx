@@ -296,7 +296,7 @@ function Directions() {
           </p>
           <button
             onClick={() => window.location.href = '/backoffice/dashboard'}
-            className="btn-primary btn-lg"
+            className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             Retour au tableau de bord
           </button>

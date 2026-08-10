@@ -23,7 +23,7 @@ import {
 import Navbar from "../components/backoffice/Navbar";
 
 function BackofficeLayout() {
-  const { user, loading } = useAuth();
+  const { user, loading, hasPermission } = useAuth();
   const { darkMode } = useTheme();
   const location = useLocation();
   const navigate = useNavigate();
@@ -70,32 +70,29 @@ function BackofficeLayout() {
   }
 
   // Route restriction pour les Directions
-  const userRole = user?.role || user?.nom_role;
-  const isAdmin =
-    userRole === "administrateur_systeme" ||
-    userRole === "administrateur" ||
-    userRole === "agent_central";
+  const userRole = user?.role || user?.nom_role || user?.role_nom;
   const isSuperAdmin = userRole === "administrateur_systeme";
 
-  const adminOnlyRoutes = [
-    "/backoffice/users",
-    "/backoffice/roles",
-    "/backoffice/directions",
-    "/backoffice/direction/",
-    "/backoffice/transfert",
-    "/backoffice/ajouter-doleance",
-    "/backoffice/categories",
+  // Gating par permissions : chaque route est accessible si hasPermission(module, action)
+  // (hasPermission inclut le bypass des rôles admin → le role-based reste fonctionnel)
+  const routePermissionMap = [
+    { prefix: "/backoffice/users", module: "users", action: "view" },
+    { prefix: "/backoffice/roles", module: "users", action: "manage_roles" },
+    { prefix: "/backoffice/directions", module: "directions", action: "view_team" },
+    { prefix: "/backoffice/direction/", module: "directions", action: "view_team" },
+    { prefix: "/backoffice/transfert", module: "doleances", action: "transfer" },
+    { prefix: "/backoffice/ajouter-doleance", module: "doleances", action: "create" },
+    { prefix: "/backoffice/categories", module: "doleances", action: "update" },
   ];
 
-  const superAdminOnlyRoutes = [
-    "/backoffice/corbeille",
-  ];
-
-  if (!isAdmin && adminOnlyRoutes.some(route => location.pathname.startsWith(route))) {
+  const deniedRoute = routePermissionMap.find(
+    (r) => location.pathname.startsWith(r.prefix) && !hasPermission(r.module, r.action)
+  );
+  if (deniedRoute) {
     return <Navigate to="/backoffice/dashboard" replace />;
   }
 
-  if (!isSuperAdmin && superAdminOnlyRoutes.some(route => location.pathname.startsWith(route))) {
+  if (!isSuperAdmin && location.pathname.startsWith("/backoffice/corbeille")) {
     return <Navigate to="/backoffice/dashboard" replace />;
   }
 
@@ -132,29 +129,35 @@ function BackofficeLayout() {
       icon: DocumentTextIcon,
     },
     { name: "Messages", href: "/backoffice/messages", icon: ChatBubbleLeftRightIcon },
-    ...(isAdmin ? [
+    ...(hasPermission('doleances', 'transfer') ? [
       { name: "Transfert", href: "/backoffice/transfert", icon: ArrowPathIcon },
     ] : []),
   ];
 
+  const adminSubItems = [
+    {
+      name: "Directions",
+      href: "/backoffice/directions",
+      icon: BuildingOfficeIcon,
+      module: "directions",
+      action: "view_team",
+    },
+    {
+      name: "Utilisateurs",
+      href: "/backoffice/users",
+      icon: UserGroupIcon,
+      module: "users",
+      action: "view",
+    },
+    { name: "Rôles", href: "/backoffice/roles", icon: ShieldCheckIcon, module: "users", action: "manage_roles" },
+    { name: "Catégories", href: "/backoffice/categories", icon: TagIcon, module: "doleances", action: "update" },
+  ].filter((sub) => hasPermission(sub.module, sub.action));
+
   const secondaryNavigation = [
-    ...(isAdmin ? [{
+    ...(adminSubItems.length > 0 ? [{
       name: "Administration",
       icon: BuildingOfficeIcon,
-      subItems: [
-        {
-          name: "Directions",
-          href: "/backoffice/directions",
-          icon: BuildingOfficeIcon,
-        },
-        {
-          name: "Utilisateurs",
-          href: "/backoffice/users",
-          icon: UserGroupIcon,
-        },
-        { name: "Rôles", href: "/backoffice/roles", icon: ShieldCheckIcon },
-        { name: "Catégories", href: "/backoffice/categories", icon: TagIcon },
-      ],
+      subItems: adminSubItems,
     }] : []),
     {
       name: "Statistiques",
@@ -172,19 +175,8 @@ function BackofficeLayout() {
     });
   }, [location.pathname]);
 
-  // Filtrer les éléments de navigation selon les permissions
-  const filteredSecondaryNavigation = secondaryNavigation.filter((item) => {
-    if (item.subItems) {
-      const filteredSubItems = item.subItems.filter((subItem) => {
-        if (subItem.name === "Utilisateurs" || subItem.name === "Rôles") {
-          return isAdmin;
-        }
-        return true;
-      });
-      return filteredSubItems.length > 0;
-    }
-    return true;
-  });
+  // La navigation est déjà filtrée par permissions (voir adminSubItems/secondaryNavigation)
+  const filteredSecondaryNavigation = secondaryNavigation;
 
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
@@ -272,8 +264,8 @@ function BackofficeLayout() {
     ))}
     </div>
 
-  {/* Bouton Ajouter doléance - Admin only */}
-  {isAdmin && (
+  {/* Bouton Ajouter doléance - permission create */}
+  {hasPermission('doleances', 'create') && (
     <Link
       to="/backoffice/ajouter-doleance"
       onClick={() => isMobile && setSidebarOpen(false)}

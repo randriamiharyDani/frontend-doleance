@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
+import { translateCategory } from '../i18n/category';
 import api from '../services/api';
 import toast from 'react-hot-toast';
 import {
@@ -295,7 +296,7 @@ function SuiviDoleance() {
                           {t('form.category')}
                         </p>
                         <p className={`font-medium text-sm sm:text-base ${darkMode ? 'text-gray-200' : 'text-slate-800'}`}>
-                          {getCategoryIcon(doleance.categorie)} {doleance.categorie || t('allComplaints.uncategorized')}
+                          {getCategoryIcon(doleance.categorie)} {translateCategory(doleance.categorie, t)}
                         </p>
                       </div>
                     </div>
