@@ -32,7 +32,6 @@ function AjouterDoleance() {
 
   const [reference] = useState(generateReference());
   const [categories, setCategories] = useState([]);
-  const [quartiers, setQuartiers] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
   const [files, setFiles] = useState([]);
@@ -47,7 +46,7 @@ function AjouterDoleance() {
     email_citoyen: '',
     telephone_citoyen: '',
     adresse_citoyen: '',
-    id_quartier: '',
+    quartier: '',
     lieu_exact: '',
     suggestions: '',
   });
@@ -55,12 +54,8 @@ function AjouterDoleance() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [catRes, qRes] = await Promise.all([
-          api.get('/doleances/categories'),
-          api.get('/doleances/quartiers'),
-        ]);
+        const catRes = await api.get('/doleances/categories');
         if (catRes.data.success) setCategories(catRes.data.data);
-        if (qRes.data.success) setQuartiers(qRes.data.data);
       } catch (err) {
         console.error('Erreur chargement données:', err);
         toast.error('Erreur lors du chargement des données');
@@ -170,7 +165,7 @@ function AjouterDoleance() {
         telephone_citoyen: formData.telephone_citoyen || null,
         email_citoyen: formData.email_citoyen || null,
         adresse_citoyen: formData.adresse_citoyen || null,
-        id_quartier: formData.id_quartier ? Number(formData.id_quartier) : null,
+        quartier: formData.quartier?.trim() || null,
       };
 
       const response = await api.post('/doleances', dataToSend);
@@ -242,8 +237,8 @@ function AjouterDoleance() {
       <form onSubmit={handleSubmit}>
         {/* Informations sur la doléance */}
         <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 p-4 md:p-6 mb-4">
-          <h2 className="text-sm font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
-            <DocumentTextIcon className="h-4 w-4 text-blue-600" />
+          <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
+            <DocumentTextIcon className="h-6 w-6 text-blue-600" />
             Informations sur la doléance
           </h2>
           <div className="space-y-4">
@@ -293,8 +288,8 @@ function AjouterDoleance() {
 
         {/* Informations du citoyen */}
         <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 p-4 md:p-6 mb-4">
-          <h2 className="text-sm font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
-            <UserIcon className="h-4 w-4 text-blue-600" />
+          <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
+            <UserIcon className="h-6 w-6 text-blue-600" />
             Informations du citoyen
           </h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -360,26 +355,21 @@ function AjouterDoleance() {
 
         {/* Localisation */}
         <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 p-4 md:p-6 mb-4">
-          <h2 className="text-sm font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
-            <MapPinIcon className="h-4 w-4 text-blue-600" />
+          <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
+            <MapPinIcon className="h-6 w-6 text-blue-600" />
             Localisation de l'incident
           </h2>
           <div className="space-y-4">
             <div>
               <label className={labelClass}>Quartier</label>
-              <select
-                name="id_quartier"
-                value={formData.id_quartier}
+              <input
+                type="text"
+                name="quartier"
+                value={formData.quartier}
                 onChange={handleChange}
                 className={inputClass}
-              >
-                <option value="">Sélectionner un quartier</option>
-                {quartiers.map((q) => (
-                  <option key={q.id_quartier} value={q.id_quartier}>
-                    {q.nom_quartier}{q.nom_arrondissement ? ` (${q.nom_arrondissement})` : ''}
-                  </option>
-                ))}
-              </select>
+                placeholder="Ex: Analakely, Isotry, Andraharo..."
+              />
             </div>
             <div>
               <label className={labelClass}>Adresse de l'incident</label>
@@ -408,8 +398,8 @@ function AjouterDoleance() {
 
         {/* Images / Pièces jointes */}
         <div className="bg-white dark:bg-slate-800 rounded-xl shadow-sm border border-gray-100 dark:border-slate-700 p-4 md:p-6 mb-6">
-          <h2 className="text-sm font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
-            <PhotoIcon className="h-4 w-4 text-blue-600" />
+          <h2 className="text-xl font-bold text-gray-800 dark:text-gray-100 mb-4 flex items-center gap-2">
+            <PhotoIcon className="h-6 w-6 text-blue-600" />
             Images (optionnel)
             <span className="text-xs font-normal text-gray-400 dark:text-gray-500 ml-1">— Max 5 images, 50 Mo chacune</span>
           </h2>
@@ -427,7 +417,7 @@ function AjouterDoleance() {
             }`}
           >
             <CloudArrowUpIcon className={`h-10 w-10 mx-auto mb-2 ${dragOver ? 'text-blue-500' : 'text-gray-400 dark:text-gray-500'}`} />
-            <p className="text-sm text-gray-600 dark:text-gray-300 font-medium">
+            <p className="text-xl text-gray-600 dark:text-gray-300 font-medium">
               Glissez vos images ici ou <span className="text-blue-600 underline">parcourir</span>
             </p>
             <p className="text-xs text-gray-400 dark:text-gray-500 mt-1">PNG, JPG, GIF — Max 50 Mo</p>
@@ -484,12 +474,12 @@ function AjouterDoleance() {
           >
             {loading ? (
               <>
-                <div className="animate-spin rounded-full h-4 w-4 border-2 border-white/40 border-t-white" />
+                <div className="animate-spin rounded-full h-6 w-6 border-2 border-white/40 border-t-white" />
                 Création en cours...
               </>
             ) : (
               <>
-                <CheckCircleIcon className="h-4 w-4" />
+                <CheckCircleIcon className="h-6 w-6" />
                 Créer la doléance
               </>
             )}
