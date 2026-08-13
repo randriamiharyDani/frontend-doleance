@@ -190,7 +190,7 @@ function Profile() {
           {/* Section Informations */}
           <div className="card">
             <div className="card-body">
-              <div className="flex justify-between items-center mb-4">
+              <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
                 <h2 className="text-lg font-semibold flex items-center gap-2 text-gray-900 dark:text-white">
                   <UserCircleIcon className="h-5 w-5 text-blue-500" />
                   Informations personnelles
@@ -298,7 +298,7 @@ function Profile() {
           {/* Section Changement de mot de passe */}
           <div className="card">
             <div className="card-body">
-              <div className="flex justify-between items-center mb-4">
+              <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
                 <h2 className="text-lg font-semibold flex items-center gap-2 text-gray-900 dark:text-white">
                   <KeyIcon className="h-5 w-5 text-blue-500" />
                   Sécurité

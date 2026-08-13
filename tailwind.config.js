@@ -195,6 +195,10 @@ export default {
         '2xl': '1.5rem',
         '3xl': '2rem',
       },
+      maxWidth: {
+        '8xl': '96rem',
+        '9xl': '112rem',
+      },
       backdropBlur: {
         'xs': '2px',
       },

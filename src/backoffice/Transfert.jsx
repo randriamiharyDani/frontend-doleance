@@ -491,7 +491,7 @@ function Transfert() {
           <>
             {/* --- Vue tableau (sm+) --- */}
             <div className="hidden sm:block overflow-x-auto">
-              <table className="min-w-full text-xl">
+              <table className="min-w-full text-sm">
                 <thead>
                   <tr className="border-b border-slate-100 dark:border-slate-700">
                     <th className="px-4 py-3 text-left text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Réf.</th>

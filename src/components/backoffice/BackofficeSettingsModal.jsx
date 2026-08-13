@@ -122,7 +122,7 @@ function BackofficeSettingsModal({ isOpen, onClose }) {
             </div>
           </div>
           <div className={`p-4 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
-            <div className="flex gap-3">
+            <div className="flex flex-col sm:flex-row gap-3">
               {languages.map(lang => (
                 <button
                   key={lang.code}

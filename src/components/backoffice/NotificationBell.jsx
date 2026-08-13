@@ -150,7 +150,7 @@ function NotificationBell() {
       </button>
 
       {open && (
-        <div className={`absolute right-0 mt-2 w-[340px] sm:w-[380px] max-h-[480px] overflow-hidden rounded-2xl shadow-2xl border z-50 transition-all duration-200 flex flex-col ${
+        <div className={`fixed top-20 right-4 left-4 sm:absolute sm:top-auto sm:left-auto sm:right-0 sm:mt-2 sm:w-[380px] max-h-[480px] overflow-hidden rounded-2xl shadow-2xl border z-50 transition-all duration-200 flex flex-col ${
           darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-100'
         }`}>
           {/* Header */}

@@ -454,7 +454,7 @@ function DoleanceDetail() {
 
           {/* Section Pièces jointes */}
           <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <PaperClipIcon className="h-5 w-5" />
                 Pièces jointes
@@ -581,7 +581,7 @@ function DoleanceDetail() {
 
           {/* Section des réponses */}
           <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex flex-wrap justify-between items-center gap-3 mb-4">
               <h3 className="text-lg font-semibold flex items-center gap-2">
                 <ChatBubbleLeftRightIcon className="h-5 w-5" />
                 Historique des échanges
@@ -601,7 +601,7 @@ function DoleanceDetail() {
                   <div key={index} className={`border-l-4 pl-4 ${
                     rep.type_auteur === 'citoyen' ? 'border-emerald-500' : 'border-blue-500'
                   }`}>
-                    <div className="flex justify-between items-start mb-2">
+                    <div className="flex flex-wrap justify-between items-start gap-2 mb-2">
                       <div className="flex items-center">
                         <UserCircleIcon className="h-5 w-5 text-gray-400 dark:text-gray-500 mr-2" />
                         <span className="font-medium">

@@ -22,11 +22,11 @@ function DoleanceFilters({
             className="w-full pl-10 pr-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none dark:bg-slate-700 dark:border-slate-600 dark:text-white"
           />
         </div>
-        <div className="flex gap-2">
+        <div className="flex flex-wrap gap-2">
           <button
             type="button"
             onClick={onToggleFilters}
-            className="px-4 py-2 text-gray-600 dark:text-gray-300 border rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center gap-2 transition-colors"
+            className="flex-1 sm:flex-none px-4 py-2 text-gray-600 dark:text-gray-300 border rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 flex items-center justify-center gap-2 transition-colors"
           >
             <FunnelIcon className="h-5 w-5" />
             Filtres
@@ -34,13 +34,13 @@ function DoleanceFilters({
           <button
             type="button"
             onClick={onReset}
-            className="px-4 py-2 text-gray-600 dark:text-gray-300 border rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
+            className="flex-1 sm:flex-none px-4 py-2 text-gray-600 dark:text-gray-300 border rounded-lg hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors"
           >
             Réinitialiser
           </button>
           <button
             type="submit"
-            className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+            className="flex-1 sm:flex-none px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             Rechercher
           </button>

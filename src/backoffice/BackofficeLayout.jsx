@@ -188,7 +188,7 @@ function BackofficeLayout() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-30 h-full w-64 lg:w-72 shadow-xl transition-transform duration-300 ease-in-out overflow-y-auto ${
+        className={`fixed top-0 left-0 z-30 h-full w-72 lg:w-64 shadow-xl transition-transform duration-300 ease-in-out overflow-y-auto ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0 ${
           darkMode
@@ -197,25 +197,24 @@ function BackofficeLayout() {
         }`}
       >
         {/* Logo */}
-        {/* Logo */}
-        <div className="sticky top-0 z-10 flex items-center gap-3 p-4 border-b border-white/10 bg-opacity-95 backdrop-blur-sm">
+        <div className="sticky top-0 z-10 flex items-center gap-3 p-3 border-b border-white/10 bg-opacity-95 backdrop-blur-sm">
           {/* Logo */}
-          <div className="flex-shrink-0 ">
+          <div className="flex-shrink-0">
             <img
               src="/images/logo_CUA.svg"
               alt="Logo CUA"
-              className="h-20 w-20 object-contain rounded-2xl"
+              className="h-14 w-14 object-contain rounded-xl"
             />
           </div>
 
           {/* Texte */}
           <div className="flex-1 min-w-0">
-            <h1 className="text-white font-bold text-4xl sm:text-lg tracking-tight leading-tight">
+            <h1 className="text-white font-bold text-lg tracking-tight leading-tight">
               CUA
             </h1>
-            <p className="text-white/60 text-xl sm:text-sm font-medium">
-              <span className="block">Commune Urbaine</span>
-              <span className="block">d'Antananarivo</span>
+            <p className="text-white/60 text-xs font-medium">
+              <span className="block truncate">Commune Urbaine</span>
+              <span className="block truncate">d'Antananarivo</span>
             </p>
           </div>
 
@@ -506,7 +505,7 @@ function BackofficeLayout() {
       </aside>
 
       {/* Contenu principal */}
-      <div className="lg:pl-72 h-screen flex flex-col overflow-hidden">
+      <div className="lg:pl-64 h-screen flex flex-col overflow-hidden">
         <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
         <main className="flex-1 overflow-hidden flex flex-col">
           <div className="flex-1 overflow-auto p-4 sm:p-6">

@@ -208,7 +208,7 @@ function AjouterDoleance() {
   }
 
   return (
-    <div className="max-w-auto mx-5">
+    <div className="max-w-5xl mx-auto">
       {/* En-tête */}
       <div className="flex items-center gap-3 mb-6">
         <button
@@ -459,7 +459,7 @@ function AjouterDoleance() {
         </div>
 
         {/* Boutons d'action */}
-        <div className="flex justify-end gap-3">
+        <div className="flex flex-wrap justify-end gap-3">
           <button
             type="button"
             onClick={() => navigate('/backoffice/doleances')}

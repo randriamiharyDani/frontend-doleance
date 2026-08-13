@@ -220,8 +220,8 @@ function DirectionDetail() {
 
       {/* En-tête */}
       <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6 mb-6">
-        <div className="flex justify-between items-start">
-          <div>
+        <div className="flex flex-col lg:flex-row justify-between items-start gap-4">
+          <div className="min-w-0">
             <div className="flex items-center gap-2 mb-2">
               <BuildingOfficeIcon className="h-8 w-8 text-blue-600" />
               <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">{direction.nom_direction}</h1>

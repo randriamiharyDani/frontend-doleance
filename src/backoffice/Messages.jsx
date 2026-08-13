@@ -567,7 +567,7 @@ export default function Messages() {
                           <div className="mb-2">
                             {(msg.fichier || msg.file_url || msg.attachment_url || '').match(/\.(jpg|jpeg|png|gif|webp|bmp)/i) ? (
                               <div
-                                className="cursor-pointer rounded-lg overflow-hidden max-w-[250px]"
+                                className="cursor-pointer rounded-lg overflow-hidden w-[min(250px,100%)]"
                                 onClick={() => setLightboxImage(msg.fichier || msg.file_url || msg.attachment_url)}
                               >
                                 <img

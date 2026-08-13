@@ -142,7 +142,7 @@ function Notifications() {
   return (
     <div className="p-4 md:p-6">
       {/* En-tête */}
-      <div className="flex justify-between items-center mb-6">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 mb-6">
         <div>
           <h1 className="text-2xl font-bold text-gray-800 dark:text-gray-100">Notifications</h1>
           <p className="text-gray-600 dark:text-gray-300 text-sm mt-1">
@@ -228,7 +228,7 @@ function Notifications() {
                 className={`p-4 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors ${!notif.lu ? 'bg-blue-50 dark:bg-blue-900/20' : ''} ${getNotificationColor(notif.type)}`}
               >
                 <div className="flex justify-between items-start">
-                  <div className="flex-1 cursor-pointer" onClick={() => viewDetails(notif)}>
+                  <div className="flex-1 min-w-0 cursor-pointer" onClick={() => viewDetails(notif)}>
                     <div className="flex items-center gap-2 mb-1">
                       {getNotificationIcon(notif.type)}
                       <h3 className={`font-semibold ${!notif.lu ? 'text-blue-800 dark:text-blue-300' : 'text-gray-800 dark:text-gray-100'}`}>
