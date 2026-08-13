@@ -129,6 +129,34 @@ export const ChatProvider = ({ children }) => {
       const activeId = activeContactRef.current
         ? (activeContactRef.current.id_utilisateur || activeContactRef.current.id)
         : null;
+
+      // Message système d'appel (JSON {"t":"call"}) : affiché dans la conversation concernée
+      let isCallMsg = false;
+      if (typeof data.message === 'string' && data.message.trim().startsWith('{')) {
+        try {
+          const parsed = JSON.parse(data.message);
+          isCallMsg = parsed && parsed.t === 'call';
+        } catch (e) {
+          isCallMsg = false;
+        }
+      }
+      if (isCallMsg) {
+        const receiverId = data.receiver_id || data.id_destinataire;
+        const otherId = senderId === userId ? receiverId : senderId;
+        if (activeId && otherId === activeId) {
+          setMessages(prev => {
+            const exists = prev.some(m => (m.id_message || m.id) === (data.id_message || data.id));
+            if (exists) return prev;
+            return [...prev, data];
+          });
+          if (data.id_message || data.id) {
+            const newId = data.id_message || data.id;
+            if (newId > lastMessageIdRef.current) lastMessageIdRef.current = newId;
+          }
+        }
+        return;
+      }
+
       if (senderId === activeId) {
         setMessages(prev => {
           const exists = prev.some(m => (m.id_message || m.id) === (data.id_message || data.id));

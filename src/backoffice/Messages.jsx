@@ -32,6 +32,31 @@ function formatTime(dateStr) {
   return d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
 }
 
+function getCallPayload(msg) {
+  if (!msg || typeof msg.message !== 'string') return null;
+  const text = msg.message.trim();
+  if (!text.startsWith('{')) return null;
+  try {
+    const p = JSON.parse(text);
+    return p && p.t === 'call' ? p : null;
+  } catch (e) {
+    return null;
+  }
+}
+
+function decodeLastMessage(text) {
+  if (!text) return '';
+  const str = String(text).trim();
+  if (!str.startsWith('{')) return text;
+  try {
+    const p = JSON.parse(str);
+    if (p && p.t === 'call') return p.d;
+  } catch (e) {
+    /* ignore */
+  }
+  return text;
+}
+
 function formatDate(dateStr) {
   if (!dateStr) return '';
   const d = new Date(dateStr);
@@ -378,7 +403,7 @@ export default function Messages() {
               const isActive = activeContact && (activeContact.id_utilisateur || activeContact.id) === contactId;
               const isOnline = contact.is_online || contact.online || contact.live_status === 'online';
               const unread = contact.unread_count || 0;
-              const lastMsg = contact.last_message || contact.dernier_message || '';
+              const lastMsg = decodeLastMessage(contact.last_message || contact.dernier_message || '');
               const lastTime = contact.last_message_time || contact.updated_at || '';
 
               return (
@@ -510,6 +535,22 @@ export default function Messages() {
                   const msgSenderId = msg.id_expediteur || msg.sender_id || msg.id_utilisateur;
                   const isMine = msgSenderId === myId;
                   const msgId = msg.id_message || msg.id || idx;
+                  const callPayload = getCallPayload(msg);
+
+                  if (callPayload) {
+                    if (msgSenderId !== myId) return null;
+                    return (
+                      <div key={msgId} className="flex justify-center">
+                        <div className={`max-w-[85%] text-center text-xs px-3 py-1.5 rounded-full my-0.5 ${
+                          darkMode
+                            ? 'bg-slate-700/60 text-slate-300'
+                            : 'bg-gray-200/70 text-gray-600'
+                        }`}>
+                          {callPayload.d}
+                        </div>
+                      </div>
+                    );
+                  }
 
                   return (
                     <div key={msgId} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>

@@ -135,7 +135,7 @@ export default function useWebRTC({ onIncomingCall, onCallAccepted, onCallReject
         startTimer();
       } else if (state === 'failed') {
         setCallStatus('failed');
-        if (callbacksRef.current.onCallFailed) callbacksRef.current.onCallFailed();
+        if (callbacksRef.current.onCallFailed) callbacksRef.current.onCallFailed(callIdRef.current);
       } else if (state === 'disconnected' || state === 'closed') {
         setCallStatus('ended');
         if (callbacksRef.current.onCallEnded) callbacksRef.current.onCallEnded();

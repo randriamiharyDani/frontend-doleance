@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { PhoneIcon, VideoCameraIcon } from '@heroicons/react/24/outline';
 
-export default function IncomingCallModal({ callerName, callType, onAccept, onReject }) {
+export default function IncomingCallModal({ callerName, callType, onAccept, onReject, onMiss }) {
   const [visible, setVisible] = useState(false);
   const [dismissed, setDismissed] = useState(false);
 
@@ -12,10 +12,10 @@ export default function IncomingCallModal({ callerName, callType, onAccept, onRe
   useEffect(() => {
     if (dismissed) return;
     const timer = setTimeout(() => {
-      onReject();
+      onMiss();
     }, 30000);
     return () => clearTimeout(timer);
-  }, [dismissed, onReject]);
+  }, [dismissed, onMiss]);
 
   const handleAccept = useCallback(() => {
     setDismissed(true);
