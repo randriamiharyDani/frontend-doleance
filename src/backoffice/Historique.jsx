@@ -236,7 +236,7 @@ function Historique() {
                     <th className="hidden md:table-cell">Catégorie</th>
                     <th>Titre</th>
                     <th className="text-center">Statut</th>
-                    <th className="hidden xl:table-cell">Direction</th>
+                    <th className="hidden 2xl:table-cell">Direction</th>
                     <th>Résolu le</th>
                   </tr>
                 </thead>
@@ -258,7 +258,7 @@ function Historique() {
                       <td className="text-center">
                         <StatusPill statut={d.nom_statut} />
                       </td>
-                      <td className="text-gray-500 dark:text-gray-400 text-sm hidden xl:table-cell">
+                      <td className="text-gray-500 dark:text-gray-400 text-sm hidden 2xl:table-cell">
                         {d.nom_direction || '—'}
                       </td>
                       <td className="text-gray-500 dark:text-gray-400 text-sm">

@@ -188,7 +188,7 @@ function BackofficeLayout() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-30 h-full w-72 lg:w-64 shadow-xl transition-transform duration-300 ease-in-out overflow-y-auto ${
+        className={`fixed top-0 left-0 z-30 h-full w-72 lg:w-60 xl:w-64 2xl:w-72 shadow-xl transition-transform duration-300 ease-in-out overflow-y-auto overflow-x-hidden ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0 ${
           darkMode
@@ -505,10 +505,10 @@ function BackofficeLayout() {
       </aside>
 
       {/* Contenu principal */}
-      <div className="lg:pl-64 h-screen flex flex-col overflow-hidden">
+      <div className="lg:pl-60 xl:pl-64 2xl:pl-72 h-screen flex flex-col overflow-hidden min-w-0">
         <Navbar sidebarOpen={sidebarOpen} setSidebarOpen={setSidebarOpen} />
-        <main className="flex-1 overflow-hidden flex flex-col">
-          <div className="flex-1 overflow-auto p-4 sm:p-6">
+        <main className="flex-1 overflow-hidden flex flex-col w-full max-w-full min-w-0">
+          <div className="flex-1 min-w-0 w-full max-w-full overflow-y-auto overflow-x-hidden p-4 sm:p-6">
             <Outlet />
           </div>
         </main>

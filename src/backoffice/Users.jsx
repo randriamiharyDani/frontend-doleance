@@ -580,7 +580,7 @@ function Users() {
                 <th className="px-3 py-3 hidden md:table-cell">Téléphone</th>
                 <th className="px-3 py-3">Fonction</th>
                 <th className="px-3 py-3 hidden lg:table-cell">Direction</th>
-                <th className="px-3 py-3 hidden xl:table-cell">Catégorie</th>
+                <th className="px-3 py-3 hidden 2xl:table-cell">Catégorie</th>
                 <th className="px-3 py-3">En ligne</th>
                 <th className="px-3 py-3 text-right">Actions</th>
               </tr>
@@ -624,7 +624,7 @@ function Users() {
                   <td className="px-3 py-3 text-sm text-gray-500 dark:text-gray-400 max-w-[140px] truncate hidden lg:table-cell">
                     {user.nom_direction || '-'}
                   </td>
-                  <td className="px-3 py-3 whitespace-nowrap hidden xl:table-cell">
+                  <td className="px-3 py-3 whitespace-nowrap hidden 2xl:table-cell">
                     <span className={`badge ${getCategorieColor(getDirectionCategorie(user.id_direction))}`}>
                       {getDirectionCategorie(user.id_direction)}
                     </span>

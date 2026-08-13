@@ -21,8 +21,6 @@ import {
 
 // ---- Design tokens (kept local so the file stays drop-in) ----------------
 // Navy  #0F172A / #1E3A8A  ·  Gold accent #D4AF37  ·  Slate neutrals
-// These echo the palette already used on the localisation card, so the
-// backoffice reads as one product rather than a patchwork of screens.
 
 const STATUS_STYLES = {
   en_attente:  { dot: 'bg-amber-500',  text: 'text-amber-700',  bg: 'bg-amber-50',  ring: 'ring-amber-200'  },
@@ -79,8 +77,8 @@ function StatusPill({ statut }) {
   const key = normalizeStatut(statut);
   const s = STATUS_STYLES[key] || STATUS_STYLES.cloturee;
   return (
-    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ring-1 ${s.bg} ${s.text} ${s.ring}`}>
-      <span className={`w-1.5 h-1.5 rounded-full ${s.dot}`} />
+    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-semibold ring-1 whitespace-nowrap ${s.bg} ${s.text} ${s.ring}`}>
+      <span className={`w-1.5 h-1.5 rounded-full flex-shrink-0 ${s.dot}`} />
       {STATUS_LABELS[key] || statut}
     </span>
   );
@@ -88,13 +86,13 @@ function StatusPill({ statut }) {
 
 function StatCard({ label, value, icon: Icon, accent, sub }) {
   return (
-    <div className="relative overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm ring-1 ring-slate-100 dark:ring-slate-700 p-4 sm:p-5">
+    <div className="relative overflow-hidden bg-white dark:bg-slate-800 rounded-2xl shadow-sm ring-1 ring-slate-100 dark:ring-slate-700 p-4 sm:p-5 min-w-0">
       <div className={`absolute -right-4 -top-4 w-20 h-20 rounded-full opacity-10 ${accent.bgSolid}`} />
-      <div className="flex items-start justify-between">
-        <div>
-          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500">{label}</p>
+      <div className="flex items-start justify-between gap-2">
+        <div className="min-w-0">
+          <p className="text-[11px] font-semibold uppercase tracking-wide text-slate-400 dark:text-slate-500 truncate">{label}</p>
           <p className="text-2xl sm:text-3xl font-bold text-[#0F172A] dark:text-white mt-1 tabular-nums">{value}</p>
-          {sub && <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5">{sub}</p>}
+          {sub && <p className="text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 truncate">{sub}</p>}
         </div>
         <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 ${accent.bg}`}>
           <Icon className={`w-5 h-5 ${accent.text}`} />
@@ -345,26 +343,26 @@ function Transfert() {
   const doleancestransferts = doleances.filter((d) => !canTransfer(d.nom_statut));
 
   return (
-    <div className=" mx-auto">
+    <div className="w-full max-w-screen-2xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
       {/* En-tête */}
       <div className="flex flex-wrap justify-between items-start gap-3 mb-6">
-        <div>
+        <div className="min-w-0">
           <h1 className="text-2xl sm:text-3xl font-bold text-[#0F172A] dark:text-white tracking-tight">
             Transfert de doléances
           </h1>
           <p className="text-sm sm:text-base text-gray-500 dark:text-gray-400 mt-1">Acheminer chaque doléance vers la bonne direction</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <button
             onClick={refreshData}
-            className="inline-flex items-center px-3.5 py-2.5 bg-white dark:bg-slate-800 text-[#1E3A8A] rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-sm font-semibold ring-1 ring-slate-200 dark:ring-slate-700 shadow-sm"
+            className="inline-flex items-center flex-shrink-0 px-3.5 py-2.5 bg-white dark:bg-slate-800 text-[#1E3A8A] rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors text-sm font-semibold ring-1 ring-slate-200 dark:ring-slate-700 shadow-sm"
           >
             <ArrowPathIcon className="h-4 w-4 mr-1.5" />
             Rafraîchir
           </button>
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className={`inline-flex items-center px-3.5 py-2.5 rounded-xl transition-colors text-sm font-semibold ring-1 shadow-sm ${
+            className={`inline-flex items-center flex-shrink-0 px-3.5 py-2.5 rounded-xl transition-colors text-sm font-semibold ring-1 shadow-sm ${
               showFilters || hasActiveFilters
                 ? 'bg-[#1E3A8A] text-white ring-[#1E3A8A]'
                 : 'bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 ring-slate-200 dark:ring-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
@@ -380,8 +378,7 @@ function Transfert() {
       </div>
 
       {/* Statistiques */}
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 mb-6">
         <StatCard
           label="Total"
           value={statsTotals.total}
@@ -394,26 +391,25 @@ function Transfert() {
           icon={CheckBadgeIcon}
           accent={{ bg: 'bg-emerald-50 dark:bg-emerald-900/30', bgSolid: 'bg-emerald-400', text: 'text-emerald-600' }}
         />
-          <StatCard
-            label="En attente"
-            value={statsTotals.enAttente}
-            icon={ClockIcon}
-            accent={{ bg: 'bg-amber-50 dark:bg-amber-900/30', bgSolid: 'bg-amber-400', text: 'text-amber-600' }}
-          />
-          <StatCard
-            label="Transférées"
-            value={statsTotals.transferts}
-            icon={PaperAirplaneIcon}
-            accent={{ bg: 'bg-violet-50 dark:bg-violet-900/30', bgSolid: 'bg-violet-500', text: 'text-violet-600' }}
-          />
+        <StatCard
+          label="En attente"
+          value={statsTotals.enAttente}
+          icon={ClockIcon}
+          accent={{ bg: 'bg-amber-50 dark:bg-amber-900/30', bgSolid: 'bg-amber-400', text: 'text-amber-600' }}
+        />
+        <StatCard
+          label="Transférées"
+          value={statsTotals.transferts}
+          icon={PaperAirplaneIcon}
+          accent={{ bg: 'bg-violet-50 dark:bg-violet-900/30', bgSolid: 'bg-violet-500', text: 'text-violet-600' }}
+        />
       </div>
-
 
       {/* Filtres */}
       {showFilters && (
         <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-sm ring-1 ring-slate-100 dark:ring-slate-700 p-4 sm:p-5 mb-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            <div>
+            <div className="min-w-0">
               <label className="block text-sm font-bold text-slate-500 dark:text-slate-400 mb-1.5">Catégorie</label>
               <select
                 value={filters.categorie}
@@ -428,7 +424,7 @@ function Transfert() {
                 ))}
               </select>
             </div>
-            <div>
+            <div className="min-w-0">
               <label className="block text-sm font-bold text-slate-500 dark:text-slate-400 mb-1.5">Statut</label>
               <select
                 value={filters.statut}
@@ -443,7 +439,7 @@ function Transfert() {
                 ))}
               </select>
             </div>
-            <div>
+            <div className="min-w-0">
               <label className="block text-sm font-bold text-slate-500 dark:text-slate-400 mb-1.5">Rechercher</label>
               <div className="relative">
                 <MagnifyingGlassIcon className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 dark:text-slate-500" />
@@ -491,16 +487,16 @@ function Transfert() {
           <>
             {/* --- Vue tableau (sm+) --- */}
             <div className="hidden sm:block overflow-x-auto">
-              <table className="min-w-full text-sm">
+              <table className="w-full text-sm table-auto">
                 <thead>
                   <tr className="border-b border-slate-100 dark:border-slate-700">
-                    <th className="px-4 py-3 text-left text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Réf.</th>
+                    <th className="px-4 py-3 text-left text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide whitespace-nowrap">Réf.</th>
                     <th className="px-4 py-3 text-left text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide hidden lg:table-cell">Citoyen</th>
                     <th className="px-4 py-3 text-left text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide hidden md:table-cell">Catégorie</th>
-                    <th className="px-4 py-3 text-left text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Titre</th>
-                    <th className="px-4 py-3 text-center text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Statut</th>
-                    <th className="px-4 py-3 text-left text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide hidden xl:table-cell">Direction</th>
-                    <th className="px-4 py-3 text-right text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide">Action</th>
+                    <th className="px-4 py-3 text-left text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide w-full">Titre</th>
+                    <th className="px-4 py-3 text-center text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide whitespace-nowrap">Statut</th>
+                    <th className="px-4 py-3 text-left text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide hidden 2xl:table-cell">Direction</th>
+                    <th className="px-4 py-3 text-right text-[13px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-wide whitespace-nowrap">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-50 dark:divide-slate-700">
@@ -515,21 +511,21 @@ function Transfert() {
                       <td className="px-4 py-3.5 whitespace-nowrap text-slate-500 dark:text-slate-400 text-sm hidden md:table-cell">
                         {getCategoryName(doleance.id_categorie)}
                       </td>
-                      <td className="px-4 py-3.5 text-slate-700 dark:text-slate-200 max-w-[160px] truncate text-sm">
+                      <td className="px-4 py-3.5 text-slate-700 dark:text-slate-200 max-w-[140px] md:max-w-[220px] lg:max-w-xs xl:max-w-sm truncate text-sm">
                         {doleance.titre}
                       </td>
                       <td className="px-4 py-3.5 whitespace-nowrap text-center">
                         <StatusPill statut={getDisplayStatut(doleance)} />
                       </td>
-                      <td className="px-4 py-3.5 whitespace-nowrap text-slate-500 dark:text-slate-400 text-sm hidden xl:table-cell">
+                      <td className="px-4 py-3.5 whitespace-nowrap text-slate-500 dark:text-slate-400 text-sm hidden 2xl:table-cell">
                         {doleance.nom_direction || '—'}
                       </td>
                       <td className="px-4 py-3.5 whitespace-nowrap text-right">
                         <button
                           onClick={() => openTransferModal(doleance)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1E3A8A] text-white rounded-lg hover:bg-[#0F172A] transition-colors text-sm font-semibold shadow-sm"
+                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1E3A8A] text-white rounded-lg hover:bg-[#0F172A] transition-colors text-sm font-semibold shadow-sm whitespace-nowrap"
                         >
-                          <PaperAirplaneIcon className="h-3.5 w-3.5" />
+                          <PaperAirplaneIcon className="h-3.5 w-3.5 flex-shrink-0" />
                           Transférer
                         </button>
                       </td>
@@ -539,7 +535,7 @@ function Transfert() {
                   {doleancestransferts.length > 0 && (
                     <>
                       <tr>
-                        <td colSpan="8" className="px-4 py-2 bg-slate-50/70 dark:bg-slate-900/50 text-center text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">
+                        <td colSpan="7" className="px-4 py-2 bg-slate-50/70 dark:bg-slate-900/50 text-center text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">
                           Déjà transférées ou traitées
                         </td>
                       </tr>
@@ -554,25 +550,18 @@ function Transfert() {
                           <td className="px-4 py-2.5 whitespace-nowrap text-slate-400 dark:text-slate-500 text-sm hidden md:table-cell">
                             {getCategoryName(doleance.id_categorie)}
                           </td>
-                          <td className="px-4 py-2.5 text-slate-400 dark:text-slate-500 max-w-[160px] truncate text-sm">
+                          <td className="px-4 py-2.5 text-slate-400 dark:text-slate-500 max-w-[140px] md:max-w-[220px] lg:max-w-xs xl:max-w-sm truncate text-sm">
                             {doleance.titre}
                           </td>
                           <td className="px-4 py-2.5 whitespace-nowrap text-center">
                             <StatusPill statut={getDisplayStatut(doleance)} />
                           </td>
-                          <td className="px-4 py-2.5 whitespace-nowrap text-slate-400 dark:text-slate-500 text-sm hidden xl:table-cell">
+                          <td className="px-4 py-2.5 whitespace-nowrap text-slate-400 dark:text-slate-500 text-sm hidden 2xl:table-cell">
                             {doleance.nom_direction || '—'}
                           </td>
-                          <td className="px-4 py-2.5 text-slate-400 dark:text-slate-500 max-w-[200px] text-sm hidden lg:table-cell">
-                            {doleance.motif_transfert ? (
-                              <span className="italic text-xs bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-400 px-2 py-0.5 rounded-md" title={doleance.motif_transfert}>
-                                {doleance.motif_transfert.length > 40 ? doleance.motif_transfert.substring(0, 40) + '…' : doleance.motif_transfert}
-                              </span>
-                            ) : '—'}
-                          </td>
                           <td className="px-4 py-2.5 whitespace-nowrap text-right">
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-lg text-[10px] font-semibold">
-                              <CheckCircleIcon className="h-3 w-3" />
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-lg text-[10px] font-semibold whitespace-nowrap">
+                              <CheckCircleIcon className="h-3 w-3 flex-shrink-0" />
                               {normalizeStatut(doleance.nom_statut) === 'transferee' ? 'Transférée' : 'Traitée'}
                             </span>
                           </td>
@@ -640,37 +629,37 @@ function Transfert() {
           onClick={() => setShowTransferModal(false)}
         >
           <div
-            className="relative bg-white dark:bg-slate-800 rounded-t-3xl sm:rounded-2xl shadow-2xl max-w-md w-full p-6 animate-[slideUp_0.2s_ease-out]"
+            className="relative bg-white dark:bg-slate-800 rounded-t-3xl sm:rounded-2xl shadow-2xl max-w-md w-full p-5 sm:p-6 animate-[slideUp_0.2s_ease-out]"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex justify-between items-start mb-5">
-              <div className="flex items-center gap-3">
+            <div className="flex justify-between items-start mb-4 gap-3">
+              <div className="flex items-center gap-3 min-w-0">
                 <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
                   <BuildingOfficeIcon className="w-5 h-5 text-[#1E3A8A]" />
                 </div>
-                <div>
+                <div className="min-w-0">
                   <h3 className="text-base font-bold text-[#0F172A] dark:text-white">Transférer la doléance</h3>
                   <p className="text-sm text-slate-400 dark:text-slate-500">Choisissez la direction destinataire</p>
                 </div>
               </div>
               <button
                 onClick={() => setShowTransferModal(false)}
-                className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg p-1.5 transition-colors"
+                className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-lg p-1.5 transition-colors flex-shrink-0"
               >
                 <XMarkIcon className="h-5 w-5" />
               </button>
             </div>
 
-            <div className="mb-5 p-3.5 bg-slate-50 dark:bg-slate-900 rounded-xl text-sm space-y-1">
+            <div className="mb-4 p-3 bg-slate-50 dark:bg-slate-900 rounded-xl text-sm space-y-1">
               <p>
                 <span className="font-semibold text-slate-500 dark:text-slate-400">Réf.</span>{' '}
                 <span className="font-mono text-[#1E3A8A] font-semibold">{selectedDoleance.reference}</span>
               </p>
-              <p className="text-slate-700 dark:text-slate-200">{selectedDoleance.titre}</p>
+              <p className="text-slate-700 dark:text-slate-200 break-words">{selectedDoleance.titre}</p>
             </div>
 
             <form onSubmit={handleTransfert}>
-              <div className="mb-4">
+              <div className="mb-3">
                 <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1.5">
                   Direction destinataire <span className="text-rose-500">*</span>
                 </label>
@@ -689,14 +678,14 @@ function Transfert() {
                 </select>
               </div>
 
-              <div className="mb-6">
+              <div className="mb-5">
                 <label className="block text-sm font-bold text-slate-600 dark:text-slate-300 mb-1.5">
                   Motif du transfert <span className="text-slate-400 dark:text-slate-500 font-normal">(optionnel)</span>
                 </label>
                 <textarea
                   value={transferData.commentaire}
                   onChange={(e) => setTransferData({ ...transferData, commentaire: e.target.value })}
-                  rows="3"
+                  rows="2"
                   className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-900 border-2 border-transparent rounded-xl focus:outline-none focus:border-[#1E3A8A]/30 focus:bg-white dark:focus:bg-slate-800 transition-all text-sm resize-none"
                   placeholder="Précisez la raison du transfert..."
                 />
