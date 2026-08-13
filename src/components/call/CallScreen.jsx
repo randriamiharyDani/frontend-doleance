@@ -31,6 +31,7 @@ export default function CallScreen({
   isVideoOff,
   onToggleMute,
   onToggleVideo,
+  error,
 }) {
   const remoteVideoRef = useRef(null);
   const localVideoRef = useRef(null);
@@ -52,8 +53,11 @@ export default function CallScreen({
     idle: '',
     calling: 'Appel en cours...',
     ringing: 'Sonner...',
+    connecting: 'Connexion...',
     connected: formatDuration(callDuration),
     ended: 'Appel terminé',
+    failed: 'Erreur d\'appel',
+    rejected: 'Appel refusé',
   };
 
   return (
@@ -101,6 +105,12 @@ export default function CallScreen({
             </p>
           )}
         </div>
+
+        {error && (
+          <div className="max-w-sm text-center bg-red-500/20 border border-red-400/30 text-red-200 text-sm rounded-xl px-4 py-3">
+            {error}
+          </div>
+        )}
 
         <div className="flex items-center gap-4 mt-8">
           {isIncoming && status === 'ringing' ? (

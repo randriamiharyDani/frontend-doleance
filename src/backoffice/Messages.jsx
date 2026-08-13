@@ -4,10 +4,9 @@ import { useTranslation } from 'react-i18next';
 import { useTheme } from '../contexts/ThemeContext';
 import { useAuth } from '../contexts/AuthContext';
 import { useChat } from '../contexts/ChatContext';
-import useWebRTC from '../components/hooks/useWebRTC';
+import { useCall } from '../contexts/CallContext';
 import useChatSounds from '../components/hooks/useChatSounds';
-import CallScreen from '../components/call/CallScreen';
-import IncomingCallModal from '../components/call/IncomingCallModal';
+import chatService from '../services/chatService';
 import toast from 'react-hot-toast';
 import {
   MagnifyingGlassIcon,
@@ -22,6 +21,9 @@ import {
   DocumentIcon,
   EyeIcon,
   CheckCircleIcon,
+  ClockIcon,
+  ArrowDownTrayIcon,
+  ArrowUpTrayIcon,
 } from '@heroicons/react/24/outline';
 
 function formatTime(dateStr) {
@@ -77,9 +79,9 @@ export default function Messages() {
     loadContacts,
     loadMoreMessages,
     typingUsers,
-    incomingCall,
-    setIncomingCall,
   } = useChat();
+
+  const { startCall } = useCall();
 
   const [searchQuery, setSearchQuery] = useState('');
   const [messageText, setMessageText] = useState('');
@@ -87,7 +89,9 @@ export default function Messages() {
   const [previewFile, setPreviewFile] = useState(null);
   const [showMobileChat, setShowMobileChat] = useState(false);
   const [lightboxImage, setLightboxImage] = useState(null);
-  const [callInfo, setCallInfo] = useState(null);
+  const [showCallHistory, setShowCallHistory] = useState(false);
+  const [callHistory, setCallHistory] = useState([]);
+  const [callHistoryLoading, setCallHistoryLoading] = useState(false);
 
   const messagesEndRef = useRef(null);
   const fileInputRef = useRef(null);
@@ -96,20 +100,6 @@ export default function Messages() {
   const chatContainerRef = useRef(null);
 
   const sounds = useChatSounds();
-
-  const handleIncomingCall = useCallback((data) => {
-    setIncomingCall(data);
-  }, [setIncomingCall]);
-
-  const handleCallEnded = useCallback(() => {
-    setCallInfo(null);
-    sounds.playCallEnded();
-  }, [sounds]);
-
-  const webrtc = useWebRTC({
-    onIncomingCall: handleIncomingCall,
-    onCallEnded: handleCallEnded,
-  });
 
   const scrollToBottom = useCallback(() => {
     if (messagesEndRef.current) {
@@ -183,73 +173,48 @@ export default function Messages() {
     sounds.playMessageReceived();
   }, [selectContact, sounds]);
 
-  const handleStartCall = useCallback(async (type) => {
+  const handleStartCall = useCallback((type) => {
     if (!activeContact) return;
     const calleeId = activeContact.id_utilisateur || activeContact.id;
     const calleeName = `${activeContact.prenom || ''} ${activeContact.nom || ''}`.trim();
-    setCallInfo({
-      calleeId,
-      calleeName,
-      callType: type,
-      isIncoming: false,
-    });
-    sounds.playRinging();
+    startCall(calleeId, calleeName, type);
+  }, [activeContact, startCall]);
+
+  const openCallHistory = useCallback(async () => {
+    setShowCallHistory(true);
+    setCallHistoryLoading(true);
     try {
-      await webrtc.startCall(calleeId, type);
+      const res = await chatService.getCallHistory();
+      setCallHistory(res.data?.calls || []);
     } catch (err) {
-      console.error('Erreur appel:', err);
-      setCallInfo(null);
-      if (err.message?.includes('non supporté') || err.message?.includes('HTTPS')) {
-        toast.error(err.message);
-      } else {
-        toast.error('Impossible de démarrer l\'appel. Vérifiez votre connexion et les permissions caméra/micro.');
-      }
+      console.error('Erreur historique appels:', err);
+      toast.error('Impossible de charger l\'historique des appels');
+    } finally {
+      setCallHistoryLoading(false);
     }
-  }, [activeContact, webrtc, sounds]);
+  }, []);
 
-  const handleAcceptCall = useCallback(async () => {
-    if (!incomingCall) return;
-    const callId = incomingCall.call_id || incomingCall.id || incomingCall.callId;
-    const callerId = incomingCall.caller_id || incomingCall.sender_id || incomingCall.callerId;
-    const callerName = incomingCall.caller_name || incomingCall.sender_name || incomingCall.callerName || '';
-    const callType = incomingCall.call_type || incomingCall.callType || 'audio';
+  const formatCallDate = useCallback((dateStr) => {
+    if (!dateStr) return '';
+    const d = new Date(dateStr);
+    return d.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) + ' ' +
+      d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+  }, []);
 
-    setCallInfo({
-      callId,
-      callerId,
-      callerName,
-      callType,
-      isIncoming: true,
-    });
-    setIncomingCall(null);
-    sounds.playCallAccepted();
-    try {
-      await webrtc.acceptIncoming(callId, callerId, callType);
-    } catch (err) {
-      console.error('Erreur acceptation:', err);
-      setCallInfo(null);
-      if (err.message?.includes('non supporté') || err.message?.includes('HTTPS')) {
-        toast.error(err.message);
-      } else {
-        toast.error('Impossible d\'accepter l\'appel. Vérifiez vos permissions caméra/micro.');
-      }
-    }
-  }, [incomingCall, webrtc, sounds, setIncomingCall]);
+  const formatCallDuration = useCallback((seconds) => {
+    if (!seconds || seconds <= 0) return '';
+    const m = Math.floor(seconds / 60);
+    const s = seconds % 60;
+    return m > 0 ? `${m} min ${s}s` : `${s}s`;
+  }, []);
 
-  const handleRejectCall = useCallback(() => {
-    if (!incomingCall) return;
-    const callId = incomingCall.call_id || incomingCall.id || incomingCall.callId;
-    const callerId = incomingCall.caller_id || incomingCall.sender_id || incomingCall.callerId;
-    sounds.playCallRejected();
-    webrtc.rejectIncoming(callId, callerId);
-    setIncomingCall(null);
-  }, [incomingCall, webrtc, sounds, setIncomingCall]);
-
-  const handleEndCall = useCallback(() => {
-    sounds.playCallEnded();
-    webrtc.endCall();
-    setCallInfo(null);
-  }, [webrtc, sounds]);
+  const callStatusLabel = useCallback((call) => {
+    if (call.status === 'ended' || call.status === 'accepted') return 'Terminé';
+    if (call.status === 'missed') return 'Manqué';
+    if (call.status === 'rejected') return 'Refusé';
+    if (call.status === 'ringing') return 'Sans réponse';
+    return call.status || '';
+  }, []);
 
   const handleTextareaChange = useCallback((e) => {
     setMessageText(e.target.value);
@@ -263,38 +228,6 @@ export default function Messages() {
 
   return (
     <div className={`flex h-full ${darkMode ? 'bg-slate-900' : 'bg-gray-50'} `}>
-      {callInfo && (
-        <CallScreen
-          callId={callInfo.callId}
-          calleeId={callInfo.calleeId}
-          calleeName={callInfo.calleeName}
-          callerId={callInfo.callerId}
-          callerName={callInfo.callerName}
-          callType={callInfo.callType}
-          localStream={webrtc.localStream}
-          remoteStream={webrtc.remoteStream}
-          onEndCall={handleEndCall}
-          onAcceptCall={handleAcceptCall}
-          onRejectCall={handleRejectCall}
-          isIncoming={callInfo.isIncoming}
-          status={webrtc.callStatus}
-          callDuration={webrtc.callDuration}
-          isMuted={webrtc.isMuted}
-          isVideoOff={webrtc.isVideoOff}
-          onToggleMute={webrtc.toggleMute}
-          onToggleVideo={webrtc.toggleVideo}
-        />
-      )}
-
-      {incomingCall && !callInfo && (
-        <IncomingCallModal
-          callerName={incomingCall.caller_name || incomingCall.sender_name || incomingCall.callerName || ''}
-          callType={incomingCall.call_type || incomingCall.callType || 'audio'}
-          onAccept={handleAcceptCall}
-          onReject={handleRejectCall}
-        />
-      )}
-
       {lightboxImage && (
         <div
           className="fixed overflow-hidden inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm"
@@ -307,6 +240,98 @@ export default function Messages() {
             <XMarkIcon className="w-8 h-8" />
           </button>
           <img src={lightboxImage} alt="" className="max-w-[90vw] max-h-[90vh] object-contain rounded-lg" />
+        </div>
+      )}
+
+      {showCallHistory && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+          onClick={() => setShowCallHistory(false)}
+        >
+          <div
+            className={`w-full max-w-lg mx-4 max-h-[80vh] flex flex-col rounded-2xl shadow-2xl border overflow-hidden ${
+              darkMode ? 'bg-slate-800 border-slate-700' : 'bg-white border-gray-200'
+            }`}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className={`flex items-center justify-between px-5 py-4 border-b shrink-0 ${
+              darkMode ? 'border-slate-700' : 'border-gray-200'
+            }`}>
+              <div className="flex items-center gap-2">
+                <ClockIcon className={`w-5 h-5 ${darkMode ? 'text-blue-400' : 'text-blue-500'}`} />
+                <h3 className={`font-bold ${darkMode ? 'text-white' : 'text-slate-800'}`}>
+                  Historique des appels
+                </h3>
+              </div>
+              <button
+                onClick={() => setShowCallHistory(false)}
+                className={`p-1.5 rounded-full transition-colors ${
+                  darkMode ? 'hover:bg-slate-700 text-slate-400' : 'hover:bg-gray-100 text-gray-500'
+                }`}
+              >
+                <XMarkIcon className="w-5 h-5" />
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-y-auto">
+              {callHistoryLoading ? (
+                <div className="flex items-center justify-center py-12">
+                  <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin" />
+                </div>
+              ) : callHistory.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-12 px-6 text-center">
+                  <ClockIcon className={`w-12 h-12 mb-3 ${darkMode ? 'text-slate-600' : 'text-gray-300'}`} />
+                  <p className={`text-sm ${darkMode ? 'text-slate-400' : 'text-gray-500'}`}>
+                    Aucun appel enregistré pour le moment.
+                  </p>
+                </div>
+              ) : (
+                <ul className="divide-y divide-gray-100 dark:divide-slate-700">
+                  {callHistory.map((call) => {
+                    const name = `${call.prenom || ''} ${call.nom || ''}`.trim() || 'Utilisateur';
+                    const initials = name.split(' ').map(n => n[0]).join('').slice(0, 2).toUpperCase();
+                    const isOutgoing = call.direction === 'outgoing';
+                    const isEnded = call.status === 'ended' || call.status === 'accepted';
+                    const statusColor = call.status === 'missed'
+                      ? 'text-red-500'
+                      : call.status === 'rejected'
+                        ? 'text-orange-500'
+                        : isEnded
+                          ? 'text-emerald-500'
+                          : 'text-gray-500';
+
+                    return (
+                      <li key={call.id} className={`flex items-center gap-3 px-5 py-3 ${darkMode ? 'hover:bg-slate-700/50' : 'hover:bg-gray-50'}`}>
+                        <div className="w-11 h-11 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center font-semibold text-white flex-shrink-0">
+                          {initials}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2">
+                            <p className={`font-medium text-sm truncate ${darkMode ? 'text-white' : 'text-slate-800'}`}>
+                              {name}
+                            </p>
+                            {isOutgoing ? (
+                              <ArrowUpTrayIcon className="w-3.5 h-3.5 flex-shrink-0 text-gray-400" />
+                            ) : (
+                              <ArrowDownTrayIcon className="w-3.5 h-3.5 flex-shrink-0 text-gray-400" />
+                            )}
+                          </div>
+                          <p className={`text-xs truncate ${darkMode ? 'text-slate-400' : 'text-gray-500'}`}>
+                            {call.call_type === 'video' ? 'Appel vidéo' : 'Appel audio'}
+                            {call.duration_seconds > 0 ? ` · ${formatCallDuration(call.duration_seconds)}` : ''}
+                            <span className={`ml-2 ${statusColor}`}>{callStatusLabel(call)}</span>
+                          </p>
+                        </div>
+                        <span className={`text-xs flex-shrink-0 ${darkMode ? 'text-slate-400' : 'text-gray-400'}`}>
+                          {formatCallDate(call.started_at)}
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </div>
+          </div>
         </div>
       )}
 
@@ -436,6 +461,13 @@ export default function Messages() {
                 </p>
               </div>
               <div className="flex items-center gap-2">
+                <button
+                  onClick={openCallHistory}
+                  className="p-2 rounded-full hover:bg-blue-50 dark:hover:bg-slate-700 text-blue-500 transition-colors"
+                  title={t('chat.callHistory') || 'Historique des appels'}
+                >
+                  <ClockIcon className="w-5 h-5" />
+                </button>
                 <button
                   onClick={() => handleStartCall('audio')}
                   className="p-2 rounded-full hover:bg-blue-50 dark:hover:bg-slate-700 text-blue-500 transition-colors"

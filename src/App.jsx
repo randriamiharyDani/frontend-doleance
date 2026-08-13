@@ -36,6 +36,7 @@ import Corbeille from './backoffice/Corbeille';
 import Categories from './backoffice/Categories';
 import Messages from './backoffice/Messages';
 import { ChatProvider } from './contexts/ChatContext';
+import { CallProvider } from './contexts/CallContext';
 import PrivateRoute from './components/PrivateRoute';
 
 function AppRoutes() {
@@ -85,7 +86,9 @@ function App() {
     <AuthProvider>
       <ThemeProvider>
         <StatsProvider>
-          <AppRoutes />
+          <CallProvider>
+            <AppRoutes />
+          </CallProvider>
           <Toaster 
             position="top-right"
             toastOptions={{

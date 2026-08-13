@@ -40,6 +40,13 @@ class SocketManager {
       timeout: 10000,
     });
 
+    // Ré-appliquer les écouteurs enregistrés avant la connexion
+    Object.keys(this.eventListeners).forEach((event) => {
+      this.eventListeners[event].forEach((callback) => {
+        if (typeof callback === 'function') this.socket.on(event, callback);
+      });
+    });
+
     // Événements de connexion
     this.socket.on('connect', () => {
       this.connected = true;
@@ -317,23 +324,23 @@ class SocketManager {
   }
 
   on(event, callback) {
+    if (!this.eventListeners[event]) {
+      this.eventListeners[event] = [];
+    }
+    this.eventListeners[event].push(callback);
     if (this.socket) {
       this.socket.on(event, callback);
-      if (!this.eventListeners[event]) {
-        this.eventListeners[event] = [];
-      }
-      this.eventListeners[event].push(callback);
     }
   }
 
   off(event, callback) {
     if (this.socket) {
       this.socket.off(event, callback);
-      if (this.eventListeners[event]) {
-        this.eventListeners[event] = this.eventListeners[event].filter(
-          cb => cb !== callback
-        );
-      }
+    }
+    if (this.eventListeners[event]) {
+      this.eventListeners[event] = this.eventListeners[event].filter(
+        cb => cb !== callback
+      );
     }
   }
 

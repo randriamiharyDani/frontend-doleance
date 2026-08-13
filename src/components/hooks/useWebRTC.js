@@ -9,7 +9,7 @@ const ICE_SERVERS = {
   ],
 };
 
-export default function useWebRTC({ onIncomingCall, onCallAccepted, onCallRejected, onCallEnded } = {}) {
+export default function useWebRTC({ onIncomingCall, onCallAccepted, onCallRejected, onCallEnded, onCallFailed } = {}) {
   const [localStream, setLocalStream] = useState(null);
   const [remoteStream, setRemoteStream] = useState(null);
   const [callStatus, setCallStatus] = useState('idle');
@@ -23,8 +23,8 @@ export default function useWebRTC({ onIncomingCall, onCallAccepted, onCallReject
   const remoteUserRef = useRef(null);
   const offerRef = useRef(null);
   const pendingCandidatesRef = useRef([]);
-  const callbacksRef = useRef({ onIncomingCall, onCallAccepted, onCallRejected, onCallEnded });
-  callbacksRef.current = { onIncomingCall, onCallAccepted, onCallRejected, onCallEnded };
+  const callbacksRef = useRef({ onIncomingCall, onCallAccepted, onCallRejected, onCallEnded, onCallFailed });
+  callbacksRef.current = { onIncomingCall, onCallAccepted, onCallRejected, onCallEnded, onCallFailed };
 
   const clearTimer = useCallback(() => {
     if (timerRef.current) {
@@ -133,7 +133,10 @@ export default function useWebRTC({ onIncomingCall, onCallAccepted, onCallReject
       if (state === 'connected') {
         setCallStatus('connected');
         startTimer();
-      } else if (state === 'disconnected' || state === 'failed' || state === 'closed') {
+      } else if (state === 'failed') {
+        setCallStatus('failed');
+        if (callbacksRef.current.onCallFailed) callbacksRef.current.onCallFailed();
+      } else if (state === 'disconnected' || state === 'closed') {
         setCallStatus('ended');
         if (callbacksRef.current.onCallEnded) callbacksRef.current.onCallEnded();
       }
@@ -213,6 +216,7 @@ export default function useWebRTC({ onIncomingCall, onCallAccepted, onCallReject
     } catch (err) {
       console.error('Erreur démarrage appel:', err);
       cleanup();
+      throw err;
     }
   }, [getMedia, createPeerConnection, flushPendingCandidates, startTimer, cleanup]);
 
@@ -224,6 +228,7 @@ export default function useWebRTC({ onIncomingCall, onCallAccepted, onCallReject
       const pc = createPeerConnection(stream);
       callIdRef.current = callId;
       remoteUserRef.current = callerId;
+      setCallStatus('connecting');
 
       // Accepter l'appel dans la DB
       await chatService.callAction(callId, 'accept');

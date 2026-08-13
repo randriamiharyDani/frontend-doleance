@@ -16,7 +16,6 @@ export const ChatProvider = ({ children }) => {
   const [unreadTotal, setUnreadTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [typingUsers, setTypingUsers] = useState({});
-  const [incomingCall, setIncomingCall] = useState(null);
 
   const messagesRef = useRef([]);
   const activeContactRef = useRef(null);
@@ -159,14 +158,6 @@ export const ChatProvider = ({ children }) => {
       }, 3000);
     };
 
-    const handleIncomingCall = (data) => {
-      setIncomingCall(data);
-    };
-
-    const handleCallEnd = () => {
-      setIncomingCall(null);
-    };
-
     const handleOnlineUsersUpdate = (onlineUsersList) => {
       const onlineIds = new Set(onlineUsersList.map(u => u.userId));
       setContacts(prev => prev.map(c => ({
@@ -178,11 +169,6 @@ export const ChatProvider = ({ children }) => {
     socket.on('online-users-updated', handleOnlineUsersUpdate);
     socket.on('new-message', handleNewMessage);
     socket.on('chat-typing', handleTyping);
-    socket.on('incoming-call', handleIncomingCall);
-    socket.on('call-invite', handleIncomingCall);
-    socket.on('call-accept', handleCallEnd);
-    socket.on('call-reject', handleCallEnd);
-    socket.on('call-end', handleCallEnd);
 
     loadContacts();
 
@@ -215,11 +201,6 @@ export const ChatProvider = ({ children }) => {
       socket.off('online-users-updated', handleOnlineUsersUpdate);
       socket.off('new-message', handleNewMessage);
       socket.off('chat-typing', handleTyping);
-      socket.off('incoming-call', handleIncomingCall);
-      socket.off('call-invite', handleIncomingCall);
-      socket.off('call-accept', handleCallEnd);
-      socket.off('call-reject', handleCallEnd);
-      socket.off('call-end', handleCallEnd);
       clearInterval(pollMessagesRef.current);
       clearInterval(pollContactsRef.current);
     };
@@ -237,8 +218,6 @@ export const ChatProvider = ({ children }) => {
       loadContacts,
       loadMoreMessages,
       typingUsers,
-      incomingCall,
-      setIncomingCall,
     }}>
       {children}
     </ChatContext.Provider>
