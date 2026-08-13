@@ -21,6 +21,8 @@ export default function useWebRTC({ onIncomingCall, onCallAccepted, onCallReject
   const timerRef = useRef(null);
   const callIdRef = useRef(null);
   const remoteUserRef = useRef(null);
+  const offerRef = useRef(null);
+  const pendingCandidatesRef = useRef([]);
   const callbacksRef = useRef({ onIncomingCall, onCallAccepted, onCallRejected, onCallEnded });
   callbacksRef.current = { onIncomingCall, onCallAccepted, onCallRejected, onCallEnded };
 
@@ -58,6 +60,8 @@ export default function useWebRTC({ onIncomingCall, onCallAccepted, onCallReject
     setIsVideoOff(false);
     callIdRef.current = null;
     remoteUserRef.current = null;
+    offerRef.current = null;
+    pendingCandidatesRef.current = [];
   }, [clearTimer]);
 
   const getMedia = useCallback(async (video = false) => {
@@ -145,6 +149,15 @@ export default function useWebRTC({ onIncomingCall, onCallAccepted, onCallReject
     return pc;
   }, [startTimer]);
 
+  const flushPendingCandidates = useCallback(async () => {
+    const pc = pcRef.current;
+    if (!pc) return;
+    while (pendingCandidatesRef.current.length) {
+      const candidate = pendingCandidatesRef.current.shift();
+      try { await pc.addIceCandidate(candidate); } catch (e) { /* ignore */ }
+    }
+  }, []);
+
   // Appeler quelqu'un
   const startCall = useCallback(async (calleeId, callType = 'audio') => {
     try {
@@ -160,25 +173,54 @@ export default function useWebRTC({ onIncomingCall, onCallAccepted, onCallReject
       callIdRef.current = callId;
       remoteUserRef.current = calleeId;
 
+      const offerData = { sdp: offer.sdp, type: offer.type };
+
       // Envoyer l'offre via socket
       socket.emit('call-signal', {
         call_id: callId,
         receiver_id: calleeId,
         signal_type: 'offer',
-        signal_data: { sdp: offer.sdp, type: offer.type },
+        signal_data: offerData,
       });
 
+      // Persister l'offre en base (repli si l'événement socket est manqué)
+      chatService.sendSignal(callId, calleeId, 'offer', offerData).catch(() => {});
+
       setCallStatus('calling');
+
+      // Repli : interroger la base pour récupérer la réponse si le socket ne passe pas
+      (async () => {
+        for (let i = 0; i < 15; i++) {
+          await new Promise(r => setTimeout(r, 1000));
+          if (callIdRef.current !== callId || !pcRef.current || pcRef.current.remoteDescription) return;
+          try {
+            const res = await chatService.getSignals(callId);
+            const signals = res.data?.signals || res.data || [];
+            const answerSignal = signals.find(s => s.signal_type === 'answer');
+            if (answerSignal) {
+              const sdpData = typeof answerSignal.signal_data === 'string'
+                ? JSON.parse(answerSignal.signal_data)
+                : answerSignal.signal_data;
+              await pcRef.current.setRemoteDescription(new RTCSessionDescription(sdpData));
+              await flushPendingCandidates();
+              setCallStatus('connected');
+              startTimer();
+              return;
+            }
+          } catch (e) { /* ignore */ }
+        }
+      })();
     } catch (err) {
       console.error('Erreur démarrage appel:', err);
       cleanup();
     }
-  }, [getMedia, createPeerConnection, cleanup]);
+  }, [getMedia, createPeerConnection, flushPendingCandidates, startTimer, cleanup]);
 
   // Accepter un appel entrant
-  const acceptIncoming = useCallback(async (callId, callerId) => {
+  const acceptIncoming = useCallback(async (callId, callerId, callType = 'video') => {
     try {
-      const stream = await getMedia(true);
+      const video = callType === 'video';
+      const stream = await getMedia(video);
       const pc = createPeerConnection(stream);
       callIdRef.current = callId;
       remoteUserRef.current = callerId;
@@ -186,37 +228,49 @@ export default function useWebRTC({ onIncomingCall, onCallAccepted, onCallReject
       // Accepter l'appel dans la DB
       await chatService.callAction(callId, 'accept');
 
-      // Récupérer les signaux (l'offre)
+      // Récupérer l'offre (reçue via socket, sinon en base)
+      let offerSignal = offerRef.current;
+      offerRef.current = null;
+
       let retries = 5;
-      let offerSignal = null;
-      while (retries > 0 && !offerSignal) {
-        const res = await chatService.getSignals(callId);
-        const signals = res.data?.signals || res.data || [];
-        offerSignal = signals.find(s => s.signal_type === 'offer');
+      while (!offerSignal && retries > 0) {
+        try {
+          const res = await chatService.getSignals(callId);
+          const signals = res.data?.signals || res.data || [];
+          offerSignal = signals.find(s => s.signal_type === 'offer');
+        } catch (e) { /* ignore */ }
         if (!offerSignal) {
           await new Promise(r => setTimeout(r, 500));
           retries--;
         }
       }
 
-      if (offerSignal) {
-        const sdpData = typeof offerSignal.signal_data === 'string'
-          ? JSON.parse(offerSignal.signal_data)
-          : offerSignal.signal_data;
-
-        await pc.setRemoteDescription(new RTCSessionDescription(sdpData));
-
-        const answer = await pc.createAnswer();
-        await pc.setLocalDescription(answer);
-
-        // Envoyer la réponse via socket
-        socket.emit('call-signal', {
-          call_id: callId,
-          receiver_id: callerId,
-          signal_type: 'answer',
-          signal_data: { sdp: answer.sdp, type: answer.type },
-        });
+      if (!offerSignal) {
+        throw new Error('Offre WebRTC introuvable');
       }
+
+      const sdpData = typeof offerSignal.signal_data === 'string'
+        ? JSON.parse(offerSignal.signal_data)
+        : offerSignal.signal_data;
+
+      await pc.setRemoteDescription(new RTCSessionDescription(sdpData));
+      await flushPendingCandidates();
+
+      const answer = await pc.createAnswer();
+      await pc.setLocalDescription(answer);
+
+      const answerData = { sdp: answer.sdp, type: answer.type };
+
+      // Envoyer la réponse via socket
+      socket.emit('call-signal', {
+        call_id: callId,
+        receiver_id: callerId,
+        signal_type: 'answer',
+        signal_data: answerData,
+      });
+
+      // Persister la réponse en base (repli)
+      chatService.sendSignal(callId, callerId, 'answer', answerData).catch(() => {});
 
       setCallStatus('connected');
       startTimer();
@@ -229,8 +283,9 @@ export default function useWebRTC({ onIncomingCall, onCallAccepted, onCallReject
     } catch (err) {
       console.error('Erreur acceptation appel:', err);
       cleanup();
+      throw err;
     }
-  }, [getMedia, createPeerConnection, startTimer, cleanup]);
+  }, [getMedia, createPeerConnection, flushPendingCandidates, startTimer, cleanup]);
 
   // Refuser un appel entrant
   const rejectIncoming = useCallback(async (callId, callerId) => {
@@ -282,12 +337,24 @@ export default function useWebRTC({ onIncomingCall, onCallAccepted, onCallReject
     const handleCallSignal = async (data) => {
       const { signal_type, signal_data, senderId, call_id } = data;
 
-      if (signal_type === 'answer' && pcRef.current) {
+      if (signal_type === 'offer') {
+        const sdpData = typeof signal_data === 'string'
+          ? JSON.parse(signal_data)
+          : signal_data;
+        if (pcRef.current && pcRef.current.remoteDescription) {
+          try {
+            await pcRef.current.setRemoteDescription(new RTCSessionDescription(sdpData));
+          } catch (e) { console.error('Erreur offer:', e); }
+        } else {
+          offerRef.current = sdpData;
+        }
+      } else if (signal_type === 'answer' && pcRef.current) {
         try {
           const sdpData = typeof signal_data === 'string'
             ? JSON.parse(signal_data)
             : signal_data;
           await pcRef.current.setRemoteDescription(new RTCSessionDescription(sdpData));
+          await flushPendingCandidates();
           setCallStatus('connected');
         } catch (e) { console.error('Erreur answer:', e); }
       } else if (signal_type === 'ice-candidate' && pcRef.current) {
@@ -295,7 +362,11 @@ export default function useWebRTC({ onIncomingCall, onCallAccepted, onCallReject
           const candidateData = typeof signal_data === 'string'
             ? JSON.parse(signal_data)
             : signal_data;
-          await pcRef.current.addIceCandidate(new RTCIceCandidate(candidateData));
+          if (pcRef.current.remoteDescription) {
+            await pcRef.current.addIceCandidate(new RTCIceCandidate(candidateData));
+          } else {
+            pendingCandidatesRef.current.push(new RTCIceCandidate(candidateData));
+          }
         } catch (e) {
           // Ignore non-critical ICE errors
         }
@@ -333,7 +404,7 @@ export default function useWebRTC({ onIncomingCall, onCallAccepted, onCallReject
       socket.off('call-end', handleCallEnd);
       cleanup();
     };
-  }, []);
+  }, [flushPendingCandidates, cleanup]);
 
   return {
     localStream,

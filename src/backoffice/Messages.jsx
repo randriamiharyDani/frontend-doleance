@@ -209,9 +209,9 @@ export default function Messages() {
 
   const handleAcceptCall = useCallback(async () => {
     if (!incomingCall) return;
-    const callId = incomingCall.call_id || incomingCall.id;
-    const callerId = incomingCall.caller_id || incomingCall.caller_id || incomingCall.sender_id;
-    const callerName = incomingCall.caller_name || incomingCall.sender_name || '';
+    const callId = incomingCall.call_id || incomingCall.id || incomingCall.callId;
+    const callerId = incomingCall.caller_id || incomingCall.sender_id || incomingCall.callerId;
+    const callerName = incomingCall.caller_name || incomingCall.sender_name || incomingCall.callerName || '';
     const callType = incomingCall.call_type || incomingCall.callType || 'audio';
 
     setCallInfo({
@@ -224,7 +224,7 @@ export default function Messages() {
     setIncomingCall(null);
     sounds.playCallAccepted();
     try {
-      await webrtc.acceptIncoming(callId, callerId);
+      await webrtc.acceptIncoming(callId, callerId, callType);
     } catch (err) {
       console.error('Erreur acceptation:', err);
       setCallInfo(null);
@@ -238,8 +238,8 @@ export default function Messages() {
 
   const handleRejectCall = useCallback(() => {
     if (!incomingCall) return;
-    const callId = incomingCall.call_id || incomingCall.id;
-    const callerId = incomingCall.caller_id || incomingCall.sender_id;
+    const callId = incomingCall.call_id || incomingCall.id || incomingCall.callId;
+    const callerId = incomingCall.caller_id || incomingCall.sender_id || incomingCall.callerId;
     sounds.playCallRejected();
     webrtc.rejectIncoming(callId, callerId);
     setIncomingCall(null);
@@ -288,8 +288,8 @@ export default function Messages() {
 
       {incomingCall && !callInfo && (
         <IncomingCallModal
-          callerName={incomingCall.caller_name || incomingCall.sender_name || ''}
-          callType={incomingCall.call_type || 'audio'}
+          callerName={incomingCall.caller_name || incomingCall.sender_name || incomingCall.callerName || ''}
+          callType={incomingCall.call_type || incomingCall.callType || 'audio'}
           onAccept={handleAcceptCall}
           onReject={handleRejectCall}
         />
