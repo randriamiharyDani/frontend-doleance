@@ -12,6 +12,7 @@ import PublicLayout from './components/public/PublicLayout';
 import DeposerDoleance from './public/DeposerDoleance';
 import SuiviDoleance from './public/SuiviDoleance';
 import ToutesDoleances from './public/ToutesDoleances';
+import AppelerAgent from './public/AppelerAgent';
 import Login from './pages/Login';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
@@ -51,6 +52,7 @@ function AppRoutes() {
       <Route path="/suivi-doleance" element={<PublicLayout><SuiviDoleance /></PublicLayout>} />
       <Route path="/suivi-doleance/:reference" element={<PublicLayout><SuiviDoleance /></PublicLayout>} />
       <Route path="/toutes-doleances" element={<PublicLayout><ToutesDoleances /></PublicLayout>} />
+      <Route path="/appeler-agent" element={<PublicLayout><AppelerAgent /></PublicLayout>} />
       
       {/* Routes back-office */}
       <Route path="/backoffice" element={<PrivateRoute><BackofficeLayout /></PrivateRoute>}>

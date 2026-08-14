@@ -1,5 +1,5 @@
 // src/backoffice/Settings.jsx
-import React, { useState, useMemo } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import {
@@ -14,9 +14,11 @@ import {
   CalendarDaysIcon,
   ShieldCheckIcon,
   CheckCircleIcon,
+  PhoneIcon,
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import api from '../services/api';
+import citoyenCallService from '../services/citoyenCallService';
 
 // ---- Design tokens ---------------------------------------------------
 // Même identité que les autres écrans du backoffice : navy #1E3A8A /
@@ -45,6 +47,48 @@ function Settings() {
     newPassword: '',
     confirmPassword: '',
   });
+
+  // ===== Appels citoyens (Admin) =====
+  const isAdmin = ['administrateur_systeme', 'administrateur', 'agent_central'].includes(user?.role);
+  const [callConfig, setCallConfig] = useState(null);
+  const [callAgents, setCallAgents] = useState([]);
+  const [callLoading, setCallLoading] = useState(false);
+  const [callSaving, setCallSaving] = useState(false);
+  const [selectedAgentId, setSelectedAgentId] = useState('');
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    let mounted = true;
+    citoyenCallService.getRecipient()
+      .then((res) => {
+        if (!mounted) return;
+        const config = res?.data?.config || res?.config || null;
+        const agents = res?.data?.agents || res?.agents || [];
+        setCallConfig(config);
+        setCallAgents(agents);
+        setSelectedAgentId(config?.id_utilisateur ? String(config.id_utilisateur) : '');
+      })
+      .catch(() => {});
+    return () => { mounted = false; };
+  }, [isAdmin]);
+
+  const handleSaveRecipient = async () => {
+    if (!selectedAgentId) {
+      toast.error('Veuillez choisir un agent destinataire');
+      return;
+    }
+    setCallSaving(true);
+    try {
+      const res = await citoyenCallService.updateRecipient(Number(selectedAgentId));
+      const config = res?.data?.config || res?.config || null;
+      setCallConfig(config);
+      toast.success('Agent destinataire mis à jour');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Erreur lors de la mise à jour');
+    } finally {
+      setCallSaving(false);
+    }
+  };
 
   const strength = useMemo(() => passwordStrength(passwordData.newPassword), [passwordData.newPassword]);
   const strengthColors = ['bg-rose-400', 'bg-orange-400', 'bg-amber-400', 'bg-lime-500', 'bg-emerald-500'];
@@ -227,6 +271,79 @@ function Settings() {
           </form>
         </div>
       </div>
+
+      {/* Appels citoyens (Admin) */}
+      {isAdmin && (
+        <div className="card">
+          <div className="flex items-center gap-3 px-5 sm:px-6 py-4 border-b border-gray-100 dark:border-slate-700">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-emerald-50 dark:bg-emerald-900/30">
+              <PhoneIcon className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
+            </div>
+            <div>
+              <h2 className="font-bold text-gray-900 dark:text-white text-sm">Appels citoyens</h2>
+              <p className="text-xs text-gray-400">
+                Configurez l'agent destinataire des appels directs Citoyen → Agent
+              </p>
+            </div>
+          </div>
+          <div className="p-5 sm:p-6">
+            {callConfig && (
+              <div className="mb-4 rounded-xl bg-gray-50 dark:bg-slate-800/60 border border-gray-100 dark:border-slate-700 p-4">
+                <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
+                  Agent destinataire actuel
+                </p>
+                <div className="mt-2 flex items-center justify-between gap-3 flex-wrap">
+                  <div>
+                    <p className="text-sm font-bold text-gray-900 dark:text-white">
+                      {`${callConfig.prenom || ''} ${callConfig.nom || ''}`.trim() || callConfig.email || '—'}
+                    </p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                      {[callConfig.email, callConfig.nom_direction || callConfig.direction]
+                        .filter(Boolean)
+                        .join(' • ')}
+                    </p>
+                  </div>
+                  <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                    callConfig.disponible
+                      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-400'
+                      : 'bg-gray-100 text-gray-500 dark:bg-slate-700 dark:text-slate-400'
+                  }`}>
+                    <span className={`w-1.5 h-1.5 rounded-full ${callConfig.disponible ? 'bg-emerald-500' : 'bg-gray-400'}`} />
+                    {callConfig.disponible ? 'En ligne' : 'Hors ligne'}
+                  </span>
+                </div>
+              </div>
+            )}
+
+            <label className="label">Choisir l'agent destinataire</label>
+            <div className="flex items-center gap-3">
+              <select
+                value={selectedAgentId}
+                onChange={(e) => setSelectedAgentId(e.target.value)}
+                className="input flex-1"
+                disabled={callLoading}
+              >
+                <option value="">— Sélectionner un agent —</option>
+                {callAgents.map((a) => (
+                  <option key={a.id_utilisateur} value={a.id_utilisateur}>
+                    {`${a.prenom || ''} ${a.nom || ''}`.trim()} — {a.email}
+                    {a.disponible ? ' (en ligne)' : ''}
+                  </option>
+                ))}
+              </select>
+              <button
+                type="button"
+                onClick={handleSaveRecipient}
+                disabled={callSaving || !selectedAgentId}
+                className="btn-primary btn-md whitespace-nowrap"
+              >
+                {callSaving && <div className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin mr-1.5" />}
+                {callSaving ? 'Enregistrement...' : 'Enregistrer'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Infos du compte */}
       <div className="card">

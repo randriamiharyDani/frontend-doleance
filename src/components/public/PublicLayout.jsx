@@ -12,6 +12,7 @@ import {
   SunIcon,
   MoonIcon,
   ShieldCheckIcon,
+  PhoneIcon,
 } from "@heroicons/react/24/outline";
 
 function PublicLayout({ children }) {
@@ -41,6 +42,11 @@ function PublicLayout({ children }) {
       label: t("nav.track"),
       path: "/suivi-doleance",
       icon: MagnifyingGlassIcon,
+    },
+    {
+      label: t("nav.callAgent"),
+      path: "/appeler-agent",
+      icon: PhoneIcon,
     },
   ];
 

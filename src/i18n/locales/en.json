@@ -238,5 +238,52 @@
     "refresh": "Refresh",
     "export": "Export",
     "import": "Import"
+  },
+  "nav": {
+    "submit": "Submit a complaint",
+    "all": "All complaints",
+    "track": "Track my complaint",
+    "callAgent": "Call an agent"
+  },
+  "citizenCall": {
+    "badge": "Direct call",
+    "title": "Call an agent",
+    "subtitle": "Talk directly to a City agent, without an account and without filing a complaint.",
+    "agentName": "Agent Commune Urbaine of Antananarivo",
+    "available": "Agent {{agent}} is available.",
+    "unavailable": "No agent available. Try again later.",
+    "noAgent": "No agent available right now. Try again later.",
+    "callAudio": "Audio call",
+    "callVideo": "Video call",
+    "calling": "Calling...",
+    "connecting": "Connecting to the service...",
+    "inCall": "In conversation with {{agent}}",
+    "endCall": "Hang up",
+    "mute": "Mute microphone",
+    "unmute": "Unmute microphone",
+    "cameraOn": "Camera on",
+    "cameraOff": "Camera off",
+    "rejected": "Call rejected",
+    "missed": "Missed call",
+    "failed": "Call failed. Please try again.",
+    "noAnswer": "No answer. Please try again.",
+    "cancelled": "Call cancelled",
+    "ended": "Call ended",
+    "callAgain": "Call again",
+    "loading": "Loading...",
+    "noAccountHint": "No account required: your call is automatically forwarded to the duty agent.",
+    "infoTitle": "How does it work?",
+    "infoText": "Click \"Call an agent\". The call is automatically sent to the duty agent of the City. Once accepted, you are connected. Use a microphone for the best experience."
+  },
+  "adminCitizenCall": {
+    "title": "Citizen calls",
+    "subtitle": "Configure the recipient agent for direct Citizen → Agent calls",
+    "currentRecipient": "Current recipient agent",
+    "selectAgent": "Choose the recipient agent",
+    "save": "Save",
+    "saved": "Recipient agent updated",
+    "available": "Online",
+    "unavailable": "Offline",
+    "noRecipient": "No recipient agent configured"
   }
 }
