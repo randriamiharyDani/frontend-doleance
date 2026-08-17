@@ -122,7 +122,7 @@ function Transfert() {
   const [loading, setLoading] = useState(true);
   const [selectedDoleance, setSelectedDoleance] = useState(null);
   const [showTransferModal, setShowTransferModal] = useState(false);
-  const [filters, setFilters] = useState({ categorie: '', search: '', statut: 'all' });
+  const [filters, setFilters] = useState({ categorie: '', search: '', statut: '' });
   const [categories, setCategories] = useState([]);
   const [statuts, setStatuts] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
@@ -217,7 +217,7 @@ function Transfert() {
       };
       if (!params.categorie) delete params.categorie;
       if (!params.search) delete params.search;
-      if (!params.statut || params.statut === 'all') delete params.statut;
+      if (!params.statut) delete params.statut;
 
       const response = await api.get('/doleances', { params });
 
@@ -337,7 +337,7 @@ function Transfert() {
     toast.success('Données rafraîchies');
   };
 
-  const hasActiveFilters = filters.categorie || filters.search || (filters.statut && filters.statut !== 'all');
+  const hasActiveFilters = filters.categorie || filters.search || filters.statut;
 
   const doleancesNontransferts = doleances.filter((d) => canTransfer(d.nom_statut));
   const doleancestransferts = doleances.filter((d) => !canTransfer(d.nom_statut));
@@ -431,10 +431,10 @@ function Transfert() {
                 onChange={(e) => setFilters((prev) => ({ ...prev, statut: e.target.value }))}
                 className="w-full px-3 py-2.5 bg-slate-50 dark:bg-slate-900 border-2 border-transparent rounded-xl text-sm outline-none focus:border-[#1E3A8A]/30 focus:bg-white dark:focus:bg-slate-800 transition-all"
               >
-                <option value="all">Tous statuts</option>
+                <option value="">Tous statuts</option>
                 {statuts.map((stat) => (
-                  <option key={stat.id_statut} value={stat.nom_statut}>
-                    {STATUS_LABELS[stat.nom_statut] || stat.nom_statut}
+                  <option key={stat.id_statut} value={stat.id_statut}>
+                    {stat.nom_statut}
                   </option>
                 ))}
               </select>
@@ -454,7 +454,7 @@ function Transfert() {
             </div>
             <div className="flex items-end">
               <button
-                onClick={() => setFilters({ categorie: '', search: '', statut: 'all' })}
+                onClick={() => setFilters({ categorie: '', search: '', statut: '' })}
                 disabled={!hasActiveFilters}
                 className="w-full px-4 py-2.5 text-slate-600 dark:text-slate-300 bg-slate-50 dark:bg-slate-900 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 text-sm font-semibold transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
               >
