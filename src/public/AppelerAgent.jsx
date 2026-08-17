@@ -78,7 +78,7 @@ export default function AppelerAgent() {
           <PhoneIcon className="w-3.5 h-3.5" />
           {t('citizenCall.badge')}
         </div>
-        <h1 className="cua-display text-3xl sm:text-4xl font-semibold text-[#0F172A] dark:text-white">
+        <h1 className="cua-display text-xl sm:text-2xl font-semibold text-[#0F172A] dark:text-white">
           {t('citizenCall.title')}
         </h1>
         <p className={`mt-2 text-sm sm:text-base ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>

@@ -18,6 +18,7 @@ import {
   ClockIcon,
   TrashIcon,
   TagIcon,
+  PhoneIcon,
 } from "@heroicons/react/24/outline";
 import Navbar from "../components/backoffice/Navbar";
 
@@ -433,6 +434,35 @@ function BackofficeLayout() {
   </div>
 
 
+
+  {/* Appels citoyens — admin / agent_central uniquement */}
+  {['administrateur_systeme', 'administrateur', 'agent_central'].includes(userRole) && (
+  <div className="mt-4">
+    <Link
+      to="/backoffice/appels-citoyens"
+      onClick={() => isMobile && setSidebarOpen(false)}
+      className={`relative w-full flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group ${
+        isActive("/backoffice/appels-citoyens")
+          ? "bg-[#D4AF37] text-white shadow-md shadow-[#D4AF37]/20"
+          : "text-white/70 hover:bg-[#D4AF37]/20 hover:text-white hover:shadow-lg hover:shadow-[#D4AF37]/25"
+      }`}
+    >
+      {isActive("/backoffice/appels-citoyens") && (
+        <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 bg-white rounded-r-full" />
+      )}
+      <PhoneIcon
+        className={`h-5 w-5 mr-3 flex-shrink-0 ${
+          isActive("/backoffice/appels-citoyens")
+            ? "text-white"
+            : "text-white/40 group-hover:text-white"
+        }`}
+      />
+      <span className="text-sm font-medium">
+        Appels citoyens
+      </span>
+    </Link>
+  </div>
+  )}
 
   {/* Paramètres */}
   <div className="mt-4">

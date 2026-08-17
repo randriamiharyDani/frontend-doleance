@@ -35,6 +35,7 @@ import Historique from './backoffice/Historique';
 import AjouterDoleance from './backoffice/AjouterDoleance';
 import Corbeille from './backoffice/Corbeille';
 import Categories from './backoffice/Categories';
+import AppelsCitoyens from './backoffice/AppelsCitoyens';
 import Messages from './backoffice/Messages';
 import { ChatProvider } from './contexts/ChatContext';
 import { CallProvider } from './contexts/CallContext';
@@ -66,6 +67,7 @@ function AppRoutes() {
         <Route path="roles" element={<PrivateRoute allowedRoles={['administrateur_systeme']} allowedPermissions={[{ module: 'users', action: 'manage_roles' }]}><Roles /></PrivateRoute>} />
         <Route path="statistiques" element={<Statistiques />} />
         <Route path="historique" element={<Historique />} />
+        <Route path="appels-citoyens" element={<PrivateRoute allowedRoles={['administrateur_systeme', 'administrateur', 'agent_central']}><AppelsCitoyens /></PrivateRoute>} />
         <Route path="directions" element={<PrivateRoute allowedPermissions={[{ module: 'directions', action: 'view_team' }]}><Directions /></PrivateRoute>} />
         <Route path="direction/:id_direction" element={<PrivateRoute allowedPermissions={[{ module: 'directions', action: 'view_team' }]}><DirectionDoleances /></PrivateRoute>} />
         <Route path="transfert" element={<PrivateRoute allowedPermissions={[{ module: 'doleances', action: 'transfer' }]}><Transfert /></PrivateRoute>} />

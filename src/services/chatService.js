@@ -16,6 +16,9 @@ const chatService = {
   callAction: (callId, action) => api.post('/chat/calls/action', { call_id: callId, action }),
   getCallStatus: (callId) => api.get(`/chat/calls/status${callId ? `?call_id=${callId}` : ''}`),
   getCallHistory: () => api.get('/chat/calls/history'),
+  getAdminCalls: (params) => api.get('/chat/calls/admin', { params }),
+  getAdminCallDetail: (callId) => api.get(`/chat/calls/admin/${callId}`),
+  getAdminCallStats: (params) => api.get('/chat/calls/admin/stats', { params }),
   sendSignal: (callId, receiverId, signalType, signalData) => api.post('/chat/signals', {
     call_id: callId, receiver_id: receiverId, signal_type: signalType, signal_data: signalData
   }),
