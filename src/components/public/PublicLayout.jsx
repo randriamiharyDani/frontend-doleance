@@ -104,7 +104,7 @@ function PublicLayout({ children }) {
   return (
     <div
       className={`cua-layout min-h-screen transition-colors duration-200 ${
-        darkMode ? "bg-slate-900" : "bg-[#F8FAFC]"
+        darkMode ? "bg-slate-900" : "bg-[#EEF2F6]"
       }`}
     >
       <style>{`

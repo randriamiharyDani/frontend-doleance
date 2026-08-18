@@ -135,9 +135,21 @@ export default function useWebRTC({ onIncomingCall, onCallAccepted, onCallReject
         startTimer();
       } else if (state === 'failed') {
         setCallStatus('failed');
+        if (callIdRef.current && remoteUserRef.current) {
+          socket.emit('call-end', {
+            call_id: callIdRef.current,
+            receiver_id: remoteUserRef.current,
+          });
+        }
         if (callbacksRef.current.onCallFailed) callbacksRef.current.onCallFailed(callIdRef.current);
       } else if (state === 'disconnected' || state === 'closed') {
         setCallStatus('ended');
+        if (callIdRef.current && remoteUserRef.current) {
+          socket.emit('call-end', {
+            call_id: callIdRef.current,
+            receiver_id: remoteUserRef.current,
+          });
+        }
         if (callbacksRef.current.onCallEnded) callbacksRef.current.onCallEnded();
       }
     };
@@ -277,10 +289,8 @@ export default function useWebRTC({ onIncomingCall, onCallAccepted, onCallReject
       // Persister la réponse en base (repli)
       chatService.sendSignal(callId, callerId, 'answer', answerData).catch(() => {});
 
-      setCallStatus('connected');
-      startTimer();
+      // Ne pas mettre 'connected' ici — onconnectionstatechange le fera quand ICE est prêt
 
-      // Notifier l'appel accepté
       socket.emit('call-accept', {
         call_id: callId,
         caller_id: callerId,

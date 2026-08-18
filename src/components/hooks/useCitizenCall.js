@@ -150,7 +150,21 @@ export default function useCitizenCall() {
         setStatus('connected');
         startTimer();
       } else if (state === 'failed') {
+        if (callIdRef.current && agentRef.current) {
+          guestSocket.emit('call-end', {
+            call_id: callIdRef.current,
+            receiver_id: agentRef.current.id_utilisateur,
+          });
+        }
         finishCall('failed');
+      } else if (state === 'disconnected' || state === 'closed') {
+        if (callIdRef.current && agentRef.current) {
+          guestSocket.emit('call-end', {
+            call_id: callIdRef.current,
+            receiver_id: agentRef.current.id_utilisateur,
+          });
+        }
+        finishCall(endReasonRef.current || 'ended');
       }
     };
 
@@ -296,7 +310,7 @@ export default function useCitizenCall() {
             : signal_data;
           await pcRef.current.setRemoteDescription(new RTCSessionDescription(sdpData));
           await flushPendingCandidates();
-          setStatus('connected');
+          // Ne pas mettre 'connected' ici — onconnectionstatechange le fera quand ICE est prêt
         } catch (e) { console.error('Erreur answer (citoyen):', e); }
       } else if (signal_type === 'ice-candidate' && pcRef.current) {
         try {
@@ -313,8 +327,7 @@ export default function useCitizenCall() {
     };
 
     const handleCallAccept = () => {
-      setStatus('connected');
-      startTimer();
+      // Ne pas mettre 'connected' ici — onconnectionstatechange le fera quand ICE est prêt
     };
 
     const handleCallReject = () => {

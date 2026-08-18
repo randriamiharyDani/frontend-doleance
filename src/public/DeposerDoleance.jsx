@@ -876,7 +876,7 @@ function DeposerDoleance() {
   ];
 
   return (
-    <div className="cua-doleance shadow-2xl p-4 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 mx-auto">
+    <div className="cua-doleance shadow-xl p-4 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 mx-auto">
       <style>{`
         .cua-doleance { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; --cua-navy:#0F172A; --cua-blue:#1E3A8A; --cua-blue-light:#2E4FA3; --cua-gold:#D4AF37; --cua-gold-dark:#B8860B; }
         .cua-doleance .cua-display { font-family: 'Fraunces', ui-serif, Georgia, serif; }
@@ -884,12 +884,13 @@ function DeposerDoleance() {
         .cua-doleance .cua-section {
           background: #ffffff;
           border: 1px solid #F1F5F9;
-          box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+          box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08), 0 6px 16px -2px rgba(15, 23, 42, 0.07);
+          line-height: 1.8;
           transition: box-shadow 0.2s ease, border-color 0.2s ease;
         }
-        .cua-doleance .cua-section:hover { box-shadow: 0 4px 16px -4px rgba(15, 23, 42, 0.08); }
-        .dark .cua-doleance .cua-section { background: #1e293b; border-color: #334155; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2); }
-        .dark .cua-doleance .cua-section:hover { box-shadow: 0 4px 16px -4px rgba(0, 0, 0, 0.3); }
+        .cua-doleance .cua-section:hover { box-shadow: 0 6px 20px -4px rgba(15, 23, 42, 0.12); }
+        .dark .cua-doleance .cua-section { background: #1e293b; border-color: #334155; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.30), 0 6px 16px -2px rgba(0, 0, 0, 0.22); }
+        .dark .cua-doleance .cua-section:hover { box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.40); }
 
         .cua-doleance .cua-field {
           border-color: #D1D5DB;
@@ -986,7 +987,7 @@ function DeposerDoleance() {
           <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{t("deposer.instructionBox")}</p>
         </div>
 
-        <p className="inline-flex items-center rounded-xl border border-yellow-400 dark:border-yellow-600 bg-yellow-100 dark:bg-yellow-900/30 mt-5 px-4 py-2 text-[13px] font-medium text-yellow-800 dark:text-yellow-300 w-fit">
+        <p className="inline-flex items-center rounded-xl border border-yellow-400 dark:border-yellow-600 bg-yellow-100 dark:bg-yellow-900/30 mt-5 px-4 py-2 text-[13px] mb-4 font-medium text-yellow-800 dark:text-yellow-300 w-fit">
           {t("deposer.fillForm")}
         </p>
       </div>
@@ -1354,7 +1355,7 @@ function DeposerDoleance() {
         {/* 8. Coordonnées */}
         <Section step={8} iconPath={ICONS.user} title={t("form.yourInfo")} required>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-            <Field id="nom_citoyen" label="Nom" required>
+            <Field id="nom_citoyen" label="Anarana" required>
               <input
                 id="nom_citoyen"
                 type="text"
@@ -1366,7 +1367,7 @@ function DeposerDoleance() {
                 required
               />
             </Field>
-            <Field id="prenom_citoyen" label="Prénom" required>
+            <Field id="prenom_citoyen" label="Fanampin'anarana" required>
               <input
                 id="prenom_citoyen"
                 type="text"
@@ -1378,7 +1379,7 @@ function DeposerDoleance() {
                 required
               />
             </Field>
-            <Field id="email" label="Email">
+            <Field id="email" label="Mailaka">
               <input
                 id="email"
                 type="email"
@@ -1386,10 +1387,10 @@ function DeposerDoleance() {
                 value={formData.email}
                 onChange={handleChange}
                 className="cua-field w-full border rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200"
-                placeholder="exemple@email.com"
+                placeholder="ohatra@gmail.com"
               />
             </Field>
-            <Field id="telephone" label="Téléphone" required>
+            <Field id="telephone" label="Laharan-telefaonina" required>
               <input
                 id="telephone"
                 type="tel"
