@@ -28,6 +28,7 @@ export default function AppelerAgent() {
     endReason,
     endedDuration,
     error,
+    mediaError,
     localStream,
     remoteStream,
     callDuration,
@@ -115,29 +116,29 @@ export default function AppelerAgent() {
       <div className={`relative overflow-hidden rounded-3xl border shadow-sm ${
         darkMode ? 'border-slate-700 bg-slate-800/60' : 'border-slate-200 bg-white'
       }`}>
-        {/* Vidéo distante / avatar */}
-        <div className={`relative ${remoteStream ? 'aspect-video' : 'h-72 sm:h-80'} bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center`}>
-          {remoteStream ? (
-            <video
+        {/* Audio distant / avatar */}
+        <div className="relative h-72 sm:h-80 bg-gradient-to-br from-slate-900 to-slate-800 flex items-center justify-center">
+          {/* Audio uniquement — pas de vidéo pour les appels Citoyen ↔ Agent */}
+          {remoteStream && (
+            <audio
               ref={(el) => { if (el) el.srcObject = remoteStream; }}
               autoPlay
-              playsInline
-              className="absolute inset-0 w-full h-full object-cover"
             />
-          ) : (
-            <div className="text-center px-6">
-              <div className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center ${
-                status === 'ringing' ? 'animate-pulse bg-[#D4AF37]/20 border border-[#D4AF37]/50' : 'bg-white/10'
-              }`}>
-                {status === 'ringing' ? (
-                  <PhoneIcon className="w-10 h-10 text-[#D4AF37]" />
-                ) : (
-                  <PhoneIcon className="w-10 h-10 text-white/50" />
-                )}
-              </div>
-              <p className="mt-4 text-lg font-semibold text-white">{agentName}</p>
-            </div>
           )}
+          <div className="text-center px-6">
+            <div className={`w-24 h-24 mx-auto rounded-full flex items-center justify-center ${
+              status === 'ringing' ? 'animate-pulse bg-[#D4AF37]/20 border border-[#D4AF37]/50' : status === 'connected' ? 'bg-emerald-500/20 border border-emerald-500/50' : 'bg-white/10'
+            }`}>
+              {status === 'ringing' ? (
+                <PhoneIcon className="w-10 h-10 text-[#D4AF37]" />
+              ) : status === 'connected' ? (
+                <MicrophoneIcon className="w-10 h-10 text-emerald-400" />
+              ) : (
+                <PhoneIcon className="w-10 h-10 text-white/50" />
+              )}
+            </div>
+            <p className="mt-4 text-lg font-semibold text-white">{agentName}</p>
+          </div>
 
           {/* Aperçu local (petit, en appel) */}
           {localStream && (
@@ -178,6 +179,42 @@ export default function AppelerAgent() {
           )}
           {error && (
             <p className="text-sm text-rose-600 dark:text-rose-400">{error}</p>
+          )}
+          {mediaError && status === 'idle' && (
+            <div className="mt-3 text-left rounded-xl border p-4 text-xs leading-relaxed border-rose-200 bg-rose-50 dark:border-rose-500/30 dark:bg-rose-500/10">
+              <p className="font-semibold text-rose-700 dark:text-rose-300 mb-2">Diagnostic microphone</p>
+              <ul className="space-y-1 text-rose-600 dark:text-rose-400">
+                {mediaError.type === 'insecure_context' && (
+                  <>
+                    <li>Le navigateur considère ce site comme non sécurisé (HTTP ou certificat non validé).</li>
+                    <li>Sur Android, acceptez le certificat SSL dans la page d'avertissement, puis rafraîchissez.</li>
+                    <li>Ou accédez via <code>https://localhost:5173</code> sur cet appareil.</li>
+                  </>
+                )}
+                {mediaError.type === 'not_allowed' && (
+                  <>
+                    <li>L'accès au microphone a été refusé par le navigateur.</li>
+                    <li>Cliquez sur l'icône 🔒 à gauche de la barre d'adresse → Microphone → Autoriser.</li>
+                    <li>Puis rafraîchissez la page et réessayez.</li>
+                  </>
+                )}
+                {mediaError.type === 'not_readable' && (
+                  <>
+                    <li>Le microphone est peut-être utilisé par une autre application.</li>
+                    <li>Fermez les autres onglets/applications utilisant le micro, puis réessayez.</li>
+                  </>
+                )}
+                {mediaError.type === 'security_error' && (
+                  <li>Erreur de sécurité. Vérifiez que le site est bien en HTTPS avec un certificat accepté.</li>
+                )}
+                {mediaError.type === 'no_media_devices' && (
+                  <li>Votre navigateur ne supporte pas l'API mediaDevices. Essayez Chrome ou Firefox.</li>
+                )}
+                {mediaError.detail && (
+                  <li className="mt-1 text-rose-400 dark:text-rose-500 font-mono text-[10px]">Détail : {mediaError.detail}</li>
+                )}
+              </ul>
+            </div>
           )}
           {status === 'ended' && endMessage && (
             <p className="text-sm font-semibold text-slate-600 dark:text-slate-300">{endMessage}</p>

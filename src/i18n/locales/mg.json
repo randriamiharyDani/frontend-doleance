@@ -58,7 +58,8 @@
     "noComplaints": "Tsy misy fitarainana hita",
     "submitFirst": "Alefaso ny fitarainanao voalohany!",
     "copyReference": "Adikao ny laharan-kitokisana",
-    "viewTracking": "Jereo ny fanarahana"
+    "viewTracking": "Jereo ny fanarahana", 
+    "photosProbleme": "Sary manamarina ny olàna"
   },
   "categories": {
     "administration": "Fitantanana",
@@ -480,7 +481,7 @@
     "loading": "Am-pamakiana...",
     "noAccountHint": "Tsy mila kaonty: alefa ho azy any amin'ny mpandraharaha ny antso.",
     "infoTitle": "Ahoana no fiasan'izany?",
-    "infoText": "Tsindrio ny « Antsoy ny mpiasa ». Alefa ho azy any amin’ny mpiasan’ny permanence ao amin’ny Kaominina ny antsonao. Rehefa ekeny ilay antso dia afaka mifampiresaka mivantana amin’ny alalan’ny antso ianao. Ampiasao ny mikrô mba hahazoana fifandraisana tsara kokoaTsindrio ny « Antsoy ny mpiasa ». Alefa ho azy any amin’ny mpiasan’ny Kaominina misahana ny antso ny antsonao. Rehefa ekeny ny antso dia afaka mifampiresaka mivantana aminy ianao. Ampiasao ny mikrô mba hahazoana fifandraisana tsara kokoa."
+    "infoText": "Tsindrio ny « Antso am-peo  ».Alefa ho azy any amin’ny mpiasan’ny Kaominina misahana ny antso ny antsonao. Rehefa ekeny ny antso dia afaka mifampiresaka mivantana aminy ianao. Ampiasao ny mikrô mba hahazoana fifandraisana tsara kokoa."
   },
   "adminCitizenCall": {
     "title": "Antso avy amin'ny olom-pirenena",

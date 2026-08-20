@@ -58,7 +58,8 @@
     "noComplaints": "Aucune doléance trouvée",
     "submitFirst": "Soumettez votre première doléance !",
     "copyReference": "Copier la référence",
-    "viewTracking": "Voir le suivi"
+    "viewTracking": "Voir le suivi",
+    "photosProbleme": "Photos du problème"
   },
   "categories": {
     "administration": "Administration",

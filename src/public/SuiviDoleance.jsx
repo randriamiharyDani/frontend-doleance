@@ -361,7 +361,7 @@ function SuiviDoleance() {
                       }`}>
                         <div className="cua-gold-bar w-1 h-5 sm:h-6 rounded-full"></div>
                         <PhotoIcon className={`h-4 w-4 sm:h-5 sm:w-5 ${darkMode ? 'text-[#D4AF37]' : 'text-[#1E3A8A]'}`} />
-                        Photos du problème ({doleance.pieces_jointes.length})
+                        {t('form.photosProbleme')} ({doleance.pieces_jointes.length})
                       </h3>
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                         {doleance.pieces_jointes.map((piece, index) => {

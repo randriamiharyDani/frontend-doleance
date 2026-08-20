@@ -35,10 +35,17 @@ export default function CallScreen({
 }) {
   const remoteVideoRef = useRef(null);
   const localVideoRef = useRef(null);
+  const remoteAudioRef = useRef(null);
 
   useEffect(() => {
     if (remoteVideoRef.current && remoteStream) {
       remoteVideoRef.current.srcObject = remoteStream;
+    }
+  }, [remoteStream]);
+
+  useEffect(() => {
+    if (remoteAudioRef.current && remoteStream) {
+      remoteAudioRef.current.srcObject = remoteStream;
     }
   }, [remoteStream]);
 
@@ -68,6 +75,14 @@ export default function CallScreen({
           autoPlay
           playsInline
           className="absolute inset-0 w-full h-full object-cover"
+        />
+      )}
+
+      {/* Audio uniquement — flux distant pour appels audio */}
+      {callType !== 'video' && remoteStream && (
+        <audio
+          ref={remoteAudioRef}
+          autoPlay
         />
       )}
 

@@ -88,6 +88,7 @@ export const CallProvider = ({ children }) => {
   useEffect(() => {
     const handleCallInvite = (data) => {
       if (callInfoRef.current) return;
+      console.log('[CallContext] call-invite received:', JSON.stringify(data));
       const name = data.caller_name || data.sender_name || data.callerName || 'Utilisateur';
       setIncomingCall(data);
       toast.success(`📵 Appel entrant de ${name}`);
@@ -138,9 +139,8 @@ export const CallProvider = ({ children }) => {
     try {
       await webrtcState.startCall(calleeId, type);
     } catch (err) {
-      const msg = err.message?.includes('non supporté') || err.message?.includes('HTTPS')
-        ? err.message
-        : 'Impossible de démarrer l\'appel. Vérifiez votre connexion et les permissions caméra/micro.';
+      console.error('[CallContext] startCall error:', err.name, err.message, err);
+      const msg = err.message || 'Impossible de démarrer l\'appel. Vérifiez votre connexion et les permissions caméra/micro.';
       setCallError(msg);
       webrtcState.setCallStatus('failed');
       toast.error(msg);
@@ -154,6 +154,8 @@ export const CallProvider = ({ children }) => {
     const callerName = incomingCall.caller_name || incomingCall.sender_name || incomingCall.callerName || '';
     const callType = incomingCall.call_type || incomingCall.callType || 'audio';
 
+    console.log(`[CallContext] acceptCall() callId=${callId} callerId=${callerId} callType=${callType} isCitizenCall=${incomingCall.isCitizenCall}`);
+
     locallyEndedRef.current = false;
     failureShownRef.current = false;
     setIncomingCall(null);
@@ -165,9 +167,8 @@ export const CallProvider = ({ children }) => {
     try {
       await webrtcState.acceptIncoming(callId, callerId, callType);
     } catch (err) {
-      const msg = err.message?.includes('non supporté') || err.message?.includes('HTTPS')
-        ? err.message
-        : 'Impossible d\'accepter l\'appel. Vérifiez vos permissions caméra/micro.';
+      console.error('[CallContext] acceptCall error:', err.name, err.message, err);
+      const msg = err.message || 'Impossible d\'accepter l\'appel. Vérifiez vos permissions caméra/micro.';
       setCallError(msg);
       webrtcState.setCallStatus('failed');
       toast.error(msg);

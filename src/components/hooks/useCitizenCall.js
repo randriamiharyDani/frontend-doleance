@@ -4,12 +4,32 @@
 import { useState, useRef, useCallback, useEffect } from 'react';
 import guestSocket from '../../config/guestSocket';
 
-const ICE_SERVERS = {
-  iceServers: [
+function getCandidateType(candidateString) {
+  if (!candidateString) return 'unknown';
+  if (candidateString.includes('typ relay')) return 'relay';
+  if (candidateString.includes('typ srflx')) return 'srflx';
+  if (candidateString.includes('typ host')) return 'host';
+  return 'unknown';
+}
+
+function buildIceServers() {
+  const servers = [
     { urls: 'stun:stun.l.google.com:19302' },
     { urls: 'stun:stun1.l.google.com:19302' },
-  ],
-};
+  ];
+  const turnUrl = import.meta.env.VITE_TURN_URL;
+  const turnUser = import.meta.env.VITE_TURN_USERNAME;
+  const turnCred = import.meta.env.VITE_TURN_CREDENTIAL;
+  if (turnUrl && turnUser && turnCred) {
+    servers.push({ urls: turnUrl, username: turnUser, credential: turnCred });
+    console.log('[CitizenCall] TURN server configured:', turnUrl);
+  } else {
+    console.warn('[CitizenCall] No TURN server configured — relay candidates will NOT be generated. Set VITE_TURN_URL, VITE_TURN_USERNAME, VITE_TURN_CREDENTIAL in .env');
+  }
+  return { iceServers: servers };
+}
+
+const ICE_SERVERS = buildIceServers();
 
 const RING_TIMEOUT_MS = 45000;
 
@@ -19,6 +39,7 @@ export default function useCitizenCall() {
   const [callId, setCallId] = useState(null);
   const [agent, setAgent] = useState(null);
   const [error, setError] = useState(null);
+  const [mediaError, setMediaError] = useState(null); // { type, message, detail }
   const [localStream, setLocalStream] = useState(null);
   const [remoteStream, setRemoteStream] = useState(null);
   const [callDuration, setCallDuration] = useState(0);
@@ -82,17 +103,28 @@ export default function useCitizenCall() {
   }, [clearTimer, clearRingTimer]);
 
   const getMedia = useCallback(async (video = false) => {
+    setMediaError(null);
+
+    // --- Diagnostic : contexte sécurisé ---
+    if (!window.isSecureContext) {
+      const detail = `isSecureContext=false | protocol=${window.location.protocol} | hostname=${window.location.hostname}`;
+      console.error('Contexte non sécurisé:', detail);
+      const err = { type: 'insecure_context', message: 'Ce site doit être accessible en HTTPS pour utiliser le microphone.', detail };
+      setMediaError(err);
+      throw new Error(err.message);
+    }
+
+    // --- Diagnostic : mediaDevices disponible ---
+    if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+      const detail = `mediaDevices=${!!navigator.mediaDevices} | getUserMedia=${!!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia)}`;
+      console.error('mediaDevices non disponible:', detail);
+      const err = { type: 'no_media_devices', message: 'Votre navigateur ne supporte pas l\'accès au microphone.', detail };
+      setMediaError(err);
+      throw new Error(err.message);
+    }
+
     const tryGetMedia = async (constraints) => {
-      if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
-        return await navigator.mediaDevices.getUserMedia(constraints);
-      }
-      if (navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia) {
-        const getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia || navigator.mozGetUserMedia;
-        return await new Promise((resolve, reject) => {
-          getUserMedia.call(navigator, constraints, resolve, reject);
-        });
-      }
-      throw new Error('WebRTC non supporté. Accédez au site via HTTPS ou localhost.');
+      return await navigator.mediaDevices.getUserMedia(constraints);
     };
 
     try {
@@ -113,7 +145,30 @@ export default function useCitizenCall() {
       return stream;
     } catch (err) {
       console.error('Erreur accès média (citoyen):', err);
-      throw err;
+
+      let type = 'media_error';
+      let message = 'Impossible d\'accéder au microphone.';
+
+      if (err.name === 'NotAllowedError' || err.name === 'PermissionDeniedError') {
+        type = 'not_allowed';
+        message = 'L\'accès au microphone a été refusé. Autorisez le microphone dans les paramètres de votre navigateur, puis réessayez.';
+      } else if (err.name === 'NotReadableError' || err.name === 'TrackStartError') {
+        type = 'not_readable';
+        message = 'Le microphone est utilisé par une autre application ou n\'est pas disponible.';
+      } else if (err.name === 'SecurityError') {
+        type = 'security_error';
+        message = 'Erreur de sécurité : le microphone est bloqué. Vérifiez que le site est bien en HTTPS.';
+      } else if (err.name === 'OverconstrainedError') {
+        type = 'overconstrained';
+        message = 'Les contraintes du micro/caméra ne sont pas satisfaites par votre appareil.';
+      } else if (err.message && (err.message.includes('non supporté') || err.message.includes('HTTPS'))) {
+        type = 'webrtc_unsupported';
+        message = err.message;
+      }
+
+      const mediaErr = { type, message, detail: `${err.name}: ${err.message}` };
+      setMediaError(mediaErr);
+      throw new Error(message);
     }
   }, []);
 
@@ -125,9 +180,15 @@ export default function useCitizenCall() {
     const pc = new RTCPeerConnection(ICE_SERVERS);
     pcRef.current = pc;
 
-    stream.getTracks().forEach((track) => pc.addTrack(track, stream));
+    console.log('[CitizenCall] RTCPeerConnection created — ICE_SERVERS:', JSON.stringify(ICE_SERVERS));
+
+    stream.getTracks().forEach((track) => {
+      console.log('[CitizenCall] addTrack:', track.kind, track.label);
+      pc.addTrack(track, stream);
+    });
 
     pc.ontrack = (event) => {
+      console.log('[CitizenCall] ontrack:', event.track.kind, 'streams:', event.streams?.length);
       if (event.streams && event.streams[0]) {
         setRemoteStream(event.streams[0]);
       }
@@ -135,6 +196,8 @@ export default function useCitizenCall() {
 
     pc.onicecandidate = (event) => {
       if (event.candidate && callIdRef.current && agentRef.current) {
+        const type = getCandidateType(event.candidate.candidate);
+        console.log('[CitizenCall] ICE candidate sent:', type, '|', event.candidate.candidate?.substring(0, 80));
         guestSocket.emit('call-signal', {
           call_id: callIdRef.current,
           receiver_id: agentRef.current.id_utilisateur,
@@ -146,6 +209,7 @@ export default function useCitizenCall() {
 
     pc.onconnectionstatechange = () => {
       const state = pc.connectionState;
+      console.log('[CitizenCall] Connection state:', state);
       if (state === 'connected') {
         setStatus('connected');
         startTimer();
@@ -170,6 +234,7 @@ export default function useCitizenCall() {
 
     pc.oniceconnectionstatechange = () => {
       const iceState = pc.iceConnectionState;
+      console.log('[CitizenCall] ICE state:', iceState);
       if (iceState === 'connected' || iceState === 'completed') {
         setStatus('connected');
       }
@@ -189,9 +254,11 @@ export default function useCitizenCall() {
   const flushPendingCandidates = useCallback(async () => {
     const pc = pcRef.current;
     if (!pc) return;
+    const count = pendingCandidatesRef.current.length;
+    if (count > 0) console.log(`[CitizenCall] Flushing ${count} pending ICE candidates`);
     while (pendingCandidatesRef.current.length) {
       const candidate = pendingCandidatesRef.current.shift();
-      try { await pc.addIceCandidate(candidate); } catch (e) { /* ignore */ }
+      try { await pc.addIceCandidate(candidate); } catch (e) { console.warn('[CitizenCall] flush ICE error:', e.message); }
     }
   }, []);
 
@@ -207,8 +274,9 @@ export default function useCitizenCall() {
   }, [status, finishCall]);
 
   // Démarrer l'appel vers l'agent destinataire configuré
+  // Appels Citoyen → Agent : AUDIO UNIQUEMENT, jamais de vidéo
   const startCall = useCallback(async (callType = 'audio') => {
-    callTypeRef.current = callType === 'video' ? 'video' : 'audio';
+    callTypeRef.current = 'audio';
     setEndReason(null);
     endReasonRef.current = null;
     setError(null);
@@ -261,8 +329,7 @@ export default function useCitizenCall() {
       setCallId(started.callId);
       setAgent(started.agent);
 
-      const video = callTypeRef.current === 'video';
-      const stream = await getMedia(video);
+      const stream = await getMedia(false);
       const pc = createPeerConnection(stream);
 
       const offer = await pc.createOffer();
@@ -290,10 +357,11 @@ export default function useCitizenCall() {
       }, RING_TIMEOUT_MS);
     } catch (err) {
       console.error('Erreur démarrage appel citoyen:', err);
-      const msg = err.message?.includes('non supporté') || err.message?.includes('HTTPS')
-        ? err.message
-        : 'Impossible de démarrer l\'appel. Vérifiez votre connexion et les permissions caméra/micro.';
-      setError(msg);
+      if (!mediaError) {
+        setError(err.message || 'Impossible de démarrer l\'appel. Vérifiez votre connexion et les permissions caméra/micro.');
+      } else {
+        setError(mediaError.message);
+      }
       cleanup();
       setStatus('idle');
     }
@@ -308,21 +376,31 @@ export default function useCitizenCall() {
           const sdpData = typeof signal_data === 'string'
             ? JSON.parse(signal_data)
             : signal_data;
+          console.log('[CitizenCall] Answer received — type:', sdpData?.type, '| sdp:', sdpData?.sdp ? sdpData.sdp.substring(0, 30) + '...' : 'MISSING');
+          if (!sdpData || !sdpData.type || !sdpData.sdp) {
+            console.error('[CitizenCall] SDP answer invalide:', sdpData);
+            return;
+          }
           await pcRef.current.setRemoteDescription(new RTCSessionDescription(sdpData));
+          console.log('[CitizenCall] setRemoteDescription(answer) — OK, flushing pending candidates:', pendingCandidatesRef.current.length);
           await flushPendingCandidates();
           // Ne pas mettre 'connected' ici — onconnectionstatechange le fera quand ICE est prêt
         } catch (e) { console.error('Erreur answer (citoyen):', e); }
-      } else if (signal_type === 'ice-candidate' && pcRef.current) {
+      } else if (signal_type === 'ice-candidate') {
         try {
           const candidateData = typeof signal_data === 'string'
             ? JSON.parse(signal_data)
             : signal_data;
-          if (pcRef.current.remoteDescription) {
+          console.log('[CitizenCall] ICE candidate received:', getCandidateType(candidateData?.candidate), '|', candidateData?.candidate?.substring(0, 80), '| pcRef:', !!pcRef.current, '| remoteDesc:', !!pcRef.current?.remoteDescription);
+          if (pcRef.current && pcRef.current.remoteDescription) {
             await pcRef.current.addIceCandidate(new RTCIceCandidate(candidateData));
           } else {
+            console.log('[CitizenCall] ICE candidate queued (PC not ready yet)');
             pendingCandidatesRef.current.push(new RTCIceCandidate(candidateData));
           }
-        } catch (e) { /* ignore */ }
+        } catch (e) {
+          console.warn('[CitizenCall] ICE candidate error:', e.message);
+        }
       }
     };
 
@@ -404,6 +482,7 @@ export default function useCitizenCall() {
     callId,
     agent,
     error,
+    mediaError,
     localStream,
     remoteStream,
     callDuration,

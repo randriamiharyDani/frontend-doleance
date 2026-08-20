@@ -49,7 +49,7 @@ function Settings() {
   });
 
   // ===== Appels citoyens (Admin) =====
-  const isAdmin = ['administrateur_systeme', 'administrateur', 'agent_central'].includes(user?.role);
+  const isAdmin = ['administrateur_systeme', 'agent_central'].includes(user?.role);
   const [callConfig, setCallConfig] = useState(null);
   const [callAgents, setCallAgents] = useState([]);
   const [callLoading, setCallLoading] = useState(false);
@@ -316,31 +316,37 @@ function Settings() {
             )}
 
             <label className="label">Choisir l'agent destinataire</label>
-            <div className="flex items-center gap-3">
-              <select
-                value={selectedAgentId}
-                onChange={(e) => setSelectedAgentId(e.target.value)}
-                className="input flex-1"
-                disabled={callLoading}
-              >
-                <option value="">— Sélectionner un agent —</option>
-                {callAgents.map((a) => (
-                  <option key={a.id_utilisateur} value={a.id_utilisateur}>
-                    {`${a.prenom || ''} ${a.nom || ''}`.trim()} — {a.email}
-                    {a.disponible ? ' (en ligne)' : ''}
-                  </option>
-                ))}
-              </select>
-              <button
-                type="button"
-                onClick={handleSaveRecipient}
-                disabled={callSaving || !selectedAgentId}
-                className="btn-primary btn-md whitespace-nowrap"
-              >
-                {callSaving && <div className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin mr-1.5" />}
-                {callSaving ? 'Enregistrement...' : 'Enregistrer'}
-              </button>
-            </div>
+            {callAgents.length === 0 ? (
+              <p className="text-sm text-gray-500 dark:text-gray-400 italic py-2">
+                Aucun agent disponible (rôle requis : administrateur système ou agent central)
+              </p>
+            ) : (
+              <div className="flex items-center gap-3">
+                <select
+                  value={selectedAgentId}
+                  onChange={(e) => setSelectedAgentId(e.target.value)}
+                  className="input flex-1"
+                  disabled={callLoading}
+                >
+                  <option value="">— Sélectionner un agent —</option>
+                  {callAgents.map((a) => (
+                    <option key={a.id_utilisateur} value={a.id_utilisateur}>
+                      {`${a.prenom || ''} ${a.nom || ''}`.trim()} — {a.email}
+                      {a.disponible ? ' (en ligne)' : ''}
+                    </option>
+                  ))}
+                </select>
+                <button
+                  type="button"
+                  onClick={handleSaveRecipient}
+                  disabled={callSaving || !selectedAgentId}
+                  className="btn-primary btn-md whitespace-nowrap"
+                >
+                  {callSaving && <div className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin mr-1.5" />}
+                  {callSaving ? 'Enregistrement...' : 'Enregistrer'}
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
