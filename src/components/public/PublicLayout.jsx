@@ -43,11 +43,13 @@ function PublicLayout({ children }) {
       path: "/suivi-doleance",
       icon: MagnifyingGlassIcon,
     },
-    {
-      label: t("nav.callAgent"),
-      path: "/appeler-agent",
-      icon: PhoneIcon,
-    },
+    // ===== MASQUÉ : Appel Citoyen → Agent (fonctionnalité conservée, affichage retiré du navbar public) =====
+    // Pour réafficher, décommenter le bloc ci-dessous.
+    // {
+    //   label: t("nav.callAgent"),
+    //   path: "/appeler-agent",
+    //   icon: PhoneIcon,
+    // },
   ];
 
   const emergencyContacts = [
@@ -485,6 +487,33 @@ function PublicLayout({ children }) {
                 </p>
               </div>
             </div>
+
+            {/* Numéro vert CUA - 147 */}
+            <a
+              href="tel:147"
+              title={t("footer.greenNumber")}
+              className={`group flex items-center gap-3 px-4 py-2.5 rounded-xl border transition-all duration-200 ${
+                darkMode
+                  ? "bg-white/5 border-white/10 hover:bg-white/10"
+                  : "bg-slate-50 border-slate-200 hover:bg-green-50 hover:border-green-300"
+              }`}
+            >
+              <span className="flex items-center justify-center h-9 w-9 rounded-full bg-green-500 group-hover:bg-green-400 transition-colors duration-200 shadow-md flex-shrink-0">
+                <PhoneIcon className="h-4 w-4 text-white" />
+              </span>
+              <span className="flex flex-col leading-tight text-center md:text-left">
+                <span
+                  className={`text-[11px] uppercase tracking-wider font-medium ${
+                    darkMode ? "text-slate-400" : "text-slate-500"
+                  }`}
+                >
+                  {t("footer.greenNumber")}
+                </span>
+                <span className="text-lg md:text-xl font-bold group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-200 text-[#0F172A] dark:text-slate-100">
+                  147
+                </span>
+              </span>
+            </a>
 
             {/* Réseaux sociaux */}
             <div className={`flex items-center gap-3 `}>

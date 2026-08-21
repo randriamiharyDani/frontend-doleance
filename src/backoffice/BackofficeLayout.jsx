@@ -458,7 +458,7 @@ function BackofficeLayout() {
         }`}
       />
       <span className="text-sm font-medium">
-        Appels citoyens
+        Historique des appels
       </span>
     </Link>
   </div>

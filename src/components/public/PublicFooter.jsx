@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { UserIcon } from '@heroicons/react/24/outline';
+import { UserIcon, PhoneIcon } from '@heroicons/react/24/outline';
 
 function PublicFooter() {
   const { t, i18n } = useTranslation();
@@ -14,6 +14,7 @@ function PublicFooter() {
       commune_subtitle: "d'Antananarivo",
       copyright: 'Plateforme de gestion des doléances',
       admin_access: 'Accès agents municipaux',
+      green_number: 'Numéro vert',
       version: 'Version 2.0 | Plateforme optimisée pour mobile et desktop'
     },
     mg: {
@@ -21,6 +22,7 @@ function PublicFooter() {
       commune_subtitle: 'Antananarivo',
       copyright: 'Sehatra fitantanana ny fitarainana',
       admin_access: 'Fidiran\'ny mpiasan\'ny kaominina',
+      green_number: 'Nomerao maitso',
       version: 'Dika 2.0 | Sehatra namboarina ho an\'ny finday sy solosaina'
     },
     en: {
@@ -28,6 +30,7 @@ function PublicFooter() {
       commune_subtitle: 'of Antananarivo',
       copyright: 'Complaint management platform',
       admin_access: 'Municipal agents access',
+      green_number: 'Green number',
       version: 'Version 2.0 | Optimized for mobile and desktop'
     }
   };
@@ -57,7 +60,25 @@ function PublicFooter() {
             </p>
           </div>
 
-       
+          {/* Numéro vert CUA - 147 */}
+          <a
+            href="tel:147"
+            className="group flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 transition-all duration-200"
+            title={tFooter.green_number}
+          >
+            <span className="flex items-center justify-center h-9 w-9 rounded-full bg-green-500 group-hover:bg-green-400 transition-colors duration-200 shadow-md flex-shrink-0">
+              <PhoneIcon className="h-4.5 w-4.5 text-white" />
+            </span>
+            <span className="flex flex-col leading-tight text-center md:text-left">
+              <span className="text-[11px] uppercase tracking-wider text-sky-200 font-medium">
+                {tFooter.green_number}
+              </span>
+              <span className="text-lg md:text-xl font-bold text-white group-hover:text-green-300 transition-colors duration-200">
+                147
+              </span>
+            </span>
+          </a>
+
           {/* Espace admin - avec icône de tête de personne */}
           <div>
             <Link 
