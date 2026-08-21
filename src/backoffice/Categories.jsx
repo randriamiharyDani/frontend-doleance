@@ -66,6 +66,8 @@ function Categories() {
   const tabs = [
     { key: 'CUA', label: 'Catégories CUA' },
     { key: 'Sapeurs-Pompiers', label: 'Catégories Sapeurs-Pompiers' },
+    { key: 'Police Municipale', label: 'Catégories Police Municipale' },
+    { key: 'BMH', label: 'Catégories BMH' },
   ];
 
   const fetchCategories = useCallback(async () => {

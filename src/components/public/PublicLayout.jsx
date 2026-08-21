@@ -50,6 +50,11 @@ function PublicLayout({ children }) {
     },
   ];
 
+  const emergencyContacts = [
+    { label: 'CUA', phone: '034 72 139 93', tel: 'tel:0347213993' },
+    { label: 'Pompiers', phone: '034 12 232 35', tel: 'tel:0341223235' },
+  ];
+
   const SOCIALS = [
     {
       name: "WhatsApp",
@@ -125,9 +130,54 @@ function PublicLayout({ children }) {
         }
       `}</style>
 
+      {/* ===== TOP BAR — Urgences ===== */}
+      <div className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled ? '-translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'
+      } ${
+        darkMode
+          ? 'bg-[#0C1222]/90 backdrop-blur-md border-b border-white/5'
+          : 'bg-[#0B1A33]/95 backdrop-blur-md border-b border-white/5'
+      }`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Desktop: centered */}
+          <div className="hidden md:flex items-center justify-center gap-6 h-8">
+            {emergencyContacts.map((contact) => (
+              <a
+                key={contact.label}
+                href={contact.tel}
+                className="inline-flex items-center gap-2 text-[11px] font-medium tracking-wide transition-all duration-200 group"
+              >
+                <span className="relative flex items-center justify-center">
+                  <span className="absolute w-4 h-4 rounded-full bg-red-500/20 animate-ping" />
+                  <PhoneIcon className="h-3 w-3 text-red-400 relative z-10" />
+                </span>
+                <span className="text-white/40 group-hover:text-white/60 transition-colors">{contact.label}</span>
+                <span className="text-white/80 group-hover:text-red-300 transition-colors font-semibold">{contact.phone}</span>
+              </a>
+            ))}
+          </div>
+          {/* Mobile: centered compact */}
+          <div className="flex md:hidden items-center justify-center gap-4 h-8">
+            {emergencyContacts.map((contact) => (
+              <a
+                key={contact.label}
+                href={contact.tel}
+                className="inline-flex items-center gap-1.5 text-[10px] font-medium tracking-wide group"
+              >
+                <PhoneIcon className="h-2.5 w-2.5 text-red-400" />
+                <span className="text-white/40">{contact.label}</span>
+                <span className="text-white/80 group-hover:text-red-300 font-semibold">{contact.phone}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* ===== HEADER ===== */}
       <header
-        className={`fixed top-0 left-0 right-0 z-40 transition-all duration-300 ${
+        className={`fixed left-0 right-0 z-40 transition-all duration-300 ${
+          scrolled ? 'top-0' : 'top-8'
+        } ${
           scrolled
             ? darkMode
               ? "bg-slate-900/85 backdrop-blur-xl shadow-lg shadow-black/10 border-b border-slate-700/50"
@@ -301,6 +351,34 @@ function PublicLayout({ children }) {
                 className={`border-t my-2 ${darkMode ? "border-slate-700" : "border-slate-100"}`}
               />
 
+              {/* Urgences (mobile) */}
+              <div className="px-4 pt-2 pb-1">
+                <p className={`text-[10px] font-semibold uppercase tracking-widest flex items-center gap-1.5 ${darkMode ? "text-red-400/70" : "text-red-400/80"}`}>
+                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse" />
+                  Urgences
+                </p>
+              </div>
+              {emergencyContacts.map((contact) => (
+                <a
+                  key={contact.label}
+                  href={contact.tel}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                    darkMode
+                      ? "text-slate-300 hover:bg-white/10 hover:text-white"
+                      : "text-slate-600 hover:bg-slate-50 hover:text-[#0F172A]"
+                  }`}
+                >
+                  <PhoneIcon className="h-5 w-5 text-red-400" />
+                  <span className={`text-xs ${darkMode ? "text-slate-500" : "text-slate-400"}`}>{contact.label}</span>
+                  <span>{contact.phone}</span>
+                </a>
+              ))}
+
+              <div
+                className={`border-t my-2 ${darkMode ? "border-slate-700" : "border-slate-100"}`}
+              />
+
               {/* Language selector (mobile) */}
               <div className={`flex items-center gap-2 px-4 py-2`}>
                 <span
@@ -359,7 +437,7 @@ function PublicLayout({ children }) {
 
       {/* ===== MAIN CONTENT ===== */}
       <main
-        className={`pt-16 min-h-screen transition-colors duration-200 ${
+        className={`pt-24 min-h-screen transition-colors duration-200 ${
           darkMode ? "bg-slate-900" : "bg-[#F8FAFC]"
         }`}
       >

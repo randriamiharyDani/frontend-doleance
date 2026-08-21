@@ -443,7 +443,7 @@ function SuiviDoleance() {
                     {doleance.historique && doleance.historique.length > 0 ? (
                       <div className="overflow-x-auto pb-2">
                         <div className="flex flex-wrap gap-2 sm:gap-3 min-w-[280px]">
-                          {doleance.historique.map((hist, index) => (
+                          {doleance.historique.filter(h => !h.nouveau_statut?.toLowerCase().includes('transfert')).map((hist, index) => (
                             <div key={index} className="flex items-center gap-1 sm:gap-2">
                               <div className={`rounded-lg px-2 py-1 sm:px-3 sm:py-2 border-2 min-w-[100px] sm:min-w-[130px] shadow-sm ${
                                 darkMode ? 'bg-gray-700 border-gray-600' : 'bg-slate-50 border-slate-200'

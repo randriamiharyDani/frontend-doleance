@@ -995,7 +995,7 @@ function DeposerDoleance() {
       <form onSubmit={handleSubmit} noValidate>
         {/* 1. Type d'entité */}
         <Section step={1} iconPath={ICONS.building} title={t("deposer.typeSituation")} required tag={t("deposer.toChoose")}>
-          <div className="flex gap-3 text-center">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 text-center">
             <ModuleCard
               active={module === "CUA"}
               onClick={() => setModule("CUA")}
@@ -1009,6 +1009,20 @@ function DeposerDoleance() {
               emoji="🚒"
               label={t("deposer.sapeursPompiers")}
               activeClasses="border-amber-500 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 shadow-sm"
+            />
+            <ModuleCard
+              active={module === "Police Municipale"}
+              onClick={() => setModule("Police Municipale")}
+              emoji="🚔"
+              label={t("deposer.policeMunicipale")}
+              activeClasses="border-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 shadow-sm"
+            />
+            <ModuleCard
+              active={module === "BMH"}
+              onClick={() => setModule("BMH")}
+              emoji="🧹"
+              label={t("deposer.bmh")}
+              activeClasses="border-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 shadow-sm"
             />
           </div>
         </Section>

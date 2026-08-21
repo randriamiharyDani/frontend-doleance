@@ -9,7 +9,8 @@ import {
   ListBulletIcon,
   SunIcon,
   MoonIcon,
-  Cog6ToothIcon
+  Cog6ToothIcon,
+  PhoneIcon
 } from '@heroicons/react/24/outline';
 import { useTheme } from '../../contexts/ThemeContext';
 import SettingsModal from './SettingsModal';
@@ -35,6 +36,11 @@ function PublicNavbar() {
     { name: t('nav.submit'), href: '/deposer-doleance', icon: DocumentTextIcon },
     // { name: t('nav.all'), href: '/toutes-doleances', icon: ListBulletIcon },
     { name: t('nav.track'), href: '/suivi-doleance', icon: MagnifyingGlassIcon },
+  ];
+
+  const emergencyContacts = [
+    { label: 'CUA', phone: '034 72 139 93', tel: 'tel:0347213993' },
+    { label: 'Pompiers', phone: '034 12 232 35', tel: 'tel:0341223235' },
   ];
 
   const isActive = (path) => location.pathname.startsWith(path);
@@ -97,6 +103,20 @@ function PublicNavbar() {
                 </Link>
               ))}
               
+              <div className="w-px h-6 bg-white/30 mx-1"></div>
+
+              {emergencyContacts.map((contact) => (
+                <a
+                  key={contact.label}
+                  href={contact.tel}
+                  className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium text-white/90 bg-white/10 hover:bg-red-500/30 hover:text-white border border-white/10 hover:border-red-400/40 transition-all duration-200 whitespace-nowrap backdrop-blur-sm"
+                >
+                  <PhoneIcon className="h-3 w-3 text-red-400" />
+                  <span className="text-white/60 hidden xl:inline">{contact.label}</span>
+                  <span>{contact.phone}</span>
+                </a>
+              ))}
+
               <div className="w-px h-6 bg-white/30 mx-1"></div>
               
               <button
@@ -168,6 +188,26 @@ function PublicNavbar() {
                   <item.icon className="h-5 w-5 mr-3" />
                   {item.name}
                 </Link>
+              ))}
+              
+              <div className="border-t border-white/20 my-2"></div>
+
+              <div className="px-3 py-1.5">
+                <p className="text-[10px] font-semibold text-white/40 uppercase tracking-widest flex items-center gap-1.5">
+                  <span className="inline-block w-1.5 h-1.5 rounded-full bg-red-400 animate-pulse"></span>
+                  Urgences
+                </p>
+              </div>
+              {emergencyContacts.map((contact) => (
+                <a
+                  key={contact.label}
+                  href={contact.tel}
+                  className="flex items-center px-3 py-2.5 rounded-md text-sm font-medium text-white hover:bg-white/20 dark:hover:bg-slate-700 hover:text-yellow-200 transition-colors"
+                >
+                  <PhoneIcon className="h-5 w-5 mr-3 text-red-400" />
+                  <span className="text-white/50 text-xs mr-2">{contact.label}</span>
+                  <span>{contact.phone}</span>
+                </a>
               ))}
               
               <div className="border-t border-white/20 my-2"></div>
