@@ -356,7 +356,7 @@
     "notFound": "Tsy hita ny pejy"
   },
   "buttons": {
-    "save": "Hanary",
+    "save": "Tehirizo",
     "cancel": "Hanaisotra",
     "delete": "Hamafa",
     "edit": "Hanova",
@@ -379,7 +379,7 @@
     "toChoose": "(hisafidy)",
     "communeCUA": "CUA",
     "sapeursPompiers": "Sapeurs Pompiers",
-    "policeMunicipale": "Polisin'ny Tanàna",
+    "policeMunicipale": "Polisy monisipaly",
     "bmh": "BMH (Fahadiovana)",
     "categoryHint1": "*______Raha mahita sokajy aminy ireo ianao, azafady kitiho izany.",
     "categoryHint2": "*______Raha tsy mahita sokajy mifanaraka ianao, azafady farito eto ambany ny olàna misy anao.",

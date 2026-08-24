@@ -189,7 +189,7 @@ function BackofficeLayout() {
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-30 h-full w-72 lg:w-60 xl:w-64 2xl:w-72 shadow-xl transition-transform duration-300 ease-in-out overflow-y-auto overflow-x-hidden ${
+        className={`fixed top-0 left-0 z-30 h-full w-72 lg:w-60 xl:w-64 2xl:w-72 shadow-xl transition-transform duration-300 ease-in-out flex flex-col ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0 ${
           darkMode
@@ -198,7 +198,7 @@ function BackofficeLayout() {
         }`}
       >
         {/* Logo */}
-        <div className="sticky top-0 z-10 flex items-center gap-3 p-3 border-b border-white/10 bg-opacity-95 backdrop-blur-sm">
+        <div className="flex-shrink-0 z-10 flex items-center gap-3 p-3 border-b border-white/10 bg-opacity-95 backdrop-blur-sm">
           {/* Logo */}
           <div className="flex-shrink-0">
             <img
@@ -230,7 +230,7 @@ function BackofficeLayout() {
         </div>
 
         {/* Navigation */}
-    <nav className="p-3 pb-20">
+    <nav className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-3 pb-6">
   <div className="space-y-1">
     {navigation.map((item) => (
       <Link
@@ -505,14 +505,18 @@ function BackofficeLayout() {
 
         {/* Footer */}
         {/* Infos utilisateur */}
-        <div className="absolute bottom-0 left-0 right-0 z-10 p-4 border-t border-white/10 bg-opacity-95 backdrop-blur-sm">
+        <div
+          className={`flex-shrink-0 z-10 p-4 border-t border-white/10 backdrop-blur-sm ${
+            darkMode ? "bg-slate-900" : "bg-[#0B1A33]/95"
+          }`}
+        >
           <div className="flex items-center">
             <div className="relative w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-md bg-white/10">
               <span className="text-white text-sm font-medium">
                 {user?.prenom?.charAt(0) || "U"}
                 {user?.nom?.charAt(0) || "?"}
               </span>
-              <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-[#0B1A33] ${isCurrentUserOnline ? 'bg-green-500' : 'bg-gray-400 dark:bg-gray-500'}`} />
+              <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 ${darkMode ? 'border-slate-900' : 'border-[#0B1A33]'} ${isCurrentUserOnline ? 'bg-green-500' : 'bg-gray-400 dark:bg-gray-500'}`} />
             </div>
 
             <div className="ml-3 flex-1 min-w-0">

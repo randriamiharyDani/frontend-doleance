@@ -25,14 +25,6 @@ function PublicFooter() {
       green_number: 'Nomerao maitso',
       version: 'Dika 2.0 | Sehatra namboarina ho an\'ny finday sy solosaina'
     },
-    en: {
-      commune_name: 'Urban Commune',
-      commune_subtitle: 'of Antananarivo',
-      copyright: 'Complaint management platform',
-      admin_access: 'Municipal agents access',
-      green_number: 'Green number',
-      version: 'Version 2.0 | Optimized for mobile and desktop'
-    }
   };
 
   const tFooter = translations[language] || translations.fr;
@@ -63,7 +55,7 @@ function PublicFooter() {
           {/* Numéro vert CUA - 147 */}
           <a
             href="tel:147"
-            className="group flex items-center gap-3 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 transition-all duration-200"
+            className="group flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 border border-white/15 transition-all duration-200"
             title={tFooter.green_number}
           >
             <span className="flex items-center justify-center h-9 w-9 rounded-full bg-green-500 group-hover:bg-green-400 transition-colors duration-200 shadow-md flex-shrink-0">

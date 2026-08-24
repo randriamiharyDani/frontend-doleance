@@ -15,10 +15,13 @@ import {
   ShieldCheckIcon,
   CheckCircleIcon,
   PhoneIcon,
+  BellAlertIcon,
+  ChatBubbleLeftRightIcon,
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
 import api from '../services/api';
 import citoyenCallService from '../services/citoyenCallService';
+import siteSettingsService from '../services/siteSettingsService';
 
 // ---- Design tokens ---------------------------------------------------
 // Même identité que les autres écrans du backoffice : navy #1E3A8A /
@@ -87,6 +90,77 @@ function Settings() {
       toast.error(error.response?.data?.message || 'Erreur lors de la mise à jour');
     } finally {
       setCallSaving(false);
+    }
+  };
+
+  // ===== Contacts d'urgence + Réseaux sociaux (Admin) =====
+  const [emergencyContacts, setEmergencyContacts] = useState([]);
+  const [contactsLoading, setContactsLoading] = useState(false);
+  const [contactsSaving, setContactsSaving] = useState(false);
+  const [socials, setSocials] = useState({ whatsapp: '', facebook: '', instagram: '' });
+  const [socialsLoading, setSocialsLoading] = useState(false);
+  const [socialsSaving, setSocialsSaving] = useState(false);
+
+  useEffect(() => {
+    if (!isAdmin) return;
+    let mounted = true;
+    setContactsLoading(true);
+    setSocialsLoading(true);
+    siteSettingsService.getSettings()
+      .then((res) => {
+        if (!mounted) return;
+        const data = res?.data || {};
+        setEmergencyContacts(Array.isArray(data.contacts) ? data.contacts : []);
+        setSocials({ whatsapp: '', facebook: '', instagram: '', ...(data.socials || {}) });
+      })
+      .catch(() => {})
+      .finally(() => {
+        setContactsLoading(false);
+        setSocialsLoading(false);
+      });
+    return () => { mounted = false; };
+  }, [isAdmin]);
+
+  const handleContactPhoneChange = (code, value) => {
+    setEmergencyContacts((prev) => prev.map((c) => (c.code === code ? { ...c, telephone: value } : c)));
+  };
+
+  const handleSaveContacts = async () => {
+    const invalid = emergencyContacts.find((c) => !(c.telephone || '').trim());
+    if (invalid) {
+      toast.error(`Numéro requis pour : ${invalid.libelle}`);
+      return;
+    }
+    setContactsSaving(true);
+    try {
+      await siteSettingsService.updateContacts(
+        emergencyContacts.map((c) => ({ code: c.code, libelle: c.libelle, telephone: c.telephone.trim() }))
+      );
+      toast.success("Contacts d'urgence mis à jour");
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Erreur lors de la mise à jour des contacts");
+    } finally {
+      setContactsSaving(false);
+    }
+  };
+
+  const handleSocialChange = (key, value) => {
+    setSocials((prev) => ({ ...prev, [key]: value }));
+  };
+
+  const handleSaveSocials = async () => {
+    setSocialsSaving(true);
+    try {
+      await siteSettingsService.updateSocials({
+        whatsapp: socials.whatsapp.trim(),
+        facebook: socials.facebook.trim(),
+        instagram: socials.instagram.trim(),
+      });
+      toast.success('Réseaux sociaux mis à jour');
+    } catch (error) {
+      toast.error(error.response?.data?.message || 'Erreur lors de la mise à jour des réseaux sociaux');
+    } finally {
+      setSocialsSaving(false);
     }
   };
 
@@ -273,7 +347,7 @@ function Settings() {
       </div>
 
       {/* Appels citoyens (Admin) */}
-      {isAdmin && (
+      {/* {isAdmin && (
         <div className="card">
           <div className="flex items-center gap-3 px-5 sm:px-6 py-4 border-b border-gray-100 dark:border-slate-700">
             <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-emerald-50 dark:bg-emerald-900/30">
@@ -346,6 +420,131 @@ function Settings() {
                   {callSaving ? 'Enregistrement...' : 'Enregistrer'}
                 </button>
               </div>
+            )}
+          </div>
+        </div>
+      )} */}
+
+      {/* Contacts d'urgence (Admin) */}
+      {isAdmin && (
+        <div className="card">
+          <div className="flex items-center gap-3 px-5 sm:px-6 py-4 border-b border-gray-100 dark:border-slate-700">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-red-50 dark:bg-red-900/30">
+              <BellAlertIcon className="h-5 w-5 text-red-600 dark:text-red-400" />
+            </div>
+            <div>
+              <h2 className="font-bold text-gray-900 dark:text-white text-sm">Contacts d'urgence</h2>
+              <p className="text-xs text-gray-400">
+                Numéros affichés dans la barre d'urgence du site public
+              </p>
+            </div>
+          </div>
+          <div className="p-5 sm:p-6">
+            {contactsLoading ? (
+              <p className="text-sm text-gray-500 dark:text-gray-400 italic py-2">Chargement...</p>
+            ) : emergencyContacts.length === 0 ? (
+              <p className="text-sm text-gray-500 dark:text-gray-400 italic py-2">
+                Aucun contact d'urgence configuré
+              </p>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  {emergencyContacts.map((contact) => (
+                    <div key={contact.code}>
+                      <label className="label">{contact.libelle}</label>
+                      <div className="relative">
+                        <PhoneIcon className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+                        <input
+                          type="tel"
+                          value={contact.telephone || ''}
+                          onChange={(e) => handleContactPhoneChange(contact.code, e.target.value)}
+                          className="input pl-9"
+                          placeholder="Ex : 034 12 345 67"
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+                <div className="mt-4 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={handleSaveContacts}
+                    disabled={contactsSaving || contactsLoading}
+                    className="btn-primary btn-md"
+                  >
+                    {contactsSaving && <div className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin mr-1.5" />}
+                    {contactsSaving ? 'Enregistrement...' : "Enregistrer les contacts"}
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Réseaux sociaux - Footer public (Admin) */}
+      {isAdmin && (
+        <div className="card">
+          <div className="flex items-center gap-3 px-5 sm:px-6 py-4 border-b border-gray-100 dark:border-slate-700">
+            <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 bg-sky-50 dark:bg-sky-900/30">
+              <ChatBubbleLeftRightIcon className="h-5 w-5 text-sky-600 dark:text-sky-400" />
+            </div>
+            <div>
+              <h2 className="font-bold text-gray-900 dark:text-white text-sm">Réseaux sociaux (footer public)</h2>
+              <p className="text-xs text-gray-400">
+                Numéro WhatsApp et liens Facebook / Instagram affichés dans le pied de page du site public
+              </p>
+            </div>
+          </div>
+          <div className="p-5 sm:p-6">
+            {socialsLoading ? (
+              <p className="text-sm text-gray-500 dark:text-gray-400 italic py-2">Chargement...</p>
+            ) : (
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  <div>
+                    <label className="label">Numéro WhatsApp</label>
+                    <input
+                      type="tel"
+                      value={socials.whatsapp}
+                      onChange={(e) => handleSocialChange('whatsapp', e.target.value)}
+                      className="input"
+                      placeholder="Ex : 034 00 000 00"
+                    />
+                  </div>
+                  <div>
+                    <label className="label">Lien Facebook</label>
+                    <input
+                      type="url"
+                      value={socials.facebook}
+                      onChange={(e) => handleSocialChange('facebook', e.target.value)}
+                      className="input"
+                      placeholder="https://facebook.com/..."
+                    />
+                  </div>
+                  <div>
+                    <label className="label">Lien Instagram</label>
+                    <input
+                      type="url"
+                      value={socials.instagram}
+                      onChange={(e) => handleSocialChange('instagram', e.target.value)}
+                      className="input"
+                      placeholder="https://instagram.com/..."
+                    />
+                  </div>
+                </div>
+                <div className="mt-4 flex justify-end">
+                  <button
+                    type="button"
+                    onClick={handleSaveSocials}
+                    disabled={socialsSaving || socialsLoading}
+                    className="btn-primary btn-md"
+                  >
+                    {socialsSaving && <div className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin mr-1.5" />}
+                    {socialsSaving ? 'Enregistrement...' : 'Enregistrer les réseaux sociaux'}
+                  </button>
+                </div>
+              </>
             )}
           </div>
         </div>
