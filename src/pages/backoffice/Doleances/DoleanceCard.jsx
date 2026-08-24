@@ -23,7 +23,7 @@ function DoleanceCard({
     }).format(new Date(dateString));
   };
 
-  if (!isAdminOrAgentCentral && (!userCanView || isBloquee || !isDeSaDirection)) {
+  if (!isAdminOrAgentCentral && (!userCanView || !isDeSaDirection)) {
     return null;
   }
 
@@ -40,11 +40,6 @@ function DoleanceCard({
               <span className="text-[10px] sm:text-sm font-mono bg-gray-100 dark:bg-slate-700 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
                 {doleance.reference}
               </span>
-              {isNouvelle && (
-                <span className="px-1.5 sm:px-2 py-0.5 sm:py-1 text-[10px] sm:text-xs font-medium rounded-full bg-blue-500 text-white animate-pulse">
-                  Nouvelle
-                </span>
-              )}
               <PriorityBadge priorite={doleance.nom_priorite} niveau={doleance.niveau} />
               <StatusBadge statut={doleance.nom_statut} couleur={doleance.statut_couleur} />
               {doleance.nom_direction && (

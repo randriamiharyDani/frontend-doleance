@@ -6,7 +6,7 @@ import doleanceService from '../services/doleanceService';
 import toast from 'react-hot-toast';
 import {
   DocumentTextIcon, CheckCircleIcon, ClockIcon, ExclamationTriangleIcon,
-  TagIcon, ArrowPathIcon
+  TagIcon, ArrowPathIcon, ArrowRightCircleIcon
 } from '@heroicons/react/24/outline';
 import StatCard from '../pages/backoffice/Dashboard/StatCard';
 import InfoCard from '../pages/backoffice/Dashboard/InfoCard';
@@ -22,7 +22,7 @@ function Dashboard() {
   const { statsVersion } = useStatsRefresh();
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [stats, setStats] = useState({ total: 0, enCours: 0, resolues: 0, urgentes: 0 });
+  const [stats, setStats] = useState({ total: 0, enCours: 0, resolues: 0, urgentes: 0, transferees: 0 });
   const [recentDoleances, setRecentDoleances] = useState([]);
   const [monthlyStats, setMonthlyStats] = useState([]);
   const [statsByCategory, setStatsByCategory] = useState([]);
@@ -113,11 +113,12 @@ function Dashboard() {
   const evo = stats.evolution || {};
   const tauxResolution = stats.total > 0 ? Math.round((stats.resolues / stats.total) * 100) : 0;
   const statsCards = [
-    { title: 'Total Doléances', value: stats.total, icon: DocumentTextIcon, color: 'bg-blue-500', link: '/backoffice/doleances', change: evo.total?.value, changeType: evo.total?.type },
-    { title: 'En cours', value: stats.enCours, icon: ClockIcon, color: 'bg-amber-500', link: '/backoffice/doleances?statut=en_cours', change: evo.enCours?.value, changeType: evo.enCours?.type },
-    { title: 'Résolues', value: stats.resolues, icon: CheckCircleIcon, color: 'bg-emerald-500', link: '/backoffice/doleances?statut=resolues', change: evo.resolues?.value, changeType: evo.resolues?.type },
-    { title: 'Urgentes', value: stats.urgentes, icon: ExclamationTriangleIcon, color: 'bg-rose-500', link: '/backoffice/doleances?priorite=urgente', change: evo.urgentes?.value, changeType: evo.urgentes?.type },
-    { title: 'Taux de résolution', value: `${tauxResolution}%`, icon: CheckCircleIcon, color: 'bg-indigo-500', link: '/backoffice/statistiques' },
+    { title: 'Total Doléances', value: stats.total, icon: DocumentTextIcon, color: 'bg-blue-500', subtitle: 'Toutes doléances confondues', change: evo.total?.value, changeType: evo.total?.type },
+    { title: 'En cours', value: stats.enCours, icon: ClockIcon, color: 'bg-amber-500', subtitle: 'À traiter', change: evo.enCours?.value, changeType: evo.enCours?.type },
+    { title: 'Résolues', value: stats.resolues, icon: CheckCircleIcon, color: 'bg-emerald-500', subtitle: 'Résolues et clôturées', change: evo.resolues?.value, changeType: evo.resolues?.type },
+    { title: 'Transférées', value: stats.transferees || 0, icon: ArrowRightCircleIcon, color: 'bg-purple-500', subtitle: 'Vers les directions', change: evo.transferees?.value, changeType: evo.transferees?.type },
+    { title: 'Urgentes', value: stats.urgentes, icon: ExclamationTriangleIcon, color: 'bg-rose-500', subtitle: 'Priorité urgente active', change: evo.urgentes?.value, changeType: evo.urgentes?.type },
+    { title: 'Taux de résolution', value: `${tauxResolution}%`, icon: CheckCircleIcon, color: 'bg-indigo-500', progress: tauxResolution },
   ];
 
   if (loading) {
@@ -144,7 +145,7 @@ function Dashboard() {
         </button>
       </div>
 
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-3 min-[1401px]:grid-cols-6 gap-4">
         {statsCards.map((stat, i) => <StatCard key={i} {...stat} />)}
       </div>
 
