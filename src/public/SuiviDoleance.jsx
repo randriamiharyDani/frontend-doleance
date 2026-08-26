@@ -432,7 +432,7 @@ function SuiviDoleance() {
                   )}
 
                   {/* Historique du traitement - Statuts côte à côte responsive */}
-                  <div>
+                  {/* <div>
                     <h3 className={`font-semibold mb-3 sm:mb-4 flex items-center gap-2 text-sm sm:text-base ${
                       darkMode ? 'text-white' : 'text-[#1E3A8A]'
                     }`}>
@@ -475,7 +475,7 @@ function SuiviDoleance() {
                         </p>
                       </div>
                     )}
-                  </div>
+                  </div> */}
 
                   {/* Réponses de la mairie */}
                   {/* {doleance.reponses && doleance.reponses.length > 0 && (

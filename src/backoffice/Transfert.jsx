@@ -17,6 +17,7 @@ import {
   FunnelIcon,
   InboxIcon,
   CheckBadgeIcon,
+  PlayIcon,
 } from '@heroicons/react/24/outline';
 
 // ---- Design tokens (kept local so the file stays drop-in) ----------------
@@ -318,6 +319,29 @@ function Transfert() {
     setShowTransferModal(true);
   };
 
+  const handleMettreEnCours = async (doleance) => {
+    setLoading(true);
+    try {
+      const response = await api.put(`/doleances/${doleance.id_doleance}/statut`, {
+        id_statut: 4,
+        commentaire: 'Mise en cours de traitement depuis le transfert',
+      });
+      if (response.data.success) {
+        toast.success('La doléance est maintenant en cours de traitement');
+        fetchStats();
+        fetchDoleances();
+        notifyStatsChange();
+      } else {
+        toast.error(response.data.message || 'Erreur lors de la mise à jour');
+      }
+    } catch (error) {
+      console.error('Erreur mise en cours:', error);
+      toast.error(error.response?.data?.message || 'Erreur lors de la mise à jour');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const getCategoryName = (idCategorie) => {
     const cat = categories.find((c) => c.id_categorie === idCategorie);
     return cat?.nom_categorie || 'Non catégorisée';
@@ -341,6 +365,16 @@ function Transfert() {
 
   const doleancesNontransferts = doleances.filter((d) => canTransfer(d.nom_statut));
   const doleancestransferts = doleances.filter((d) => !canTransfer(d.nom_statut));
+
+  const doleancesTransfertEnCours = doleancestransferts.filter((d) => {
+    const s = normalizeStatut(d.nom_statut);
+    return d.id_direction && s !== 'resolue' && s !== 'traitee' && s !== 'cloturee' && s !== 'rejetee';
+  });
+
+  const doleancesTransfertResolues = doleancestransferts.filter((d) => {
+    const s = normalizeStatut(d.nom_statut);
+    return s === 'resolue' || s === 'traitee' || s === 'cloturee';
+  });
 
   return (
     <div className="w-full max-w-screen-2xl mx-auto px-3 sm:px-4 lg:px-6 xl:px-8">
@@ -521,25 +555,35 @@ function Transfert() {
                         {doleance.nom_direction || '—'}
                       </td>
                       <td className="px-4 py-3.5 whitespace-nowrap text-right">
-                        <button
-                          onClick={() => openTransferModal(doleance)}
-                          className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1E3A8A] text-white rounded-lg hover:bg-[#0F172A] transition-colors text-sm font-semibold shadow-sm whitespace-nowrap"
-                        >
-                          <PaperAirplaneIcon className="h-3.5 w-3.5 flex-shrink-0" />
-                          Transférer
-                        </button>
+                        {doleance.id_direction ? (
+                          <button
+                            onClick={() => handleMettreEnCours(doleance)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-500 text-white rounded-lg hover:bg-amber-600 transition-colors text-sm font-semibold shadow-sm whitespace-nowrap"
+                          >
+                            <PlayIcon className="h-3.5 w-3.5 flex-shrink-0" />
+                            Mettre en cours
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => openTransferModal(doleance)}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-[#1E3A8A] text-white rounded-lg hover:bg-[#0F172A] transition-colors text-sm font-semibold shadow-sm whitespace-nowrap"
+                          >
+                            <PaperAirplaneIcon className="h-3.5 w-3.5 flex-shrink-0" />
+                            Transférer
+                          </button>
+                        )}
                       </td>
                     </tr>
                   ))}
 
-                  {doleancestransferts.length > 0 && (
+                  {doleancesTransfertEnCours.length > 0 && (
                     <>
                       <tr>
-                        <td colSpan="7" className="px-4 py-2 bg-slate-50/70 dark:bg-slate-900/50 text-center text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">
-                          Déjà transférées ou traitées
+                        <td colSpan="7" className="px-4 py-2 bg-slate-50/70 dark:bg-slate-900/50 text-center text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wide">
+                          Déjà transférées – En cours
                         </td>
                       </tr>
-                      {doleancestransferts.map((doleance) => (
+                      {doleancesTransfertEnCours.map((doleance) => (
                         <tr key={doleance.id_doleance} className="bg-slate-50/30 dark:bg-slate-900/30 hover:bg-slate-50/60 dark:hover:bg-slate-700/50 transition-colors">
                           <td className="px-4 py-2.5 whitespace-nowrap font-mono font-semibold text-slate-400 dark:text-slate-500 text-sm">
                             {doleance.reference}
@@ -560,9 +604,47 @@ function Transfert() {
                             {doleance.nom_direction || '—'}
                           </td>
                           <td className="px-4 py-2.5 whitespace-nowrap text-right">
-                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400 rounded-lg text-[10px] font-semibold whitespace-nowrap">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-lg text-[10px] font-semibold whitespace-nowrap">
+                              <ClockIcon className="h-3 w-3 flex-shrink-0" />
+                              En cours
+                            </span>
+                          </td>
+                        </tr>
+                      ))}
+                    </>
+                  )}
+
+                  {doleancesTransfertResolues.length > 0 && (
+                    <>
+                      <tr>
+                        <td colSpan="7" className="px-4 py-2 bg-slate-50/70 dark:bg-slate-900/50 text-center text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">
+                          Déjà transférées – Résolues / Traitées
+                        </td>
+                      </tr>
+                      {doleancesTransfertResolues.map((doleance) => (
+                        <tr key={doleance.id_doleance} className="bg-slate-50/30 dark:bg-slate-900/30 hover:bg-slate-50/60 dark:hover:bg-slate-700/50 transition-colors">
+                          <td className="px-4 py-2.5 whitespace-nowrap font-mono font-semibold text-slate-400 dark:text-slate-500 text-sm">
+                            {doleance.reference}
+                          </td>
+                          <td className="px-4 py-2.5 whitespace-nowrap text-slate-400 dark:text-slate-500 text-sm hidden lg:table-cell">
+                            {doleance.citoyen_nom || '—'}
+                          </td>
+                          <td className="px-4 py-2.5 whitespace-nowrap text-slate-400 dark:text-slate-500 text-sm hidden md:table-cell">
+                            {getCategoryName(doleance.id_categorie)}
+                          </td>
+                          <td className="px-4 py-2.5 text-slate-400 dark:text-slate-500 max-w-[140px] md:max-w-[220px] lg:max-w-xs xl:max-w-sm truncate text-sm">
+                            {doleance.titre}
+                          </td>
+                          <td className="px-4 py-2.5 whitespace-nowrap text-center">
+                            <StatusPill statut={getDisplayStatut(doleance)} />
+                          </td>
+                          <td className="px-4 py-2.5 whitespace-nowrap text-slate-400 dark:text-slate-500 text-sm hidden 2xl:table-cell">
+                            {doleance.nom_direction || '—'}
+                          </td>
+                          <td className="px-4 py-2.5 whitespace-nowrap text-right">
+                            <span className="inline-flex items-center gap-1 px-2.5 py-1 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-lg text-[10px] font-semibold whitespace-nowrap">
                               <CheckCircleIcon className="h-3 w-3 flex-shrink-0" />
-                              {normalizeStatut(doleance.nom_statut) === 'transferee' ? 'Transférée' : 'Traitée'}
+                              {normalizeStatut(doleance.nom_statut) === 'cloturee' ? 'Clôturée' : normalizeStatut(doleance.nom_statut) === 'traitee' ? 'Traitée' : 'Résolue'}
                             </span>
                           </td>
                         </tr>
@@ -586,22 +668,54 @@ function Transfert() {
                     {getCategoryName(doleance.id_categorie)}
                     {doleance.citoyen_nom ? ` · ${doleance.citoyen_nom}` : ''}
                   </p>
-                  <button
-                    onClick={() => openTransferModal(doleance)}
-                    className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2.5 bg-[#1E3A8A] text-white rounded-xl hover:bg-[#0F172A] transition-colors text-sm font-semibold shadow-sm"
-                  >
-                    <PaperAirplaneIcon className="h-3.5 w-3.5" />
-                    Transférer
-                  </button>
+                  {doleance.id_direction ? (
+                    <button
+                      onClick={() => handleMettreEnCours(doleance)}
+                      className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2.5 bg-amber-500 text-white rounded-xl hover:bg-amber-600 transition-colors text-sm font-semibold shadow-sm"
+                    >
+                      <PlayIcon className="h-3.5 w-3.5" />
+                      Mettre en cours
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => openTransferModal(doleance)}
+                      className="w-full inline-flex items-center justify-center gap-1.5 px-3 py-2.5 bg-[#1E3A8A] text-white rounded-xl hover:bg-[#0F172A] transition-colors text-sm font-semibold shadow-sm"
+                    >
+                      <PaperAirplaneIcon className="h-3.5 w-3.5" />
+                      Transférer
+                    </button>
+                  )}
                 </div>
               ))}
 
-              {doleancestransferts.length > 0 && (
+              {doleancesTransfertEnCours.length > 0 && (
                 <>
-                  <div className="px-4 py-2 bg-slate-50/70 dark:bg-slate-900/50 text-center text-[10px] font-semibold text-slate-400 dark:text-slate-500 uppercase tracking-wide">
-                    Déjà transférées ou traitées
+                  <div className="px-4 py-2 bg-slate-50/70 dark:bg-slate-900/50 text-center text-[10px] font-semibold text-amber-600 dark:text-amber-400 uppercase tracking-wide">
+                    Déjà transférées – En cours
                   </div>
-                  {doleancestransferts.map((doleance) => (
+                  {doleancesTransfertEnCours.map((doleance) => (
+                    <div key={doleance.id_doleance} className="p-4 bg-slate-50/30 dark:bg-slate-900/30">
+                      <div className="flex items-start justify-between gap-2 mb-2">
+                        <span className="font-mono font-semibold text-slate-400 dark:text-slate-500 text-sm">{doleance.reference}</span>
+                        <StatusPill statut={getDisplayStatut(doleance)} />
+                      </div>
+                      <p className="text-sm font-medium text-slate-500 dark:text-slate-400">{doleance.titre}</p>
+                      {doleance.motif_transfert && (
+                        <p className="text-xs italic text-amber-600 dark:text-amber-400 mt-1.5 bg-amber-50 dark:bg-amber-900/20 px-2 py-1 rounded-md">
+                          Motif : {doleance.motif_transfert}
+                        </p>
+                      )}
+                    </div>
+                  ))}
+                </>
+              )}
+
+              {doleancesTransfertResolues.length > 0 && (
+                <>
+                  <div className="px-4 py-2 bg-slate-50/70 dark:bg-slate-900/50 text-center text-[10px] font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-wide">
+                    Déjà transférées – Résolues / Traitées
+                  </div>
+                  {doleancesTransfertResolues.map((doleance) => (
                     <div key={doleance.id_doleance} className="p-4 bg-slate-50/30 dark:bg-slate-900/30">
                       <div className="flex items-start justify-between gap-2 mb-2">
                         <span className="font-mono font-semibold text-slate-400 dark:text-slate-500 text-sm">{doleance.reference}</span>
