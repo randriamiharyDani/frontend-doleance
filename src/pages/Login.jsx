@@ -93,7 +93,7 @@ function Login() {
             <div className="relative inline-block">
               <div className="cua-crest-ring absolute -inset-2 rounded-full border border-[#D4AF37]/40" />
               <img
-                src="/images/logo_CUA.svg"
+                src={`${import.meta.env.BASE_URL}images/logo_CUA.svg`}
                 alt="Blason de la Commune Urbaine d'Antananarivo"
                 className="relative w-20 h-20 object-contain drop-shadow-[0_4px_20px_rgba(212,175,55,0.35)]"
               />
@@ -148,7 +148,7 @@ function Login() {
             <div className="relative">
               <div className="w-16 h-16 rounded-2xl flex items-center justify-center shadow-lg">
                 <img
-                  src="/images/logo_CUA.svg"
+                  src={`${import.meta.env.BASE_URL}images/logo_CUA.svg`}
                   alt="Logo CUA"
                   className="w-11 h-11 object-contain"
                 />
@@ -170,7 +170,7 @@ function Login() {
                 <div className="relative">
                   <div className="w-16 h-16 flex items-center justify-center rounded-full border ">
                     <img
-                      src="/images/logo_CUA.svg"
+                      src={`${import.meta.env.BASE_URL}images/logo_CUA.svg`}
                       alt="Logo CUA"
                       className="w-11 h-11 object-contain"
                     />

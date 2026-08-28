@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import api from '../services/api';
 import toast from 'react-hot-toast';
@@ -31,6 +32,7 @@ import {
 } from '@heroicons/react/24/outline';
 
 function Roles() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   
   // Tous les useState en premier
@@ -471,7 +473,7 @@ function Roles() {
             Vous n'avez pas les permissions nécessaires pour accéder à cette section.
           </p>
           <button
-            onClick={() => window.location.href = '/backoffice/dashboard'}
+            onClick={() => navigate('/backoffice/dashboard')}
             className="inline-flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
           >
             Retour au tableau de bord

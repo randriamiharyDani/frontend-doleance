@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import api from '../services/api';
 import socket from '../config/socket';
 import toast from 'react-hot-toast';
@@ -10,6 +11,7 @@ export const useAuth = () => useContext(AuthContext);
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const connectSocket = (userData, token) => {
     if (!userData || !token) return;
@@ -97,8 +99,8 @@ export const AuthProvider = ({ children }) => {
     if (!silent) {
       toast.success('Déconnexion réussie');
     }
-    if (window.location.pathname !== '/login') {
-      window.location.href = '/login';
+    if (window.location.pathname !== `${import.meta.env.BASE_URL}login`) {
+      navigate('/login', { replace: true });
     }
   };
 

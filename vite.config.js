@@ -6,17 +6,18 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
-    server: {
-      host: '0.0.0.0',
-      port: 5173,
-      // HTTPS/mkcert désactivé — retour à HTTP
-      // https: {
-      //   key: fs.readFileSync(env.VITE_SSL_KEY || './dev-key.pem'),
-      //   cert: fs.readFileSync(env.VITE_SSL_CERT || './dev-cert.pem'),
+      base: '/doleance/',
+      server: {
+        host: '0.0.0.0',
+        port: 5173,
+        // HTTPS/mkcert désactivé — retour à HTTP
+        // https: {
+        //   key: fs.readFileSync(env.VITE_SSL_KEY || './dev-key.pem'),
+        //   cert: fs.readFileSync(env.VITE_SSL_CERT || './dev-cert.pem'),
       // },
       proxy: {
         '/api': {
-          target: 'http://192.168.99.86:5000',
+          target: 'http://192.168.99.4:5000',
           changeOrigin: true
         }
       }
@@ -29,9 +30,9 @@ export default defineConfig(({ mode }) => {
         output: {
           manualChunks: {
             vendor: ['react', 'react-dom', 'react-router-dom'],
-            icons: ['@heroicons/react'],
             charts: ['recharts'],
-            utils: ['axios', 'react-hot-toast']
+            utils: ['axios', 'react-hot-toast'],
+            socket: ['socket.io-client']
           }
         }
       }

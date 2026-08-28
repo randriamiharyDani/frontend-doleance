@@ -251,7 +251,7 @@ function PublicLayout({ children }) {
             <div className="flex items-center gap-3 flex-shrink-0">
               <Link to="/deposer-doleance" className="flex items-center group">
                 <img
-                  src="/images/logo_CUA.svg"
+                  src={`${import.meta.env.BASE_URL}images/logo_CUA.svg`}
                   alt="Logo CUA"
                   className="h-16 w-16 object-contain cua-crest-ring space rounded-full border border-[#D4AF37]/40 transition-transform duration-200 group-hover:scale-105"
                 />
@@ -517,7 +517,7 @@ function PublicLayout({ children }) {
             {/* Logo + Infos */}
             <div className="flex items-center gap-3">
               <img
-                src="/images/logo_CUA.svg"
+                src={`${import.meta.env.BASE_URL}images/logo_CUA.svg`}
                 alt="CUA"
                 className="h-10 w-10 object-contain rounded-lg"
               />
@@ -607,7 +607,7 @@ function PublicLayout({ children }) {
                 >
                   <img
                     className="h-2.5 w-20.1 "
-                    src="/images/logo.png"
+                    src="/doleance/images/logo.png"
                     alt=""
                     srcset=""
                   />

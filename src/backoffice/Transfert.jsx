@@ -1,5 +1,6 @@
 // backoffice/Transfert.jsx
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { useStatsRefresh } from '../contexts/StatsContext';
 import api from '../services/api';
@@ -115,6 +116,7 @@ function SkeletonRow() {
 }
 
 function Transfert() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { notifyStatsChange } = useStatsRefresh();
 
@@ -168,7 +170,7 @@ function Transfert() {
             Cette page est réservée à l'agent central et à l'administrateur système.
           </p>
           <button
-            onClick={() => (window.location.href = '/backoffice/dashboard')}
+            onClick={() => navigate('/backoffice/dashboard')}
             className="inline-flex items-center px-5 py-2.5 bg-[#1E3A8A] text-white rounded-xl font-semibold hover:bg-[#0F172A] transition-colors text-sm shadow-sm"
           >
             Retour au tableau de bord

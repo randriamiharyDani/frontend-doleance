@@ -202,7 +202,7 @@ function BackofficeLayout() {
           {/* Logo */}
           <div className="flex-shrink-0">
             <img
-              src="/images/logo_CUA.svg"
+              src={`${import.meta.env.BASE_URL}images/logo_CUA.svg`}
               alt="Logo CUA"
               className="h-14 w-14 object-contain rounded-xl"
             />

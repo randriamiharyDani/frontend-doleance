@@ -1031,7 +1031,7 @@ function DoleanceDetail() {
       <div className="print-only" id="print-area">
 
         <div className="print-header">
-          <img className="h-10 w-10" src="/images/logo_CUA.svg" alt="Logo CUA" />
+          <img className="h-10 w-10" src={`${import.meta.env.BASE_URL}images/logo_CUA.svg`} alt="Logo CUA" />
           <h1>COMMUNE URBAINE D'ANTANANARIVO</h1>
           <h2>DELEGATION SPECIALE</h2>
         </div>
