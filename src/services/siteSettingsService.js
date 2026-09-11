@@ -20,6 +20,12 @@ const siteSettingsService = {
     const res = await api.put('/site-settings/socials', socials);
     return res.data;
   },
+
+  // Admin : mise à jour des numéros verts du footer public
+  async updateGreenNumbers(greenNumbers) {
+    const res = await api.put('/site-settings/green-numbers', greenNumbers);
+    return res.data;
+  },
 };
 
 export default siteSettingsService;

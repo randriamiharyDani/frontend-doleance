@@ -1,6 +1,6 @@
 // navbar frontend
 
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, Fragment } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useTranslation } from "react-i18next";
@@ -30,6 +30,12 @@ const DEFAULT_SOCIAL_HREFS = {
   instagram: "#",
 };
 
+const DEFAULT_GREEN_NUMBERS = {
+  greenNumberCua: '147',
+  greenNumberTelma: '+26134222111',
+  greenNumberOrange: '+2613211332',
+};
+
 function PublicLayout({ children }) {
   const { darkMode, toggleDarkMode } = useTheme();
   const { i18n, t } = useTranslation();
@@ -38,6 +44,7 @@ function PublicLayout({ children }) {
   const [scrolled, setScrolled] = useState(false);
   const [emergencyContacts, setEmergencyContacts] = useState(DEFAULT_EMERGENCY_CONTACTS);
   const [socialHrefs, setSocialHrefs] = useState(DEFAULT_SOCIAL_HREFS);
+  const [greenNumbers, setGreenNumbers] = useState(DEFAULT_GREEN_NUMBERS);
 
   // Hauteur réelle de la barre d'urgence (mesurée) : le header et le contenu
   // s'adaptent automatiquement, quelle que soit la façon dont les contacts
@@ -91,6 +98,12 @@ function PublicLayout({ children }) {
           whatsapp: waDigits ? `https://wa.me/${waDigits}` : DEFAULT_SOCIAL_HREFS.whatsapp,
           facebook: fb || DEFAULT_SOCIAL_HREFS.facebook,
           instagram: ig || DEFAULT_SOCIAL_HREFS.instagram,
+        });
+        const gn = data.greenNumbers || {};
+        setGreenNumbers({
+          greenNumberCua: (gn.greenNumberCua || '').trim() || DEFAULT_GREEN_NUMBERS.greenNumberCua,
+          greenNumberTelma: (gn.greenNumberTelma || '').trim() || DEFAULT_GREEN_NUMBERS.greenNumberTelma,
+          greenNumberOrange: (gn.greenNumberOrange || '').trim() || DEFAULT_GREEN_NUMBERS.greenNumberOrange,
         });
       })
       .catch(() => {});
@@ -542,59 +555,69 @@ function PublicLayout({ children }) {
               </div>
             </div>
 
-            {/* Numéro vert CUA - 147 */}
-            <a
-              href="tel:147"
-              title={t("footer.greenNumber")}
-              className={`group flex items-center gap-3 px-2 py-2 rounded-xl border transition-all duration-200 ${
-                darkMode
-                  ? "bg-white/5 border-white/10 hover:bg-white/10"
-                  : "bg-slate-50 border-slate-200 hover:bg-green-50 hover:border-green-300"
-              }`}
-            >
-              <span className="flex items-center justify-center h-9 w-9 rounded-full bg-green-500 group-hover:bg-green-400 transition-colors duration-200 shadow-md flex-shrink-0">
-                <PhoneIcon className="h-4 w-4 text-white" />
-              </span>
-              <span className="flex flex-col leading-tight text-center md:text-left">
-                <span
-                  className={`text-[11px] uppercase tracking-wider font-medium ${
-                    darkMode ? "text-slate-400" : "text-slate-500"
-                  }`}
-                >
+            {/* ===== Numéros verts ===== */}
+            <div className={`flex flex-col items-center gap-2.5 px-4 py-3 rounded-2xl border ${
+              darkMode ? 'bg-white/5 border-white/10' : 'bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200'
+            }`}>
+              <div className="flex items-center gap-1.5">
+                <PhoneIcon className="h-3.5 w-3.5 text-[#D4AF37]" />
+                <p className={`text-[11px] uppercase tracking-wider font-bold ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
                   {t("footer.greenNumber")}
-                </span>
-                <span className="text-sm md:text-sm font-bold group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-200 text-[#0F172A] dark:text-slate-100">
-                  147
-                </span>
-              </span>
-            </a>
-
-                  {/* Numéro vert CUA orange - +261323211332 */}
-            <a
-              href="tel:+2613211332"
-              title={t("footer.greenNumber-orange")}
-              className={`group flex items-center gap-3 px-2 py-2 rounded-xl border transition-all duration-200 ${
-                darkMode
-                  ? "bg-white/5 border-white/10 hover:bg-white/10"
-                  : "bg-slate-50 border-slate-200 hover:bg-orange-50 hover:border-orange-300"
-              }`}
-            >
-              <span className="flex items-center justify-center h-9 w-9 rounded-full bg-orange-500 group-hover:bg-orange-400 transition-colors duration-200 shadow-md flex-shrink-0">
-                <PhoneIcon className="h-4 w-4 text-white" />
-              </span>
-              <span className="flex flex-col leading-tight text-center md:text-left">
-                <span
-                  className={`text-[11px] uppercase tracking-wider font-medium ${
-                    darkMode ? "text-slate-400" : "text-slate-500"
-                  }`}
-                >
-                  {t("footer.greenNumber-orange")}
-                </span>
-                <span className="text-sm text-orange md:text-sm font-bold group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors duration-200 dark:text-slate-100">
-                  +2613211332
-                </span>
-              </span>
-            </a>
+                </p>
+              </div>
+              <div className="flex items-center gap-3 flex-wrap justify-center">
+                {[
+                  {
+                    key: 'greenNumberCua', label: 'CUA',
+                    phone: greenNumbers.greenNumberCua,
+                    icon: 'bg-green-500 group-hover:bg-green-400',
+                    hover: 'hover:bg-green-50',
+                    text: 'group-hover:text-green-600 dark:group-hover:text-green-400',
+                  },
+                  {
+                    key: 'greenNumberTelma', label: 'Telma',
+                    phone: greenNumbers.greenNumberTelma,
+                    icon: 'bg-yellow-500 group-hover:bg-yellow-400',
+                    hover: 'hover:bg-yellow-50',
+                    text: 'group-hover:text-yellow-600 dark:group-hover:text-yellow-400',
+                  },
+                  {
+                    key: 'greenNumberOrange', label: 'Orange',
+                    phone: greenNumbers.greenNumberOrange,
+                    icon: 'bg-orange-500 group-hover:bg-orange-400',
+                    hover: 'hover:bg-orange-50',
+                    text: 'group-hover:text-orange-600 dark:group-hover:text-orange-400',
+                  },
+                ]
+                  .filter((n) => (n.phone || '').trim())
+                  .map((n, i) => (
+                    <Fragment key={n.key}>
+                      {i > 0 && (
+                        <span className={`h-6 w-px ${darkMode ? 'bg-white/15' : 'bg-slate-300'}`} />
+                      )}
+                      <a
+                        href={`tel:${n.phone.replace(/[^0-9+]/g, '')}`}
+                        title={`${n.label} – ${t("footer.greenNumber")}`}
+                        className={`group flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all duration-200 ${
+                          darkMode ? 'hover:bg-white/10' : n.hover
+                        }`}
+                      >
+                        <span className={`flex items-center justify-center h-8 w-8 rounded-full ${n.icon} transition-colors duration-200 shadow-md flex-shrink-0`}>
+                          <PhoneIcon className="h-4 w-4 text-white" />
+                        </span>
+                        <span className="flex flex-col leading-tight">
+                          <span className={`text-[10px] uppercase tracking-wider font-medium ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                            {n.label}
+                          </span>
+                          <span className={`text-sm font-bold ${n.text} transition-colors duration-200 text-[#0F172A] dark:text-slate-100`}>
+                            {n.phone}
+                          </span>
+                        </span>
+                      </a>
+                    </Fragment>
+                  ))}
+              </div>
+            </div>
 
 
             {/* Réseaux sociaux */}
