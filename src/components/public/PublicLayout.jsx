@@ -546,7 +546,7 @@ function PublicLayout({ children }) {
             <a
               href="tel:147"
               title={t("footer.greenNumber")}
-              className={`group flex items-center gap-3 px-4 py-2.5 rounded-xl border transition-all duration-200 ${
+              className={`group flex items-center gap-3 px-2 py-2 rounded-xl border transition-all duration-200 ${
                 darkMode
                   ? "bg-white/5 border-white/10 hover:bg-white/10"
                   : "bg-slate-50 border-slate-200 hover:bg-green-50 hover:border-green-300"
@@ -563,11 +563,39 @@ function PublicLayout({ children }) {
                 >
                   {t("footer.greenNumber")}
                 </span>
-                <span className="text-lg md:text-xl font-bold group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-200 text-[#0F172A] dark:text-slate-100">
+                <span className="text-sm md:text-sm font-bold group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors duration-200 text-[#0F172A] dark:text-slate-100">
                   147
                 </span>
               </span>
             </a>
+
+                  {/* Numéro vert CUA orange - +261323211332 */}
+            <a
+              href="tel:+2613211332"
+              title={t("footer.greenNumber-orange")}
+              className={`group flex items-center gap-3 px-2 py-2 rounded-xl border transition-all duration-200 ${
+                darkMode
+                  ? "bg-white/5 border-white/10 hover:bg-white/10"
+                  : "bg-slate-50 border-slate-200 hover:bg-orange-50 hover:border-orange-300"
+              }`}
+            >
+              <span className="flex items-center justify-center h-9 w-9 rounded-full bg-orange-500 group-hover:bg-orange-400 transition-colors duration-200 shadow-md flex-shrink-0">
+                <PhoneIcon className="h-4 w-4 text-white" />
+              </span>
+              <span className="flex flex-col leading-tight text-center md:text-left">
+                <span
+                  className={`text-[11px] uppercase tracking-wider font-medium ${
+                    darkMode ? "text-slate-400" : "text-slate-500"
+                  }`}
+                >
+                  {t("footer.greenNumber-orange")}
+                </span>
+                <span className="text-sm text-orange md:text-sm font-bold group-hover:text-orange-600 dark:group-hover:text-orange-400 transition-colors duration-200 dark:text-slate-100">
+                  +2613211332
+                </span>
+              </span>
+            </a>
+
 
             {/* Réseaux sociaux */}
             <div className={`flex items-center gap-3 `}>

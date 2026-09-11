@@ -367,7 +367,8 @@
   "footer": {
     "rights": "Tous droits réservés",
     "quickLinks": "Liens rapides",
-    "greenNumber": "Numéro vert"
+    "greenNumber": "Numéro vert",
+    "greenNumber-orange": "Numéro vert - orange"
   },
   "deposer": {
     "communeTitle": "Commune Urbaine d'Antananarivo",

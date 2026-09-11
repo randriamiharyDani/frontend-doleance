@@ -14,7 +14,7 @@ function StatCard({ title, value, icon: Icon, color, change, changeType, subtitl
             {subtitle && !change && (
               <p className="text-[11px] text-gray-400 dark:text-gray-500 mt-0.5 truncate">{subtitle}</p>
             )}
-            {change && (
+            {change?.value && (
               <div className="flex items-center mt-1.5">
                 {changeType === 'up' ? (
                   <ArrowTrendingUpIcon className="h-3.5 w-3.5 text-emerald-500 mr-1 flex-shrink-0" />
@@ -22,7 +22,7 @@ function StatCard({ title, value, icon: Icon, color, change, changeType, subtitl
                   <ArrowTrendingDownIcon className="h-3.5 w-3.5 text-rose-500 mr-1 flex-shrink-0" />
                 )}
                 <span className={`text-xs font-medium ${changeType === 'up' ? 'text-emerald-600' : 'text-rose-600'}`}>
-                  {change} ce mois
+                  {change.value} vs mois précédent
                 </span>
               </div>
             )}

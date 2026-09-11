@@ -367,7 +367,9 @@
   "footer": {
     "rights": "Zo rehetra voatokana",
     "quickLinks": "Rohy haingana",
-    "greenNumber": "Laharana maimaim-poana"
+    "greenNumber": "Laharana maimaim-poana",
+    "greenNumber-orange": "Laharana maimaim-poana - orange"
+
   },
   "deposer": {
     "communeTitle": "Commune Urbaine d'Antananarivo",

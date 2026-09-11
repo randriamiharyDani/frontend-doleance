@@ -138,6 +138,7 @@ function Dashboard() {
             Bienvenue, <span className="font-medium text-gray-700 dark:text-gray-200">{user?.prenom || ''} {user?.nom || ''}</span>
           </p>
         </div>
+        
         <button onClick={() => fetchAll(false)} disabled={refreshing}
           className="btn-primary btn-md">
           <ArrowPathIcon className={`h-4 w-4 ${refreshing ? 'animate-spin' : ''}`} />
