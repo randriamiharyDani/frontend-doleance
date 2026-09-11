@@ -30,7 +30,11 @@ function AjouterDoleance() {
   const { notifyStatsChange } = useStatsRefresh();
   const fileInputRef = useRef(null);
 
-  const [reference] = useState(generateReference());
+  const [reference, setReference] = useState(generateReference());
+  const [manualReferenceMode, setManualReferenceMode] = useState(false);
+  const [referenceAvailable, setReferenceAvailable] = useState(null);
+  const [referenceChecking, setReferenceChecking] = useState(false);
+  const referenceCheckTimerRef = useRef(null);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loadingData, setLoadingData] = useState(true);
@@ -70,6 +74,59 @@ function AjouterDoleance() {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   }, []);
+
+  useEffect(() => {
+    return () => {
+      if (referenceCheckTimerRef.current) clearTimeout(referenceCheckTimerRef.current);
+    };
+  }, []);
+
+  const checkReferenceAvailability = useCallback(async (value) => {
+    const ref = (value ?? '').trim();
+    if (!ref) {
+      setReferenceAvailable(null);
+      setReferenceChecking(false);
+      return true;
+    }
+    setReferenceChecking(true);
+    try {
+      const res = await api.get(`/doleances/public/check-reference/${encodeURIComponent(ref)}`);
+      const available = res.data?.success ? res.data.available !== false : null;
+      setReferenceAvailable(available);
+      return available;
+    } catch (err) {
+      console.error('Erreur vérification référence:', err);
+      setReferenceAvailable(null);
+      return null;
+    } finally {
+      setReferenceChecking(false);
+    }
+  }, []);
+
+  const handleReferenceChange = (e) => {
+    const value = e.target.value;
+    setReference(value);
+    setReferenceAvailable(null);
+    if (referenceCheckTimerRef.current) clearTimeout(referenceCheckTimerRef.current);
+    referenceCheckTimerRef.current = setTimeout(() => {
+      checkReferenceAvailability(value);
+    }, 400);
+  };
+
+  const enableManualReference = () => {
+    if (referenceCheckTimerRef.current) clearTimeout(referenceCheckTimerRef.current);
+    setManualReferenceMode(true);
+    setReference('');
+    setReferenceAvailable(null);
+  };
+
+  const disableManualReference = () => {
+    if (referenceCheckTimerRef.current) clearTimeout(referenceCheckTimerRef.current);
+    setReferenceAvailable(null);
+    setReferenceChecking(false);
+    setManualReferenceMode(false);
+    setReference(generateReference());
+  };
 
   const allowedMimeTypes = [
     'image/jpeg', 'image/jpg', 'image/png', 'image/gif', 'image/webp',
@@ -158,6 +215,24 @@ function AjouterDoleance() {
       return;
     }
 
+    if (manualReferenceMode) {
+      if (!reference || !reference.trim()) {
+        toast.error('Veuillez saisir une référence manuelle');
+        setLoading(false);
+        return;
+      }
+      if (reference.length > 50) {
+        toast.error('La référence ne doit pas dépasser 50 caractères');
+        setLoading(false);
+        return;
+      }
+      if (referenceAvailable === false) {
+        toast.error('Cette référence existe déjà. Veuillez en choisir une autre.');
+        setLoading(false);
+        return;
+      }
+    }
+
     setLoading(true);
     try {
       const dataToSend = {
@@ -167,6 +242,16 @@ function AjouterDoleance() {
         adresse_citoyen: formData.adresse_citoyen || null,
         quartier: formData.quartier?.trim() || null,
       };
+
+      if (manualReferenceMode && reference.trim()) {
+        const isAvailable = await checkReferenceAvailability(reference.trim());
+        if (isAvailable === false) {
+          toast.error('Cette référence existe déjà. Veuillez en choisir une autre.');
+          setLoading(false);
+          return;
+        }
+        dataToSend.reference = reference.trim();
+      }
 
       const response = await api.post('/doleances', dataToSend);
 
@@ -192,7 +277,7 @@ function AjouterDoleance() {
     } finally {
       setLoading(false);
     }
-  }, [formData, files, navigate]);
+  }, [formData, files, navigate, manualReferenceMode, reference, referenceAvailable, checkReferenceAvailability]);
 
   const inputClass = "w-full px-3 py-2 text-sm border border-gray-300 dark:border-slate-600 dark:bg-slate-700 dark:text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors";
   const textareaClass = `${inputClass} resize-none`;
@@ -225,13 +310,48 @@ function AjouterDoleance() {
 
       {/* Référence */}
       <div className="bg-gradient-to-r from-blue-600 to-blue-700 rounded-xl p-4 mb-6 shadow-md">
-        <div className="flex items-center gap-3">
-          <DocumentTextIcon className="h-6 w-6 text-white/80" />
-          <div>
+        <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center gap-3">
+            <DocumentTextIcon className="h-6 w-6 text-white/80" />
             <p className="text-xs text-white/60 uppercase tracking-wide">Référence</p>
-            <p className="text-lg font-mono font-bold text-white">{reference}</p>
           </div>
+          <button
+            type="button"
+            onClick={manualReferenceMode ? disableManualReference : enableManualReference}
+            className="text-xs font-semibold px-3 py-1 rounded-full bg-white/20 hover:bg-white/30 text-white transition-colors"
+          >
+            {manualReferenceMode ? 'Génération auto' : 'Saisir manuellement'}
+          </button>
         </div>
+
+        {manualReferenceMode ? (
+          <div>
+            <input
+              type="text"
+              value={reference}
+              onChange={handleReferenceChange}
+              maxLength={50}
+              placeholder="Ex: DOL-20250901-0001"
+              className="w-full px-3 py-2 text-lg font-mono font-bold bg-white/20 border border-white/30 text-white placeholder-white/40 rounded-lg focus:outline-none focus:ring-2 focus:ring-white/50"
+            />
+            <div className="flex items-center gap-2 mt-1 min-h-[20px]">
+              {referenceChecking && (
+                <p className="text-xs text-white/60 flex items-center gap-1">
+                  <svg className="animate-spin h-3 w-3" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/></svg>
+                  Vérification…
+                </p>
+              )}
+              {!referenceChecking && reference && referenceAvailable === true && (
+                <p className="text-xs text-green-300">Référence disponible</p>
+              )}
+              {!referenceChecking && reference && referenceAvailable === false && (
+                <p className="text-xs text-red-300">Cette référence existe déjà</p>
+              )}
+            </div>
+          </div>
+        ) : (
+          <p className="text-lg font-mono font-bold text-white">{reference}</p>
+        )}
       </div>
 
       <form onSubmit={handleSubmit}>

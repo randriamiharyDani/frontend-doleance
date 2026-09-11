@@ -490,7 +490,7 @@ function Settings() {
               <ChatBubbleLeftRightIcon className="h-5 w-5 text-sky-600 dark:text-sky-400" />
             </div>
             <div>
-              <h2 className="font-bold text-gray-900 dark:text-white text-sm">Réseaux sociaux (footer public)</h2>
+              <h2 className="font-bold text-gray-900 dark:text-white text-sm">Réseaux sociaux</h2>
               <p className="text-xs text-gray-400">
                 Numéro WhatsApp et liens Facebook / Instagram affichés dans le pied de page du site public
               </p>
