@@ -339,6 +339,9 @@ function DeposerDoleance() {
   const [showSuggestions, setShowSuggestions] = useState(false);
   const fileInputRef = useRef(null);
   const searchTimeoutRef = useRef(null);
+  const searchAbortRef = useRef(null);
+  const reverseAbortRef = useRef(null);
+  const reverseTimeoutRef = useRef(null);
   const [dragOver, setDragOver] = useState(false);
   const [savedDirection, setSavedDirection] = useState(null);
 
@@ -410,6 +413,15 @@ function DeposerDoleance() {
         if (url) URL.revokeObjectURL(url);
       });
   }, [files]);
+
+  useEffect(() => {
+    return () => {
+      if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+      if (reverseTimeoutRef.current) clearTimeout(reverseTimeoutRef.current);
+      searchAbortRef.current?.abort();
+      reverseAbortRef.current?.abort();
+    };
+  }, []);
 
   const currentLang = i18n.language?.startsWith("mg") ? "mg" : "fr";
   const mappedCategories = [...categoriesData]
@@ -748,11 +760,23 @@ function DeposerDoleance() {
     return (bytes / (1024 * 1024)).toFixed(1) + " MB";
   };
 
+  const fillReverseAbort = () => {
+    if (reverseTimeoutRef.current) {
+      clearTimeout(reverseTimeoutRef.current);
+      reverseTimeoutRef.current = null;
+    }
+    reverseAbortRef.current?.abort();
+  };
+
   const fillFromNominatim = (data) => {
     const addr = data.address || {};
     const quartierNom = addr.suburb || addr.neighbourhood || addr.quarter || "";
-    const matchedQuartier = quartiers.find((q) => q.nom_quartier.toLowerCase() === quartierNom.toLowerCase());
+    const matchedQuartier = quartiers.find(
+      (q) => q.nom_quartier && q.nom_quartier.toLowerCase() === quartierNom.toLowerCase(),
+    );
 
+    setLocationName(data.display_name || "");
+    setSearchAddress(data.display_name || "");
     setFormData((prev) => ({
       ...prev,
       arrondissement: addr.city_district || addr.district || prev.arrondissement,
@@ -760,8 +784,63 @@ function DeposerDoleance() {
       fokontany: prev.fokontany,
       lieu_exact: data.display_name || prev.lieu_exact,
     }));
+  };
 
-    setSearchAddress(data.display_name || "");
+  const reverseGeocodePosition = async (latlng, { silent = false } = {}) => {
+    if (reverseAbortRef.current) reverseAbortRef.current.abort();
+    const controller = new AbortController();
+    reverseAbortRef.current = controller;
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}&addressdetails=1&accept-language=fr,mg`,
+        { signal: controller.signal },
+      );
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      if (data?.display_name) {
+        fillFromNominatim(data);
+        return true;
+      }
+      return false;
+    } catch (err) {
+      if (err.name === "AbortError") return false;
+      console.error("Erreur reverse geocoding:", err);
+      if (!silent) toast.error(t("deposerMessages.locationError"));
+      return false;
+    }
+  };
+
+  const scheduleReverseGeocode = (latlng) => {
+    fillReverseAbort();
+    const controller = new AbortController();
+    reverseAbortRef.current = controller;
+    reverseTimeoutRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}&addressdetails=1&accept-language=fr,mg`,
+          { signal: controller.signal },
+        );
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        if (data?.display_name) {
+          fillFromNominatim(data);
+        } else {
+          setLocationName("");
+          setFormData((prev) => ({
+            ...prev,
+            lieu_exact: `${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}`,
+          }));
+        }
+      } catch (err) {
+        if (err.name === "AbortError") return;
+        console.error("Erreur reverse geocoding:", err);
+        setLocationName("");
+        setFormData((prev) => ({
+          ...prev,
+          lieu_exact: `${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}`,
+        }));
+      }
+    }, 450);
   };
 
   const handleLocateMe = () => {
@@ -775,20 +854,13 @@ function DeposerDoleance() {
       async (pos) => {
         const { latitude, longitude } = pos.coords;
         setMapPosition([latitude, longitude]);
-
-        try {
-          const res = await fetch(
-            `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&addressdetails=1`,
-          );
-          const data = await res.json();
-          fillFromNominatim(data);
+        const ok = await reverseGeocodePosition({ lat: latitude, lng: longitude }, { silent: true });
+        if (ok) {
           toast.success(t("deposerMessages.locationFound"));
-        } catch (err) {
-          console.error("Erreur reverse geocoding:", err);
+        } else {
           toast.error(t("deposerMessages.locationError"));
-        } finally {
-          setIsLocating(false);
         }
+        setIsLocating(false);
       },
       (err) => {
         setIsLocating(false);
@@ -806,6 +878,33 @@ function DeposerDoleance() {
     );
   };
 
+  const NOMINATIM_SEARCH_PREFIX =
+    "https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&countrycodes=mg&accept-language=fr,mg&limit=5&q=";
+
+  const performSearch = async (value) => {
+    if (searchAbortRef.current) searchAbortRef.current.abort();
+    const controller = new AbortController();
+    searchAbortRef.current = controller;
+    setIsSearching(true);
+    try {
+      const res = await fetch(`${NOMINATIM_SEARCH_PREFIX}${encodeURIComponent(value)}`, {
+        signal: controller.signal,
+      });
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      setSuggestions(data || []);
+      setShowSuggestions((data || []).length > 0);
+      return data || [];
+    } catch (err) {
+      if (err.name === "AbortError") return [];
+      console.error("Erreur recherche:", err);
+      toast.error(t("deposer.searchError"));
+      return [];
+    } finally {
+      setIsSearching(false);
+    }
+  };
+
   const handleSearchInputChange = (e) => {
     const value = e.target.value;
     setSearchAddress(value);
@@ -813,29 +912,17 @@ function DeposerDoleance() {
     if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
 
     if (value.trim().length < 3) {
+      if (searchAbortRef.current) searchAbortRef.current.abort();
       setSuggestions([]);
       setShowSuggestions(false);
       return;
     }
 
-    searchTimeoutRef.current = setTimeout(async () => {
-      setIsSearching(true);
-      try {
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&limit=5&q=${encodeURIComponent(value)}`,
-        );
-        const data = await res.json();
-        setSuggestions(data);
-        setShowSuggestions(true);
-      } catch (err) {
-        console.error("Erreur recherche:", err);
-      } finally {
-        setIsSearching(false);
-      }
-    }, 400);
+    searchTimeoutRef.current = setTimeout(() => performSearch(value), 400);
   };
 
   const handleSelectSuggestion = (item) => {
+    fillReverseAbort();
     setMapPosition([parseFloat(item.lat), parseFloat(item.lon)]);
     fillFromNominatim(item);
     setSuggestions([]);
@@ -844,9 +931,27 @@ function DeposerDoleance() {
 
   const handleSearchAddress = async (e) => {
     e.preventDefault();
+    const value = searchAddress.trim();
+    if (value.length < 3) return;
     if (suggestions.length > 0) {
       handleSelectSuggestion(suggestions[0]);
+      return;
     }
+    const results = await performSearch(value);
+    if (results.length > 0) {
+      handleSelectSuggestion(results[0]);
+      toast.success(t("deposerMessages.locationFound"));
+    } else {
+      toast.error(t("deposer.searchNoResults"));
+    }
+  };
+
+  const handleMapPositionChange = (latlng) => {
+    setFormData((prev) => ({
+      ...prev,
+      lieu_exact: prev.lieu_exact || `${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}`,
+    }));
+    scheduleReverseGeocode(latlng);
   };
 
   const charsCount = formData.description.length;
@@ -1204,12 +1309,7 @@ function DeposerDoleance() {
               <DraggableMarker
                 position={mapPosition}
                 setPosition={setMapPosition}
-                onPositionChange={(latlng) => {
-                  setFormData((prev) => ({
-                    ...prev,
-                    lieu_exact: prev.lieu_exact || `${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}`,
-                  }));
-                }}
+                onPositionChange={handleMapPositionChange}
               />
               {assignedDoleances
                 .filter((d) => d.latitude && d.longitude)

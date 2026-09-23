@@ -396,6 +396,8 @@
     "locationTitle": "Localisation & adresse",
     "searchPlaceholder": "Rechercher une adresse, un quartier...",
     "searchBtn": "Chercher",
+    "searchError": "Erreur lors de la recherche. Réessayez.",
+    "searchNoResults": "Aucun résultat trouvé pour cette adresse.",
     "locateMe": "Me localiser",
     "mapHint": "Cliquez ou déplacez le marqueur pour ajuster",
     "exactLocation": "Lieu exact",
