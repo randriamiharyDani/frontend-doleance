@@ -251,6 +251,68 @@ function ModuleCard({ active, onClick, emoji, label, activeClasses }) {
   );
 }
 
+/* --- Recherche d'adresse sur la carte -----------------------------------
+ * Logique identique à celle de « Doléance téléphonique » (backoffice) :
+ * même délai de saisie, même seuil, même biais géographique, même
+ * dédoublonnage et même navigation au clavier.
+ * ------------------------------------------------------------------------ */
+const MIN_SEARCH_CHARS = 3;
+const SEARCH_RESULT_LIMIT = 8;
+/** Demi-largeur (en degrés) de la zone de biais géographique, ~20 km. */
+const SEARCH_BIAS_SPAN = 0.18;
+/** Attente avant interrogation automatique pendant la saisie. */
+const SEARCH_DEBOUNCE_MS = 350;
+
+const SEARCH_TYPE_LABEL_KEYS = {
+  amenity: "deposer.searchType.amenity",
+  building: "deposer.searchType.building",
+  shop: "deposer.searchType.shop",
+  highway: "deposer.searchType.highway",
+  place: "deposer.searchType.place",
+  tourism: "deposer.searchType.tourism",
+  office: "deposer.searchType.office",
+  craft: "deposer.searchType.craft",
+  healthcare: "deposer.searchType.healthcare",
+  school: "deposer.searchType.school",
+  university: "deposer.searchType.university",
+  railway: "deposer.searchType.railway",
+  aeroway: "deposer.searchType.aeroway",
+};
+
+/** Découpe un `display_name` Nominatim en libellé principal + complément. */
+function splitDisplayName(displayName) {
+  const parts = String(displayName || "")
+    .split(",")
+    .map((part) => part.trim())
+    .filter(Boolean);
+  return { primary: parts[0] || "", secondary: parts.slice(1, 3).join(", ") };
+}
+
+/** Type de lieu lisible, utilisé comme pastille sur chaque résultat. */
+function resultTypeLabel(item, t) {
+  const raw = item?.type || item?.category || item?.class;
+  if (!raw) return "";
+  const key = SEARCH_TYPE_LABEL_KEYS[raw];
+  return key ? t(key) : raw;
+}
+
+/** Met en évidence le fragment de texte correspondant à la saisie. */
+function HighlightMatch({ text, query }) {
+  const needle = (query || "").trim();
+  if (!needle || !text) return <>{text}</>;
+  const index = text.toLowerCase().indexOf(needle.toLowerCase());
+  if (index === -1) return <>{text}</>;
+  return (
+    <>
+      {text.slice(0, index)}
+      <mark className="bg-blue-100 dark:bg-blue-900/50 text-blue-900 dark:text-blue-100 rounded px-0.5">
+        {text.slice(index, index + needle.length)}
+      </mark>
+      {text.slice(index + needle.length)}
+    </>
+  );
+}
+
 function DeposerDoleance() {
   const { t, i18n } = useTranslation();
   const { darkMode } = useTheme();
@@ -282,9 +344,13 @@ function DeposerDoleance() {
   const [isSearching, setIsSearching] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
+  const [searchDone, setSearchDone] = useState(false);
+  const [activeSuggestion, setActiveSuggestion] = useState(-1);
   const fileInputRef = useRef(null);
   const searchTimeoutRef = useRef(null);
   const searchAbortRef = useRef(null);
+  const searchInputRef = useRef(null);
+  const searchOptionRefs = useRef([]);
   const reverseAbortRef = useRef(null);
   const reverseTimeoutRef = useRef(null);
   const [dragOver, setDragOver] = useState(false);
@@ -760,41 +826,84 @@ function DeposerDoleance() {
     }, 450);
   };
 
+  /* --- Recherche d'adresse --------------------------------------------- */
+  // Biais géographique : le viewbox ne restreint pas les résultats, il les
+  // ordonne par proximité autour du point actuellement affiché sur la carte.
+  const searchViewbox = useMemo(() => {
+    const [lat, lng] = mapPosition || ANTANANARIVO_CENTER;
+    const span = SEARCH_BIAS_SPAN;
+    return `${lng - span},${lat - span},${lng + span},${lat + span}`;
+  }, [mapPosition]);
+
+  const resetSearch = () => {
+    if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
+    searchAbortRef.current?.abort();
+    setSearchAddress("");
+    setSuggestions([]);
+    setShowSuggestions(false);
+    setSearchDone(false);
+    setActiveSuggestion(-1);
+  };
+
   const performSearch = async (value) => {
+    const query = String(value || "").trim();
+    if (query.length < MIN_SEARCH_CHARS) return [];
+
     if (searchAbortRef.current) searchAbortRef.current.abort();
     const controller = new AbortController();
     searchAbortRef.current = controller;
     setIsSearching(true);
+    setShowSuggestions(true);
+    setActiveSuggestion(-1);
+
     try {
-      const data = await searchGeocode(value, { signal: controller.signal });
+      const data = await searchGeocode(query, {
+        signal: controller.signal,
+        limit: SEARCH_RESULT_LIMIT,
+        viewbox: searchViewbox,
+      });
       const results = Array.isArray(data) ? data : [];
-      setSuggestions(results);
-      setShowSuggestions(results.length > 0);
-      return results;
+      // Élimine les doublons exacts renvoyés par Nominatim.
+      const seen = new Set();
+      const unique = results.filter((item) => {
+        const key = `${item.lat},${item.lon},${item.display_name}`;
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+      setSuggestions(unique);
+      setSearchDone(true);
+      return unique;
     } catch (err) {
       if (err.name === "AbortError") return [];
       console.error("Erreur recherche:", err);
+      setSuggestions([]);
+      setSearchDone(true);
       toast.error(t("deposer.searchError"));
       return [];
     } finally {
-      setIsSearching(false);
+      // Ne libère l'indicateur que si aucune requête plus récente n'a démarré.
+      if (searchAbortRef.current === controller) setIsSearching(false);
     }
   };
 
   const handleSearchInputChange = (e) => {
     const value = e.target.value;
     setSearchAddress(value);
-
+    setActiveSuggestion(-1);
+    setSearchDone(false);
     if (searchTimeoutRef.current) clearTimeout(searchTimeoutRef.current);
 
-    if (value.trim().length < 3) {
-      if (searchAbortRef.current) searchAbortRef.current.abort();
+    if (value.trim().length < MIN_SEARCH_CHARS) {
+      // L'abort déclenche le `finally` de la requête en cours, qui libère
+      // l'indicateur d'activité.
+      searchAbortRef.current?.abort();
       setSuggestions([]);
       setShowSuggestions(false);
       return;
     }
 
-    searchTimeoutRef.current = setTimeout(() => performSearch(value), 400);
+    searchTimeoutRef.current = setTimeout(() => performSearch(value), SEARCH_DEBOUNCE_MS);
   };
 
   const handleSelectSuggestion = (item) => {
@@ -804,22 +913,59 @@ function DeposerDoleance() {
     fillFromNominatim(item);
     setSuggestions([]);
     setShowSuggestions(false);
+    setSearchDone(false);
+    setActiveSuggestion(-1);
   };
 
-  const handleSearchAddress = async (e) => {
-    e.preventDefault();
+  const submitSearch = async () => {
     const value = searchAddress.trim();
-    if (value.length < 3) return;
-    if (suggestions.length > 0) {
-      handleSelectSuggestion(suggestions[0]);
+    if (value.length < MIN_SEARCH_CHARS) {
+      toast.error(t("deposer.searchTooShort", { count: MIN_SEARCH_CHARS }));
+      searchInputRef.current?.focus();
       return;
     }
+    if (isSearching) return;
+
+    // Résultats déjà affichés pour cette saisie : on sélectionne la ligne
+    // surlignée au clavier, sinon le premier résultat, sans appel réseau.
+    if (suggestions.length > 0 && showSuggestions) {
+      const target = activeSuggestion >= 0 ? suggestions[activeSuggestion] : suggestions[0];
+      if (target) {
+        handleSelectSuggestion(target);
+        toast.success(t("deposerMessages.locationFound"));
+        return;
+      }
+    }
+
     const results = await performSearch(value);
     if (results.length > 0) {
       handleSelectSuggestion(results[0]);
       toast.success(t("deposerMessages.locationFound"));
     } else {
       toast.error(t("deposer.searchNoResults"));
+    }
+  };
+
+  const handleSearchKeyDown = (e) => {
+    if (e.key === "Escape") {
+      setShowSuggestions(false);
+      setActiveSuggestion(-1);
+      return;
+    }
+    const count = suggestions.length;
+    if (e.key === "ArrowDown" || e.key === "ArrowUp") {
+      if (!showSuggestions || count === 0) return;
+      e.preventDefault();
+      setActiveSuggestion((current) => {
+        const next = e.key === "ArrowDown" ? (current + 1) % count : current <= 0 ? count - 1 : current - 1;
+        searchOptionRefs.current[next]?.scrollIntoView({ block: "nearest" });
+        return next;
+      });
+      return;
+    }
+    if (e.key === "Enter") {
+      e.preventDefault();
+      submitSearch();
     }
   };
 
@@ -1096,16 +1242,21 @@ function DeposerDoleance() {
         {/* 5. Localisation & Adresse */}
         <Section step={5} iconPath={ICONS.pin} title={t("deposer.locationTitle")} required>
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-3 relative">
-            <form
-              onSubmit={handleSearchAddress}
-              className="cua-field-wrap flex-1 flex items-center gap-3 bg-slate-50 dark:bg-slate-800 rounded-xl px-4 border border-transparent transition-all relative order-2 sm:order-1"
-            >
+            <div className="cua-field-wrap flex-1 flex items-center gap-3 bg-slate-50 dark:bg-slate-800 rounded-xl px-4 border border-transparent transition-all relative order-2 sm:order-1">
               <Icon path={ICONS.search} className="w-4 h-4 text-slate-400 flex-shrink-0" />
               <input
+                ref={searchInputRef}
                 type="text"
+                role="combobox"
+                aria-expanded={showSuggestions}
+                aria-controls="map-search-results"
+                aria-autocomplete="list"
+                aria-label={t("deposer.searchAriaLabel")}
+                aria-activedescendant={activeSuggestion >= 0 ? `map-search-option-${activeSuggestion}` : undefined}
                 value={searchAddress}
                 onChange={handleSearchInputChange}
-                onFocus={() => searchAddress.length >= 3 && setShowSuggestions(true)}
+                onKeyDown={handleSearchKeyDown}
+                onFocus={() => searchAddress.trim().length >= MIN_SEARCH_CHARS && setShowSuggestions(true)}
                 onBlur={() => setTimeout(() => setShowSuggestions(false), 150)}
                 placeholder={t("deposer.searchPlaceholder")}
                 className="flex-1 bg-transparent py-2.5 sm:py-3 text-sm font-medium text-slate-800 dark:text-slate-200 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500 min-w-0"
@@ -1113,29 +1264,116 @@ function DeposerDoleance() {
               {isSearching && (
                 <div className="w-4 h-4 border border-slate-300 border-t-[#1E3A8A] rounded-full animate-spin flex-shrink-0" />
               )}
-              <button
-                type="submit"
-                className="text-xs font-semibold text-[#1E3A8A] dark:text-blue-400 hover:text-[#0F172A] dark:hover:text-blue-300 py-1 px-2 rounded-lg hover:bg-[#1E3A8A]/5 dark:hover:bg-blue-400/10 transition-all flex-shrink-0"
-              >
-                {t("deposer.searchBtn")}
-              </button>
+              {searchAddress && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    resetSearch();
+                    searchInputRef.current?.focus();
+                  }}
+                  className="p-1 rounded-full text-slate-400 hover:text-slate-600 hover:bg-slate-100 dark:hover:text-slate-200 dark:hover:bg-slate-700 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37] flex-shrink-0"
+                  aria-label={t("deposer.searchClear")}
+                  title={t("deposer.searchClear")}
+                >
+                  <Icon path={ICONS.close} className="w-3.5 h-3.5" />
+                </button>
+              )}
 
-              {showSuggestions && suggestions.length > 0 && (
-                <div className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-slate-800 rounded-xl shadow-lg border dark:border-slate-600 z-[1001] max-h-60 overflow-y-auto">
-                  {suggestions.map((item, i) => (
-                    <button
-                      key={i}
-                      type="button"
-                      onClick={() => handleSelectSuggestion(item)}
-                      className="w-full text-left px-4 py-2.5 text-sm text-slate-700 dark:text-slate-300 hover:bg-[#D4AF37]/10 transition-colors border-b border-slate-50 dark:border-slate-700 last:border-0"
-                    >
-                      {item.display_name}
-                    </button>
-                  ))}
+              {showSuggestions && (
+                <div
+                  id="map-search-results"
+                  role="listbox"
+                  aria-label={t("deposer.searchResultsAriaLabel")}
+                  className="absolute top-full left-0 right-0 mt-1 bg-white dark:bg-slate-800 rounded-xl shadow-lg border dark:border-slate-600 z-[1001] max-h-72 overflow-y-auto"
+                >
+                  {isSearching && (
+                    <div className="flex items-center gap-2 px-4 py-2.5 text-xs text-slate-500 dark:text-slate-400">
+                      <div className="w-3.5 h-3.5 border border-slate-300 border-t-[#1E3A8A] rounded-full animate-spin flex-shrink-0" />
+                      {t("deposer.searchLoading")}
+                    </div>
+                  )}
+
+                  {!isSearching && !searchDone && (
+                    <div className="px-4 py-2.5 text-xs text-slate-500 dark:text-slate-400">
+                      {t("deposer.searchHintType")}
+                    </div>
+                  )}
+
+                  {!isSearching && searchDone && suggestions.length === 0 && (
+                    <div className="px-4 py-2.5 text-xs text-slate-500 dark:text-slate-400">
+                      {t("deposer.searchEmpty")}
+                    </div>
+                  )}
+
+                  {suggestions.map((item, i) => {
+                    const { primary, secondary } = splitDisplayName(item.display_name);
+                    const typeLabel = resultTypeLabel(item, t);
+                    const isActive = i === activeSuggestion;
+                    return (
+                      <button
+                        key={`${item.lat}-${item.lon}-${i}`}
+                        id={`map-search-option-${i}`}
+                        ref={(el) => {
+                          searchOptionRefs.current[i] = el;
+                        }}
+                        type="button"
+                        role="option"
+                        aria-selected={isActive}
+                        onMouseDown={(e) => e.preventDefault()}
+                        onClick={() => handleSelectSuggestion(item)}
+                        className={`w-full text-left px-4 py-2.5 border-b border-slate-50 dark:border-slate-700 last:border-0 transition-colors ${
+                          isActive ? "bg-blue-50 dark:bg-blue-900/30" : "hover:bg-slate-50 dark:hover:bg-slate-700"
+                        }`}
+                      >
+                        <span className="flex items-start gap-2">
+                          <Icon path={ICONS.pin} className="w-4 h-4 mt-0.5 flex-shrink-0 text-[#1E3A8A] dark:text-blue-400" />
+                          <span className="min-w-0 flex-1">
+                            <span className="block text-xs font-semibold text-slate-800 dark:text-slate-100 truncate">
+                              <HighlightMatch text={primary} query={searchAddress} />
+                            </span>
+                            {secondary && (
+                              <span className="block text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                                {secondary}
+                              </span>
+                            )}
+                          </span>
+                          {typeLabel && (
+                            <span className="flex-shrink-0 text-[10px] uppercase tracking-wide px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-700 text-slate-500 dark:text-slate-400">
+                              {typeLabel}
+                            </span>
+                          )}
+                        </span>
+                      </button>
+                    );
+                  })}
+
+                  {suggestions.length > 0 && (
+                    <div className="px-4 py-1.5 text-[10px] text-slate-400 dark:text-slate-500 bg-slate-50 dark:bg-slate-900/40">
+                      {t("deposer.searchKeyboardHint")}
+                    </div>
+                  )}
                 </div>
               )}
-            </form>
+            </div>
+
+            <button
+              type="button"
+              onClick={submitSearch}
+              disabled={isSearching || searchAddress.trim().length < MIN_SEARCH_CHARS}
+              aria-busy={isSearching}
+              className="cua-btn-primary order-1 sm:order-2 flex-shrink-0 text-xs font-semibold px-4 py-3 rounded-xl text-white transition-all disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center justify-center gap-2"
+            >
+              {isSearching ? (
+                <div className="w-4 h-4 border border-white/40 border-t-white rounded-full animate-spin" />
+              ) : (
+                <Icon path={ICONS.search} className="w-4 h-4" />
+              )}
+              {t("deposer.searchBtn")}
+            </button>
           </div>
+          <p className="text-[11px] text-slate-400 dark:text-slate-500 -mt-1 mb-3">
+            {t("deposer.searchMinChars", { count: MIN_SEARCH_CHARS })}
+          </p>
 
           <LocationPickerMap
             className="mb-4"

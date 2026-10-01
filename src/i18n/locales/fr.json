@@ -18,7 +18,6 @@
     "btnSubmit": "Déposer une doléance",
     "btnTrack": "Suivre ma doléance"
   },
-
   "form": {
     "yourInfo": "Vos informations",
     "lastName": "Nom",
@@ -443,7 +442,31 @@
     "trackReport": "Suivre mon signalement",
     "assigned": "Assignée",
     "refLabel": "Référence :",
-    "transmittedTo": "Transmis à:"
+    "transmittedTo": "Transmis à:",
+    "searchMinChars": "{{count}} caractères minimum. Le marqueur se place sur l’emplacement choisi.",
+    "searchTooShort": "Saisissez au moins {{count}} caractères pour rechercher.",
+    "searchLoading": "Recherche en cours…",
+    "searchHintType": "Saisissez le nom d’un lieu, d’une rue ou d’un quartier.",
+    "searchEmpty": "Aucun résultat. Essayez un autre mot-clé ou cliquez directement sur la carte.",
+    "searchKeyboardHint": "↑ ↓ pour naviguer · Entrée pour sélectionner · Échap pour fermer",
+    "searchClear": "Effacer la recherche",
+    "searchAriaLabel": "Rechercher une adresse sur la carte",
+    "searchResultsAriaLabel": "Résultats de recherche d’adresse",
+    "searchType": {
+      "amenity": "équipement",
+      "building": "bâtiment",
+      "shop": "commerce",
+      "highway": "voie",
+      "place": "lieu",
+      "tourism": "tourisme",
+      "office": "bureau",
+      "craft": "atelier",
+      "healthcare": "santé",
+      "school": "école",
+      "university": "université",
+      "railway": "gare",
+      "aeroway": "aéroport"
+    }
   },
   "deposerMessages": {
     "emailOrPhoneRequired": "Email ou téléphone requis",

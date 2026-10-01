@@ -18,7 +18,6 @@
     "btnSubmit": "Hametraka fitarainana",
     "btnTrack": "Hanaraka ny fitarainako"
   },
-
   "form": {
     "yourInfo": "Ny momba anao",
     "lastName": "Anarana",
@@ -58,7 +57,7 @@
     "noComplaints": "Tsy misy fitarainana hita",
     "submitFirst": "Alefaso ny fitarainanao voalohany!",
     "copyReference": "Adikao ny laharan-kitokisana",
-    "viewTracking": "Jereo ny fanarahana", 
+    "viewTracking": "Jereo ny fanarahana",
     "photosProbleme": "Sary manamarina ny olàna"
   },
   "categories": {
@@ -369,7 +368,6 @@
     "quickLinks": "Rohy haingana",
     "greenNumber": "Laharana maimaim-poana",
     "greenNumber-orange": "Laharana maimaim-poana - orange"
-
   },
   "deposer": {
     "communeTitle": "Commune Urbaine d'Antananarivo",
@@ -444,7 +442,31 @@
     "trackReport": "Hanara-maso ny tatitrako",
     "assigned": "Nodiriana",
     "refLabel": "Laharan-kitokisana :",
-    "transmittedTo": "Nalefa tany amin'ny :"
+    "transmittedTo": "Nalefa tany amin'ny :",
+    "searchMinChars": "Litera {{count}} farafahakeliny. Alefa ny marika amin’ny toerana nofidiana.",
+    "searchTooShort": "Ampidiro litera {{count}} farafahakeliny mba hikarohana.",
+    "searchLoading": "Mikaroka…",
+    "searchHintType": "Ampidiro ny anaran’ny toerana, lalana na faritra.",
+    "searchEmpty": "Tsy misy vokatra. Andramo teny hafa na tsindrio mivantana amin’ny sary.",
+    "searchKeyboardHint": "↑ ↓ mba hilindrana · Enter mamafona · Échap mamehana",
+    "searchClear": "Hamafa ny fikarohana",
+    "searchAriaLabel": "Hikaroha adiresy amin’ny sary",
+    "searchResultsAriaLabel": "Vokatra nosamborina tamin’ny fikarohana",
+    "searchType": {
+      "amenity": "fitaovana",
+      "building": "trano",
+      "shop": "fivarotana",
+      "highway": "lalana",
+      "place": "toerana",
+      "tourism": "fitsanganana",
+      "office": "biro",
+      "craft": "asa tanana",
+      "healthcare": "fitsaboana",
+      "school": "sekoly",
+      "university": "onsekoly",
+      "railway": "loko",
+      "aeroway": "aerizoma"
+    }
   },
   "deposerMessages": {
     "emailOrPhoneRequired": "Mailaka na laharan-telefaona ilaina",
@@ -455,11 +477,9 @@
     "refLabel": "Laharan-kitokisana :",
     "forwardedTo": "Alefa any amin'ny"
   },
-  "chat": {
-   
-  },
-  "header" :{
-    "bigtitle" : "Fampahafantarana" 
+  "chat": {},
+  "header": {
+    "bigtitle": "Fampahafantarana"
   },
   "citizenCall": {
     "badge": "Antso mivantana",
