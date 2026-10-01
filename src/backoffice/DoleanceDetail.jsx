@@ -391,7 +391,7 @@ function DoleanceDetail() {
                   className="flex items-center gap-1.5 px-3 py-1.5 text-sm bg-[#1E3A8A] text-white rounded-lg hover:bg-[#0F172A] transition-colors print:hidden"
                 >
                   <PrinterIcon className="h-4 w-4" />
-                  Imprimer
+                  Imprimer PDS et Maire
                 </button>
                 {isAdminOrOperator && (
                   <button

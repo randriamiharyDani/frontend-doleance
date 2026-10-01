@@ -148,6 +148,10 @@ function Doleances() {
     navigate(`/backoffice/doleances/${doleance.id_doleance}`);
   };
 
+  const openPrintPage = async (doleance) => {
+    navigate(`/backoffice/doleances/${doleance.id_doleance}/imprimer`);
+  };
+
   const confirmDelete = (doleance) => {
     if (!isAdminOrAgentCentral) { toast.error('Vous n\'avez pas les droits'); return; }
     setDoleanceToDelete(doleance);
@@ -266,6 +270,7 @@ function Doleances() {
               onPriorite={openPrioriteModal}
               onReponse={openReponseModal}
               onStatut={openStatutModal}
+              onImprimer={openPrintPage}
               isNouvelle={isNouvelle(doleance.nom_statut)}
               isBloquee={isBloquee(doleance.nom_statut)}
               isDeSaDirection={doleance.id_direction === user?.id_direction || (!user?.id_direction && doleance.id_utilisateur_assignee === user?.id_utilisateur)}

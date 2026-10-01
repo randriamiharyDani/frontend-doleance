@@ -23,6 +23,7 @@ const BackofficeLayout = lazy(() => import('./backoffice/BackofficeLayout'));
 const Dashboard = lazy(() => import('./backoffice/Dashboard'));
 const Doleances = lazy(() => import('./backoffice/Doleances'));
 const DoleanceDetail = lazy(() => import('./backoffice/DoleanceDetail'));
+const DoleancePrint = lazy(() => import('./pages/backoffice/Doleances/DoleancePrint'));
 const Users = lazy(() => import('./backoffice/Users'));
 const Roles = lazy(() => import('./backoffice/Roles'));
 const Statistiques = lazy(() => import('./backoffice/Statistiques'));
@@ -57,6 +58,9 @@ function AppRoutes() {
         <Route path="/toutes-doleances" element={<PublicLayout><ToutesDoleances /></PublicLayout>} />
         <Route path="/appeler-agent" element={<PublicLayout><AppelerAgent /></PublicLayout>} />
         
+        {/* Page d'impression dédiée (plein écran, sans navigation) */}
+        <Route path="/backoffice/doleances/:id/imprimer" element={<PrivateRoute><DoleancePrint /></PrivateRoute>} />
+
         {/* Routes back-office */}
         <Route path="/backoffice" element={<PrivateRoute><BackofficeLayout /></PrivateRoute>}>
           <Route index element={<Navigate to="/backoffice/dashboard" replace />} />

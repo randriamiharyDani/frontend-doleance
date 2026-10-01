@@ -2,7 +2,7 @@ import React from 'react';
 import {
   UserIcon, PhoneIcon, EnvelopeIcon, FolderIcon,
   CalendarIcon, MapPinIcon, PencilIcon,
-  ChatBubbleLeftRightIcon, ArrowPathIcon, EyeIcon
+  ChatBubbleLeftRightIcon, ArrowPathIcon, EyeIcon, PrinterIcon
 } from '@heroicons/react/24/outline';
 import StatusBadge from '../../../components/common/StatusBadge';
 import PriorityBadge from '../../../components/common/PriorityBadge';
@@ -12,7 +12,7 @@ const STATUTS_BLOQUES = ['Résolue', 'Rejetée', 'Clôturée', 'Fermée'];
 function DoleanceCard({
   doleance,
   user, isAdminOrAgentCentral, canTraiter,
-  onView, onDelete, onPriorite, onReponse, onStatut,
+  onView, onDelete, onPriorite, onReponse, onStatut, onImprimer,
   isNouvelle, isBloquee, isDeSaDirection, userCanAct, userCanView, fullAddress
 }) {
   const formatDateTime = (dateString) => {
@@ -143,6 +143,17 @@ function DoleanceCard({
               title="Voir tous les détails"
             >
               <EyeIcon className="h-4 w-4 sm:h-5 sm:w-5" />
+            </button>
+            <button
+              onClick={() => onImprimer(doleance)}
+              className={`p-1.5 sm:p-2 rounded-lg transition-colors ${
+                !userCanView ? 'text-gray-400 dark:text-slate-500 cursor-not-allowed' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700'
+              }`}
+              disabled={!userCanView}
+              title="Imprimer la fiche"
+              aria-label="Imprimer la fiche"
+            >
+              <PrinterIcon className="h-4 w-4 sm:h-5 sm:w-5" />
             </button>
           </div>
         </div>
