@@ -4,30 +4,14 @@ import { useTranslation } from "react-i18next";
 import { useTheme } from "../contexts/ThemeContext";
 import api from "../services/api";
 import toast from "react-hot-toast";
-import {
-  MapContainer,
-  TileLayer,
-  Marker,
-  useMapEvents,
-  useMap,
-  Popup,
-  GeoJSON,
-} from "react-leaflet";
-import L from "leaflet";
-import icon from "leaflet/dist/images/marker-icon.png";
-import iconShadow from "leaflet/dist/images/marker-shadow.png";
 import EmailService from "../services/emailService";
+import LocationPickerMap from "../components/common/LocationPickerMap";
 import { ShieldCheckIcon } from "@heroicons/react/24/outline";
-
-const DefaultIcon = L.icon({
-  iconUrl: icon,
-  shadowUrl: iconShadow,
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
-});
-L.Marker.prototype.options.icon = DefaultIcon;
+import {
+  ANTANANARIVO_CENTER,
+  reverseGeocode,
+  searchGeocode,
+} from "../services/geocodingService";
 
 // ============================================================================
 // DESIGN SYSTEM — thème institutionnel CUA (bleu / jaune-or)
@@ -267,45 +251,6 @@ function ModuleCard({ active, onClick, emoji, label, activeClasses }) {
   );
 }
 
-function DraggableMarker({ position, setPosition, onPositionChange }) {
-  const markerRef = useRef(null);
-
-  useMapEvents({
-    click(e) {
-      const pos = [e.latlng.lat, e.latlng.lng];
-      setPosition(pos);
-      if (onPositionChange) onPositionChange(e.latlng);
-    },
-  });
-
-  return (
-    <Marker
-      draggable={true}
-      position={position}
-      ref={markerRef}
-      eventHandlers={{
-        dragend() {
-          const marker = markerRef.current;
-          if (marker) {
-            const ll = marker.getLatLng();
-            const pos = [ll.lat, ll.lng];
-            setPosition(pos);
-            if (onPositionChange) onPositionChange(ll);
-          }
-        },
-      }}
-    />
-  );
-}
-
-function MapView({ center }) {
-  const map = useMap();
-  useEffect(() => {
-    map.setView(center, map.getZoom());
-  }, [center, map]);
-  return null;
-}
-
 function DeposerDoleance() {
   const { t, i18n } = useTranslation();
   const { darkMode } = useTheme();
@@ -328,12 +273,12 @@ function DeposerDoleance() {
   const [sendError, setSendError] = useState(null);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [module, setModule] = useState(null);
-  const [mapPosition, setMapPosition] = useState([-18.8792, 47.5079]);
+  const [mapPosition, setMapPosition] = useState(ANTANANARIVO_CENTER);
   const [searchAddress, setSearchAddress] = useState("");
   const [locationName, setLocationName] = useState("");
   const [assignedDoleances, setAssignedDoleances] = useState([]);
   const [quartierGeoJSON, setQuartierGeoJSON] = useState(null);
-  const [isLocating, setIsLocating] = useState(false);
+  const [flyToSignal, setFlyToSignal] = useState(0);
   const [isSearching, setIsSearching] = useState(false);
   const [suggestions, setSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
@@ -496,6 +441,7 @@ function DeposerDoleance() {
     setFormData((prev) => ({ ...prev, [name]: value }));
     if (name === "arrondissement" && arrondissementCoords[value]) {
       setMapPosition(arrondissementCoords[value]);
+      setFlyToSignal((n) => n + 1);
     }
   };
 
@@ -786,28 +732,12 @@ function DeposerDoleance() {
     }));
   };
 
-  const reverseGeocodePosition = async (latlng, { silent = false } = {}) => {
-    if (reverseAbortRef.current) reverseAbortRef.current.abort();
-    const controller = new AbortController();
-    reverseAbortRef.current = controller;
-    try {
-      const res = await fetch(
-        `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}&addressdetails=1&accept-language=fr,mg`,
-        { signal: controller.signal },
-      );
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      if (data?.display_name) {
-        fillFromNominatim(data);
-        return true;
-      }
-      return false;
-    } catch (err) {
-      if (err.name === "AbortError") return false;
-      console.error("Erreur reverse geocoding:", err);
-      if (!silent) toast.error(t("deposerMessages.locationError"));
-      return false;
-    }
+  const fallbackToCoords = (latlng) => {
+    setLocationName("");
+    setFormData((prev) => ({
+      ...prev,
+      lieu_exact: `${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}`,
+    }));
   };
 
   const scheduleReverseGeocode = (latlng) => {
@@ -816,70 +746,19 @@ function DeposerDoleance() {
     reverseAbortRef.current = controller;
     reverseTimeoutRef.current = setTimeout(async () => {
       try {
-        const res = await fetch(
-          `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latlng.lat}&lon=${latlng.lng}&addressdetails=1&accept-language=fr,mg`,
-          { signal: controller.signal },
-        );
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const data = await res.json();
+        const data = await reverseGeocode(latlng, { signal: controller.signal });
         if (data?.display_name) {
           fillFromNominatim(data);
         } else {
-          setLocationName("");
-          setFormData((prev) => ({
-            ...prev,
-            lieu_exact: `${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}`,
-          }));
+          fallbackToCoords(latlng);
         }
       } catch (err) {
         if (err.name === "AbortError") return;
         console.error("Erreur reverse geocoding:", err);
-        setLocationName("");
-        setFormData((prev) => ({
-          ...prev,
-          lieu_exact: `${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}`,
-        }));
+        fallbackToCoords(latlng);
       }
     }, 450);
   };
-
-  const handleLocateMe = () => {
-    if (!navigator.geolocation) {
-      toast.error(t("deposerMessages.geoNotSupported"));
-      return;
-    }
-    setIsLocating(true);
-
-    navigator.geolocation.getCurrentPosition(
-      async (pos) => {
-        const { latitude, longitude } = pos.coords;
-        setMapPosition([latitude, longitude]);
-        const ok = await reverseGeocodePosition({ lat: latitude, lng: longitude }, { silent: true });
-        if (ok) {
-          toast.success(t("deposerMessages.locationFound"));
-        } else {
-          toast.error(t("deposerMessages.locationError"));
-        }
-        setIsLocating(false);
-      },
-      (err) => {
-        setIsLocating(false);
-        if (err.code === err.PERMISSION_DENIED) {
-          toast.error(t("deposerMessages.locationDenied"));
-        } else if (err.code === err.POSITION_UNAVAILABLE) {
-          toast.error(t("deposerMessages.locationUnavailable"));
-        } else if (err.code === err.TIMEOUT) {
-          toast.error(t("deposerMessages.locationTimeout"));
-        } else {
-          toast.error(t("deposerMessages.locationErrorGeneric"));
-        }
-      },
-      { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 },
-    );
-  };
-
-  const NOMINATIM_SEARCH_PREFIX =
-    "https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&countrycodes=mg&accept-language=fr,mg&limit=5&q=";
 
   const performSearch = async (value) => {
     if (searchAbortRef.current) searchAbortRef.current.abort();
@@ -887,14 +766,11 @@ function DeposerDoleance() {
     searchAbortRef.current = controller;
     setIsSearching(true);
     try {
-      const res = await fetch(`${NOMINATIM_SEARCH_PREFIX}${encodeURIComponent(value)}`, {
-        signal: controller.signal,
-      });
-      if (!res.ok) throw new Error(`HTTP ${res.status}`);
-      const data = await res.json();
-      setSuggestions(data || []);
-      setShowSuggestions((data || []).length > 0);
-      return data || [];
+      const data = await searchGeocode(value, { signal: controller.signal });
+      const results = Array.isArray(data) ? data : [];
+      setSuggestions(results);
+      setShowSuggestions(results.length > 0);
+      return results;
     } catch (err) {
       if (err.name === "AbortError") return [];
       console.error("Erreur recherche:", err);
@@ -924,6 +800,7 @@ function DeposerDoleance() {
   const handleSelectSuggestion = (item) => {
     fillReverseAbort();
     setMapPosition([parseFloat(item.lat), parseFloat(item.lon)]);
+    setFlyToSignal((n) => n + 1);
     fillFromNominatim(item);
     setSuggestions([]);
     setShowSuggestions(false);
@@ -946,7 +823,9 @@ function DeposerDoleance() {
     }
   };
 
+  /** Clic / glisser-déposer du marqueur principal sur la carte. */
   const handleMapPositionChange = (latlng) => {
+    setMapPosition([latlng.lat, latlng.lng]);
     setFormData((prev) => ({
       ...prev,
       lieu_exact: prev.lieu_exact || `${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}`,
@@ -1256,92 +1135,39 @@ function DeposerDoleance() {
                 </div>
               )}
             </form>
-
-            <button
-              type="button"
-              onClick={handleLocateMe}
-              disabled={isLocating}
-              className="cua-btn-primary flex items-center justify-center gap-2 px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl text-sm font-bold text-white shadow-md disabled:opacity-60 order-1 sm:order-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]/50"
-            >
-              {isLocating ? (
-                <div className="w-4 h-4 border border-white/40 border-t-white rounded-full animate-spin" />
-              ) : (
-                <Icon path={ICONS.pin} className="w-4 h-4" strokeWidth={2.5} />
-              )}
-              <span className="hidden sm:inline">{t("deposer.locateMe")}</span>
-            </button>
           </div>
 
-          <div className="h-64 sm:h-96 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-600 relative z-0 mb-4">
-            <MapContainer center={mapPosition} zoom={14} className="h-full w-full" scrollWheelZoom={true}>
-              <TileLayer
-                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              />
-              {quartierGeoJSON && quartierGeoJSON.features && quartierGeoJSON.features.length > 0 && (
-                <GeoJSON
-                  key={JSON.stringify(quartierGeoJSON)}
-                  data={quartierGeoJSON}
-                  style={() => ({
-                    fillColor: "#D4AF37",
-                    weight: 2,
-                    opacity: 1,
-                    color: "#B8860B",
-                    dashArray: "3",
-                    fillOpacity: 0.15,
-                  })}
-                  onEachFeature={(feature, layer) => {
-                    if (feature.properties) {
-                      layer.bindPopup(
-                        `<div style="text-align:center"><b>${feature.properties.nom_quartier}</b><br/><span style="color:#666">${feature.properties.nom_arrondissement || ""}</span></div>`,
-                      );
-                      layer.on("mouseover", function () {
-                        this.setStyle({ fillOpacity: 0.4, weight: 3 });
-                      });
-                      layer.on("mouseout", function () {
-                        this.setStyle({ fillOpacity: 0.15, weight: 2 });
-                      });
-                    }
-                  }}
-                />
-              )}
-              <MapView center={mapPosition} />
-              <DraggableMarker
-                position={mapPosition}
-                setPosition={setMapPosition}
-                onPositionChange={handleMapPositionChange}
-              />
-              {assignedDoleances
-                .filter((d) => d.latitude && d.longitude)
-                .map((d) => (
-                  <Marker
-                    key={d.id_doleance}
-                    position={[parseFloat(d.latitude), parseFloat(d.longitude)]}
-                    icon={L.divIcon({
-                      className: "assigned-marker",
-                      html: '<div style="background:#D4AF37;width:12px;height:12px;border-radius:50%;border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.4)"></div>',
-                      iconSize: [12, 12],
-                      iconAnchor: [6, 6],
-                    })}
-                  >
-                    <Popup>
-                      <div className="text-xs">
-                        <p className="font-bold">{d.titre}</p>
-                        <p className="text-slate-500">{d.nom_categorie}</p>
-                        <p className="text-slate-400">
-                          {t("deposer.refLabel")} {d.reference}
-                        </p>
-                        <p className="text-emerald-600 font-semibold mt-1">{t("deposer.assigned")}</p>
-                      </div>
-                    </Popup>
-                  </Marker>
-                ))}
-            </MapContainer>
-            <div className="absolute bottom-3 left-3 z-[1000] bg-[#0F172A]/75 backdrop-blur-sm text-white text-xs font-medium px-3 py-1.5 rounded-full flex items-center gap-1">
-              <Icon path={ICONS.pin} className="w-3 h-3" />
-              {t("deposer.mapHint")}
-            </div>
-          </div>
+          <LocationPickerMap
+            className="mb-4"
+            position={mapPosition}
+            onPick={handleMapPositionChange}
+            dark={darkMode}
+            zoom={14}
+            flyToSignal={flyToSignal}
+            geojson={quartierGeoJSON}
+            showCoordinateBar={false}
+            markers={assignedDoleances.map((d) => ({
+              id: d.id_doleance,
+              lat: d.latitude,
+              lng: d.longitude,
+              title: d.titre,
+              subtitle: d.nom_categorie,
+              reference: d.reference,
+              badge: t("deposer.assigned"),
+            }))}
+            labels={{
+              coordinates: t("deposer.mapCoordinates"),
+              copy: t("deposer.mapCopy"),
+              copied: t("deposer.mapCopied"),
+              copyError: t("deposer.mapCopyError"),
+              noPosition: t("deposer.mapNoPosition"),
+              hint: t("deposer.mapHint"),
+              recenter: t("deposer.mapRecenter"),
+              showQuartiers: t("deposer.mapShowQuartiers"),
+              hideQuartiers: t("deposer.mapHideQuartiers"),
+              refLabel: t("deposer.refLabel"),
+            }}
+          />
 
           <Field id="lieu_exact" label={t("deposer.exactLocation")} optional={t("deposer.optional")}>
             <input

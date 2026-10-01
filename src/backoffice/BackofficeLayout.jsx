@@ -436,6 +436,7 @@ function BackofficeLayout() {
 
 
   {/* Appels citoyens — admin / agent_central uniquement */}
+{/*   
   {['administrateur_systeme', 'administrateur', 'agent_central'].includes(userRole) && (
   <div className="mt-4">
     <Link
@@ -462,7 +463,7 @@ function BackofficeLayout() {
       </span>
     </Link>
   </div>
-  )}
+  )} */}
 
   {/* Paramètres */}
   <div className="mt-4">

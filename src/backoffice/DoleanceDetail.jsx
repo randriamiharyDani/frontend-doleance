@@ -4,6 +4,7 @@ import api from '../services/api';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 import { useStatsRefresh } from '../contexts/StatsContext';
+import LocationPickerMap from '../components/common/LocationPickerMap';
 import { 
   ArrowLeftIcon, 
   DocumentTextIcon,
@@ -769,11 +770,31 @@ function DoleanceDetail() {
             <div className="bg-white dark:bg-slate-800 rounded-lg shadow-md p-6">
               <h3 className="text-lg font-semibold mb-4">Localisation</h3>
               {doleance.latitude && doleance.longitude ? (
-                <div>
-                  <p className="text-sm text-gray-500 dark:text-gray-400">Coordonnées GPS</p>
-                  <p className="text-sm font-mono">
-                    Lat: {doleance.latitude}, Lng: {doleance.longitude}
-                  </p>
+                <div className="space-y-4">
+                  <LocationPickerMap
+                    position={[Number(doleance.latitude), Number(doleance.longitude)]}
+                    readOnly
+                    zoom={16}
+                    heightClass="h-64 sm:h-80"
+                    showHint={false}
+                    labels={{
+                      coordinates: 'Coordonnées GPS',
+                      copy: 'Copier',
+                      copied: 'Coordonnées copiées !',
+                      copyError: 'Copie impossible',
+                      noPosition: 'Aucune position',
+                      recenter: 'Recentrer',
+                      locateMe: 'Me localiser',
+                      showQuartiers: 'Afficher les quartiers',
+                      hideQuartiers: 'Masquer les quartiers',
+                    }}
+                  />
+                  {doleance.lieu_exact && (
+                    <div>
+                      <p className="text-sm text-gray-500 dark:text-gray-400">Lieu exact</p>
+                      <p className="text-sm text-gray-800 dark:text-gray-100">{doleance.lieu_exact}</p>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <p className="text-gray-500 dark:text-gray-400 text-sm">Aucune localisation fournie</p>
