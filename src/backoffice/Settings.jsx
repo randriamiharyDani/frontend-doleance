@@ -1,5 +1,6 @@
 // src/backoffice/Settings.jsx
 import React, { useState, useEffect, useMemo } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import {
@@ -43,6 +44,7 @@ function passwordStrength(pwd) {
 function Settings() {
   const { user } = useAuth();
   const { darkMode, toggleDarkMode } = useTheme();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [passwordData, setPasswordData] = useState({
@@ -100,7 +102,7 @@ function Settings() {
   const [socials, setSocials] = useState({ whatsapp: '', facebook: '', instagram: '' });
   const [socialsLoading, setSocialsLoading] = useState(false);
   const [socialsSaving, setSocialsSaving] = useState(false);
-  const [greenNumbers, setGreenNumbers] = useState({ greenNumberCua: '', greenNumberTelma: '', greenNumberOrange: '' });
+  const [greenNumbers, setGreenNumbers] = useState({ greenNumberCua: '', greenNumberOrange: '' });
   const [greenLoading, setGreenLoading] = useState(false);
   const [greenSaving, setGreenSaving] = useState(false);
 
@@ -116,7 +118,7 @@ function Settings() {
         const data = res?.data || {};
         setEmergencyContacts(Array.isArray(data.contacts) ? data.contacts : []);
         setSocials({ whatsapp: '', facebook: '', instagram: '', ...(data.socials || {}) });
-        setGreenNumbers({ greenNumberCua: '', greenNumberTelma: '', greenNumberOrange: '', ...(data.greenNumbers || {}) });
+        setGreenNumbers({ greenNumberCua: '', greenNumberOrange: '', ...(data.greenNumbers || {}) });
       })
       .catch(() => {})
       .finally(() => {
@@ -184,7 +186,6 @@ function Settings() {
     try {
       await siteSettingsService.updateGreenNumbers({
         greenNumberCua: greenNumbers.greenNumberCua.trim(),
-        greenNumberTelma: greenNumbers.greenNumberTelma.trim(),
         greenNumberOrange: greenNumbers.greenNumberOrange.trim(),
       });
       toast.success('Numéros verts mis à jour');
@@ -589,9 +590,9 @@ function Settings() {
               <PhoneIcon className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div>
-              <h2 className="font-bold text-gray-900 dark:text-white text-sm">Numéros verts</h2>
+              <h2 className="font-bold text-gray-900 dark:text-white text-sm">{t('settings.greenNumbers.title')}</h2>
               <p className="text-xs text-gray-400">
-                Numéros verts affichés dans le pied de page du site public (CUA, Telma, Orange)
+                {t('settings.greenNumbers.subtitle')}
               </p>
             </div>
           </div>
@@ -600,35 +601,25 @@ function Settings() {
               <p className="text-sm text-gray-500 dark:text-gray-400 italic py-2">Chargement...</p>
             ) : (
               <>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <label className="label">CUA (147)</label>
+                    <label className="label">{t('settings.greenNumbers.violence')}</label>
                     <input
                       type="tel"
                       value={greenNumbers.greenNumberCua}
                       onChange={(e) => handleGreenNumberChange('greenNumberCua', e.target.value)}
                       className="input"
-                      placeholder="Ex : 147"
+                      placeholder={t('settings.greenNumbers.violencePlaceholder')}
                     />
                   </div>
                   <div>
-                    <label className="label">Telma</label>
-                    <input
-                      type="tel"
-                      value={greenNumbers.greenNumberTelma}
-                      onChange={(e) => handleGreenNumberChange('greenNumberTelma', e.target.value)}
-                      className="input"
-                      placeholder="Ex : +261 34 222 11 11"
-                    />
-                  </div>
-                  <div>
-                    <label className="label">Orange</label>
+                    <label className="label">{t('settings.greenNumbers.doleance')}</label>
                     <input
                       type="tel"
                       value={greenNumbers.greenNumberOrange}
                       onChange={(e) => handleGreenNumberChange('greenNumberOrange', e.target.value)}
                       className="input"
-                      placeholder="Ex : +261 32 113 32"
+                      placeholder={t('settings.greenNumbers.doleancePlaceholder')}
                     />
                   </div>
                 </div>

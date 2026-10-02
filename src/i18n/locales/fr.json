@@ -207,7 +207,15 @@
     "accountInfo": "Informations du compte",
     "accountInfoDesc": "Détails de votre compte utilisateur",
     "fullName": "Nom complet",
-    "role": "Rôle"
+    "role": "Rôle",
+    "greenNumbers": {
+      "title": "Numéros verts",
+      "subtitle": "Numéros affichés dans le pied de page du site public",
+      "violence": "Numéro vert pour les violences",
+      "violencePlaceholder": "Ex : 147",
+      "doleance": "Numéro vert pour les doléances",
+      "doleancePlaceholder": "Ex : +261 32 32 113 32"
+    }
   },
   "tracking": {
     "title": "Suivi de doléance",
@@ -367,7 +375,9 @@
     "rights": "Tous droits réservés",
     "quickLinks": "Liens rapides",
     "greenNumber": "Numéro vert",
-    "greenNumber-orange": "Numéro vert - orange"
+    "greenNumber-orange": "Numéro vert - orange",
+    "greenNumberSecurity": "Ho an'ny herisetra !",
+    "greenNumberDoleance": "Doléance !"
   },
   "deposer": {
     "communeTitle": "Commune Urbaine d'Antananarivo",

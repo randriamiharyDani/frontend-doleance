@@ -207,7 +207,15 @@
     "accountInfo": "Mombamomba ny kaonty",
     "accountInfoDesc": "Détails de votre compte",
     "fullName": "Anarana feno",
-    "role": "Toerana"
+    "role": "Toerana",
+    "greenNumbers": {
+      "title": "Laharana maimaim-poana",
+      "subtitle": "Laharana aseho amin'ny farany amin'ny tranokalan'ny tranonkala",
+      "violence": "Laharana maimaim-poana ho an'ny herisetra",
+      "violencePlaceholder": "Ohatra : 147",
+      "doleance": "Laharana maimaim-poana ho an'ny fitarainana",
+      "doleancePlaceholder": "Ohatra : +261 32 32 113 32"
+    }
   },
   "tracking": {
     "title": "Fanarahana ny fitarainana",
@@ -367,7 +375,9 @@
     "rights": "Zo rehetra voatokana",
     "quickLinks": "Rohy haingana",
     "greenNumber": "Laharana maimaim-poana",
-    "greenNumber-orange": "Laharana maimaim-poana - orange"
+    "greenNumber-orange": "Laharana maimaim-poana - orange",
+    "greenNumberSecurity": "Ho an'ny herisetra !",
+    "greenNumberDoleance": "Doléance !"
   },
   "deposer": {
     "communeTitle": "Commune Urbaine d'Antananarivo",

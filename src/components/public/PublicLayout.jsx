@@ -1,6 +1,6 @@
 // navbar frontend
 
-import React, { useState, useEffect, useRef, Fragment } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useTheme } from "../../contexts/ThemeContext";
 import { useTranslation } from "react-i18next";
@@ -14,6 +14,7 @@ import {
   MoonIcon,
   ShieldCheckIcon,
   PhoneIcon,
+  ChatBubbleBottomCenterTextIcon,
 } from "@heroicons/react/24/outline";
 
 // Valeurs par défaut (utilisées si l'API n'est pas joignable)
@@ -32,8 +33,36 @@ const DEFAULT_SOCIAL_HREFS = {
 
 const DEFAULT_GREEN_NUMBERS = {
   greenNumberCua: '147',
-  greenNumberTelma: '+26134222111',
-  greenNumberOrange: '+2613211332',
+  greenNumberOrange: '+261323211332',
+};
+
+/**
+ * Met en forme un numéro pour l'affichage public.
+ * - 147                -> 147                (numéro court)
+ * - +261323211332      -> 032 32 113 32      (format national lisible)
+ */
+const formatGreenNumber = (raw) => {
+  let digits = (raw || '').replace(/\D/g, '');
+  if (!digits) return '';
+
+  if (digits.startsWith('261')) digits = `0${digits.slice(3)}`;
+  else if (!digits.startsWith('0') && digits.length > 4) digits = `0${digits}`;
+
+  if (digits.length <= 4) return digits;
+
+  // Format national malgache : 3 - 2 - 3 - 2
+  if (digits.length === 10) {
+    return [
+      digits.slice(0, 3),
+      digits.slice(3, 5),
+      digits.slice(5, 8),
+      digits.slice(8, 10),
+    ].join(' ');
+  }
+
+  // Longueur inattendue : préfixe de 3 puis paires, pour rester lisible
+  const rest = digits.slice(3).match(/.{1,2}/g) || [];
+  return [digits.slice(0, 3), ...rest].join(' ');
 };
 
 function PublicLayout({ children }) {
@@ -102,7 +131,6 @@ function PublicLayout({ children }) {
         const gn = data.greenNumbers || {};
         setGreenNumbers({
           greenNumberCua: (gn.greenNumberCua || '').trim() || DEFAULT_GREEN_NUMBERS.greenNumberCua,
-          greenNumberTelma: (gn.greenNumberTelma || '').trim() || DEFAULT_GREEN_NUMBERS.greenNumberTelma,
           greenNumberOrange: (gn.greenNumberOrange || '').trim() || DEFAULT_GREEN_NUMBERS.greenNumberOrange,
         });
       })
@@ -180,6 +208,32 @@ function PublicLayout({ children }) {
     if (path === "/") return location.pathname === "/";
     return location.pathname.startsWith(path);
   };
+
+  // Numéros d'urgence affichés dans le footer public.
+  // Les explications sont traduites ; les numéros restent configurables
+  // depuis l'espace Admin (Réglages > Numéros verts).
+  const GREEN_NUMBERS = [
+    {
+      key: 'greenNumberCua',
+      phone: greenNumbers.greenNumberCua,
+      icon: ShieldCheckIcon,
+      caption: t("footer.greenNumberSecurity"),
+      badge:
+        "bg-gradient-to-br from-emerald-500 to-emerald-600 group-hover:from-emerald-400 group-hover:to-emerald-500 ring-emerald-600/20",
+    },
+    {
+      key: 'greenNumberOrange',
+      phone: greenNumbers.greenNumberOrange,
+      icon: ChatBubbleBottomCenterTextIcon,
+      caption: t("footer.greenNumberDoleance"),
+      badge:
+        "bg-gradient-to-br from-emerald-500 to-emerald-600 group-hover:from-emerald-400 group-hover:to-emerald-500 ring-emerald-600/20",
+    },
+  ].map((n) => ({
+    ...n,
+    display: formatGreenNumber(n.phone),
+    tel: `tel:${(n.phone || "").replace(/\D/g, "")}`,
+  }));
 
   return (
     <div
@@ -555,67 +609,51 @@ function PublicLayout({ children }) {
               </div>
             </div>
 
-            {/* ===== Numéros verts ===== */}
-            <div className={`flex flex-col items-center gap-2.5 px-4 py-3 rounded-2xl border ${
-              darkMode ? 'bg-white/5 border-white/10' : 'bg-gradient-to-br from-slate-50 to-slate-100 border-slate-200'
-            }`}>
-              <div className="flex items-center gap-1.5">
-                <PhoneIcon className="h-3.5 w-3.5 text-[#D4AF37]" />
-                <p className={`text-[11px] uppercase tracking-wider font-bold ${darkMode ? 'text-slate-300' : 'text-slate-600'}`}>
-                  {t("footer.greenNumber")}
-                </p>
-              </div>
-              <div className="flex items-center gap-3 flex-wrap justify-center">
-                {[
-                  {
-                    key: 'greenNumberCua', label: 'CUA',
-                    phone: greenNumbers.greenNumberCua,
-                    icon: 'bg-green-500 group-hover:bg-green-400',
-                    hover: 'hover:bg-green-50',
-                    text: 'group-hover:text-green-600 dark:group-hover:text-green-400',
-                  },
-                  {
-                    key: 'greenNumberTelma', label: 'Telma',
-                    phone: greenNumbers.greenNumberTelma,
-                    icon: 'bg-yellow-500 group-hover:bg-yellow-400',
-                    hover: 'hover:bg-yellow-50',
-                    text: 'group-hover:text-yellow-600 dark:group-hover:text-yellow-400',
-                  },
-                  {
-                    key: 'greenNumberOrange', label: 'Orange',
-                    phone: greenNumbers.greenNumberOrange,
-                    icon: 'bg-orange-500 group-hover:bg-orange-400',
-                    hover: 'hover:bg-orange-50',
-                    text: 'group-hover:text-orange-600 dark:group-hover:text-orange-400',
-                  },
-                ]
-                  .filter((n) => (n.phone || '').trim())
-                  .map((n, i) => (
-                    <Fragment key={n.key}>
-                      {i > 0 && (
-                        <span className={`h-6 w-px ${darkMode ? 'bg-white/15' : 'bg-slate-300'}`} />
-                      )}
-                      <a
-                        href={`tel:${n.phone.replace(/[^0-9+]/g, '')}`}
-                        title={`${n.label} – ${t("footer.greenNumber")}`}
-                        className={`group flex items-center gap-2.5 px-3 py-2 rounded-xl transition-all duration-200 ${
-                          darkMode ? 'hover:bg-white/10' : n.hover
+            {/* ===== Numéros d'urgence ===== */}
+            <div
+              className={`w-full max-w-md rounded-2xl border p-3.5 sm:p-4 transition-colors duration-200 ${
+                darkMode
+                  ? "bg-emerald-500/[0.07] border-emerald-400/25"
+                  : "bg-gradient-to-br from-emerald-50 to-white border-emerald-200/80"
+              }`}
+            >
+              <div className="flex flex-col sm:flex-row items-stretch gap-2.5">
+                {GREEN_NUMBERS.filter((n) => (n.phone || "").trim()).map((n) => (
+                  <a
+                    key={n.key}
+                    href={n.tel}
+                    title={`${n.display} – ${n.caption}`}
+                    aria-label={`${n.display} – ${n.caption}`}
+                    className={`group relative flex items-center gap-3 flex-1 min-w-0 rounded-xl px-3 py-3 transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/70 focus-visible:ring-offset-2 ${
+                      darkMode
+                        ? "bg-white/[0.06] ring-1 ring-inset ring-white/10 hover:bg-white/[0.12] hover:ring-emerald-400/40 focus-visible:ring-offset-slate-900"
+                        : "bg-white ring-1 ring-inset ring-emerald-100 hover:bg-emerald-50/70 hover:ring-emerald-300 focus-visible:ring-offset-white"
+                    }`}
+                  >
+                    <span
+                      className={`flex items-center justify-center h-10 w-10 rounded-full flex-shrink-0 shadow-sm ring-1 ring-inset transition-all duration-200 group-hover:scale-105 ${n.badge}`}
+                    >
+                      <n.icon className="h-5 w-5 text-white" />
+                    </span>
+
+                    <span className="flex flex-col leading-tight min-w-0">
+                      <span
+                        className={`text-xl sm:text-2xl font-extrabold tracking-tight whitespace-nowrap transition-colors duration-200 ${
+                          darkMode
+                            ? "text-white group-hover:text-emerald-300"
+                            : "text-[#0F172A] group-hover:text-emerald-600"
                         }`}
                       >
-                        <span className={`flex items-center justify-center h-8 w-8 rounded-full ${n.icon} transition-colors duration-200 shadow-md flex-shrink-0`}>
-                          <PhoneIcon className="h-4 w-4 text-white" />
-                        </span>
-                        <span className="flex flex-col leading-tight">
-                          <span className={`text-[10px] uppercase tracking-wider font-medium ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
-                            {n.label}
-                          </span>
-                          <span className={`text-sm font-bold ${n.text} transition-colors duration-200 text-[#0F172A] dark:text-slate-100`}>
-                            {n.phone}
-                          </span>
-                        </span>
-                      </a>
-                    </Fragment>
-                  ))}
+                        {n.display}
+                      </span>
+                      <span
+                        className={`text-[11px] sm:text-xs font-semibold ${darkMode ? "text-emerald-300/90" : "text-emerald-600/90"}`}
+                      >
+                        {n.caption}
+                      </span>
+                    </span>
+                  </a>
+                ))}
               </div>
             </div>
 
