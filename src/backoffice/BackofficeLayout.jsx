@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Outlet, Link, useLocation, useNavigate, Navigate } from "react-router-dom";
-import { useTranslation } from "react-i18next";
+import i18n from "../i18n";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import socket from "../config/socket";
@@ -26,7 +26,6 @@ import Navbar from "../components/backoffice/Navbar";
 function BackofficeLayout() {
   const { user, loading, hasPermission } = useAuth();
   const { darkMode } = useTheme();
-  const { i18n } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -38,6 +37,9 @@ function BackofficeLayout() {
   // La préférence de langue du site public n'est pas écrasée : la détection
   // ne met pas le cache en mémoire pendant le back-office, puis la langue
   // d'origine est restaurée à la sortie.
+  // IMPORTANT : utiliser l'instance singleton importée ci-dessus et NON
+  // `useTranslation().i18n` (wrapper dont l'identité change à chaque
+  // changement de langue => effet/cleanup en boucle infinie).
   useEffect(() => {
     const previousLanguage = i18n.language;
     if (previousLanguage && previousLanguage.startsWith("fr")) return;
