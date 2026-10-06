@@ -13,6 +13,11 @@ export default defineConfig(({ mode }) => {
       server: {
         host: '0.0.0.0',
         port: 5173,
+        // Vite 5.4+ : protection DNS-rebinding. Sans ceci, l'accès via
+        // un domaine (ex: http://webapp.cua.mg:5173) est rejeté avec
+        // "Blocked request. This host is not allowed".
+        // Personnalisable via VITE_ALLOWED_HOSTS="webapp.cua.mg,autre.domaine".
+        allowedHosts: (env.VITE_ALLOWED_HOSTS || 'webapp.cua.mg,localhost,127.0.0.1').split(',').map(s => s.trim()).filter(Boolean),
         // HTTPS/mkcert désactivé — retour à HTTP
         // https: {
         //   key: fs.readFileSync(env.VITE_SSL_KEY || './dev-key.pem'),
@@ -24,6 +29,11 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true
         }
       }
+    },
+    preview: {
+      host: '0.0.0.0',
+      port: 4173,
+      allowedHosts: (env.VITE_ALLOWED_HOSTS || 'webapp.cua.mg,localhost,127.0.0.1').split(',').map(s => s.trim()).filter(Boolean),
     },
     build: {
       outDir: 'dist',
