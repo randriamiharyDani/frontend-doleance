@@ -68,7 +68,7 @@ function Login() {
       {/* ============ Partie gauche — identité institutionnelle ============ */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-[#0F172A]">
         <img
-          src="/images/tana-renivohitra.jpeg"
+          src={`${import.meta.env.BASE_URL}images/tana-renivohitra.jpeg`}
           alt="Vue d'Antananarivo"
           className="absolute inset-0 w-full h-full object-cover opacity-70"
         />

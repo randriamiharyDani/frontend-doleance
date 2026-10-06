@@ -9,7 +9,6 @@ import {
   EyeIcon,
   EyeSlashIcon,
   UserCircleIcon,
-  LanguageIcon,
   BellIcon
 } from '@heroicons/react/24/outline';
 import toast from 'react-hot-toast';
@@ -37,7 +36,7 @@ function Switch({ enabled, onChange }) {
 function BackofficeSettingsModal({ isOpen, onClose }) {
   const { user } = useAuth();
   const { darkMode, toggleDarkMode } = useTheme();
-  const { i18n, t } = useTranslation();
+  const { t } = useTranslation();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [passwordData, setPasswordData] = useState({
@@ -45,19 +44,6 @@ function BackofficeSettingsModal({ isOpen, onClose }) {
     newPassword: '',
     confirmPassword: ''
   });
-
-  const languages = [
-    { code: 'fr', name: 'Français', flag: '🇫🇷' },
-    { code: 'mg', name: 'Malagasy', flag: '🇲🇬' },
-    { code: 'en', name: 'English', flag: '🇬🇧' }
-  ];
-
-  const handleLanguageChange = (langCode) => {
-    i18n.changeLanguage(langCode);
-    localStorage.setItem('i18nextLng', langCode);
-    const langName = languages.find(l => l.code === langCode)?.name;
-    toast.success(`Langue changée en ${langName}`);
-  };
 
   const handlePasswordChange = async (e) => {
     e.preventDefault();
@@ -110,37 +96,7 @@ function BackofficeSettingsModal({ isOpen, onClose }) {
           </div>
         </div>
 
-        {/* Langue */}
-        <div className={`rounded-xl overflow-hidden border ${darkMode ? 'border-gray-600' : 'border-gray-200'}`}>
-          <div className={`flex items-center gap-3 p-4 ${darkMode ? 'bg-green-900/30' : 'bg-green-50'}`}>
-            <div className={`p-2 rounded-lg ${darkMode ? 'bg-green-900/50' : 'bg-green-100'}`}>
-              <LanguageIcon className={`h-5 w-5 ${darkMode ? 'text-green-400' : 'text-green-600'}`} />
-            </div>
-            <div>
-              <h3 className={`font-semibold text-sm ${darkMode ? 'text-white' : 'text-gray-800'}`}>{t('settings.language')}</h3>
-              <p className={`text-xs ${darkMode ? 'text-gray-400' : 'text-gray-500'}`}>{t('settings.languageDesc')}</p>
-            </div>
-          </div>
-          <div className={`p-4 ${darkMode ? 'bg-gray-800' : 'bg-white'}`}>
-            <div className="flex flex-col sm:flex-row gap-3">
-              {languages.map(lang => (
-                <button
-                  key={lang.code}
-                  onClick={() => handleLanguageChange(lang.code)}
-                  className={`flex-1 px-3 py-2 rounded-lg text-sm font-medium transition-all ${
-                    i18n.language === lang.code
-                      ? 'bg-blue-600 text-white shadow'
-                      : darkMode
-                        ? 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                  }`}
-                >
-                  {lang.flag} {lang.name}
-                </button>
-              ))}
-            </div>
-          </div>
-        </div>
+        {/* L'espace admin est réservé au français : pas de choix de langue */}
 
         {/* Changement de mot de passe */}
         <div className={`rounded-xl overflow-hidden border ${darkMode ? 'border-gray-600' : 'border-gray-200'}`}>

@@ -64,7 +64,7 @@ function PublicNavbar() {
               <Link to="/" className="flex items-center space-x-2 sm:space-x-3">
                 <div className="relative flex-shrink-0">
                   <img 
-                    src="/images/logo-cua.png"
+                    src={`${import.meta.env.BASE_URL}images/logo-cua.png`}
                     alt="Logo CUA - Commune Urbaine d'Antananarivo" 
                     className="w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 object-contain drop-shadow-md"
                     onError={() => setImgError(true)}

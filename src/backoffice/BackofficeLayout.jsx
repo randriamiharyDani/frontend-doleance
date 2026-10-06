@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Outlet, Link, useLocation, useNavigate, Navigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import socket from "../config/socket";
@@ -25,12 +26,34 @@ import Navbar from "../components/backoffice/Navbar";
 function BackofficeLayout() {
   const { user, loading, hasPermission } = useAuth();
   const { darkMode } = useTheme();
+  const { i18n } = useTranslation();
   const location = useLocation();
   const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [openMenus, setOpenMenus] = useState({});
   const [isCurrentUserOnline, setIsCurrentUserOnline] = useState(false);
+
+  // L'espace admin est affiché uniquement en français (pas de malagasy).
+  // La préférence de langue du site public n'est pas écrasée : la détection
+  // ne met pas le cache en mémoire pendant le back-office, puis la langue
+  // d'origine est restaurée à la sortie.
+  useEffect(() => {
+    const previousLanguage = i18n.language;
+    if (previousLanguage && previousLanguage.startsWith("fr")) return;
+
+    const detector = i18n.services && i18n.services.languageDetector;
+    const cacheUserLanguage = detector && detector.cacheUserLanguage && detector.cacheUserLanguage.bind(detector);
+    if (detector && cacheUserLanguage) {
+      detector.cacheUserLanguage = () => {};
+    }
+    i18n.changeLanguage("fr");
+
+    return () => {
+      if (detector && cacheUserLanguage) detector.cacheUserLanguage = cacheUserLanguage;
+      if (previousLanguage) i18n.changeLanguage(previousLanguage);
+    };
+  }, [i18n]);
 
   useEffect(() => {
     const checkScreenSize = () => {

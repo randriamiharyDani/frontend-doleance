@@ -57,7 +57,7 @@ function ForgotPassword() {
       {/* ============ Partie gauche — identité institutionnelle ============ */}
       <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-[#0F172A]">
         <img
-          src="/images/tana-renivohitra.jpeg"
+          src={`${import.meta.env.BASE_URL}images/tana-renivohitra.jpeg`}
           alt="Vue d'Antananarivo"
           className="absolute inset-0 w-full h-full object-cover opacity-70"
         />
@@ -73,7 +73,7 @@ function ForgotPassword() {
             <div className="relative inline-block">
               <div className="cua-crest-ring absolute -inset-2 rounded-full border border-[#D4AF37]/40" />
               <img
-                src="/images/logo-cua.png"
+                src={`${import.meta.env.BASE_URL}images/logo-cua.png`}
                 alt="Blason de la Commune Urbaine d'Antananarivo"
                 className="relative w-20 h-20 object-contain drop-shadow-[0_4px_20px_rgba(212,175,55,0.35)]"
               />
@@ -120,7 +120,7 @@ function ForgotPassword() {
           <div className="flex lg:hidden justify-center mb-8">
             <div className="relative">
               <div className="w-16 h-16 rounded-2xl bg-[#0F172A] flex items-center justify-center shadow-lg">
-                <img src="/images/logo-cua.png" alt="Logo CUA" className="w-11 h-11 object-contain" />
+                <img src={`${import.meta.env.BASE_URL}images/logo-cua.png`} alt="Logo CUA" className="w-11 h-11 object-contain" />
               </div>
               <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full bg-[#D4AF37] flex items-center justify-center shadow ring-4 ring-white dark:ring-slate-800">
                 <BuildingLibraryIcon className="w-3.5 h-3.5 text-[#0F172A]" />
@@ -136,7 +136,7 @@ function ForgotPassword() {
               <div className="hidden lg:flex justify-center mb-5">
                 <div className="relative">
                   <div className="w-16 h-16 rounded-2xl bg-[#0F172A] flex items-center justify-center shadow-lg shadow-[#0F172A]/20">
-                    <img src="/images/logo-cua.png" alt="Logo CUA" className="w-11 h-11 object-contain" />
+                    <img src={`${import.meta.env.BASE_URL}images/logo-cua.png`} alt="Logo CUA" className="w-11 h-11 object-contain" />
                   </div>
                   <div className="absolute -bottom-1.5 -right-1.5 w-6 h-6 rounded-full bg-[#D4AF37] flex items-center justify-center shadow ring-4 ring-white dark:ring-slate-800">
                     <BuildingLibraryIcon className="w-3.5 h-3.5 text-[#0F172A]" />

@@ -29,7 +29,12 @@ import siteSettingsService from '../services/siteSettingsService';
 // #0F172A, accent or #D4AF37. Le mode sombre reste piloté par ThemeContext.
 
 
-function passwordStrength(pwd) {
+// Champs « numéros verts » réellement éditables dans cet écran.
+// Le backend expose aussi greenNumberTelma (non géré ici) : il ne doit
+// jamais entrer dans l'état du formulaire, sinon la validation échoue.
+const GREEN_NUMBER_FIELDS = ['greenNumberCua', 'greenNumberOrange'];
+
+function passwordStrength(pwd, t) {
   if (!pwd) return { score: 0, label: '' };
   let score = 0;
   if (pwd.length >= 6) score++;
@@ -37,14 +42,18 @@ function passwordStrength(pwd) {
   if (/[A-Z]/.test(pwd) && /[a-z]/.test(pwd)) score++;
   if (/[0-9]/.test(pwd)) score++;
   if (/[^A-Za-z0-9]/.test(pwd)) score++;
-  const labels = ['Très faible', 'Faible', 'Correct', 'Bon', 'Fort'];
+  const labels = ['strength0', 'strength1', 'strength2', 'strength3', 'strength4'].map(
+    (k) => t('settings.password.' + k),
+  );
   return { score, label: labels[Math.min(score, labels.length - 1)] };
 }
 
 function Settings() {
   const { user } = useAuth();
   const { darkMode, toggleDarkMode } = useTheme();
-  const { t } = useTranslation();
+  // `i18n` est nécessaire pour le formatage de la date d'inscription
+  // (voir infoRows) : sans lui, i18n.language lève un ReferenceError.
+  const { t, i18n } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const [passwordData, setPasswordData] = useState({
@@ -79,7 +88,7 @@ function Settings() {
 
   const handleSaveRecipient = async () => {
     if (!selectedAgentId) {
-      toast.error('Veuillez choisir un agent destinataire');
+      toast.error(t('settings.calls.agentRequired'));
       return;
     }
     setCallSaving(true);
@@ -87,9 +96,12 @@ function Settings() {
       const res = await citoyenCallService.updateRecipient(Number(selectedAgentId));
       const config = res?.data?.config || res?.config || null;
       setCallConfig(config);
-      toast.success('Agent destinataire mis à jour');
+      toast.success(t('settings.calls.agentUpdated'));
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Erreur lors de la mise à jour');
+      // On journalise le détail technique mais on affiche un message traduit :
+      // le message du serveur peut être vide ou techniques en cas d'erreur 500.
+      console.error('Échec mise à jour de l\'agent destinataire:', error);
+      toast.error(t('settings.calls.error'));
     } finally {
       setCallSaving(false);
     }
@@ -103,6 +115,7 @@ function Settings() {
   const [socialsLoading, setSocialsLoading] = useState(false);
   const [socialsSaving, setSocialsSaving] = useState(false);
   const [greenNumbers, setGreenNumbers] = useState({ greenNumberCua: '', greenNumberOrange: '' });
+  const [greenErrors, setGreenErrors] = useState({});
   const [greenLoading, setGreenLoading] = useState(false);
   const [greenSaving, setGreenSaving] = useState(false);
 
@@ -118,7 +131,12 @@ function Settings() {
         const data = res?.data || {};
         setEmergencyContacts(Array.isArray(data.contacts) ? data.contacts : []);
         setSocials({ whatsapp: '', facebook: '', instagram: '', ...(data.socials || {}) });
-        setGreenNumbers({ greenNumberCua: '', greenNumberOrange: '', ...(data.greenNumbers || {}) });
+        const remote = data.greenNumbers || {};
+        setGreenNumbers({
+          greenNumberCua: (remote.greenNumberCua || '').toString().trim(),
+          greenNumberOrange: (remote.greenNumberOrange || '').toString().trim(),
+        });
+        setGreenErrors({});
       })
       .catch(() => {})
       .finally(() => {
@@ -136,7 +154,7 @@ function Settings() {
   const handleSaveContacts = async () => {
     const invalid = emergencyContacts.find((c) => !(c.telephone || '').trim());
     if (invalid) {
-      toast.error(`Numéro requis pour : ${invalid.libelle}`);
+      toast.error(t('settings.emergencyContacts.phoneRequired', { libelle: invalid.libelle }));
       return;
     }
     setContactsSaving(true);
@@ -144,9 +162,10 @@ function Settings() {
       await siteSettingsService.updateContacts(
         emergencyContacts.map((c) => ({ code: c.code, libelle: c.libelle, telephone: c.telephone.trim() }))
       );
-      toast.success("Contacts d'urgence mis à jour");
+      toast.success(t('settings.emergencyContacts.success'));
     } catch (error) {
-      toast.error(error.response?.data?.message || "Erreur lors de la mise à jour des contacts");
+      console.error('Échec mise à jour des contacts:', error);
+      toast.error(t('settings.emergencyContacts.error'));
     } finally {
       setContactsSaving(false);
     }
@@ -164,9 +183,10 @@ function Settings() {
         facebook: socials.facebook.trim(),
         instagram: socials.instagram.trim(),
       });
-      toast.success('Réseaux sociaux mis à jour');
+      toast.success(t('settings.socials.success'));
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Erreur lors de la mise à jour des réseaux sociaux');
+      console.error('Échec mise à jour des réseaux sociaux:', error);
+      toast.error(t('settings.socials.error'));
     } finally {
       setSocialsSaving(false);
     }
@@ -174,39 +194,70 @@ function Settings() {
 
   const handleGreenNumberChange = (key, value) => {
     setGreenNumbers((prev) => ({ ...prev, [key]: value }));
+    if (greenErrors[key]) {
+      setGreenErrors((prev) => ({ ...prev, [key]: undefined }));
+    }
   };
 
   const handleSaveGreenNumbers = async () => {
-    const invalid = Object.entries(greenNumbers).find(([key, value]) => !(value || '').trim());
-    if (invalid) {
-      toast.error('Veuillez renseigner tous les numéros verts');
+    // Validation limitée aux champs réellement éditables : chaque champ
+    // est contrôlé séparément pour indiquer précisément lequel manque.
+    const errors = {};
+    for (const key of GREEN_NUMBER_FIELDS) {
+      const value = (greenNumbers[key] || '').trim();
+      if (!value) {
+        errors[key] = t('settings.greenNumbers.required');
+      } else if (!/^[+]?[\d\s().-]+$/.test(value)) {
+        errors[key] = t('settings.greenNumbers.invalid');
+      }
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setGreenErrors(errors);
+      toast.error(t('settings.greenNumbers.missingError'));
       return;
     }
+
+    setGreenErrors({});
     setGreenSaving(true);
     try {
-      await siteSettingsService.updateGreenNumbers({
+      const res = await siteSettingsService.updateGreenNumbers({
         greenNumberCua: greenNumbers.greenNumberCua.trim(),
         greenNumberOrange: greenNumbers.greenNumberOrange.trim(),
       });
-      toast.success('Numéros verts mis à jour');
+      // Resynchronise avec ce qui a réellement été enregistré.
+      const saved = res?.data?.greenNumbers;
+      if (saved) {
+        setGreenNumbers({
+          greenNumberCua: (saved.greenNumberCua || '').toString().trim(),
+          greenNumberOrange: (saved.greenNumberOrange || '').toString().trim(),
+        });
+      }
+      toast.success(t('settings.greenNumbers.success'));
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Erreur lors de la mise à jour des numéros verts');
+      // Le message du serveur est en français : on journalise le détail
+      // technique mais on affiche un message traduit à l'utilisateur.
+      console.error('Échec mise à jour des numéros verts:', error);
+      toast.error(t('settings.greenNumbers.saveError'));
     } finally {
       setGreenSaving(false);
     }
   };
 
-  const strength = useMemo(() => passwordStrength(passwordData.newPassword), [passwordData.newPassword]);
+  const strength = useMemo(
+    () => passwordStrength(passwordData.newPassword, t),
+    [passwordData.newPassword, t],
+  );
   const strengthColors = ['bg-rose-400', 'bg-orange-400', 'bg-amber-400', 'bg-lime-500', 'bg-emerald-500'];
 
   const handlePasswordChange = async (e) => {
     e.preventDefault();
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      toast.error('Les mots de passe ne correspondent pas');
+      toast.error(t('settings.password.errorMismatch'));
       return;
     }
     if (passwordData.newPassword.length < 6) {
-      toast.error('Le mot de passe doit contenir au moins 6 caractères');
+      toast.error(t('settings.password.errorMinLength'));
       return;
     }
 
@@ -217,13 +268,15 @@ function Settings() {
         newPassword: passwordData.newPassword
       });
       if (response.data.success) {
-        toast.success('Mot de passe modifié avec succès');
+        toast.success(t('settings.password.success'));
         setPasswordData({ currentPassword: '', newPassword: '', confirmPassword: '' });
       } else {
-        toast.error(response.data.message || 'Erreur lors du changement de mot de passe');
+        console.error('Changement de mot de passe refusé:', response.data.message);
+        toast.error(t('settings.password.error'));
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || 'Erreur lors du changement de mot de passe');
+      console.error('Échec changement de mot de passe:', error);
+      toast.error(t('settings.password.error'));
     } finally {
       setLoading(false);
     }
@@ -232,10 +285,19 @@ function Settings() {
   const initials = `${user?.prenom?.[0] || ''}${user?.nom?.[0] || ''}`.toUpperCase() || '?';
 
   const infoRows = [
-    { icon: IdentificationIcon, label: "Nom d'utilisateur", value: `${user?.prenom || ''} ${user?.nom || ''}`.trim() || '—' },
-    { icon: EnvelopeIcon, label: 'Email', value: user?.email || 'Non renseigné' },
-    { icon: ShieldCheckIcon, label: 'Rôle', value: user?.role?.replace(/_/g, ' ') || '—', capitalize: true },
-    { icon: CalendarDaysIcon, label: "Date d'inscription", value: new Date().toLocaleDateString('fr-FR') },
+    { icon: IdentificationIcon, label: t('settings.account.username'), value: `${user?.prenom || ''} ${user?.nom || ''}`.trim() || '—' },
+    { icon: EnvelopeIcon, label: t('settings.account.email'), value: user?.email || t('settings.account.notSet') },
+    { icon: ShieldCheckIcon, label: t('settings.role'), value: user?.role?.replace(/_/g, ' ') || '—', capitalize: true },
+    {
+      icon: CalendarDaysIcon,
+      label: t('settings.account.registeredAt'),
+      value: new Date(user?.date_creation || Date.now()).toLocaleDateString(
+        // i18n.language peut être 'fr', 'fr-FR', 'mg-MG'... : on compare sur
+        // le préfixe comme dans DeposerDoleance.jsx, sinon le repli FR s'applique
+        // à tort pour MG/EN détectés par le navigateur.
+        i18n.language?.startsWith('mg') ? 'mg-MG' : i18n.language?.startsWith('en') ? 'en-GB' : 'fr-FR'
+      ),
+    },
   ];
 
   return (
@@ -246,8 +308,8 @@ function Settings() {
           {initials}
         </div>
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Paramètres</h1>
-          <p className="text-gray-500 dark:text-gray-400 text-sm mt-0.5">Personnalisez votre expérience</p>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{t('settings.title')}</h1>
+          <p className="text-gray-500 dark:text-gray-400 text-sm mt-0.5">{t('settings.subtitle')}</p>
         </div>
       </div>
 
@@ -258,16 +320,16 @@ function Settings() {
             {darkMode ? <MoonIcon className="h-5 w-5 text-violet-600 dark:text-violet-400" /> : <SunIcon className="h-5 w-5 text-violet-600 dark:text-violet-400" />}
           </div>
           <div>
-            <h2 className="font-bold text-gray-900 dark:text-white text-sm">Apparence</h2>
-            <p className="text-xs text-gray-400">Personnalisez l'affichage</p>
+            <h2 className="font-bold text-gray-900 dark:text-white text-sm">{t('settings.appearance')}</h2>
+            <p className="text-xs text-gray-400">{t('settings.appearanceDesc')}</p>
           </div>
         </div>
         <div className="p-5 sm:p-6">
           <div className="flex items-center justify-between">
             <div className="pr-4">
-              <h3 className="font-semibold text-sm text-gray-900 dark:text-white">Mode sombre</h3>
+              <h3 className="font-semibold text-sm text-gray-900 dark:text-white">{t('settings.darkMode')}</h3>
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-                Réduit la fatigue oculaire en environnement peu éclairé
+                {t('settings.darkModeHint')}
               </p>
             </div>
             <button
@@ -294,14 +356,14 @@ function Settings() {
             <KeyIcon className="h-5 w-5 text-amber-600 dark:text-amber-400" />
           </div>
           <div>
-            <h2 className="font-bold text-gray-900 dark:text-white text-sm">Changer le mot de passe</h2>
-            <p className="text-xs text-gray-400">Modifiez votre mot de passe régulièrement</p>
+            <h2 className="font-bold text-gray-900 dark:text-white text-sm">{t('settings.changePassword')}</h2>
+            <p className="text-xs text-gray-400">{t('settings.changePasswordDesc')}</p>
           </div>
         </div>
         <div className="p-5 sm:p-6">
           <form onSubmit={handlePasswordChange} className="space-y-4">
             <div>
-              <label className="label">Mot de passe actuel</label>
+              <label className="label">{t('settings.currentPassword')}</label>
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={passwordData.currentPassword}
@@ -312,7 +374,7 @@ function Settings() {
             </div>
 
             <div>
-              <label className="label">Nouveau mot de passe</label>
+              <label className="label">{t('settings.newPassword')}</label>
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={passwordData.newPassword}
@@ -335,7 +397,7 @@ function Settings() {
             </div>
 
             <div>
-              <label className="label">Confirmer le mot de passe</label>
+              <label className="label">{t('settings.confirmPassword')}</label>
               <input
                 type={showPassword ? 'text' : 'password'}
                 value={passwordData.confirmPassword}
@@ -348,9 +410,9 @@ function Settings() {
                   passwordData.confirmPassword === passwordData.newPassword ? 'text-emerald-600' : 'text-rose-500'
                 }`}>
                   {passwordData.confirmPassword === passwordData.newPassword ? (
-                    <><CheckCircleIcon className="w-3.5 h-3.5" /> Les mots de passe correspondent</>
+                    <><CheckCircleIcon className="w-3.5 h-3.5" /> {t('settings.password.match')}</>
                   ) : (
-                    'Les mots de passe ne correspondent pas encore'
+                    t('settings.password.mismatchYet')
                   )}
                 </p>
               )}
@@ -363,7 +425,7 @@ function Settings() {
                 className="inline-flex items-center gap-1.5 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 transition-colors"
               >
                 {showPassword ? <EyeSlashIcon className="w-4 h-4" /> : <EyeIcon className="w-4 h-4" />}
-                {showPassword ? 'Masquer' : 'Afficher'} les mots de passe
+                {showPassword ? t('settings.password.hide') : t('settings.password.show')} {t('settings.password.showHideSuffix')}
               </button>
               <button
                 type="submit"
@@ -371,7 +433,7 @@ function Settings() {
                 className="btn-primary btn-md"
               >
                 {loading && <div className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin mr-1.5" />}
-                {loading ? 'Changement...' : 'Changer le mot de passe'}
+                {loading ? t('settings.password.saving') : t('settings.password.submit')}
               </button>
             </div>
           </form>
@@ -386,9 +448,9 @@ function Settings() {
               <PhoneIcon className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
             </div>
             <div>
-              <h2 className="font-bold text-gray-900 dark:text-white text-sm">Appels citoyens</h2>
+              <h2 className="font-bold text-gray-900 dark:text-white text-sm">{t('settings.calls.title')}</h2>
               <p className="text-xs text-gray-400">
-                Configurez l'agent destinataire des appels directs Citoyen → Agent
+                {t('settings.calls.subtitle')}
               </p>
             </div>
           </div>
@@ -396,7 +458,7 @@ function Settings() {
             {callConfig && (
               <div className="mb-4 rounded-xl bg-gray-50 dark:bg-slate-800/60 border border-gray-100 dark:border-slate-700 p-4">
                 <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
-                  Agent destinataire actuel
+                  {t('settings.calls.currentAgent')}
                 </p>
                 <div className="mt-2 flex items-center justify-between gap-3 flex-wrap">
                   <div>
@@ -415,16 +477,16 @@ function Settings() {
                       : 'bg-gray-100 text-gray-500 dark:bg-slate-700 dark:text-slate-400'
                   }`}>
                     <span className={`w-1.5 h-1.5 rounded-full ${callConfig.disponible ? 'bg-emerald-500' : 'bg-gray-400'}`} />
-                    {callConfig.disponible ? 'En ligne' : 'Hors ligne'}
+                    {callConfig.disponible ? t('settings.calls.online') : t('settings.calls.offline')}
                   </span>
                 </div>
               </div>
             )}
 
-            <label className="label">Choisir l'agent destinataire</label>
+            <label className="label">{t('settings.calls.chooseAgent')}</label>
             {callAgents.length === 0 ? (
               <p className="text-sm text-gray-500 dark:text-gray-400 italic py-2">
-                Aucun agent disponible (rôle requis : administrateur système ou agent central)
+                {t('settings.calls.noAgent')}
               </p>
             ) : (
               <div className="flex items-center gap-3">
@@ -434,11 +496,11 @@ function Settings() {
                   className="input flex-1"
                   disabled={callLoading}
                 >
-                  <option value="">— Sélectionner un agent —</option>
+                  <option value="">{t('settings.calls.selectPlaceholder')}</option>
                   {callAgents.map((a) => (
                     <option key={a.id_utilisateur} value={a.id_utilisateur}>
                       {`${a.prenom || ''} ${a.nom || ''}`.trim()} — {a.email}
-                      {a.disponible ? ' (en ligne)' : ''}
+                      {a.disponible ? ` (${t('settings.calls.onlineLower')})` : ''}
                     </option>
                   ))}
                 </select>
@@ -449,7 +511,7 @@ function Settings() {
                   className="btn-primary btn-md whitespace-nowrap"
                 >
                   {callSaving && <div className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin mr-1.5" />}
-                  {callSaving ? 'Enregistrement...' : 'Enregistrer'}
+                  {callSaving ? t('settings.calls.saving') : t('settings.calls.submit')}
                 </button>
               </div>
             )}
@@ -465,18 +527,18 @@ function Settings() {
               <BellAlertIcon className="h-5 w-5 text-red-600 dark:text-red-400" />
             </div>
             <div>
-              <h2 className="font-bold text-gray-900 dark:text-white text-sm">Contacts d'urgence</h2>
+              <h2 className="font-bold text-gray-900 dark:text-white text-sm">{t('settings.emergencyContacts.title')}</h2>
               <p className="text-xs text-gray-400">
-                Numéros affichés dans la barre d'urgence du site public
+                {t('settings.emergencyContacts.subtitle')}
               </p>
             </div>
           </div>
           <div className="p-5 sm:p-6">
             {contactsLoading ? (
-              <p className="text-sm text-gray-500 dark:text-gray-400 italic py-2">Chargement...</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 italic py-2">{t('settings.emergencyContacts.loading')}</p>
             ) : emergencyContacts.length === 0 ? (
               <p className="text-sm text-gray-500 dark:text-gray-400 italic py-2">
-                Aucun contact d'urgence configuré
+                {t('settings.emergencyContacts.empty')}
               </p>
             ) : (
               <>
@@ -491,7 +553,7 @@ function Settings() {
                           value={contact.telephone || ''}
                           onChange={(e) => handleContactPhoneChange(contact.code, e.target.value)}
                           className="input pl-9"
-                          placeholder="Ex : 034 12 345 67"
+                          placeholder={t('settings.emergencyContacts.phonePlaceholder')}
                         />
                       </div>
                     </div>
@@ -505,7 +567,7 @@ function Settings() {
                     className="btn-primary btn-md"
                   >
                     {contactsSaving && <div className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin mr-1.5" />}
-                    {contactsSaving ? 'Enregistrement...' : "Enregistrer les contacts"}
+                    {contactsSaving ? t('settings.emergencyContacts.saving') : t('settings.emergencyContacts.submit')}
                   </button>
                 </div>
               </>
@@ -522,46 +584,46 @@ function Settings() {
               <ChatBubbleLeftRightIcon className="h-5 w-5 text-sky-600 dark:text-sky-400" />
             </div>
             <div>
-              <h2 className="font-bold text-gray-900 dark:text-white text-sm">Réseaux sociaux</h2>
+              <h2 className="font-bold text-gray-900 dark:text-white text-sm">{t('settings.socials.title')}</h2>
               <p className="text-xs text-gray-400">
-                Numéro WhatsApp et liens Facebook / Instagram affichés dans le pied de page du site public
+                {t('settings.socials.subtitle')}
               </p>
             </div>
           </div>
           <div className="p-5 sm:p-6">
             {socialsLoading ? (
-              <p className="text-sm text-gray-500 dark:text-gray-400 italic py-2">Chargement...</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 italic py-2">{t('settings.emergencyContacts.loading')}</p>
             ) : (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                   <div>
-                    <label className="label">Numéro WhatsApp</label>
+                    <label className="label">{t('settings.socials.whatsapp')}</label>
                     <input
                       type="tel"
                       value={socials.whatsapp}
                       onChange={(e) => handleSocialChange('whatsapp', e.target.value)}
                       className="input"
-                      placeholder="Ex : 034 00 000 00"
+                      placeholder={t('settings.socials.whatsappPlaceholder')}
                     />
                   </div>
                   <div>
-                    <label className="label">Lien Facebook</label>
+                    <label className="label">{t('settings.socials.facebook')}</label>
                     <input
                       type="url"
                       value={socials.facebook}
                       onChange={(e) => handleSocialChange('facebook', e.target.value)}
                       className="input"
-                      placeholder="https://facebook.com/..."
+                      placeholder={t('settings.socials.facebookPlaceholder')}
                     />
                   </div>
                   <div>
-                    <label className="label">Lien Instagram</label>
+                    <label className="label">{t('settings.socials.instagram')}</label>
                     <input
                       type="url"
                       value={socials.instagram}
                       onChange={(e) => handleSocialChange('instagram', e.target.value)}
                       className="input"
-                      placeholder="https://instagram.com/..."
+                      placeholder={t('settings.socials.instagramPlaceholder')}
                     />
                   </div>
                 </div>
@@ -573,7 +635,7 @@ function Settings() {
                     className="btn-primary btn-md"
                   >
                     {socialsSaving && <div className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin mr-1.5" />}
-                    {socialsSaving ? 'Enregistrement...' : 'Enregistrer les réseaux sociaux'}
+                    {socialsSaving ? t('settings.socials.saving') : t('settings.socials.submit')}
                   </button>
                 </div>
               </>
@@ -598,30 +660,39 @@ function Settings() {
           </div>
           <div className="p-5 sm:p-6">
             {greenLoading ? (
-              <p className="text-sm text-gray-500 dark:text-gray-400 italic py-2">Chargement...</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 italic py-2">{t('settings.greenNumbers.loading')}</p>
             ) : (
               <>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div>
-                    <label className="label">{t('settings.greenNumbers.violence')}</label>
-                    <input
-                      type="tel"
-                      value={greenNumbers.greenNumberCua}
-                      onChange={(e) => handleGreenNumberChange('greenNumberCua', e.target.value)}
-                      className="input"
-                      placeholder={t('settings.greenNumbers.violencePlaceholder')}
-                    />
-                  </div>
-                  <div>
-                    <label className="label">{t('settings.greenNumbers.doleance')}</label>
-                    <input
-                      type="tel"
-                      value={greenNumbers.greenNumberOrange}
-                      onChange={(e) => handleGreenNumberChange('greenNumberOrange', e.target.value)}
-                      className="input"
-                      placeholder={t('settings.greenNumbers.doleancePlaceholder')}
-                    />
-                  </div>
+                  {GREEN_NUMBER_FIELDS.map((key) => (
+                    <div key={key}>
+                      <label className="label">
+                        {t(`settings.greenNumbers.${key === 'greenNumberCua' ? 'violence' : 'doleance'}`)}
+                      </label>
+                      <input
+                        type="tel"
+                        inputMode="tel"
+                        value={greenNumbers[key] ?? ''}
+                        onChange={(e) => handleGreenNumberChange(key, e.target.value)}
+                        onBlur={() => {
+                          const value = (greenNumbers[key] || '').trim();
+                          setGreenNumbers((prev) => ({ ...prev, [key]: value }));
+                        }}
+                        aria-invalid={greenErrors[key] ? 'true' : 'false'}
+                        aria-describedby={greenErrors[key] ? `green-error-${key}` : undefined}
+                        className={`input ${greenErrors[key] ? 'border-red-400 dark:border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
+                        placeholder={t(`settings.greenNumbers.${key === 'greenNumberCua' ? 'violencePlaceholder' : 'doleancePlaceholder'}`)}
+                      />
+                      {greenErrors[key] && (
+                        <p
+                          id={`green-error-${key}`}
+                          className="mt-1.5 text-xs font-medium text-red-500 dark:text-red-400"
+                        >
+                          {greenErrors[key]}
+                        </p>
+                      )}
+                    </div>
+                  ))}
                 </div>
                 <div className="mt-4 flex justify-end">
                   <button
@@ -631,7 +702,7 @@ function Settings() {
                     className="btn-primary btn-md"
                   >
                     {greenSaving && <div className="w-3.5 h-3.5 border-2 border-white/40 border-t-white rounded-full animate-spin mr-1.5" />}
-                    {greenSaving ? 'Enregistrement...' : 'Enregistrer les numéros verts'}
+                    {greenSaving ? t('settings.greenNumbers.saving') : t('settings.greenNumbers.saveButton')}
                   </button>
                 </div>
               </>
@@ -647,8 +718,8 @@ function Settings() {
             <UserCircleIcon className="h-5 w-5 text-emerald-600 dark:text-emerald-400" />
           </div>
           <div>
-            <h2 className="font-bold text-gray-900 dark:text-white text-sm">Informations du compte</h2>
-            <p className="text-xs text-gray-400">Détails de votre compte utilisateur</p>
+            <h2 className="font-bold text-gray-900 dark:text-white text-sm">{t('settings.accountInfo')}</h2>
+            <p className="text-xs text-gray-400">{t('settings.accountInfoDesc')}</p>
           </div>
         </div>
         <div className="p-5 sm:p-6">

@@ -1,0 +1,52 @@
+# ============================================================
+#  DOLEANCE - Apache
+#  Frontend React/Vite (fichiers statiques) + reverse-proxy
+#  vers le backend Node/Express (port 5000).
+#
+#  Ce fichier doit se trouver DANS le dossier qui contient
+#  index.html. Vite copie automatiquement le contenu de
+#  frontend/public/ a la racine de dist/, donc il est
+#  deja present apres `npm run build`.
+#
+#  MODULES APACHE REQUIS : mod_rewrite, mod_proxy, mod_proxy_http
+#  (tous actives par defaut dans XAMPP)
+# ============================================================
+
+DirectoryIndex index.html
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+
+  # Sous-dossier de deploiement = racine du site.
+  # Si le site est dans un sous-dossier (ex: /doleance/),
+  # remplacer par : RewriteBase /doleance/
+  RewriteBase /
+
+  # ---------- 1. Reverse-proxy vers le backend Node (port 5000) ----------
+  # Ces regles DOIVENT rester AVANT le fallback SPA.
+  # [P] = proxy, [L] = arret du traitement des regles suivantes.
+
+  # API REST  ->  /api/* vers http://127.0.0.1:5000/api/*
+  RewriteRule ^api(/.*)?$      http://127.0.0.1:5000/api$1      [P,L,QSA]
+
+  # Fichiers uploades (pieces jointes, images du chat)
+  RewriteRule ^uploads(/.*)?$  http://127.0.0.1:5000/uploads$1  [P,L,QSA]
+
+  # Socket.IO : WebSocket + fallback "polling".
+  # Le schema ws:// est indispensable pour l'upgrade WebSocket.
+  RewriteRule ^socket\.io(/.*)?$ ws://127.0.0.1:5000/socket.io$1 [P,L,QSA]
+
+  # ---------- 2. Fallback SPA (React Router / BrowserRouter) ----------
+  # Sans cette regle, un rafraichissement de page ou un lien direct
+  # vers /login, /suivi-doleance/REF-2026-0001, /backoffice/dashboard...
+  # renvoie une erreur 404 Apache au lieu de index.html.
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule ^ index.html [L]
+</IfModule>
+
+# Conserver le Host public (le backend genere des URLs d'images uploadees
+# a partir du Host de la requete).
+<IfModule mod_proxy.c>
+  ProxyPreserveHost On
+</IfModule>

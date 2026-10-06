@@ -6,7 +6,10 @@ export default defineConfig(({ mode }) => {
 
   return {
     plugins: [react()],
-      base: '/doleance/',
+      // Le build est servi à la racine du domaine par Apache.
+      // BASE_URL vaut "/" -> BrowserRouter (main.jsx) utilise automatiquement
+      // la racine comme basename, et tous les assets sont demandes en /assets/...
+      base: '/',
       server: {
         host: '0.0.0.0',
         port: 5173,

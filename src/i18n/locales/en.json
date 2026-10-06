@@ -95,7 +95,91 @@
     "accountInfo": "Account information",
     "accountInfoDesc": "Your user account details",
     "fullName": "Full name",
-    "role": "Role"
+    "role": "Role",
+    "greenNumbers": {
+      "title": "Green numbers",
+      "subtitle": "Numbers displayed in the public site header",
+      "violence": "Green number for violence cases",
+      "violencePlaceholder": "E.g.: 147",
+      "doleance": "Green number for complaints",
+      "doleancePlaceholder": "E.g.: +261 32 32 113 32",
+      "required": "This number is required",
+      "invalid": "Invalid number: digits, spaces and + only",
+      "missingError": "Please fill in all green numbers",
+      "success": "Green numbers updated",
+      "saveError": "Error while updating green numbers",
+      "loading": "Loading...",
+      "saving": "Saving...",
+      "saveButton": "Save green numbers"
+    },
+    "darkModeHint": "Reduces eye strain in low-light environments",
+    "account": {
+      "username": "Username",
+      "email": "Email",
+      "registeredAt": "Registration date",
+      "notSet": "Not set"
+    },
+    "calls": {
+      "title": "Citizen calls",
+      "subtitle": "Configure the recipient agent for direct Citizen → Agent calls",
+      "currentAgent": "Current recipient agent",
+      "chooseAgent": "Choose the recipient agent",
+      "selectPlaceholder": "— Select an agent —",
+      "noAgent": "No agent available (required role: system administrator or central agent)",
+      "online": "Online",
+      "offline": "Offline",
+      "onlineLower": "online",
+      "saving": "Saving...",
+      "submit": "Save",
+      "agentRequired": "Please choose a recipient agent",
+      "agentUpdated": "Recipient agent updated",
+      "error": "Error while updating"
+    },
+    "password": {
+      "match": "Passwords match",
+      "mismatchYet": "Passwords do not match yet",
+      "show": "Show",
+      "hide": "Hide",
+      "showHideSuffix": "passwords",
+      "saving": "Changing...",
+      "submit": "Change password",
+      "errorMismatch": "Passwords do not match",
+      "errorMinLength": "Password must contain at least 6 characters",
+      "success": "Password changed successfully",
+      "error": "Error while changing the password",
+      "strength0": "Very weak",
+      "strength1": "Weak",
+      "strength2": "Fair",
+      "strength3": "Good",
+      "strength4": "Strong"
+    },
+    "emergencyContacts": {
+      "title": "Emergency contacts",
+      "subtitle": "Numbers displayed in the emergency bar of the public site",
+      "loading": "Loading...",
+      "empty": "No emergency contact configured",
+      "phonePlaceholder": "E.g.: 034 12 345 67",
+      "phoneRequired": "Phone required for: {{libelle}}",
+      "saving": "Saving...",
+      "submit": "Save contacts",
+      "success": "Emergency contacts updated",
+      "error": "Error while updating contacts"
+    },
+    "socials": {
+      "title": "Social networks",
+      "subtitle": "WhatsApp number and Facebook / Instagram links displayed in the public site footer",
+      "loading": "Loading...",
+      "whatsapp": "WhatsApp number",
+      "whatsappPlaceholder": "E.g.: 034 00 000 00",
+      "facebook": "Facebook link",
+      "facebookPlaceholder": "https://facebook.com/...",
+      "instagram": "Instagram link",
+      "instagramPlaceholder": "https://instagram.com/...",
+      "saving": "Saving...",
+      "submit": "Save social networks",
+      "success": "Social networks updated",
+      "error": "Error while updating social networks"
+    }
   },
   "tracking": {
     "title": "Complaint tracking",
@@ -239,10 +323,22 @@
     "export": "Export",
     "import": "Import"
   },
+  "footer": {
+    "rights": "All rights reserved",
+    "greenNumbersCard": "Green numbers",
+    "greenNumbersCardHint": "Free call, 24/7",
+    "greenNumbersModalTitle": "Green numbers",
+    "greenNumbersModalSubtitle": "Two free emergency lines, reachable 24/7",
+    "greenNumberViolence": "Green number for violence cases",
+    "greenNumberDoleanceTitle": "Green number for complaints",
+    "greenNumbersCallAction": "Call",
+    "greenNumbersClose": "Close"
+  },
   "nav": {
     "submit": "Submit a complaint",
     "all": "All complaints",
     "track": "Track my complaint",
+    "settings": "Settings",
     "callAgent": "Call an agent"
   },
   "citizenCall": {

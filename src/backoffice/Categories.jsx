@@ -426,7 +426,7 @@ function Categories() {
                   onChange={(e) => setFormData({ ...formData, description_malagasy: e.target.value })}
                   rows={3}
                   className="input"
-                  placeholder="Famaritana amin'ny teny malagasy"
+                  placeholder="Description en malagasy"
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
