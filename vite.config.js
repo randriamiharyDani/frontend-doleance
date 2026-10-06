@@ -9,20 +9,17 @@ export default defineConfig(({ mode }) => {
       // Le build est servi à la racine du domaine par Apache.
       // BASE_URL vaut "/" -> BrowserRouter (main.jsx) utilise automatiquement
       // la racine comme basename, et tous les assets sont demandes en /assets/...
-      base: '/',
+      base: env.VITE_BASE || '/',
       server: {
-        host: '0.0.0.0',
+        host: '0.0.0.0', 
         port: 5173,
-        // Vite 5.4+ : protection DNS-rebinding. Sans ceci, l'accès via
-        // un domaine (ex: http://webapp.cua.mg:5173) est rejeté avec
-        // "Blocked request. This host is not allowed".
-        // Personnalisable via VITE_ALLOWED_HOSTS="webapp.cua.mg,autre.domaine".
+        origin: env.VITE_DEV_ORIGIN || undefined,
+        hmr: env.VITE_HMR_DISABLED === '1' ? false : {
+          host: env.VITE_HMR_HOST || undefined,
+          protocol: env.VITE_HMR_PROTOCOL || undefined,
+          clientPort: env.VITE_HMR_CLIENT_PORT ? parseInt(env.VITE_HMR_CLIENT_PORT, 10) : undefined,
+        }, 
         allowedHosts: (env.VITE_ALLOWED_HOSTS || 'webapp.cua.mg,localhost,127.0.0.1').split(',').map(s => s.trim()).filter(Boolean),
-        // HTTPS/mkcert désactivé — retour à HTTP
-        // https: {
-        //   key: fs.readFileSync(env.VITE_SSL_KEY || './dev-key.pem'),
-        //   cert: fs.readFileSync(env.VITE_SSL_CERT || './dev-cert.pem'),
-      // },
       proxy: {
         '/api': {
           target: 'http://localhost:5000',
