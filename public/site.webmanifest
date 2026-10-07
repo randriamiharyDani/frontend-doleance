@@ -2,47 +2,47 @@
   "name": "Gestion des Doléances - CUA",
   "short_name": "CUA Doléances",
   "description": "Plateforme de gestion des doléances de la Commune Urbaine d'Antananarivo",
-  "start_url": "/",
+  "start_url": "/doleance/",
   "display": "standalone",
   "theme_color": "#1e3a8a",
   "background_color": "#ffffff",
   "orientation": "portrait-primary",
-  "scope": "/",
+  "scope": "/doleance/",
   "lang": "fr-FR",
   "icons": [
     {
-      "src": "/images/logo-cua.png",
+      "src": "images/logo-cua.png",
       "sizes": "64x64",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/images/logo-cua.png",
+      "src": "images/logo-cua.png",
       "sizes": "128x128",
       "type": "image/png"
     },
     {
-      "src": "/images/logo-cua.png",
+      "src": "images/logo-cua.png",
       "sizes": "144x144",
       "type": "image/png"
     },
     {
-      "src": "/images/logo-cua.png",
+      "src": "images/logo-cua.png",
       "sizes": "152x152",
       "type": "image/png"
     },
     {
-      "src": "/images/logo-cua.png",
+      "src": "images/logo-cua.png",
       "sizes": "192x192",
       "type": "image/png"
     },
     {
-      "src": "/images/logo-cua.png",
+      "src": "images/logo-cua.png",
       "sizes": "256x256",
       "type": "image/png"
     },
     {
-      "src": "/images/logo-cua.png",
+      "src": "images/logo-cua.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
