@@ -1,7 +1,7 @@
-{
-  "name": "Gestion des Doléances - CUA",
-  "short_name": "CUA Doléances",
-  "description": "Plateforme de gestion des doléances de la Commune Urbaine d'Antananarivo",
+﻿{
+  "name": "Gestion des Doleances - CUA",
+  "short_name": "CUA Doleances",
+  "description": "Plateforme de gestion des Doleances de la Commune Urbaine d'Antananarivo",
   "start_url": "/doleance/",
   "display": "standalone",
   "theme_color": "#1e3a8a",

@@ -263,6 +263,8 @@ const SEARCH_BIAS_SPAN = 0.18;
 /** Attente avant interrogation automatique pendant la saisie. */
 const SEARCH_DEBOUNCE_MS = 350;
 
+const SHOW_LOCATION_SEARCH = false;
+
 const SEARCH_TYPE_LABEL_KEYS = {
   amenity: "deposer.searchType.amenity",
   building: "deposer.searchType.building",
@@ -1241,6 +1243,8 @@ function DeposerDoleance() {
 
         {/* 5. Localisation & Adresse */}
         <Section step={5} iconPath={ICONS.pin} title={t("deposer.locationTitle")} required>
+          {SHOW_LOCATION_SEARCH && (
+          <>
           <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 mb-3 relative">
             <div className="cua-field-wrap flex-1 flex items-center gap-3 bg-slate-50 dark:bg-slate-800 rounded-xl px-4 border border-transparent transition-all relative order-2 sm:order-1">
               <Icon path={ICONS.search} className="w-4 h-4 text-slate-400 flex-shrink-0" />
@@ -1374,9 +1378,12 @@ function DeposerDoleance() {
           <p className="text-[11px] text-slate-400 dark:text-slate-500 -mt-1 mb-3">
             {t("deposer.searchMinChars", { count: MIN_SEARCH_CHARS })}
           </p>
+          </>
+          )}
 
           <LocationPickerMap
             className="mb-4"
+            heightClass="h-72 sm:h-[28rem]"
             position={mapPosition}
             onPick={handleMapPositionChange}
             dark={darkMode}

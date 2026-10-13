@@ -35,6 +35,7 @@ const DEFAULT_SOCIAL_HREFS = {
 const DEFAULT_GREEN_NUMBERS = {
   greenNumberCua: '147',
   greenNumberOrange: '+261323211332',
+  greenNumberTelma: '0323203232',
 };
 
 /**
@@ -180,6 +181,7 @@ function PublicLayout({ children }) {
         setGreenNumbers({
           greenNumberCua: (gn.greenNumberCua || '').trim() || DEFAULT_GREEN_NUMBERS.greenNumberCua,
           greenNumberOrange: (gn.greenNumberOrange || '').trim() || DEFAULT_GREEN_NUMBERS.greenNumberOrange,
+          greenNumberTelma: (gn.greenNumberTelma || '').trim() || DEFAULT_GREEN_NUMBERS.greenNumberTelma,
         });
       })
       .catch(() => {});
@@ -277,6 +279,14 @@ function PublicLayout({ children }) {
       badge:
         "bg-gradient-to-br from-emerald-500 to-emerald-600 group-hover:from-emerald-400 group-hover:to-emerald-500 ring-emerald-600/20",
     },
+    {
+      key: 'greenNumberTelma',
+      phone: greenNumbers.greenNumberTelma,
+      icon: PhoneIcon,
+      label: t("footer.greenNumberAdditional"),
+      badge:
+        "bg-gradient-to-br from-emerald-500 to-emerald-600 group-hover:from-emerald-400 group-hover:to-emerald-500 ring-emerald-600/20",
+    },
   ].map((n) => ({
     ...n,
     display: formatGreenNumber(n.phone),
@@ -288,7 +298,7 @@ function PublicLayout({ children }) {
   );
 
   /**
-   * Mini-card « Numéros verts » + popup des deux numéros.
+   * Mini-card « Numéros verts » + popup des numéros.
    * Utilisée dans le header public (barre de navigation + menu mobile).
    * @param {boolean} compact   version resserrée pour la barre de navigation
    *                            (libellé visible à partir de lg).
@@ -303,8 +313,8 @@ function PublicLayout({ children }) {
         aria-haspopup="true"
         aria-label={t("footer.greenNumbersCard")}
         title={t("footer.greenNumbersCard")}
-        className={`group inline-flex items-center rounded-full transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/70 focus-visible:ring-offset-2 ${
-          compact ? "gap-2.5 pl-2 pr-2.5 py-1.5" : "w-full gap-3 pl-2.5 pr-4 py-2"
+        className={`group inline-flex items-center rounded-lg transition-all duration-200 ease-out hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/70 focus-visible:ring-offset-2 ${
+          compact ? "gap-2 pl-1.5 pr-2 py-1" : "w-full gap-2.5 pl-2 pr-3 py-1.5"
         } ${
           greenNumbersOpen
             ? darkMode
@@ -312,22 +322,21 @@ function PublicLayout({ children }) {
               : "bg-emerald-50 ring-1 ring-inset ring-emerald-300 focus-visible:ring-offset-white"
             : darkMode
               ? "bg-emerald-500/[0.07] ring-1 ring-inset ring-emerald-400/25 hover:bg-emerald-500/[0.14] focus-visible:ring-offset-slate-900"
-              : "bg-gradient-to-br from-emerald-50 to-white ring-1 ring-inset ring-emerald-200/80 hover:ring-emerald-300 focus-visible:ring-offset-white"
+              : "bg-white ring-1 ring-inset ring-emerald-200 hover:bg-emerald-50/70 hover:ring-emerald-300 focus-visible:ring-offset-white"
         }`}
       >
         <span
-          className={`relative flex items-center justify-center rounded-full flex-shrink-0 shadow-md ring-2 transition-transform duration-300 group-hover:scale-105 ${compact ? "h-8 w-8" : "h-10 w-10"} ${GREEN_NUMBERS_AVAILABLE[0]?.badge ?? "bg-emerald-500"}`}
+          className={`relative flex items-center justify-center rounded-md flex-shrink-0 shadow-sm transition-transform duration-200 group-hover:scale-105 ${compact ? "h-6 w-6" : "h-8 w-8"} ${GREEN_NUMBERS_AVAILABLE[0]?.badge ?? "bg-emerald-500"}`}
         >
-          <span className="absolute inset-0 rounded-full bg-white/25 animate-ping opacity-60 group-hover:animate-none transition-opacity duration-300" />
-          <PhoneIcon className={`relative text-white ${compact ? "h-4 w-4" : "h-5 w-5"}`} />
+          <PhoneIcon className={`relative text-white ${compact ? "h-3.5 w-3.5" : "h-4 w-4"}`} />
         </span>
 
         <span
           className={`flex-col leading-tight text-left ${compact ? "hidden lg:flex" : "flex"}`}
         >
           <span
-            className={`font-bold tracking-tight ${
-              compact ? "text-xs" : "text-sm"
+            className={`font-semibold tracking-tight ${
+              compact ? "text-xs" : "text-[13px]"
             } ${
               darkMode
                 ? "text-white group-hover:text-emerald-300"
@@ -338,7 +347,7 @@ function PublicLayout({ children }) {
           </span>
           {!compact && (
             <span
-              className={`text-[11px] font-medium ${
+              className={`text-[10px] font-medium ${
                 darkMode ? "text-emerald-300/80" : "text-emerald-700/80"
               }`}
             >
@@ -348,38 +357,38 @@ function PublicLayout({ children }) {
         </span>
 
         <ChevronRightIcon
-          className={`flex-shrink-0 transition-transform duration-300 ${
+          className={`flex-shrink-0 transition-transform duration-200 ${
             greenNumbersOpen ? "rotate-90" : "group-hover:translate-x-0.5"
-          } ${compact ? "hidden lg:block" : "block"} h-4 w-4 ${
+          } ${compact ? "hidden lg:block" : "block ml-auto"} h-3.5 w-3.5 ${
             darkMode ? "text-emerald-300/70" : "text-emerald-700/70"
           }`}
         />
       </button>
 
-      {/* ===== POPUP — les deux numéros verts ===== */}
+      {/* ===== POPUP — numéros verts ===== */}
       {withPopup && greenNumbersOpen && (
         <div
           role="dialog"
           aria-label={t("footer.greenNumbersModalTitle")}
-          className={`absolute top-full z-[60] mt-2.5 rounded-2xl border shadow-2xl overflow-hidden origin-top ${
+          className={`absolute top-full z-[60] mt-2 rounded-xl border shadow-xl overflow-hidden origin-top ${
             compact
-              ? "right-0 w-[min(22rem,calc(100vw-2rem))] lg:right-auto lg:left-1/2 lg:-translate-x-1/2"
-              : "left-0 w-[min(22rem,calc(100vw-2rem))]"
+              ? "right-0 w-[min(20rem,calc(100vw-2rem))] lg:right-auto lg:left-1/2 lg:-translate-x-1/2"
+              : "left-0 w-[min(20rem,calc(100vw-2rem))]"
           } ${
-            darkMode ? "bg-slate-800 border-white/10" : "bg-white border-emerald-100"
+            darkMode ? "bg-slate-800 border-white/10" : "bg-white border-slate-200"
           }`}
         >
           {/* En-tête du popup */}
           <div
-            className={`flex items-start justify-between gap-3 px-4 py-3 border-b ${
+            className={`flex items-start justify-between gap-3 px-3.5 py-2.5 border-b ${
               darkMode
                 ? "border-white/10 bg-white/[0.04]"
-                : "border-emerald-100 bg-emerald-50/60"
+                : "border-slate-100 bg-slate-50"
             }`}
           >
             <div className="min-w-0">
               <p
-                className={`text-sm font-bold tracking-tight ${
+                className={`text-[13px] font-semibold tracking-tight ${
                   darkMode ? "text-white" : "text-[#0F172A]"
                 }`}
               >
@@ -398,46 +407,45 @@ function PublicLayout({ children }) {
               type="button"
               onClick={() => setGreenNumbersOpen(false)}
               aria-label={t("footer.greenNumbersClose")}
-              className={`flex-shrink-0 p-1 rounded-full transition-colors duration-200 ${
+              className={`flex-shrink-0 p-1 rounded-md transition-colors duration-200 ${
                 darkMode
                   ? "text-slate-400 hover:text-white hover:bg-white/10"
                   : "text-slate-400 hover:text-slate-700 hover:bg-slate-100"
               }`}
             >
-              <XMarkIcon className="h-5 w-5" />
+              <XMarkIcon className="h-4 w-4" />
             </button>
           </div>
 
-          {/* Les deux numéros, distinctement présentés */}
-          <div className="p-2.5 sm:p-3 grid gap-2.5">
+          {/* Liste des numéros */}
+          <div className="p-2 grid gap-1.5">
             {GREEN_NUMBERS_AVAILABLE.map((n) => (
               <a
                 key={n.key}
                 href={n.tel}
                 title={`${n.label} — ${n.display}`}
-                className={`group flex items-center gap-3.5 rounded-full py-2.5 pl-2.5 pr-3 transition-all duration-300 ease-out hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/70 focus-visible:ring-offset-2 ${
+                className={`group flex items-center gap-3 rounded-lg py-2 pl-2 pr-2.5 transition-all duration-200 ease-out hover:shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-emerald-500/70 focus-visible:ring-offset-2 ${
                   darkMode
-                    ? "bg-white/[0.06] ring-1 ring-inset ring-white/10 hover:bg-white/[0.12] focus-visible:ring-offset-slate-800"
-                    : "bg-white ring-1 ring-inset ring-emerald-100 hover:bg-emerald-50/70 hover:ring-emerald-300 focus-visible:ring-offset-white"
+                    ? "bg-white/[0.05] ring-1 ring-inset ring-white/10 hover:bg-white/[0.1] focus-visible:ring-offset-slate-800"
+                    : "bg-white ring-1 ring-inset ring-slate-200 hover:bg-emerald-50/60 hover:ring-emerald-300 focus-visible:ring-offset-white"
                 }`}
               >
                 <span
-                  className={`relative flex items-center justify-center h-11 w-11 rounded-full flex-shrink-0 shadow-md ring-2 transition-transform duration-300 group-hover:scale-105 ${n.badge}`}
+                  className={`relative flex items-center justify-center h-9 w-9 rounded-lg flex-shrink-0 shadow-sm transition-transform duration-200 group-hover:scale-105 ${n.badge}`}
                 >
-                  <span className="absolute inset-0 rounded-full bg-white/25 animate-ping opacity-60 group-hover:animate-none transition-opacity duration-300" />
-                  <n.icon className="relative h-5 w-5 text-white" />
+                  <n.icon className="relative h-4 w-4 text-white" />
                 </span>
 
                 <span className="flex flex-col leading-tight min-w-0 flex-1">
                   <span
-                    className={`text-[11px] sm:text-xs font-semibold leading-snug ${
+                    className={`text-[11px] font-medium leading-snug ${
                       darkMode ? "text-emerald-300/90" : "text-emerald-700/90"
                     }`}
                   >
                     {n.label}
                   </span>
                   <span
-                    className={`mt-0.5 text-xl sm:text-2xl font-extrabold tracking-tight whitespace-nowrap transition-colors duration-200 ${
+                    className={`mt-0.5 text-base sm:text-lg font-bold tracking-tight whitespace-nowrap transition-colors duration-200 ${
                       darkMode
                         ? "text-white group-hover:text-emerald-300"
                         : "text-[#0F172A] group-hover:text-emerald-700"
@@ -448,13 +456,13 @@ function PublicLayout({ children }) {
                 </span>
 
                 <span
-                  className={`inline-flex items-center gap-1.5 flex-shrink-0 rounded-full px-3 py-1.5 text-[11px] font-bold transition-colors duration-300 ${
+                  className={`inline-flex items-center gap-1 flex-shrink-0 rounded-md px-2 py-1 text-[10px] font-semibold transition-colors duration-200 ${
                     darkMode
                       ? "bg-emerald-500/15 text-emerald-300 group-hover:bg-emerald-500 group-hover:text-white"
                       : "bg-emerald-50 text-emerald-700 group-hover:bg-emerald-500 group-hover:text-white"
                   }`}
                 >
-                  <PhoneIcon className="h-3.5 w-3.5" />
+                  <PhoneIcon className="h-3 w-3" />
                   {t("footer.greenNumbersCallAction")}
                 </span>
               </a>
@@ -476,7 +484,7 @@ function PublicLayout({ children }) {
         .cua-layout .cua-display { font-family: 'Fraunces', ui-serif, Georgia, serif; }
         .cua-layout .cua-nav-active {
           background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 65%, #2E4FA3 100%);
-          box-shadow: 0 8px 20px -6px rgba(15, 23, 42, 0.4);
+          box-shadow: 0 6px 16px -6px rgba(15, 23, 42, 0.4);
         }
         .cua-layout .cua-icon-btn:hover {
           color: #D4AF37;
@@ -496,31 +504,41 @@ function PublicLayout({ children }) {
           scrolled ? '-translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'
         } ${
           darkMode
-            ? 'bg-[#0C1222]/90 backdrop-blur-md border-b border-white/5'
-            : 'bg-[#0B1A33]/95 backdrop-blur-md border-b border-white/5'
+            ? 'bg-[#0C1222] border-b border-white/10'
+            : 'bg-[#0B1A33] border-b border-white/10'
         }`}
       >
-        <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-          {/* Rangée unique : 4 pills côte à côte sur grand écran,
-              réorganisation automatique en 2x2 sur petit écran */}
-          <div className="flex flex-wrap items-center justify-center gap-x-2 sm:gap-x-4 xl:gap-x-6 gap-y-1 py-1">
-            {emergencyContacts.map((contact) => (
-              <a
-                key={contact.label}
-                href={contact.tel}
-                className="group inline-flex items-center gap-1.5 sm:gap-2 rounded-full pl-1 pr-2 sm:pr-3 py-0.5 bg-white/[0.06] ring-1 ring-white/10 hover:bg-white/[0.12] hover:ring-red-400/30 transition-all duration-200 whitespace-nowrap"
-              >
-                <span className="relative flex h-5 w-5 items-center justify-center rounded-full bg-red-500/15 flex-shrink-0">
-                  <span className="absolute w-4 h-4 rounded-full bg-red-500/20 animate-ping" />
-                  <PhoneIcon className="h-3 w-3 text-red-400 relative z-10" />
-                </span>
-                <span className="text-[10px] sm:text-[11px] font-medium tracking-wide text-white/40 group-hover:text-white/60 transition-colors">
-                  {contact.label}
-                </span>
-                <span className="text-[10px] sm:text-[11px] font-semibold text-white/85 group-hover:text-red-300 transition-colors">
-                  {contact.phone}
-                </span>
-              </a>
+        <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8">
+          <div className="flex flex-wrap items-center justify-center gap-x-1 sm:gap-x-2 gap-y-0.5 py-1">
+            {/* Étiquette "Urgences" (grand écran uniquement) */}
+            <div className="hidden xl:flex items-center gap-1.5 pr-3 mr-1 border-r border-white/15">
+              <span className="relative flex h-1.5 w-1.5">
+                <span className="absolute inline-flex h-full w-full rounded-full bg-red-500 opacity-75 animate-ping" />
+                <span className="relative inline-flex h-1.5 w-1.5 rounded-full bg-red-500" />
+              </span>
+              <span className="text-[10px] font-semibold uppercase tracking-[0.18em] text-red-300">
+                Urgences
+              </span>
+            </div>
+
+            {emergencyContacts.map((contact, index) => (
+              <React.Fragment key={contact.label}>
+                {index > 0 && (
+                  <span className="hidden sm:block h-3 w-px bg-white/15" aria-hidden="true" />
+                )}
+                <a
+                  href={contact.tel}
+                  className="group inline-flex items-center gap-1.5 rounded-md px-2 py-1 hover:bg-white/10 transition-colors duration-200 whitespace-nowrap"
+                >
+                  <PhoneIcon className="h-3 w-3 text-red-400 flex-shrink-0" />
+                  <span className="text-[10px] font-medium uppercase tracking-wider text-white/50 group-hover:text-white/70 transition-colors">
+                    {contact.label}
+                  </span>
+                  <span className="text-[11px] sm:text-xs font-semibold tabular-nums text-white group-hover:text-red-200 transition-colors">
+                    {contact.phone}
+                  </span>
+                </a>
+              </React.Fragment>
             ))}
           </div>
         </div>
@@ -532,11 +550,11 @@ function PublicLayout({ children }) {
         className={`fixed left-0 right-0 z-40 transition-all duration-300 ${
           scrolled
             ? darkMode
-              ? "bg-slate-900/85 backdrop-blur-xl shadow-lg shadow-black/10 border-b border-slate-700/50"
-              : "bg-white/85 backdrop-blur-xl shadow-lg shadow-[#0F172A]/5 border-b border-slate-200/60"
+              ? "bg-slate-900/90 backdrop-blur-xl shadow-lg shadow-black/10 border-b border-slate-700/50"
+              : "bg-white/90 backdrop-blur-xl shadow-lg shadow-[#0F172A]/5 border-b border-slate-200/60"
             : darkMode
-              ? "bg-slate-900/60 backdrop-blur-md border-b border-slate-800/50"
-              : "bg-white/60 backdrop-blur-md border-b border-slate-100/60"
+              ? "bg-slate-900/70 backdrop-blur-md border-b border-slate-800/50"
+              : "bg-white/70 backdrop-blur-md border-b border-slate-100/60"
         }`}
       >
         {/* Liseré doré discret en tête de page */}
@@ -546,22 +564,22 @@ function PublicLayout({ children }) {
           <div className="flex items-center justify-between h-16">
             {/* Left: Logo + Title */}
             <div className="flex items-center gap-3 flex-shrink-0">
-              <Link to="/deposer-doleance" className="flex items-center group">
+              <Link to="/deposer-doleance" className="flex items-center gap-3 group">
                 <img
                   src={`${import.meta.env.BASE_URL}images/logo_CUA.svg`}
                   alt="Logo CUA"
-                  className="h-16 w-16 object-contain cua-crest-ring space rounded-full border border-[#D4AF37]/40 transition-transform duration-200 group-hover:scale-105"
+                  className="h-12 w-12 object-contain cua-crest-ring space rounded-full border border-[#D4AF37]/40 transition-transform duration-200 group-hover:scale-105"
                 />
                 <div className="hidden sm:block">
                   <h1
-                    className={`cua-display text-3xl font-semibold leading-tight transition-colors ${
+                    className={`cua-display text-2xl font-semibold leading-tight transition-colors ${
                       darkMode ? "text-white" : "text-[#0F172A]"
                     }`}
                   >
                      {t("hero.title")}
                   </h1>
                   <p
-                    className={`text-[13px] font-medium -mt-0.5 tracking-wide ${
+                    className={`text-xs font-medium -mt-0.5 tracking-wide ${
                       darkMode ? "text-[#D4AF37]/80" : "text-[#9A7200]"
                     }`}
                   >
@@ -573,14 +591,14 @@ function PublicLayout({ children }) {
 
             {/* Center: Navigation (desktop) */}
 
-            <nav className="hidden md:flex items-center gap-1">
+            <nav className="hidden md:flex items-center gap-1.5">
               {navItems.map((item) => {
                 const active = isActive(item.path);
                 return (
                   <Link
                     key={item.path}
                     to={item.path}
-                    className={`relative flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-medium transition-all duration-200 ${
+                    className={`relative flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-[13px] font-medium transition-all duration-200 ${
                       active
                         ? "cua-nav-active text-white"
                         : darkMode
@@ -605,7 +623,7 @@ function PublicLayout({ children }) {
               {/* Dark mode toggle */}
               <button
                 onClick={toggleDarkMode}
-                className={`cua-icon-btn p-2 rounded-xl transition-all duration-200 ${
+                className={`cua-icon-btn p-2 rounded-lg transition-all duration-200 ${
                   darkMode
                     ? "text-slate-300 hover:bg-white/10"
                     : "text-slate-400 hover:bg-slate-100"
@@ -621,7 +639,7 @@ function PublicLayout({ children }) {
 
               {/* Language selector */}
               <div
-                className={`hidden sm:flex items-center gap-0.5 rounded-xl p-0.5 border ${
+                className={`hidden sm:flex items-center gap-0.5 rounded-lg p-0.5 border ${
                   darkMode
                     ? "border-slate-600 bg-slate-800/50"
                     : "border-slate-200 bg-slate-50"
@@ -633,7 +651,7 @@ function PublicLayout({ children }) {
                     <button
                       key={code}
                       onClick={() => i18n.changeLanguage(code)}
-                      className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold transition-all duration-200 ${
+                      className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-[11px] font-semibold transition-all duration-200 ${
                         active
                           ? "bg-[#D4AF37] text-white shadow-sm"
                           : darkMode
@@ -644,7 +662,7 @@ function PublicLayout({ children }) {
                       aria-pressed={active}
                     >
                       <Flag />
-                     
+                      {label}
                     </button>
                   );
                 })}
@@ -653,7 +671,7 @@ function PublicLayout({ children }) {
               {/* Hamburger mobile */}
               <button
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className={`md:hidden p-2 rounded-xl transition-all duration-200 ${
+                className={`md:hidden p-2 rounded-lg transition-all duration-200 ${
                   mobileMenuOpen
                     ? "cua-nav-active text-white"
                     : darkMode
@@ -691,7 +709,7 @@ function PublicLayout({ children }) {
                     key={item.path}
                     to={item.path}
                     onClick={() => setMobileMenuOpen(false)}
-                    className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                    className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                       active
                         ? "cua-nav-active text-white"
                         : darkMode
@@ -705,7 +723,7 @@ function PublicLayout({ children }) {
                 );
               })}
               {GREEN_NUMBERS_AVAILABLE.length > 0 && (
-                <div className="px-4 pt-1 pb-2">
+                <div className="px-1 pt-1 pb-2">
                   {renderGreenNumbersCard({ withPopup: !isDesktopViewport })}
                 </div>
               )}
@@ -725,15 +743,15 @@ function PublicLayout({ children }) {
                   key={contact.label}
                   href={contact.tel}
                   onClick={() => setMobileMenuOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
+                  className={`flex items-center gap-3 px-4 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 ${
                     darkMode
                       ? "text-slate-300 hover:bg-white/10 hover:text-white"
                       : "text-slate-600 hover:bg-slate-50 hover:text-[#0F172A]"
                   }`}
                 >
-                  <PhoneIcon className="h-5 w-5 text-red-400" />
+                  <PhoneIcon className="h-4 w-4 text-red-400" />
                   <span className={`text-xs ${darkMode ? "text-slate-500" : "text-slate-400"}`}>{contact.label}</span>
-                  <span>{contact.phone}</span>
+                  <span className="ml-auto tabular-nums">{contact.phone}</span>
                 </a>
               ))}
 

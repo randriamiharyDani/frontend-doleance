@@ -29,10 +29,15 @@ import siteSettingsService from '../services/siteSettingsService';
 // #0F172A, accent or #D4AF37. Le mode sombre reste piloté par ThemeContext.
 
 
-// Champs « numéros verts » réellement éditables dans cet écran.
-// Le backend expose aussi greenNumberTelma (non géré ici) : il ne doit
-// jamais entrer dans l'état du formulaire, sinon la validation échoue.
-const GREEN_NUMBER_FIELDS = ['greenNumberCua', 'greenNumberOrange'];
+// Champs « numéros verts » éditables dans cet écran.
+const GREEN_NUMBER_FIELDS = ['greenNumberCua', 'greenNumberOrange', 'greenNumberTelma'];
+
+// Clés i18n (labels/placeholders) associées à chaque numéro vert.
+const GREEN_NUMBER_LABEL_KEYS = {
+  greenNumberCua: { label: 'violence', placeholder: 'violencePlaceholder' },
+  greenNumberOrange: { label: 'doleance', placeholder: 'doleancePlaceholder' },
+  greenNumberTelma: { label: 'additional', placeholder: 'additionalPlaceholder' },
+};
 
 function passwordStrength(pwd, t) {
   if (!pwd) return { score: 0, label: '' };
@@ -114,7 +119,7 @@ function Settings() {
   const [socials, setSocials] = useState({ whatsapp: '', facebook: '', instagram: '' });
   const [socialsLoading, setSocialsLoading] = useState(false);
   const [socialsSaving, setSocialsSaving] = useState(false);
-  const [greenNumbers, setGreenNumbers] = useState({ greenNumberCua: '', greenNumberOrange: '' });
+  const [greenNumbers, setGreenNumbers] = useState({ greenNumberCua: '', greenNumberOrange: '', greenNumberTelma: '' });
   const [greenErrors, setGreenErrors] = useState({});
   const [greenLoading, setGreenLoading] = useState(false);
   const [greenSaving, setGreenSaving] = useState(false);
@@ -135,6 +140,7 @@ function Settings() {
         setGreenNumbers({
           greenNumberCua: (remote.greenNumberCua || '').toString().trim(),
           greenNumberOrange: (remote.greenNumberOrange || '').toString().trim(),
+          greenNumberTelma: (remote.greenNumberTelma || '').toString().trim(),
         });
         setGreenErrors({});
       })
@@ -224,6 +230,7 @@ function Settings() {
       const res = await siteSettingsService.updateGreenNumbers({
         greenNumberCua: greenNumbers.greenNumberCua.trim(),
         greenNumberOrange: greenNumbers.greenNumberOrange.trim(),
+        greenNumberTelma: greenNumbers.greenNumberTelma.trim(),
       });
       // Resynchronise avec ce qui a réellement été enregistré.
       const saved = res?.data?.greenNumbers;
@@ -231,6 +238,7 @@ function Settings() {
         setGreenNumbers({
           greenNumberCua: (saved.greenNumberCua || '').toString().trim(),
           greenNumberOrange: (saved.greenNumberOrange || '').toString().trim(),
+          greenNumberTelma: (saved.greenNumberTelma || '').toString().trim(),
         });
       }
       toast.success(t('settings.greenNumbers.success'));
@@ -667,7 +675,7 @@ function Settings() {
                   {GREEN_NUMBER_FIELDS.map((key) => (
                     <div key={key}>
                       <label className="label">
-                        {t(`settings.greenNumbers.${key === 'greenNumberCua' ? 'violence' : 'doleance'}`)}
+                        {t(`settings.greenNumbers.${GREEN_NUMBER_LABEL_KEYS[key].label}`)}
                       </label>
                       <input
                         type="tel"
@@ -681,7 +689,7 @@ function Settings() {
                         aria-invalid={greenErrors[key] ? 'true' : 'false'}
                         aria-describedby={greenErrors[key] ? `green-error-${key}` : undefined}
                         className={`input ${greenErrors[key] ? 'border-red-400 dark:border-red-500 focus:border-red-500 focus:ring-red-500' : ''}`}
-                        placeholder={t(`settings.greenNumbers.${key === 'greenNumberCua' ? 'violencePlaceholder' : 'doleancePlaceholder'}`)}
+                        placeholder={t(`settings.greenNumbers.${GREEN_NUMBER_LABEL_KEYS[key].placeholder}`)}
                       />
                       {greenErrors[key] && (
                         <p

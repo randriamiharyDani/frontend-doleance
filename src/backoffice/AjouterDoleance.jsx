@@ -54,6 +54,8 @@ const SEARCH_BIAS_SPAN = 0.18;
 /** Attente avant interrogation automatique pendant la saisie. */
 const SEARCH_DEBOUNCE_MS = 350;
 
+const SHOW_LOCATION_SEARCH = false;
+
 /** Découpe un `display_name` Nominatim en libellé principal + complément. */
 function splitDisplayName(displayName) {
   const parts = String(displayName || '')
@@ -842,6 +844,7 @@ function AjouterDoleance() {
           </div>
 
           {/* Recherche d'adresse */}
+          {SHOW_LOCATION_SEARCH && (
           <div className="mb-4">
             <div className="flex items-stretch gap-2">
               <div className="relative flex-1">
@@ -981,6 +984,7 @@ function AjouterDoleance() {
               {MIN_SEARCH_CHARS} caractères minimum. Le marqueur se place sur l&apos;emplacement choisi.
             </p>
           </div>
+          )}
 
           {/* Carte */}
           <LocationPickerMap
@@ -991,7 +995,7 @@ function AjouterDoleance() {
             flyToSignal={flyToSignal}
             geojson={quartierGeoJSON}
             labels={MAP_LABELS}
-            heightClass="h-72 sm:h-96"
+            heightClass="h-72 sm:h-[28rem]"
           />
 
           {resolvedPlace && resolvedPlace !== formData.lieu_exact && (
