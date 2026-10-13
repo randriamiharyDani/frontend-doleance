@@ -19,8 +19,59 @@ import {
   PhotoIcon,
   PaperAirplaneIcon,
   BuildingOfficeIcon,
+  MagnifyingGlassIcon,
 } from '@heroicons/react/24/outline';
 
+// Titre de section homogène (pastille icône + libellé)
+const SectionTitle = ({ icon: Icon, darkMode, children }) => (
+  <h3
+    className={`flex items-center gap-2.5 mb-3 text-[13px] font-semibold uppercase tracking-wider ${
+      darkMode ? 'text-slate-200' : 'text-[#0F172A]'
+    }`}
+  >
+    <span
+      className={`flex h-7 w-7 items-center justify-center rounded-lg ${
+        darkMode ? 'bg-[#D4AF37]/10 text-[#D4AF37]' : 'bg-[#1E3A8A]/10 text-[#1E3A8A]'
+      }`}
+    >
+      <Icon className="h-4 w-4" />
+    </span>
+    {children}
+  </h3>
+);
+
+// Tuile d'information (icône + libellé + valeur)
+const InfoTile = ({ icon: Icon, label, darkMode, className = '', children }) => (
+  <div
+    className={`flex items-start gap-3 rounded-xl border p-3.5 ${
+      darkMode ? 'bg-slate-800/60 border-slate-700' : 'bg-slate-50/70 border-slate-200'
+    } ${className}`}
+  >
+    <span
+      className={`mt-0.5 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg ${
+        darkMode ? 'bg-[#D4AF37]/10 text-[#D4AF37]' : 'bg-[#1E3A8A]/10 text-[#1E3A8A]'
+      }`}
+    >
+      <Icon className="h-4 w-4" />
+    </span>
+    <div className="min-w-0">
+      <p
+        className={`text-[11px] font-semibold uppercase tracking-wider ${
+          darkMode ? 'text-slate-400' : 'text-slate-500'
+        }`}
+      >
+        {label}
+      </p>
+      <div
+        className={`mt-0.5 text-sm font-medium break-words ${
+          darkMode ? 'text-slate-100' : 'text-slate-800'
+        }`}
+      >
+        {children}
+      </div>
+    </div>
+  </div>
+);
 
 function SuiviDoleance() {
   const { t } = useTranslation();
@@ -158,7 +209,7 @@ function SuiviDoleance() {
         }
         .cua-suivi .cua-btn-primary:hover:not(:disabled) {
           filter: brightness(1.08);
-          transform: translateY(-1px) scale(1.02);
+          transform: translateY(-1px);
         }
         .cua-suivi .cua-gold-bar {
           background: linear-gradient(180deg, #D4AF37 0%, #B9962C 100%);
@@ -169,45 +220,54 @@ function SuiviDoleance() {
       `}</style>
 
       <div className="max-w-4xl mx-auto w-full">
+        {/* ===== Titre de page ===== */}
         <div className="text-center mb-6 sm:mb-8">
-          <span className={`inline-flex items-center gap-1.5 text-[11px] uppercase tracking-[0.2em] font-semibold mb-3 ${
-            darkMode ? 'text-[#D4AF37]' : 'text-[#9A7200]'
+          <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] font-semibold mb-4 ${
+            darkMode
+              ? 'text-[#D4AF37] bg-[#D4AF37]/10 ring-1 ring-[#D4AF37]/20'
+              : 'text-[#9A7200] bg-[#D4AF37]/10 ring-1 ring-[#D4AF37]/30'
           }`}>
             <ShieldCheckIcon className="w-3.5 h-3.5" />
             Commune Urbaine d'Antananarivo
           </span>
-          <h1 className={`cua-display font-semibold text-[#0F172A] dark:text-slate-100 ${
+          <h1 className={`cua-display text-xl sm:text-3xl font-semibold tracking-tight mb-2 ${
             darkMode ? 'text-white' : 'text-[#0F172A]'
           }`}>
             {t('tracking.title')}
           </h1>
-          <p className={darkMode ? 'text-gray-300 text-sm sm:text-base' : 'text-slate-500 text-sm sm:text-base'}>
+          <p className={`max-w-xl mx-auto text-sm sm:text-base ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
             {t('tracking.subtitle')}
           </p>
         </div>
 
-        <div className={`rounded-2xl shadow-xl p-4 sm:p-6 mb-6 sm:mb-8 border transition-colors duration-300 relative overflow-hidden ${
+        {/* ===== Recherche ===== */}
+        <div className={`rounded-2xl shadow-lg p-4 sm:p-5 mb-6 sm:mb-8 border transition-colors duration-300 relative overflow-hidden ${
           darkMode
-            ? 'bg-gray-800 border-gray-700'
-            : 'bg-white border-slate-200'
+            ? 'bg-slate-800 border-slate-700 shadow-black/20'
+            : 'bg-white border-slate-200 shadow-slate-900/5'
         }`}>
           <div className="cua-top-accent absolute top-0 left-0 right-0 h-1" />
-          <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3 sm:gap-4">
-            <input
-              type="text"
-              value={searchRef}
-              onChange={(e) => setSearchRef(e.target.value)}
-              placeholder={t('tracking.referencePlaceholder')}
-              className={`cua-field flex-1 px-3 sm:px-4 py-2 sm:py-3 border-2 rounded-xl focus:outline-none transition-all text-sm sm:text-base ${
-                darkMode
-                  ? 'bg-gray-700 border-gray-600 text-white placeholder-gray-400'
-                  : 'bg-slate-50 border-slate-200 text-slate-900'
-              }`}
-            />
+          <form onSubmit={handleSearch} className="flex flex-col sm:flex-row gap-3 pt-1">
+            <div className="relative flex-1">
+              <MagnifyingGlassIcon className={`pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 h-5 w-5 ${
+                darkMode ? 'text-slate-500' : 'text-slate-400'
+              }`} />
+              <input
+                type="text"
+                value={searchRef}
+                onChange={(e) => setSearchRef(e.target.value)}
+                placeholder={t('tracking.referencePlaceholder')}
+                className={`cua-field w-full pl-11 pr-4 py-3 border rounded-xl focus:outline-none transition-all text-sm sm:text-base font-mono ${
+                  darkMode
+                    ? 'bg-slate-900/60 border-slate-600 text-white placeholder-slate-500'
+                    : 'bg-slate-50 border-slate-200 text-slate-900 placeholder-slate-400'
+                }`}
+              />
+            </div>
             <button
               type="submit"
               disabled={loading}
-              className="cua-btn-primary px-6 sm:px-8 py-2 sm:py-3 font-semibold rounded-xl disabled:opacity-50 shadow-md text-sm sm:text-base text-white"
+              className="cua-btn-primary inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3 font-semibold rounded-xl disabled:opacity-50 shadow-md text-sm sm:text-base text-white"
             >
               {loading ? t('tracking.searching') : t('tracking.search')}
             </button>
@@ -223,146 +283,109 @@ function SuiviDoleance() {
                 }`}></div>
               </div>
             ) : doleance ? (
-              <div className={`rounded-2xl shadow-xl overflow-hidden border transition-colors duration-300 ${
+              <div className={`rounded-2xl shadow-lg overflow-hidden border transition-colors duration-300 ${
                 darkMode
-                  ? 'bg-gray-800 border-gray-700'
-                  : 'bg-white border-slate-200'
+                  ? 'bg-slate-800 border-slate-700 shadow-black/20'
+                  : 'bg-white border-slate-200 shadow-slate-900/5'
               }`}>
                 {/* En-tête avec référence et statut actuel */}
                 <div className={`p-4 sm:p-6 border-b transition-colors duration-300 relative ${
                   darkMode
-                    ? 'bg-gray-700/50 border-gray-600'
+                    ? 'bg-slate-900/40 border-slate-700'
                     : 'bg-gradient-to-r from-[#F8FAFC] via-white to-[#F8FAFC] border-slate-200'
                 }`}>
                   <div className="cua-top-accent absolute top-0 left-0 right-0 h-1" />
-                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div className="flex-1 w-full">
-                      <div className="flex items-center gap-2 mb-2">
-                        <DocumentTextIcon className={`h-4 w-4 sm:h-5 sm:w-5 ${darkMode ? 'text-[#D4AF37]' : 'text-[#1E3A8A]'}`} />
-                        <p className={`text-xs sm:text-sm font-semibold ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>
-                          {t('tracking.reference')}
-                        </p>
-                      </div>
-                      <p className={`text-base sm:text-xl md:text-2xl  font-mono font-bold break-all ${
-                        darkMode ? 'text-[#D4AF37]' : 'text-[#1E3A8A]'
+                  <div className="flex flex-col md:flex-row justify-between items-start gap-4 pt-1">
+                    <div className="flex-1 w-full min-w-0">
+                      <p className={`text-[11px] font-semibold uppercase tracking-wider mb-1.5 ${
+                        darkMode ? 'text-slate-400' : 'text-slate-500'
                       }`}>
-                        {doleance.reference}
+                        {t('tracking.reference')}
                       </p>
-                      <h2 className={`cua-display text-base sm:text-lg md:text-xl font-semibold mt-2 sm:mt-3 break-words ${
-                        darkMode ? 'text-white' : 'text-[#1E3A8A]'
+                      <span className={`inline-flex items-center gap-2 rounded-lg px-3 py-1.5 font-mono text-sm sm:text-base font-bold break-all ${
+                        darkMode
+                          ? 'bg-[#D4AF37]/10 text-[#D4AF37] ring-1 ring-[#D4AF37]/25'
+                          : 'bg-[#1E3A8A]/[0.06] text-[#1E3A8A] ring-1 ring-[#1E3A8A]/15'
+                      }`}>
+                        <DocumentTextIcon className="h-4 w-4 flex-shrink-0" />
+                        {doleance.reference}
+                      </span>
+                      <h2 className={`cua-display text-lg sm:text-2xl font-semibold mt-3 break-words leading-snug ${
+                        darkMode ? 'text-white' : 'text-[#0F172A]'
                       }`}>
                         {doleance.titre}
                       </h2>
                     </div>
-                    <div className="flex flex-col items-start md:items-end gap-2 w-full md:w-auto">
-                      <span className={`px-3 py-1 sm:px-4 sm:py-2 rounded-lg text-xs sm:text-sm font-bold shadow-md ${getStatusColor(doleance.statut)}`}>
+                    <div className="flex flex-row md:flex-col items-center md:items-end justify-between gap-2 w-full md:w-auto">
+                      <span className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold shadow-sm ${getStatusColor(doleance.statut)}`}>
+                        <span className="h-1.5 w-1.5 rounded-full bg-white/90" />
                         {doleance.statut}
                       </span>
-                      <p className={`text-xs ${darkMode ? 'text-gray-500' : 'text-slate-500'}`}>
+                      <p className={`flex items-center gap-1.5 text-xs ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
+                        <ClockIcon className="h-3.5 w-3.5" />
                         {t('tracking.lastUpdate')} : {formatDate(doleance.date_derniere_modification || doleance.date_creation)}
                       </p>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+                <div className="p-4 sm:p-6 space-y-6 sm:space-y-7">
                   {/* Description détaillée */}
                   <div>
-                    <h3 className={`font-semibold mb-2 sm:mb-3  flex items-center gap-2 text-sm sm:text-base ${
-                      darkMode ? 'text-white' : 'text-[#1E3A8A]'
-                    }`}>
-                      <div className="cua-gold-bar w-1 h-5 sm:h-6 rounded-full"></div>
-                      <InformationCircleIcon className={`h-4 w-4 sm:h-5 sm:w-5 ${darkMode ? 'text-[#D4AF37]' : 'text-[#1E3A8A]'}`} />
+                    <SectionTitle icon={InformationCircleIcon} darkMode={darkMode}>
                       {t('tracking.details')}
-                    </h3>
-                    <div className={`rounded-lg p-3 sm:p-4 border-l-4 border-[#D4AF37] ${
-                      darkMode ? 'bg-gray-700' : 'bg-slate-50'
+                    </SectionTitle>
+                    <div className={`rounded-xl p-4 border ${
+                      darkMode ? 'bg-slate-800/60 border-slate-700' : 'bg-slate-50/70 border-slate-200'
                     }`}>
-                      <p className={darkMode ? 'text-gray-200 whitespace-pre-wrap text-sm sm:text-base' : 'text-slate-700 whitespace-pre-wrap text-sm sm:text-base'}>
+                      <p className={`whitespace-pre-wrap text-sm sm:text-[15px] leading-relaxed ${
+                        darkMode ? 'text-slate-200' : 'text-slate-700'
+                      }`}>
                         {doleance.description}
                       </p>
                     </div>
                   </div>
 
                   {/* Informations supplémentaires */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {/* Catégorie */}
-                    <div className={`flex items-start gap-3 p-2 sm:p-3 rounded-lg border-l-4 border-[#D4AF37]  ${
-                      darkMode ? 'bg-gray-700' : 'bg-slate-50'
-                    }`}>
-                      <TagIcon className={`h-4 w-4 sm:h-5 sm:w-5 mt-0.5 ${darkMode ? 'text-[#D4AF37]' : 'text-[#1E3A8A]'}`} />
-                      <div>
-                        <p className={`text-xs font-semibold ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>
-                          {t('form.category')}
-                        </p>
-                        <p className={`font-medium text-sm sm:text-base ${darkMode ? 'text-gray-200' : 'text-slate-800'}`}>
-                          {getCategoryIcon(doleance.categorie)} {translateCategory(doleance.categorie, t)}
-                        </p>
-                      </div>
-                    </div>
+                    <InfoTile icon={TagIcon} label={t('form.category')} darkMode={darkMode}>
+                      {getCategoryIcon(doleance.categorie)} {translateCategory(doleance.categorie, t)}
+                    </InfoTile>
 
                     {/* Date de création */}
-                    <div className={`flex items-start gap-3 p-2 sm:p-3 rounded-lg border-l-4 border-[#D4AF37] ${
-                      darkMode ? 'bg-gray-700' : 'bg-slate-50'
-                    }`}>
-                      <CalendarIcon className={`h-4 w-4 sm:h-5 sm:w-5 mt-0.5 ${darkMode ? 'text-[#D4AF37]' : 'text-[#1E3A8A]'}`} />
-                      <div>
-                        <p className={`text-xs font-semibold ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>
-                          {t('tracking.submittedOn')}
-                        </p>
-                        <p className={`font-medium text-sm sm:text-base ${darkMode ? 'text-gray-200' : 'text-slate-800'}`}>
-                          {formatDate(doleance.date_creation)}
-                        </p>
-                      </div>
-                    </div>
+                    <InfoTile icon={CalendarIcon} label={t('tracking.submittedOn')} darkMode={darkMode}>
+                      {formatDate(doleance.date_creation)}
+                    </InfoTile>
 
                     {/* Direction concernée */}
                     {doleance.nom_direction && doleance.nom_direction !== 'Non assignée' && (
-                      <div className={`flex items-start gap-3 p-2 sm:p-3 rounded-lg border-l-4 border-[#D4AF37] ${
-                        darkMode ? 'bg-gray-700' : 'bg-slate-50'
-                      }`}>
-                        <BuildingOfficeIcon className={`h-4 w-4 sm:h-5 sm:w-5 mt-0.5 ${darkMode ? 'text-[#D4AF37]' : 'text-[#1E3A8A]'}`} />
-                        <div>
-                          <p className={`text-xs font-semibold ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>
-                            {t('tracking.concernedDirection')}
-                          </p>
-                          <p className={`font-medium text-sm sm:text-base ${darkMode ? 'text-gray-200' : 'text-slate-800'}`}>
-                            {doleance.nom_direction}
-                          </p>
-                        </div>
-                      </div>
+                      <InfoTile icon={BuildingOfficeIcon} label={t('tracking.concernedDirection')} darkMode={darkMode}>
+                        {doleance.nom_direction}
+                      </InfoTile>
                     )}
 
                     {/* Lieu */}
                     {(doleance.lieu_exact || doleance.nom_quartier) && (
-                      <div className={`flex items-start gap-3 p-2 sm:p-3 rounded-lg border-l-4 border-[#D4AF37] sm:col-span-2 ${
-                        darkMode ? 'bg-gray-700' : 'bg-slate-50'
-                      }`}>
-                        <MapPinIcon className={`h-4 w-4 sm:h-5 sm:w-5 mt-0.5 ${darkMode ? 'text-[#D4AF37]' : 'text-[#1E3A8A]'}`} />
-                        <div>
-                          <p className={`text-xs font-semibold ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>
-                            {t('tracking.location')}
-                          </p>
-                          <p className={`font-medium text-sm sm:text-base ${darkMode ? 'text-gray-200' : 'text-slate-800'}`}>
-                            {doleance.lieu_exact && <span>{doleance.lieu_exact}</span>}
-                            {doleance.lieu_exact && doleance.nom_quartier && <span> - </span>}
-                            {doleance.nom_quartier && <span>{t('form.neighborhood')}: {doleance.nom_quartier}</span>}
-                          </p>
-                        </div>
-                      </div>
+                      <InfoTile
+                        icon={MapPinIcon}
+                        label={t('tracking.location')}
+                        darkMode={darkMode}
+                        className="sm:col-span-2"
+                      >
+                        {doleance.lieu_exact && <span>{doleance.lieu_exact}</span>}
+                        {doleance.lieu_exact && doleance.nom_quartier && <span> - </span>}
+                        {doleance.nom_quartier && <span>{t('form.neighborhood')}: {doleance.nom_quartier}</span>}
+                      </InfoTile>
                     )}
                   </div>
 
                   {/* Photos / Pièces jointes */}
                   {doleance.pieces_jointes && doleance.pieces_jointes.length > 0 && (
                     <div>
-                      <h3 className={`font-semibold mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-base ${
-                        darkMode ? 'text-white' : 'text-[#1E3A8A]'
-                      }`}>
-                        <div className="cua-gold-bar w-1 h-5 sm:h-6 rounded-full"></div>
-                        <PhotoIcon className={`h-4 w-4 sm:h-5 sm:w-5 ${darkMode ? 'text-[#D4AF37]' : 'text-[#1E3A8A]'}`} />
+                      <SectionTitle icon={PhotoIcon} darkMode={darkMode}>
                         {t('form.photosProbleme')} ({doleance.pieces_jointes.length})
-                      </h3>
+                      </SectionTitle>
                       <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
                         {doleance.pieces_jointes.map((piece, index) => {
                           const ext = piece.nom_fichier?.split('.').pop()?.toLowerCase();
@@ -372,9 +395,9 @@ function SuiviDoleance() {
                           <div
                             key={index}
                             onClick={() => isVideo || isPdf ? null : setLightboxImage(piece.url)}
-                            className={`group relative aspect-square rounded-xl overflow-hidden border-2 cursor-pointer transition-all duration-200 ${
+                            className={`group relative aspect-square rounded-xl overflow-hidden border cursor-pointer shadow-sm hover:shadow-md transition-all duration-200 ${
                               darkMode
-                                ? 'border-gray-600 hover:border-[#D4AF37]'
+                                ? 'border-slate-600 hover:border-[#D4AF37]'
                                 : 'border-slate-200 hover:border-[#D4AF37]'
                             }`}
                           >
@@ -414,17 +437,13 @@ function SuiviDoleance() {
                   {/* Suggestions */}
                   {doleance.suggestions && (
                     <div>
-                      <h3 className={`font-semibold mb-2 sm:mb-3 flex items-center gap-2 text-sm sm:text-base ${
-                        darkMode ? 'text-white' : 'text-[#1E3A8A]'
-                      }`}>
-                        <div className="cua-gold-bar w-1 h-5 sm:h-6 rounded-full"></div>
-                        <ChatBubbleLeftRightIcon className={`h-4 w-4 sm:h-5 sm:w-5 ${darkMode ? 'text-[#D4AF37]' : 'text-[#1E3A8A]'}`} />
+                      <SectionTitle icon={ChatBubbleLeftRightIcon} darkMode={darkMode}>
                         {t('form.suggestions')}
-                      </h3>
-                      <div className={`rounded-lg p-3 sm:p-4 border-l-4 border-[#D4AF37] ${
-                        darkMode ? 'bg-gray-700' : 'bg-[#1E3A8A]/[0.04]'
+                      </SectionTitle>
+                      <div className={`rounded-xl p-4 border ${
+                        darkMode ? 'bg-slate-800/60 border-slate-700' : 'bg-[#1E3A8A]/[0.04] border-[#1E3A8A]/10'
                       }`}>
-                        <p className={darkMode ? 'text-gray-200 text-sm sm:text-base' : 'text-slate-700 text-sm sm:text-base'}>
+                        <p className={`text-sm sm:text-[15px] leading-relaxed ${darkMode ? 'text-slate-200' : 'text-slate-700'}`}>
                           {doleance.suggestions}
                         </p>
                       </div>
@@ -590,27 +609,27 @@ function SuiviDoleance() {
                 </div>
               </div>
             ) : (
-              <div className={`rounded-2xl shadow-xl p-6 sm:p-8 text-center border transition-colors duration-300 ${
+              <div className={`rounded-2xl shadow-lg p-8 sm:p-10 text-center border transition-colors duration-300 ${
                 darkMode
-                  ? 'bg-gray-800 border-gray-700'
-                  : 'bg-white border-slate-200'
+                  ? 'bg-slate-800 border-slate-700 shadow-black/20'
+                  : 'bg-white border-slate-200 shadow-slate-900/5'
               }`}>
-                <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-4 ${
+                <div className={`w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-5 ${
                   darkMode
-                    ? 'bg-gray-700'
+                    ? 'bg-slate-700'
                     : 'bg-gradient-to-br from-slate-100 to-slate-200'
                 }`}>
-                  <DocumentTextIcon className={`h-8 w-8 sm:h-10 sm:w-10 ${darkMode ? 'text-gray-500' : 'text-slate-400'}`} />
+                  <DocumentTextIcon className={`h-8 w-8 sm:h-10 sm:w-10 ${darkMode ? 'text-slate-500' : 'text-slate-400'}`} />
                 </div>
-                <h3 className={`cua-display text-lg sm:text-xl font-semibold mb-2 ${darkMode ? 'text-gray-200' : 'text-[#1E3A8A]'}`}>
+                <h3 className={`cua-display text-lg sm:text-xl font-semibold mb-2 ${darkMode ? 'text-slate-100' : 'text-[#0F172A]'}`}>
                   {t('tracking.notFound')}
                 </h3>
-                <p className={`text-sm sm:text-base mb-4 ${darkMode ? 'text-gray-400' : 'text-slate-500'}`}>
+                <p className={`text-sm sm:text-base mb-5 max-w-md mx-auto ${darkMode ? 'text-slate-400' : 'text-slate-500'}`}>
                   {t('tracking.notFoundDesc')}
                 </p>
                 <Link
                   to="/deposer-doleance"
-                  className="cua-btn-primary inline-block px-5 py-2 sm:px-6 sm:py-2 font-semibold rounded-xl shadow-md text-sm sm:text-base text-white"
+                  className="cua-btn-primary inline-block px-6 py-2.5 font-semibold rounded-xl shadow-md text-sm sm:text-base text-white"
                 >
                   {t('hero.btnSubmit')} →
                 </Link>

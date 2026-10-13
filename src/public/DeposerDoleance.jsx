@@ -138,7 +138,7 @@ function CircularProgress({ value, size = 48, stroke = 4 }) {
           </linearGradient>
         </defs>
       </svg>
-      <span className="absolute inset-0 flex items-center justify-center text-[11px] font-bold text-[#0F172A] dark:text-slate-100 tabular-nums">
+      <span className="absolute inset-0 flex items-center justify-center text-[10px] font-bold text-[#0F172A] dark:text-slate-100 tabular-nums">
         {value}%
       </span>
     </div>
@@ -148,31 +148,37 @@ function CircularProgress({ value, size = 48, stroke = 4 }) {
 // Badge numéroté d'étape — donne une hiérarchie de lecture claire au formulaire
 function StepBadge({ n }) {
   return (
-    <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#1E3A8A]/10 dark:bg-blue-400/15 text-[11px] font-bold text-[#1E3A8A] dark:text-blue-300">
+    <span className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-[#0F172A] to-[#1E3A8A] text-[12px] font-bold text-white shadow-sm shadow-[#0F172A]/20">
       {n}
     </span>
   );
 }
 
-// En-tête de section standardisé (icône + titre + requis + badge optionnel)
+// En-tête de section standardisé (étape + titre + requis + badge optionnel)
 function Section({ step, iconPath, title, required, tag, hint, children, className = "" }) {
   return (
-    <div className={`cua-section rounded-2xl p-5 mb-5 cua-anim ${className}`}>
-      <div className="flex flex-wrap items-center gap-2 mb-1">
+    <div className={`cua-section rounded-2xl p-5 sm:p-6 mb-5 cua-anim ${className}`}>
+      <div className="flex flex-wrap items-center gap-2.5">
         {step && <StepBadge n={step} />}
-        <Icon path={iconPath} className="w-5 h-5 text-[#1E3A8A] dark:text-blue-400" />
-        <h2 className="text-[15px] sm:text-[16px] font-bold text-[#0F172A] dark:text-slate-100">
+        <h2 className="text-[15px] sm:text-base font-semibold tracking-tight text-[#0F172A] dark:text-slate-100">
           {title}
           {required && <span className="ml-1 text-sm font-normal text-red-500">*</span>}
         </h2>
         {tag && (
-          <span className="text-[10.5px] font-semibold text-[#D4AF37] bg-[#D4AF37]/10 px-2 py-0.5 rounded-full">
+          <span className="text-[10.5px] font-semibold text-[#9A7200] dark:text-[#D4AF37] bg-[#D4AF37]/10 ring-1 ring-[#D4AF37]/20 px-2 py-0.5 rounded-full">
             {tag}
           </span>
         )}
+        {iconPath && (
+          <Icon
+            path={iconPath}
+            className="ml-auto hidden sm:block w-5 h-5 text-slate-300 dark:text-slate-600"
+            strokeWidth={1.75}
+          />
+        )}
       </div>
-      {hint && <p className="text-sm text-slate-400 dark:text-slate-500 mb-4 ml-8">{hint}</p>}
-      {children}
+      {hint && <p className="text-[13px] text-slate-500 dark:text-slate-400 mt-1.5 sm:ml-[38px]">{hint}</p>}
+      <div className="mt-4">{children}</div>
     </div>
   );
 }
@@ -182,8 +188,8 @@ function Field({ id, label, required, optional, children }) {
   return (
     <div>
       {label && (
-        <label htmlFor={id} className="block text-xs font-bold text-slate-600 dark:text-slate-400 mb-1.5">
-          {label} {required && <span className="text-[#D4AF37]">*</span>}
+        <label htmlFor={id} className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
+          {label} {required && <span className="text-red-500">*</span>}
           {optional && <span className="text-slate-400 dark:text-slate-500 font-normal ml-1">{optional}</span>}
         </label>
       )}
@@ -198,13 +204,13 @@ function CategoryCard({ cat, selected, onClick }) {
       type="button"
       onClick={() => onClick(cat.id)}
       aria-pressed={selected}
-      className={`cua-card-tap group relative flex flex-col items-center gap-2 sm:gap-3 p-3 sm:p-5 rounded-xl sm:rounded-2xl text-center cursor-pointer
+      className={`cua-card-tap group relative flex flex-col items-center gap-2 sm:gap-2.5 p-3 sm:p-4 rounded-xl text-center cursor-pointer
         transition-all duration-200 ease-out border
         bg-white dark:bg-slate-800
-        hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]/50
+        hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]/50
         ${
           selected
-            ? "border-[#D4AF37] shadow-lg shadow-[#D4AF37]/20 scale-[1.02] bg-[#D4AF37]/[0.06] dark:bg-[#D4AF37]/[0.1]"
+            ? "border-[#D4AF37] shadow-md shadow-[#D4AF37]/15 bg-[#D4AF37]/[0.06] dark:bg-[#D4AF37]/[0.1] ring-1 ring-[#D4AF37]/40"
             : "border-slate-200 dark:border-slate-700 shadow-sm hover:border-[#D4AF37]/40 hover:shadow-md"
         }`}
     >
@@ -214,14 +220,14 @@ function CategoryCard({ cat, selected, onClick }) {
         </span>
       )}
       <div
-        className={`w-10 h-10 sm:w-13 sm:h-13 rounded-xl sm:rounded-2xl flex items-center justify-center text-white
-          bg-gradient-to-br ${cat.gradient} shadow-md transition-transform duration-200 group-hover:scale-105`}
+        className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl flex items-center justify-center text-white
+          bg-gradient-to-br ${cat.gradient} shadow-sm transition-transform duration-200 group-hover:scale-105`}
       >
         <Icon path={cat.icon} className="w-5 h-5 sm:w-6 sm:h-6" />
       </div>
       <div>
-        <p className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200">{cat.label}</p>
-        <p className="text-[10px] sm:text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 hidden sm:block">
+        <p className="text-xs sm:text-[13px] font-semibold text-slate-800 dark:text-slate-200 leading-tight">{cat.label}</p>
+        <p className="text-[10px] sm:text-[11px] text-slate-400 dark:text-slate-500 mt-0.5 hidden sm:block leading-snug">
           {cat.desc}
         </p>
       </div>
@@ -236,17 +242,17 @@ function ModuleCard({ active, onClick, emoji, label, activeClasses }) {
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`flex-1 flex flex-col items-center justify-center gap-1.5 px-4 py-4 rounded-xl text-sm font-bold border transition-all duration-200 relative
+      className={`flex-1 flex flex-col items-center justify-center gap-1.5 px-3 py-3.5 rounded-xl text-[13px] font-semibold border transition-all duration-200 relative
         focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]/50
         ${
           active
             ? activeClasses
-            : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-500 hover:-translate-y-0.5"
+            : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:border-slate-300 dark:hover:border-slate-500 hover:-translate-y-0.5 hover:shadow-sm"
         }`}
     >
-      <span className="text-2xl leading-none">{emoji}</span>
-      <span className="text-center">{label}</span>
-      {active && <Icon path={ICONS.check} className="w-4 h-4 absolute top-2 right-2" strokeWidth={3} />}
+      <span className="text-xl leading-none">{emoji}</span>
+      <span className="text-center leading-tight">{label}</span>
+      {active && <Icon path={ICONS.check} className="w-3.5 h-3.5 absolute top-2 right-2" strokeWidth={3} />}
     </button>
   );
 }
@@ -1008,38 +1014,39 @@ function DeposerDoleance() {
   ];
 
   return (
-    <div className="cua-doleance shadow-xl p-4 sm:p-6 rounded-2xl bg-white dark:bg-slate-900 mx-auto">
+    <div className="cua-doleance border border-slate-200/70 dark:border-slate-800 shadow-lg shadow-slate-900/5 p-4 sm:p-6 lg:p-8 rounded-2xl bg-white dark:bg-slate-900 mx-auto">
       <style>{`
         .cua-doleance { font-family: 'Inter', ui-sans-serif, system-ui, sans-serif; --cua-navy:#0F172A; --cua-blue:#1E3A8A; --cua-blue-light:#2E4FA3; --cua-gold:#D4AF37; --cua-gold-dark:#B8860B; }
         .cua-doleance .cua-display { font-family: 'Fraunces', ui-serif, Georgia, serif; }
 
         .cua-doleance .cua-section {
           background: #ffffff;
-          border: 1px solid #F1F5F9;
-          box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08), 0 6px 16px -2px rgba(15, 23, 42, 0.07);
-          line-height: 1.8;
+          border: 1px solid #E2E8F0;
+          box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
           transition: box-shadow 0.2s ease, border-color 0.2s ease;
         }
-        .cua-doleance .cua-section:hover { box-shadow: 0 6px 20px -4px rgba(15, 23, 42, 0.12); }
-        .dark .cua-doleance .cua-section { background: #1e293b; border-color: #334155; box-shadow: 0 2px 6px rgba(0, 0, 0, 0.30), 0 6px 16px -2px rgba(0, 0, 0, 0.22); }
-        .dark .cua-doleance .cua-section:hover { box-shadow: 0 6px 20px -4px rgba(0, 0, 0, 0.40); }
+        .cua-doleance .cua-section:hover { box-shadow: 0 4px 14px -4px rgba(15, 23, 42, 0.08); }
+        .dark .cua-doleance .cua-section { background: #1e293b; border-color: #334155; box-shadow: none; }
+        .dark .cua-doleance .cua-section:hover { box-shadow: 0 4px 14px -4px rgba(0, 0, 0, 0.35); }
 
         .cua-doleance .cua-field {
-          border-color: #D1D5DB;
+          border-color: #E2E8F0;
           transition: border-color 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
         }
+        .cua-doleance .cua-field:hover { border-color: #CBD5E1; }
         .cua-doleance .cua-field:focus {
-          border-color: var(--cua-blue-light);
+          border-color: var(--cua-gold);
           box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15);
           background-color: #ffffff;
         }
         .dark .cua-doleance .cua-field { border-color: #475569; background-color: #0f172a; color: #e2e8f0; }
-        .dark .cua-doleance .cua-field:focus { border-color: #60a5fa; box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.25); background-color: #1e293b; }
+        .dark .cua-doleance .cua-field:hover { border-color: #64748b; }
+        .dark .cua-doleance .cua-field:focus { border-color: var(--cua-gold); box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.22); background-color: #1e293b; }
         .dark .cua-doleance .cua-field::placeholder { color: #64748b; }
 
-        .cua-doleance .cua-field-wrap:focus-within { border-color: var(--cua-blue-light) !important; box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15); }
+        .cua-doleance .cua-field-wrap:focus-within { border-color: var(--cua-gold) !important; box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.15); }
         .dark .cua-doleance .cua-field-wrap { background-color: #0f172a; border-color: #334155; }
-        .dark .cua-doleance .cua-field-wrap:focus-within { border-color: #60a5fa !important; box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.25); }
+        .dark .cua-doleance .cua-field-wrap:focus-within { border-color: var(--cua-gold) !important; box-shadow: 0 0 0 4px rgba(212, 175, 55, 0.22); }
 
         .cua-doleance .cua-btn-primary {
           background: linear-gradient(135deg, var(--cua-navy) 0%, var(--cua-blue) 60%, var(--cua-blue-light) 100%);
@@ -1050,11 +1057,11 @@ function DeposerDoleance() {
 
         .cua-doleance .cua-btn-submit {
           background: linear-gradient(135deg, var(--cua-navy) 0%, var(--cua-blue) 55%, var(--cua-blue-light) 100%);
-          box-shadow: 0 10px 30px -8px rgba(15, 23, 42, 0.45);
+          box-shadow: 0 8px 22px -8px rgba(15, 23, 42, 0.5);
         }
-        .cua-doleance .cua-btn-submit:hover:not(:disabled) { box-shadow: 0 14px 36px -8px rgba(15, 23, 42, 0.55); }
-        .dark .cua-doleance .cua-btn-submit { background: linear-gradient(135deg, #0f172a 0%, #1e40af 55%, #3b82f6 100%); box-shadow: 0 10px 30px -8px rgba(59, 130, 246, 0.3); }
-        .dark .cua-doleance .cua-btn-submit:hover:not(:disabled) { box-shadow: 0 14px 36px -8px rgba(59, 130, 246, 0.4); }
+        .cua-doleance .cua-btn-submit:hover:not(:disabled) { box-shadow: 0 12px 28px -8px rgba(15, 23, 42, 0.55); }
+        .dark .cua-doleance .cua-btn-submit { background: linear-gradient(135deg, #0f172a 0%, #1e40af 55%, #3b82f6 100%); box-shadow: 0 8px 22px -8px rgba(59, 130, 246, 0.35); }
+        .dark .cua-doleance .cua-btn-submit:hover:not(:disabled) { box-shadow: 0 12px 28px -8px rgba(59, 130, 246, 0.45); }
 
         .cua-doleance .cua-card-tap { will-change: transform; }
         .dark .cua-doleance .cua-card-tap { background: #1e293b; border-color: #334155; }
@@ -1068,25 +1075,25 @@ function DeposerDoleance() {
         .dark .cua-doleance .cua-progress-track { background: #334155; }
         .cua-doleance .cua-progress-bar { background: linear-gradient(90deg, var(--cua-blue) 0%, var(--cua-gold) 100%); transition: width 0.4s cubic-bezier(0.16,1,0.3,1); }
 
-        @keyframes cuaFadeUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
-        .cua-doleance .cua-anim { animation: cuaFadeUp 0.5s cubic-bezier(0.16,1,0.3,1) both; }
+        @keyframes cuaFadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .cua-doleance .cua-anim { animation: cuaFadeUp 0.45s cubic-bezier(0.16,1,0.3,1) both; }
         @media (prefers-reduced-motion: reduce) { .cua-doleance .cua-anim { animation: none !important; } }
       `}</style>
 
       {/* Barre de progression sticky (reste visible pendant le scroll, sous le header fixe) */}
-      <div className="sticky top-[64px] z-30 -mx-4 sm:-mx-6 px-4 sm:px-6 pt-3 pb-2 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-100 dark:border-slate-800 mb-4">
+      <div className="sticky top-[64px] z-30 -mx-4 sm:-mx-6 lg:-mx-8 px-4 sm:px-6 lg:px-8 py-2.5 bg-white/95 dark:bg-slate-900/95 backdrop-blur-sm border-b border-slate-100 dark:border-slate-800 mb-6">
         <div className="flex items-center gap-3">
-          <CircularProgress value={completion} size={40} stroke={4} />
+          <CircularProgress value={completion} size={36} stroke={3.5} />
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between gap-2 mb-1">
-              <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider">
+              <span className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider truncate">
                 {t("deposer.pageTitle")}
               </span>
               <span className="text-[11px] font-bold text-[#1E3A8A] dark:text-blue-400 tabular-nums">
                 {completion}%
               </span>
             </div>
-            <div className="h-1.5 w-full rounded-full cua-progress-track overflow-hidden">
+            <div className="h-1 w-full rounded-full cua-progress-track overflow-hidden">
               <div className="h-full cua-progress-bar rounded-full" style={{ width: `${completion}%` }} />
             </div>
           </div>
@@ -1094,35 +1101,36 @@ function DeposerDoleance() {
       </div>
 
       {/* Header */}
-      <div className="cua-anim flex flex-col">
-        <div className="text-center">
-          <span
-            className={`inline-flex items-center justify-center gap-1.5 text-[11px] uppercase tracking-[0.2em] font-semibold mb-3 ${
-              darkMode ? "text-[#D4AF37]" : "text-[#9A7200]"
-            }`}
-          >
-            <ShieldCheckIcon className="w-3.5 h-3.5" />
-            {t("deposer.communeTitle")}
-          </span>
-        </div>
-        <div className="flex items-center gap-3">
-          <h1 className="cua-display text-2xl font-semibold text-[#0F172A] dark:text-slate-100 flex items-center gap-2 sm:gap-3">
-            <span className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-[#0F172A] to-[#1E3A8A] flex items-center justify-center text-white shadow-md shadow-[#0F172A]/20 flex-shrink-0">
-              <Icon path={ICONS.info} className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={2.5} />
-            </span>
-            {t("deposer.pageTitle")}
-          </h1>
-        </div>
-        <p className="text-slate-500 dark:text-slate-400 mt-1.5 ml-[10px]">{t("deposer.pageSubtitle")}</p>
-
-        <div className="bg-blue-50 dark:bg-blue-900/30 border-l-4 border-blue-700 dark:border-blue-400 rounded-lg p-4 mt-5">
-          <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{t("deposer.instructionBox")}</p>
-        </div>
-
-        <p className="inline-flex items-center rounded-xl border border-yellow-400 dark:border-yellow-600 bg-yellow-100 dark:bg-yellow-900/30 mt-5 px-4 py-2 text-[13px] mb-4 font-medium text-yellow-800 dark:text-yellow-300 w-fit">
-          {t("deposer.fillForm")}
-        </p>
+      <div className="cua-anim flex flex-col items-center text-center mb-6">
+        <span
+          className={`inline-flex items-center justify-center gap-1.5 rounded-full px-3 py-1 text-[11px] uppercase tracking-[0.2em] font-semibold mb-4 ${
+            darkMode
+              ? "text-[#D4AF37] bg-[#D4AF37]/10 ring-1 ring-[#D4AF37]/20"
+              : "text-[#9A7200] bg-[#D4AF37]/10 ring-1 ring-[#D4AF37]/30"
+          }`}
+        >
+          <ShieldCheckIcon className="w-3.5 h-3.5" />
+          {t("deposer.communeTitle")}
+        </span>
+        <h1 className="cua-display text-xl sm:text-3xl font-semibold tracking-tight text-[#0F172A] dark:text-slate-100 flex items-center justify-center gap-3">
+          {/* <span className="hidden sm:flex w-11 h-11 rounded-xl bg-gradient-to-br from-[#0F172A] to-[#1E3A8A] items-center justify-center text-white shadow-md shadow-[#0F172A]/20 flex-shrink-0">
+            <Icon path={ICONS.info} className="w-5 h-5" strokeWidth={2.25} />
+          </span> */}
+          {t("deposer.pageTitle")}
+        </h1>
+        <p className="text-slate-500 dark:text-slate-400 mt-2 max-w-2xl text-sm sm:text-base">{t("deposer.pageSubtitle")}</p>
       </div>
+
+      <div className="rounded-xl border border-blue-100 dark:border-blue-900/50 bg-blue-50/70 dark:bg-blue-900/20 p-4 flex items-start gap-3">
+        <span className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-md bg-[#1E3A8A]/10 dark:bg-blue-400/15 text-[#1E3A8A] dark:text-blue-300">
+          <Icon path={ICONS.info} className="w-4 h-4" />
+        </span>
+        <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{t("deposer.instructionBox")}</p>
+      </div>
+
+      <p className="inline-flex items-center rounded-lg border border-amber-200 dark:border-amber-700/50 bg-amber-50 dark:bg-amber-900/20 mt-4 mb-6 px-3.5 py-2 text-[13px] font-medium text-amber-800 dark:text-amber-300 w-fit">
+        {t("deposer.fillForm")}
+      </p>
 
       <form onSubmit={handleSubmit} noValidate>
         {/* 1. Type d'entité */}
@@ -1133,28 +1141,28 @@ function DeposerDoleance() {
               onClick={() => setModule("CUA")}
               emoji="🏛️"
               label={t("deposer.communeCUA")}
-              activeClasses="border-blue-600 bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 shadow-sm "
+              activeClasses="border-blue-600 bg-blue-50 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 shadow-sm ring-1 ring-blue-600/20"
             />
             <ModuleCard
               active={module === "Sapeurs-Pompiers"}
               onClick={() => setModule("Sapeurs-Pompiers")}
               emoji="🚒"
               label={t("deposer.sapeursPompiers")}
-              activeClasses="border-amber-500 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 shadow-sm"
+              activeClasses="border-amber-500 bg-amber-50 dark:bg-amber-900/30 text-amber-700 dark:text-amber-300 shadow-sm ring-1 ring-amber-500/20"
             />
             <ModuleCard
               active={module === "Police Municipale"}
               onClick={() => setModule("Police Municipale")}
               emoji="🚔"
               label={t("deposer.policeMunicipale")}
-              activeClasses="border-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 shadow-sm"
+              activeClasses="border-indigo-600 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-700 dark:text-indigo-300 shadow-sm ring-1 ring-indigo-600/20"
             />
             <ModuleCard
               active={module === "BMH"}
               onClick={() => setModule("BMH")}
               emoji="🧹"
               label={t("deposer.bmh")}
-              activeClasses="border-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 shadow-sm"
+              activeClasses="border-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 shadow-sm ring-1 ring-emerald-600/20"
             />
           </div>
         </Section>
@@ -1162,9 +1170,9 @@ function DeposerDoleance() {
         {/* 2. Catégories */}
         {module && mappedCategories.length > 0 && (
           <div className="mb-5 cua-anim">
-            <div className="flex items-center gap-2 mb-3 px-1">
+            <div className="flex items-center gap-2.5 mb-3 px-1">
               <StepBadge n={2} />
-              <p className="text-[13px] font-bold text-[#0F172A] dark:text-slate-100">
+              <p className="text-[14px] font-semibold text-[#0F172A] dark:text-slate-100">
                 {t("deposer.categoryHint1")}
               </p>
             </div>
@@ -1183,8 +1191,8 @@ function DeposerDoleance() {
                 const selectedCat = mappedCategories.find((c) => c.id === selectedCategory);
                 if (!selectedCat?.nom_direction) return null;
                 return (
-                  <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-700 rounded-xl px-4 py-2.5 mt-4">
-                    <Icon path={ICONS.building} className="w-4 h-4 text-[#1E3A8A] shrink-0" />
+                  <div className="flex items-center gap-2 bg-blue-50 dark:bg-blue-900/30 border border-blue-100 dark:border-blue-700 rounded-lg px-4 py-2.5 mt-4">
+                    <Icon path={ICONS.building} className="w-4 h-4 text-[#1E3A8A] dark:text-blue-300 shrink-0" />
                     <span className="text-xs sm:text-sm text-[#1E3A8A] dark:text-blue-300 font-semibold">
                       {t("deposer.directionLabel")} {selectedCat.nom_direction}
                     </span>
@@ -1192,7 +1200,7 @@ function DeposerDoleance() {
                 );
               })()}
 
-            <p className="text-[13px] font-bold text-[#0F172A] dark:text-slate-100 mt-3">{t("deposer.categoryHint2")}</p>
+            <p className="text-[13px] font-medium text-slate-600 dark:text-slate-300 mt-3 px-1">{t("deposer.categoryHint2")}</p>
           </div>
         )}
 
@@ -1211,7 +1219,7 @@ function DeposerDoleance() {
                 value={formData.titre}
                 onChange={handleChange}
                 placeholder={t("deposer.titlePlaceholder")}
-                className="cua-field w-full border rounded-xl px-5 py-4 text-sm font-medium text-slate-800 dark:text-slate-200 outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                className="cua-field w-full border rounded-xl px-4 py-3 text-sm font-medium text-slate-800 dark:text-slate-200 outline-none bg-slate-50 dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 required
               />
             </Field>
@@ -1227,7 +1235,7 @@ function DeposerDoleance() {
             onChange={handleChange}
             rows={5}
             placeholder={t("deposer.descriptionPlaceholder")}
-            className="cua-field w-full border rounded-xl px-5 py-4 text-sm text-slate-800 dark:text-slate-200 outline-none resize-y placeholder:text-slate-400 dark:placeholder:text-slate-500"
+            className="cua-field w-full border rounded-xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 outline-none resize-y bg-slate-50 dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500"
             required
           />
           <div className="flex justify-between items-center mt-2">
@@ -1381,38 +1389,39 @@ function DeposerDoleance() {
           </>
           )}
 
-          <LocationPickerMap
-            className="mb-4"
-            heightClass="h-72 sm:h-[28rem]"
-            position={mapPosition}
-            onPick={handleMapPositionChange}
-            dark={darkMode}
-            zoom={14}
-            flyToSignal={flyToSignal}
-            geojson={quartierGeoJSON}
-            showCoordinateBar={false}
-            markers={assignedDoleances.map((d) => ({
-              id: d.id_doleance,
-              lat: d.latitude,
-              lng: d.longitude,
-              title: d.titre,
-              subtitle: d.nom_categorie,
-              reference: d.reference,
-              badge: t("deposer.assigned"),
-            }))}
-            labels={{
-              coordinates: t("deposer.mapCoordinates"),
-              copy: t("deposer.mapCopy"),
-              copied: t("deposer.mapCopied"),
-              copyError: t("deposer.mapCopyError"),
-              noPosition: t("deposer.mapNoPosition"),
-              hint: t("deposer.mapHint"),
-              recenter: t("deposer.mapRecenter"),
-              showQuartiers: t("deposer.mapShowQuartiers"),
-              hideQuartiers: t("deposer.mapHideQuartiers"),
-              refLabel: t("deposer.refLabel"),
-            }}
-          />
+          <div className="rounded-xl overflow-hidden border border-slate-200 dark:border-slate-700 mb-4">
+            <LocationPickerMap
+              heightClass="h-72 sm:h-[28rem]"
+              position={mapPosition}
+              onPick={handleMapPositionChange}
+              dark={darkMode}
+              zoom={14}
+              flyToSignal={flyToSignal}
+              geojson={quartierGeoJSON}
+              showCoordinateBar={false}
+              markers={assignedDoleances.map((d) => ({
+                id: d.id_doleance,
+                lat: d.latitude,
+                lng: d.longitude,
+                title: d.titre,
+                subtitle: d.nom_categorie,
+                reference: d.reference,
+                badge: t("deposer.assigned"),
+              }))}
+              labels={{
+                coordinates: t("deposer.mapCoordinates"),
+                copy: t("deposer.mapCopy"),
+                copied: t("deposer.mapCopied"),
+                copyError: t("deposer.mapCopyError"),
+                noPosition: t("deposer.mapNoPosition"),
+                hint: t("deposer.mapHint"),
+                recenter: t("deposer.mapRecenter"),
+                showQuartiers: t("deposer.mapShowQuartiers"),
+                hideQuartiers: t("deposer.mapHideQuartiers"),
+                refLabel: t("deposer.refLabel"),
+              }}
+            />
+          </div>
 
           <Field id="lieu_exact" label={t("deposer.exactLocation")} optional={t("deposer.optional")}>
             <input
@@ -1422,7 +1431,7 @@ function DeposerDoleance() {
               value={formData.lieu_exact}
               onChange={handleChange}
               placeholder={t("deposer.exactLocationPlaceholder")}
-              className="cua-field w-full border rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200"
+              className="cua-field w-full border rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500"
             />
             {assignedDoleances.length > 0 && (
               <p className="text-xs text-slate-400 dark:text-slate-500 mt-1.5 flex items-center gap-1.5">
@@ -1442,13 +1451,13 @@ function DeposerDoleance() {
             onChange={handleChange}
             rows={3}
             placeholder={t("deposer.suggestionPlaceholder")}
-            className="cua-field w-full border rounded-xl px-5 py-4 text-sm text-slate-800 dark:text-slate-200 outline-none resize-y placeholder:text-slate-400 dark:placeholder:text-slate-500"
+            className="cua-field w-full border rounded-xl px-4 py-3 text-sm text-slate-800 dark:text-slate-200 outline-none resize-y bg-slate-50 dark:bg-slate-800 placeholder:text-slate-400 dark:placeholder:text-slate-500"
           />
         </Section>
 
         {/* 7. Photos (optionnel) */}
         <Section step={7} iconPath={ICONS.camera} title={t("deposer.addPhotos")} tag={t("deposer.optionalFemale")} hint={t("deposer.photosHelp")}>
-          <div className="flex gap-2 sm:gap-3 mb-4 overflow-x-auto pb-2 -mx-5 px-5">
+          <div className="flex gap-2 sm:gap-3 mb-4 overflow-x-auto pb-2 -mx-5 px-5 sm:mx-0 sm:px-0">
             {photoExamples.map((ex, i) => (
               <div
                 key={i}
@@ -1468,7 +1477,7 @@ function DeposerDoleance() {
             role="button"
             tabIndex={0}
             aria-label={t("deposer.dragDrop")}
-            className={`cua-dropzone border border-dashed rounded-xl p-8 text-center cursor-pointer transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]/50 ${
+            className={`cua-dropzone border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]/50 ${
               dragOver ? "drag" : "border-slate-300 hover:border-[#D4AF37] hover:bg-slate-50"
             }`}
             onDragOver={handleDragOver}
@@ -1477,8 +1486,10 @@ function DeposerDoleance() {
             onClick={() => fileInputRef.current?.click()}
             onKeyDown={(e) => e.key === "Enter" && fileInputRef.current?.click()}
           >
-            <Icon path={ICONS.upload} className="w-10 h-10 mx-auto text-[#1E3A8A] mb-3" strokeWidth={1.5} />
-            <p className="text-sm font-bold text-slate-700 dark:text-slate-300 mb-1">{t("deposer.dragDrop")}</p>
+            <span className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#1E3A8A]/10 dark:bg-blue-400/10">
+              <Icon path={ICONS.upload} className="w-6 h-6 text-[#1E3A8A] dark:text-blue-300" strokeWidth={1.75} />
+            </span>
+            <p className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1">{t("deposer.dragDrop")}</p>
             <p className="text-xs text-slate-400 dark:text-slate-500">{t("deposer.browseFiles")}</p>
             <input
               ref={fileInputRef}
@@ -1499,7 +1510,7 @@ function DeposerDoleance() {
                 {files.map((file, i) => (
                   <div
                     key={i}
-                    className="group relative rounded-xl overflow-hidden border hover:border-[#D4AF37] transition-all duration-200 bg-slate-50 dark:bg-slate-800 aspect-square"
+                    className="group relative rounded-xl overflow-hidden border border-slate-200 dark:border-slate-600 hover:border-[#D4AF37] transition-all duration-200 bg-slate-50 dark:bg-slate-800 aspect-square"
                   >
                     {filePreviews[i] ? (
                       <img src={filePreviews[i]} alt={file.name} className="w-full h-full object-cover" />
@@ -1547,7 +1558,7 @@ function DeposerDoleance() {
                 name="nom_citoyen"
                 value={formData.nom_citoyen}
                 onChange={handleChange}
-                className="cua-field w-full border rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200"
+                className="cua-field w-full border rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 placeholder={t("deposer.namePlaceholder")}
                 required
               />
@@ -1559,7 +1570,7 @@ function DeposerDoleance() {
                 name="prenom_citoyen"
                 value={formData.prenom_citoyen}
                 onChange={handleChange}
-                className="cua-field w-full border rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200"
+                className="cua-field w-full border rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 placeholder={t("deposer.firstNamePlaceholder")}
                 required
               />
@@ -1571,7 +1582,7 @@ function DeposerDoleance() {
                 name="email"
                 value={formData.email}
                 onChange={handleChange}
-                className="cua-field w-full border rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200"
+                className="cua-field w-full border rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 placeholder="ohatra@gmail.com"
               />
             </Field>
@@ -1582,7 +1593,7 @@ function DeposerDoleance() {
                 name="telephone"
                 value={formData.telephone}
                 onChange={handleChange}
-                className="cua-field w-full border rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200"
+                className="cua-field w-full border rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                 placeholder="034 00 000 00"
               />
             </Field>
@@ -1596,7 +1607,7 @@ function DeposerDoleance() {
                   name="adresse_citoyen"
                   value={formData.adresse_citoyen}
                   onChange={handleChange}
-                  className="cua-field w-full border rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200"
+                  className="cua-field w-full border rounded-xl px-4 py-3 text-sm outline-none bg-slate-50 dark:bg-slate-800 dark:text-slate-200 placeholder:text-slate-400 dark:placeholder:text-slate-500"
                   placeholder={t("deposer.addressPlaceholder")}
                 />
               </Field>
@@ -1605,16 +1616,16 @@ function DeposerDoleance() {
         </Section>
 
         {/* Submit */}
-        <div className="flex flex-col sm:flex-row items-center justify-end gap-3 sm:gap-4 pt-2 pb-2 cua-anim border-t border-slate-100 dark:border-slate-800 mt-2">
-          <p className="text-xs sm:text-sm text-slate-400 order-2 sm:order-1 flex items-center gap-1 pt-4">
-            <Icon path={ICONS.shield} className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-600 flex-shrink-0" />
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 pt-5 cua-anim border-t border-slate-100 dark:border-slate-800 mt-2">
+          <p className="text-xs sm:text-[13px] text-slate-500 dark:text-slate-400 order-2 sm:order-1 flex items-center gap-1.5">
+            <Icon path={ICONS.shield} className="w-4 h-4 text-emerald-600 flex-shrink-0" />
             <span className="hidden sm:inline">{t("deposer.confidentialInfo")}</span>
             <span className="sm:hidden">{t("deposer.confidentialInfoShort")}</span>
           </p>
           <button
             type="submit"
             disabled={loading || uploading}
-            className="cua-btn-submit mt-4 flex items-center justify-center gap-2 sm:gap-3 px-6 sm:px-10 py-3 sm:py-4 rounded-xl sm:rounded-2xl text-base sm:text-[16px] font-bold text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:scale-100 w-full sm:w-auto order-1 sm:order-2 hover:scale-[1.02] hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]/60"
+            className="cua-btn-submit flex items-center justify-center gap-2.5 px-6 sm:px-9 py-3 sm:py-3.5 rounded-xl text-[15px] font-semibold text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed w-full sm:w-auto order-1 sm:order-2 hover:-translate-y-0.5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#D4AF37]/60 focus-visible:ring-offset-2 dark:focus-visible:ring-offset-slate-900"
           >
             {loading || uploading ? (
               <span className="flex items-center gap-2">
@@ -1630,7 +1641,7 @@ function DeposerDoleance() {
               </span>
             ) : (
               <>
-                <Icon path={ICONS.send} className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={2.5} />
+                <Icon path={ICONS.send} className="w-4 h-4 sm:w-5 sm:h-5" strokeWidth={2.25} />
                 {t("deposer.sendReport")}
               </>
             )}
@@ -1641,29 +1652,31 @@ function DeposerDoleance() {
       {/* Reference Modal */}
       {showReferenceModal && (
         <div className="fixed inset-0 bg-[#0F172A]/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" role="dialog" aria-modal="true">
-          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full mx-auto p-6 border dark:border-slate-600 relative overflow-hidden cua-anim">
+          <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl max-w-md w-full mx-auto p-6 sm:p-8 border border-slate-200 dark:border-slate-600 relative overflow-hidden cua-anim">
             <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#0F172A] via-[#D4AF37] to-[#0F172A]" />
             <div className="text-center">
-              <div className="mx-auto w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 flex items-center justify-center mb-4 shadow-lg">
-                <Icon path={ICONS.check} className="w-8 h-8 text-white" strokeWidth={2.5} />
+              <div className="mx-auto w-14 h-14 rounded-full bg-emerald-50 dark:bg-emerald-900/30 ring-8 ring-emerald-50/60 dark:ring-emerald-900/10 flex items-center justify-center mb-5">
+                <span className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 shadow-md">
+                  <Icon path={ICONS.check} className="w-5 h-5 text-white" strokeWidth={2.5} />
+                </span>
               </div>
-              <h3 className="cua-display text-xl font-semibold text-[#0F172A] dark:text-slate-100 mb-2">{t("deposer.reportSent")}</h3>
-              <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">{t("deposer.trackingRef")}</p>
-              <div className="bg-slate-50 dark:bg-slate-700 rounded-xl px-4 py-3 mb-4 border dark:border-slate-600">
-                <span className="text-2xl font-mono font-bold text-[#1E3A8A] tracking-wider">{savedReference}</span>
+              <h3 className="cua-display text-xl sm:text-2xl font-semibold text-[#0F172A] dark:text-slate-100 mb-1.5">{t("deposer.reportSent")}</h3>
+              <p className="text-sm text-slate-500 dark:text-slate-400 mb-5">{t("deposer.trackingRef")}</p>
+              <div className="bg-slate-50 dark:bg-slate-700/60 rounded-xl px-4 py-3.5 mb-4 border border-slate-200 dark:border-slate-600">
+                <span className="text-xl sm:text-2xl font-mono font-bold text-[#1E3A8A] dark:text-[#D4AF37] tracking-wider break-all">{savedReference}</span>
               </div>
               {savedDirection && (
-                <p className="text-sm text-emerald-600 font-semibold mb-4">
+                <p className="text-sm text-emerald-600 dark:text-emerald-400 font-semibold mb-4">
                   {t("deposer.forwardedTo")} {savedDirection}
                 </p>
               )}
-              <div className="flex gap-3 justify-center">
+              <div className="flex gap-3 justify-center mt-5">
                 <button
                   onClick={() => {
                     navigator.clipboard.writeText(savedReference);
                     toast.success(t("deposer.copySuccess"));
                   }}
-                  className="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-sm font-bold hover:bg-slate-200 dark:hover:bg-slate-600 transition-all"
+                  className="px-5 py-2.5 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-300 rounded-xl text-sm font-semibold hover:bg-slate-200 dark:hover:bg-slate-600 transition-all"
                 >
                   {t("deposer.copy")}
                 </button>
@@ -1672,7 +1685,7 @@ function DeposerDoleance() {
                     setShowReferenceModal(false);
                     navigate(`/suivi-doleance/${savedReference}`);
                   }}
-                  className="cua-btn-primary px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all"
+                  className="cua-btn-primary px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-all"
                 >
                   {t("deposer.trackReport")}
                 </button>
