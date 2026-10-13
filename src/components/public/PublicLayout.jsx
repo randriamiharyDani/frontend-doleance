@@ -274,7 +274,7 @@ function PublicLayout({ children }) {
     {
       key: 'greenNumberOrange',
       phone: greenNumbers.greenNumberOrange,
-      icon: ChatBubbleBottomCenterTextIcon,
+      icon: PhoneIcon,
       label: t("footer.greenNumberDoleanceTitle"),
       badge:
         "bg-gradient-to-br from-emerald-500 to-emerald-600 group-hover:from-emerald-400 group-hover:to-emerald-500 ring-emerald-600/20",
