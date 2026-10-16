@@ -1468,7 +1468,7 @@ function DoleanceDetail() {
         </div>
 
         <div className="print-footer">
-          <p>FITARAINA</p>
+          <p>FITARAINANA</p>
         </div>
         <div className="print-date">
           Imprimé le{" "}
