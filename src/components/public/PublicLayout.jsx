@@ -20,7 +20,7 @@ import {
 
 // Valeurs par défaut (utilisées si l'API n'est pas joignable)
 const DEFAULT_EMERGENCY_CONTACTS = [
-  { label: 'CUA', phone: '034 72 139 93', tel: 'tel:0347213993' },
+  { label: 'Doléance', phone: '034 72 139 93', tel: 'tel:0347213993' },
   { label: 'Sapeurs Pompiers', phone: '034 12 232 35', tel: 'tel:0341223235' },
   { label: 'Police Municipale', phone: '034 58 694 10', tel: 'tel:0345869410' },
   { label: 'BMH', phone: '032 22 655 25', tel: 'tel:0322265525' },

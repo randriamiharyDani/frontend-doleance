@@ -39,6 +39,7 @@ const Corbeille = lazy(() => import('./backoffice/Corbeille'));
 const Categories = lazy(() => import('./backoffice/Categories'));
 const AppelsCitoyens = lazy(() => import('./backoffice/AppelsCitoyens'));
 const Messages = lazy(() => import('./backoffice/Messages'));
+const MotsInterdits = lazy(() => import('./backoffice/MotsInterdits'));
 import { ChatProvider } from './contexts/ChatContext';
 import { CallProvider } from './contexts/CallContext';
 import PrivateRoute from './components/PrivateRoute';
@@ -80,6 +81,7 @@ function AppRoutes() {
           <Route path="ajouter-doleance" element={<PrivateRoute allowedPermissions={[{ module: 'doleances', action: 'create' }]}><AjouterDoleance /></PrivateRoute>} />
           <Route path="settings" element={<Settings />} />
           <Route path="corbeille" element={<PrivateRoute allowedRoles={['administrateur_systeme']}><Corbeille /></PrivateRoute>} />
+          <Route path="mots-interdits" element={<PrivateRoute allowedRoles={['administrateur_systeme', 'administrateur', 'agent_central']}><MotsInterdits /></PrivateRoute>} />
           <Route path="categories" element={<PrivateRoute allowedPermissions={[{ module: 'doleances', action: 'update' }]}><Categories /></PrivateRoute>} />
           <Route path="messages" element={<ChatProvider><Messages /></ChatProvider>} />
 

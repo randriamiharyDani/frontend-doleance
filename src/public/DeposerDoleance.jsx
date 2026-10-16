@@ -656,10 +656,6 @@ function DeposerDoleance() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!formData.email && !formData.telephone) {
-      toast.error(t("deposerMessages.emailOrPhoneRequired"));
-      return;
-    }
     if (!formData.nom_citoyen || !formData.prenom_citoyen || !formData.titre || !formData.description) {
       toast.error(t("messages.pleaseFillRequired"));
       return;
@@ -1000,7 +996,6 @@ function DeposerDoleance() {
       !!formData.description,
       !!formData.nom_citoyen,
       !!formData.prenom_citoyen,
-      !!(formData.email || formData.telephone),
     ];
     const done = requiredOk.filter(Boolean).length;
     return Math.round((done / requiredOk.length) * 100);
@@ -1586,7 +1581,7 @@ function DeposerDoleance() {
                 placeholder="ohatra@gmail.com"
               />
             </Field>
-            <Field id="telephone" label="Laharan-telefaonina" required>
+            <Field id="telephone" label="Laharan-telefaonina">
               <input
                 id="telephone"
                 type="tel"

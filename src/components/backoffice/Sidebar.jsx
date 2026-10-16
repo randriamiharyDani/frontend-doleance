@@ -13,7 +13,8 @@ import {
   ArrowPathIcon,
   CogIcon,
   ArrowRightOnRectangleIcon,
-  ChatBubbleLeftRightIcon
+  ChatBubbleLeftRightIcon,
+  NoSymbolIcon
 } from '@heroicons/react/24/outline';
 
 function Sidebar({ sidebarOpen, setSidebarOpen }) {
@@ -56,6 +57,7 @@ function Sidebar({ sidebarOpen, setSidebarOpen }) {
     { name: 'Rôles', href: '/backoffice/roles', icon: ShieldCheckIcon },
     { name: 'Statistiques', href: '/backoffice/statistiques', icon: ChartBarIcon },
     { name: 'Transfert', href: '/backoffice/transfert', icon: ArrowPathIcon },
+    { name: 'Mots interdits', href: '/backoffice/mots-interdits', icon: NoSymbolIcon },
     { name: 'Messages', href: '/backoffice/messages', icon: ChatBubbleLeftRightIcon },
 
   ];

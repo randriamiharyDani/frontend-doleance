@@ -29,7 +29,11 @@ function DoleanceCard({
 
   return (
     <div
-      className={`bg-white dark:bg-slate-800 rounded-lg shadow-md hover:shadow-lg transition-shadow ${
+      className={`${
+        Number(doleance.gros_mot_detecte) === 1
+          ? 'bg-red-300 dark:bg-red-900/20'
+          : 'bg-white dark:bg-slate-800'
+      } rounded-lg shadow-md hover:shadow-lg transition-shadow ${
         isNouvelle ? 'border-l-4 border-blue-500' : ''
       }`}
     >
@@ -50,6 +54,11 @@ function DoleanceCard({
               {isBloquee && (
                 <span className="text-[10px] sm:text-xs bg-gray-200 dark:bg-slate-600 text-gray-600 dark:text-gray-300 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
                   Non modifiable
+                </span>
+              )}
+              {Number(doleance.gros_mot_detecte) === 1 && (
+                <span className="text-[10px] sm:text-xs bg-red-800 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded font-semibold">
+                  Gros mot détecté
                 </span>
               )}
             </div>

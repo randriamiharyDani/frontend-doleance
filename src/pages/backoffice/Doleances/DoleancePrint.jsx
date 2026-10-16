@@ -193,6 +193,16 @@ function DoleancePrint() {
           )}
         </PrintSection>
 
+        {/* <PrintSection icon={FolderIcon} title="Pieces jointe">
+          <p className="print-text">{valueOrDash(doleance.description)}</p>
+          {doleance.suggestions && String(doleance.suggestions).trim() !== '' && (
+            <div className="print-suggestion">
+              <span>Suggestion du plaignant</span>
+              <p className="print-text">{doleance.suggestions}</p>
+            </div>
+          )}
+        </PrintSection> */}
+
         <footer className="print-doc-footer">
           <p className="print-doc-footer-motto">DOLEANCE</p>
           <p className="print-doc-footer-meta">

@@ -20,6 +20,7 @@ import {
   TrashIcon,
   TagIcon,
   PhoneIcon,
+  NoSymbolIcon,
 } from "@heroicons/react/24/outline";
 import Navbar from "../components/backoffice/Navbar";
 
@@ -177,6 +178,8 @@ function BackofficeLayout() {
     { name: "Catégories", href: "/backoffice/categories", icon: TagIcon, module: "doleances", action: "update" },
   ].filter((sub) => hasPermission(sub.module, sub.action));
 
+  const isAdminRole = ['administrateur_systeme', 'administrateur', 'agent_central'].includes(userRole);
+
   const secondaryNavigation = [
     ...(adminSubItems.length > 0 ? [{
       name: "Administration",
@@ -188,6 +191,11 @@ function BackofficeLayout() {
       href: "/backoffice/statistiques",
       icon: ChartBarIcon,
     },
+    ...(isAdminRole ? [{
+      name: "Mots interdits",
+      href: "/backoffice/mots-interdits",
+      icon: NoSymbolIcon,
+    }] : []),
   ];
 
   // Auto-ouvrir les sous-menus dont un enfant est actif
@@ -453,7 +461,7 @@ function BackofficeLayout() {
         }`}
       />
       <span className="text-sm font-medium">
-        Historique
+        Historiques
       </span>
     </Link>
   </div>
@@ -461,7 +469,7 @@ function BackofficeLayout() {
 
 
   {/* Appels citoyens — admin / agent_central uniquement */}
-{/*   
+ {/*   
   {['administrateur_systeme', 'administrateur', 'agent_central'].includes(userRole) && (
   <div className="mt-4">
     <Link
