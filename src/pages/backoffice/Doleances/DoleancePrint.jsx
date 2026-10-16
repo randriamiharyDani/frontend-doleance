@@ -63,6 +63,61 @@ function PrintSection({ icon: Icon, title, children, className = '' }) {
   );
 }
 
+function PlaignantInfo({ nom, telephone, email }) {
+  const items = [
+    { label: 'Nom complet', value: nom },
+    { label: 'Téléphone', value: telephone },
+    { label: 'Email', value: email }
+  ];
+
+  return (
+    <dl
+      style={{
+        display: 'grid',
+        gridTemplateColumns: '1fr 1fr 1.4fr',
+        gap: '8px 16px',
+        margin: 0
+      }}
+    >
+      {items.map((item) => (
+        <div
+          key={item.label}
+          style={{
+            minWidth: 0,
+            breakInside: 'avoid',
+            pageBreakInside: 'avoid'
+          }}
+        >
+          <dt
+            style={{
+              margin: 0,
+              fontSize: '9px',
+              fontWeight: 600,
+              letterSpacing: '0.06em',
+              textTransform: 'uppercase',
+              color: '#6b7280'
+            }}
+          >
+            {item.label}
+          </dt>
+          <dd
+            style={{
+              margin: '2px 0 0',
+              fontSize: '12px',
+              fontWeight: 600,
+              color: '#111827',
+              overflowWrap: 'anywhere',
+              wordBreak: 'break-word'
+            }}
+          >
+            {valueOrDash(item.value)}
+          </dd>
+        </div>
+      ))}
+    </dl>
+  );
+}
+
 function DoleancePrint() {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -176,11 +231,11 @@ function DoleancePrint() {
         </div>
 
         <PrintSection icon={UserCircleIcon} title="Informations du plaignant">
-          <dl className="print-rows print-rows-inline">
-            <InfoRow label="Nom complet" value={citoyenNom} />
-            <InfoRow label="Téléphone" value={doleance.citoyen_telephone} />
-            <InfoRow label="Email" value={doleance.citoyen_email} />
-          </dl>
+          <PlaignantInfo
+            nom={citoyenNom}
+            telephone={doleance.citoyen_telephone}
+            email={doleance.citoyen_email}
+          />
         </PrintSection>
 
         <PrintSection icon={FolderIcon} title="Description du problème">
@@ -193,15 +248,7 @@ function DoleancePrint() {
           )}
         </PrintSection>
 
-        {/* <PrintSection icon={FolderIcon} title="Pieces jointe">
-          <p className="print-text">{valueOrDash(doleance.description)}</p>
-          {doleance.suggestions && String(doleance.suggestions).trim() !== '' && (
-            <div className="print-suggestion">
-              <span>Suggestion du plaignant</span>
-              <p className="print-text">{doleance.suggestions}</p>
-            </div>
-          )}
-        </PrintSection> */}
+
 
         <footer className="print-doc-footer">
           <p className="print-doc-footer-motto">DOLEANCE</p>

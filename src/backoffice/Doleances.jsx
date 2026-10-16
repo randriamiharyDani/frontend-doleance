@@ -13,6 +13,7 @@ import DeleteConfirmModal from '../pages/backoffice/Doleances/DeleteConfirmModal
 import PrioriteModal from '../pages/backoffice/Doleances/PrioriteModal';
 import ReponseModal from '../pages/backoffice/Doleances/ReponseModal';
 import StatutModal from '../pages/backoffice/Doleances/StatutModal';
+import MotsDetectesModal from '../pages/backoffice/Doleances/MotsDetectesModal';
 import Pagination from '../components/common/Pagination';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import EmptyState from '../components/common/EmptyState';
@@ -60,6 +61,8 @@ function Doleances() {
   const [reponseText, setReponseText] = useState('');
   const [showStatutModal, setShowStatutModal] = useState(false);
   const [selectedStatutValue, setSelectedStatutValue] = useState('');
+  const [showMotsModal, setShowMotsModal] = useState(false);
+  const [doleanceMots, setDoleanceMots] = useState(null);
 
   const isNouvelle = (statut) => ['En attente', 'Nouvelle', 'en_attente'].includes(statut);
   const isBloquee = (statut) => STATUTS_BLOQUES.includes(statut);
@@ -221,6 +224,11 @@ function Doleances() {
     }
   };
 
+  const openMotsModal = (doleance) => {
+    setDoleanceMots(doleance);
+    setShowMotsModal(true);
+  };
+
   const canUserView = (doleance) => {
     if (isAdminOrAgentCentral) return true;
     if (!user?.id_direction && doleance.id_utilisateur_assignee === user?.id_utilisateur) return true;
@@ -271,6 +279,7 @@ function Doleances() {
               onReponse={openReponseModal}
               onStatut={openStatutModal}
               onImprimer={openPrintPage}
+              onVoirMots={openMotsModal}
               isNouvelle={isNouvelle(doleance.nom_statut)}
               isBloquee={isBloquee(doleance.nom_statut)}
               isDeSaDirection={doleance.id_direction === user?.id_direction || (!user?.id_direction && doleance.id_utilisateur_assignee === user?.id_utilisateur)}
@@ -327,6 +336,12 @@ function Doleances() {
         selectedValue={selectedStatutValue}
         onValueChange={setSelectedStatutValue}
         doleance={selectedDoleanceForReponse}
+      />
+
+      <MotsDetectesModal
+        isOpen={showMotsModal}
+        onClose={() => setShowMotsModal(false)}
+        doleance={doleanceMots}
       />
     </div>
   );

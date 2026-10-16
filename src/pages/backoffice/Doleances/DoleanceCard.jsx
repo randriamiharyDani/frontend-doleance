@@ -1,25 +1,50 @@
-import React from 'react';
+import React from "react";
 import {
-  UserIcon, PhoneIcon, EnvelopeIcon, FolderIcon,
-  CalendarIcon, MapPinIcon, PencilIcon,
-  ChatBubbleLeftRightIcon, ArrowPathIcon, EyeIcon, PrinterIcon
-} from '@heroicons/react/24/outline';
-import StatusBadge from '../../../components/common/StatusBadge';
-import PriorityBadge from '../../../components/common/PriorityBadge';
+  UserIcon,
+  PhoneIcon,
+  EnvelopeIcon,
+  FolderIcon,
+  CalendarIcon,
+  MapPinIcon,
+  PencilIcon,
+  ChatBubbleLeftRightIcon,
+  ArrowPathIcon,
+  EyeIcon,
+  PrinterIcon,
+  ExclamationTriangleIcon,
+} from "@heroicons/react/24/outline";
+import StatusBadge from "../../../components/common/StatusBadge";
+import PriorityBadge from "../../../components/common/PriorityBadge";
 
-const STATUTS_BLOQUES = ['Résolue', 'Rejetée', 'Clôturée', 'Fermée'];
+const STATUTS_BLOQUES = ["Résolue", "Rejetée", "Clôturée", "Fermée"];
 
 function DoleanceCard({
   doleance,
-  user, isAdminOrAgentCentral, canTraiter,
-  onView, onDelete, onPriorite, onReponse, onStatut, onImprimer,
-  isNouvelle, isBloquee, isDeSaDirection, userCanAct, userCanView, fullAddress
+  user,
+  isAdminOrAgentCentral,
+  canTraiter,
+  onView,
+  onDelete,
+  onPriorite,
+  onReponse,
+  onStatut,
+  onImprimer,
+  onVoirMots,
+  isNouvelle,
+  isBloquee,
+  isDeSaDirection,
+  userCanAct,
+  userCanView,
+  fullAddress,
 }) {
   const formatDateTime = (dateString) => {
-    if (!dateString) return '';
-    return new Intl.DateTimeFormat('fr-FR', {
-      day: '2-digit', month: '2-digit', year: 'numeric',
-      hour: '2-digit', minute: '2-digit'
+    if (!dateString) return "";
+    return new Intl.DateTimeFormat("fr-FR", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
     }).format(new Date(dateString));
   };
 
@@ -31,51 +56,79 @@ function DoleanceCard({
     <div
       className={`${
         Number(doleance.gros_mot_detecte) === 1
-          ? 'bg-red-300 dark:bg-red-900/20'
-          : 'bg-white dark:bg-slate-800'
+          ? "bg-red-100 dark:bg-red-900/20"
+          : "bg-white dark:bg-slate-800"
       } rounded-lg shadow-md hover:shadow-lg transition-shadow ${
-        isNouvelle ? 'border-l-4 border-blue-500' : ''
+        isNouvelle ? "border-l-4 border-blue-500" : ""
       }`}
     >
       <div className="p-4 sm:p-6">
         <div className="flex flex-col sm:flex-row justify-between gap-3 sm:gap-4">
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap mb-2 sm:mb-3">
-              <span className="text-[10px] sm:text-sm font-mono bg-gray-100 dark:bg-slate-700 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
+              <span className="text-[10px] sm:text-sm font-mono font-medium bg-gray-100 dark:bg-slate-700 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full">
                 {doleance.reference}
               </span>
-              <PriorityBadge priorite={doleance.nom_priorite} niveau={doleance.niveau} />
-              <StatusBadge statut={doleance.nom_statut} couleur={doleance.statut_couleur} />
+              <PriorityBadge
+                priorite={doleance.nom_priorite}
+                niveau={doleance.niveau}
+              />
+              <StatusBadge
+                statut={doleance.nom_statut}
+                couleur={doleance.statut_couleur}
+              />
               {doleance.nom_direction && (
-                <span className="text-[10px] sm:text-xs bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
+                <span className="text-[10px] sm:text-xs font-medium bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full">
                   {doleance.nom_direction}
                 </span>
               )}
               {isBloquee && (
-                <span className="text-[10px] sm:text-xs bg-gray-200 dark:bg-slate-600 text-gray-600 dark:text-gray-300 px-1.5 sm:px-2 py-0.5 sm:py-1 rounded">
+                <span className="text-[10px] sm:text-xs font-medium bg-gray-200 dark:bg-slate-600 text-gray-600 dark:text-gray-300 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full">
                   Non modifiable
                 </span>
               )}
               {Number(doleance.gros_mot_detecte) === 1 && (
-                <span className="text-[10px] sm:text-xs bg-red-800 text-white px-1.5 sm:px-2 py-0.5 sm:py-1 rounded font-semibold">
+                <span className="text-[10px] sm:text-xs bg-red-800 text-white px-2 sm:px-3 py-0.5 sm:py-1 rounded-full font-semibold">
                   Gros mot détecté
                 </span>
               )}
+              {Number(doleance.gros_mot_detecte) === 1 && (
+                <button
+                  type="button"
+                  onClick={() => onVoirMots?.(doleance)}
+                  className="inline-flex items-center gap-1 text-[10px] sm:text-xs font-semibold text-red-700 dark:text-red-300 bg-white dark:bg-slate-800 border border-red-300 dark:border-red-700/60 hover:bg-red-50 dark:hover:bg-red-900/30 px-2 sm:px-3 py-0.5 sm:py-1 rounded-full transition-colors"
+                  title="Voir les mots interdits détectés"
+                >
+                  <ExclamationTriangleIcon className="h-3 w-3" />
+                  Voir les mots détectés
+                </button>
+              )}
             </div>
 
-            <h3 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-100 mb-1 sm:mb-2 break-words">{doleance.titre}</h3>
-            <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-2">{doleance.description}</p>
+            <h3 className="text-base sm:text-lg font-semibold text-gray-800 dark:text-gray-100 mb-1 sm:mb-2 break-words">
+              {doleance.titre}
+            </h3>
+            <p className="text-gray-600 dark:text-gray-300 text-xs sm:text-sm mb-2 sm:mb-3 line-clamp-2">
+              {doleance.description}
+            </p>
 
             <div className="flex flex-wrap gap-2 sm:gap-4 text-xs sm:text-sm text-gray-500 dark:text-gray-400 mb-1 sm:mb-2">
               <span className="flex items-center gap-1">
                 <UserIcon className="h-3 w-3 flex-shrink-0" />
-                <span className="truncate max-w-[80px] sm:max-w-none">{doleance.citoyen_nom || 'Anonyme'} {doleance.citoyen_prenom || ''}</span>
+                <span className="truncate max-w-[80px] sm:max-w-none">
+                  {doleance.citoyen_nom || "Anonyme"}{" "}
+                  {doleance.citoyen_prenom || ""}
+                </span>
               </span>
               {doleance.telephone_citoyen && (
                 <span className="flex items-center gap-1">
                   <PhoneIcon className="h-3 w-3 flex-shrink-0" />
-                  <span className="hidden sm:inline">{doleance.telephone_citoyen}</span>
-                  <span className="sm:hidden">{doleance.telephone_citoyen}</span>
+                  <span className="hidden sm:inline">
+                    {doleance.telephone_citoyen}
+                  </span>
+                  <span className="sm:hidden">
+                    {doleance.telephone_citoyen}
+                  </span>
                 </span>
               )}
               {doleance.email_citoyen && (
@@ -87,7 +140,9 @@ function DoleanceCard({
               {doleance.nom_categorie && (
                 <span className="flex items-center gap-1">
                   <FolderIcon className="h-3 w-3 flex-shrink-0" />
-                  <span className="hidden sm:inline">{doleance.nom_categorie}</span>
+                  <span className="hidden sm:inline">
+                    {doleance.nom_categorie}
+                  </span>
                 </span>
               )}
               <span className="flex items-center gap-1">
@@ -99,7 +154,9 @@ function DoleanceCard({
             {fullAddress && (
               <div className="flex items-start gap-1 text-[10px] sm:text-xs text-gray-400 dark:text-gray-500 mt-1">
                 <MapPinIcon className="h-3 w-3 flex-shrink-0 mt-0.5" />
-                <span className="text-gray-500 dark:text-gray-400 truncate">{fullAddress}</span>
+                <span className="text-gray-500 dark:text-gray-400 truncate">
+                  {fullAddress}
+                </span>
               </div>
             )}
           </div>
@@ -109,7 +166,9 @@ function DoleanceCard({
               <button
                 onClick={() => onPriorite(doleance)}
                 className={`p-1.5 sm:p-2 rounded-lg transition-colors ${
-                  isBloquee ? 'text-gray-400 dark:text-slate-500 cursor-not-allowed' : 'text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/20'
+                  isBloquee
+                    ? "text-gray-400 dark:text-slate-500 cursor-not-allowed"
+                    : "text-yellow-600 hover:bg-yellow-50 dark:hover:bg-yellow-900/20"
                 }`}
                 disabled={isBloquee}
                 title="Changer la priorité"
@@ -122,8 +181,8 @@ function DoleanceCard({
                 onClick={() => onReponse(doleance)}
                 className={`p-1.5 sm:p-2 rounded-lg transition-colors ${
                   isNouvelle && !isAdminOrAgentCentral
-                    ? 'text-gray-400 dark:text-slate-500 cursor-not-allowed'
-                    : 'text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20'
+                    ? "text-gray-400 dark:text-slate-500 cursor-not-allowed"
+                    : "text-green-600 hover:bg-green-50 dark:hover:bg-green-900/20"
                 }`}
                 disabled={isNouvelle && !isAdminOrAgentCentral}
                 title="Répondre"
@@ -135,7 +194,9 @@ function DoleanceCard({
               <button
                 onClick={() => onStatut(doleance)}
                 className={`p-1.5 sm:p-2 rounded-lg transition-colors ${
-                  isBloquee ? 'text-gray-400 dark:text-slate-500 cursor-not-allowed' : 'text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20'
+                  isBloquee
+                    ? "text-gray-400 dark:text-slate-500 cursor-not-allowed"
+                    : "text-purple-600 hover:bg-purple-50 dark:hover:bg-purple-900/20"
                 }`}
                 disabled={isBloquee}
                 title="Changer le statut"
@@ -146,7 +207,9 @@ function DoleanceCard({
             <button
               onClick={() => onView(doleance)}
               className={`p-1.5 sm:p-2 rounded-lg transition-colors ${
-                !userCanView ? 'text-gray-400 dark:text-slate-500 cursor-not-allowed' : 'text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20'
+                !userCanView
+                  ? "text-gray-400 dark:text-slate-500 cursor-not-allowed"
+                  : "text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
               }`}
               disabled={!userCanView}
               title="Voir tous les détails"
@@ -156,7 +219,9 @@ function DoleanceCard({
             <button
               onClick={() => onImprimer(doleance)}
               className={`p-1.5 sm:p-2 rounded-lg transition-colors ${
-                !userCanView ? 'text-gray-400 dark:text-slate-500 cursor-not-allowed' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700'
+                !userCanView
+                  ? "text-gray-400 dark:text-slate-500 cursor-not-allowed"
+                  : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-700"
               }`}
               disabled={!userCanView}
               title="Imprimer la fiche"
