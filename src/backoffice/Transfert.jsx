@@ -126,6 +126,7 @@ function Transfert() {
   const [selectedDoleance, setSelectedDoleance] = useState(null);
   const [showTransferModal, setShowTransferModal] = useState(false);
   const [filters, setFilters] = useState({ categorie: '', search: '', statut: '' });
+  const [quickSearch, setQuickSearch] = useState('');
   const [categories, setCategories] = useState([]);
   const [statuts, setStatuts] = useState([]);
   const [showFilters, setShowFilters] = useState(false);
@@ -157,6 +158,10 @@ function Transfert() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filters, isAuthorized]);
+
+  useEffect(() => {
+    setFilters((prev) => ({ ...prev, search: quickSearch }));
+  }, [quickSearch]);
 
   if (!isAuthorized) {
     return (
@@ -410,6 +415,28 @@ function Transfert() {
               <span className="ml-1.5 w-1.5 h-1.5 rounded-full bg-[#D4AF37]" />
             )}
           </button>
+        </div>
+      </div>
+
+      {/* Barre de recherche */}
+      <div className="mb-6">
+        <div className="relative max-w-2xl">
+          <MagnifyingGlassIcon className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400 dark:text-slate-500" />
+          <input
+            type="text"
+            placeholder="Rechercher par référence, titre, citoyen..."
+            value={quickSearch}
+            onChange={(e) => setQuickSearch(e.target.value)}
+            className="w-full pl-11 pr-4 py-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-2xl text-sm outline-none focus:border-[#1E3A8A]/40 focus:ring-2 focus:ring-[#1E3A8A]/10 shadow-sm transition-all"
+          />
+          {quickSearch && (
+            <button
+              onClick={() => setQuickSearch('')}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 p-1"
+            >
+              <XMarkIcon className="h-4 w-4" />
+            </button>
+          )}
         </div>
       </div>
 

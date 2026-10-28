@@ -39,6 +39,7 @@ function Directions() {
   const [selectedDirection, setSelectedDirection] = useState(null);
   const [expandedDirections, setExpandedDirections] = useState({});
   const [activeTab, setActiveTab] = useState('directions');
+  const [searchTerm, setSearchTerm] = useState('');
   
   const [formData, setFormData] = useState({
     nom_direction: '',
@@ -270,7 +271,48 @@ function Directions() {
     return roles[role] || role;
   };
 
-  const groupedDirections = directions.reduce((acc, dir) => {
+  const filteredDirections = directions.filter((dir) => {
+    if (!searchTerm) return true;
+    const term = searchTerm.toLowerCase();
+    return (
+      dir.nom_direction?.toLowerCase().includes(term) ||
+      dir.categorie?.toLowerCase().includes(term) ||
+      dir.email?.toLowerCase().includes(term) ||
+      dir.telephone?.toLowerCase().includes(term) ||
+      dir.responsable?.toLowerCase().includes(term) ||
+      dir.description?.toLowerCase().includes(term)
+    );
+  });
+
+  const filteredServices = services.filter((service) => {
+    if (!searchTerm) return true;
+    const term = searchTerm.toLowerCase();
+    const dir = directions.find(d => d.id_direction === service.id_direction);
+    return (
+      service.nom_service?.toLowerCase().includes(term) ||
+      service.email?.toLowerCase().includes(term) ||
+      service.telephone?.toLowerCase().includes(term) ||
+      service.responsable?.toLowerCase().includes(term) ||
+      service.description?.toLowerCase().includes(term) ||
+      dir?.nom_direction?.toLowerCase().includes(term)
+    );
+  });
+
+  const filteredUsers = users.filter((user) => {
+    if (!searchTerm) return true;
+    const term = searchTerm.toLowerCase();
+    const dir = directions.find(d => d.id_direction === user.id_direction);
+    return (
+      user.prenom?.toLowerCase().includes(term) ||
+      user.nom?.toLowerCase().includes(term) ||
+      user.email?.toLowerCase().includes(term) ||
+      user.telephone?.toLowerCase().includes(term) ||
+      getRoleLabel(user.nom_role)?.toLowerCase().includes(term) ||
+      dir?.nom_direction?.toLowerCase().includes(term)
+    );
+  });
+
+  const groupedDirections = filteredDirections.reduce((acc, dir) => {
     const cat = dir.categorie || 'Autres';
     if (!acc[cat]) acc[cat] = [];
     acc[cat].push(dir);
@@ -337,6 +379,28 @@ function Directions() {
         </button>
       </div>
 
+      {/* Barre de recherche */}
+      <div className="relative">
+        <svg className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-gray-400 dark:text-gray-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor">
+          <path strokeLinecap="round" strokeLinejoin="round" d="m21 21-5.197-5.197m0 0A7.5 7.5 0 1 0 5.196 5.196a7.5 7.5 0 0 0 10.607 10.607Z" />
+        </svg>
+        <input
+          type="text"
+          placeholder="Rechercher une direction, un service, un agent..."
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition-all"
+        />
+        {searchTerm && (
+          <button
+            onClick={() => setSearchTerm('')}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+          >
+            <XMarkIcon className="h-4 w-4" />
+          </button>
+        )}
+      </div>
+
       {/* Onglets */}
       <div className="border-b border-gray-200 dark:border-slate-700">
         <nav className="flex gap-6">
@@ -382,14 +446,20 @@ function Directions() {
           {Object.entries(groupedDirections).length === 0 ? (
             <div className="card p-12 text-center">
               <BuildingOfficeIcon className="h-16 w-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Aucune direction</h3>
-              <p className="text-gray-500 dark:text-gray-400 mb-4">Commencez par créer une direction</p>
-              <button
-                onClick={() => setShowModal(true)}
-                className="btn-primary btn-md"
-              >
-                Créer une direction
-              </button>
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+                {searchTerm ? 'Aucun résultat' : 'Aucune direction'}
+              </h3>
+              <p className="text-gray-500 dark:text-gray-400 mb-4">
+                {searchTerm ? 'Essayez avec d\'autres mots-clés' : 'Commencez par créer une direction'}
+              </p>
+              {!searchTerm && (
+                <button
+                  onClick={() => setShowModal(true)}
+                  className="btn-primary btn-md"
+                >
+                  Créer une direction
+                </button>
+              )}
             </div>
           ) : (
             Object.entries(groupedDirections).map(([categorie, dirs]) => (
@@ -576,10 +646,19 @@ function Directions() {
 
       {/* Onglet Services */}
       {activeTab === 'services' && (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {services.map((service) => {
-            const direction = directions.find(d => d.id_direction === service.id_direction);
-            return (
+        <>
+          {filteredServices.length === 0 ? (
+            <div className="card p-12 text-center">
+              <FolderIcon className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+              <p className="text-gray-500 dark:text-gray-400">
+                {searchTerm ? 'Aucun service trouvé' : 'Aucun service'}
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {filteredServices.map((service) => {
+                const direction = directions.find(d => d.id_direction === service.id_direction);
+                return (
               <div key={service.id_service} className="card-hover">
                 <div className="p-4">
                   <div className="flex items-center gap-3 mb-3">
@@ -606,63 +685,95 @@ function Directions() {
                 </div>
               </div>
             );
-          })}
-        </div>
+              })}
+            </div>
+          )}
+        </>
       )}
 
       {/* Onglet Agents par direction */}
       {activeTab === 'agents' && (
         <div className="space-y-6">
-          {directions.filter(d => getUsersByDirection(d.id_direction).length > 0).map((direction) => {
-            const directionUsers = getUsersByDirection(direction.id_direction);
-            return (
-              <div key={direction.id_direction} className="card overflow-hidden">
-                <div className="bg-blue-50 dark:bg-blue-900/20 px-6 py-3 border-b border-blue-100 dark:border-blue-800 flex justify-between items-center">
-                  <h3 className="font-semibold text-blue-800 dark:text-blue-300">{direction.nom_direction}</h3>
-                  <span className="text-sm text-blue-600 dark:text-blue-400">{directionUsers.length} agent{directionUsers.length > 1 ? 's' : ''}</span>
+          {(() => {
+            const directionsWithUsers = directions.filter(d => {
+              const usersInDir = getUsersByDirection(d.id_direction).filter(u => {
+                if (!searchTerm) return true;
+                const term = searchTerm.toLowerCase();
+                return (
+                  u.prenom?.toLowerCase().includes(term) ||
+                  u.nom?.toLowerCase().includes(term) ||
+                  u.email?.toLowerCase().includes(term) ||
+                  u.telephone?.toLowerCase().includes(term) ||
+                  getRoleLabel(u.nom_role)?.toLowerCase().includes(term)
+                );
+              });
+              return usersInDir.length > 0;
+            });
+            if (directionsWithUsers.length === 0) {
+              return (
+                <div className="card p-12 text-center">
+                  <UserGroupIcon className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
+                  <p className="text-gray-500 dark:text-gray-400">
+                    {searchTerm ? 'Aucun agent trouvé' : 'Aucun agent affecté à une direction'}
+                  </p>
                 </div>
-                <div className="overflow-x-auto">
-                  <table className="table">
-                    <thead>
-                      <tr>
-                        <th>Agent</th>
-                        <th>Email</th>
-                        <th className="hidden sm:table-cell">Téléphone</th>
-                        <th>Rôle</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {directionUsers.map((agent) => (
-                        <tr key={agent.id_utilisateur} className="hover:bg-gray-50 dark:hover:bg-slate-700/50">
-                          <td>
-                            <div className="flex items-center gap-3">
-                              <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
-                                <span className="text-blue-600 dark:text-blue-300 text-sm font-medium">{agent.prenom?.charAt(0)}{agent.nom?.charAt(0)}</span>
-                              </div>
-                              <span className="text-sm font-medium text-gray-900 dark:text-white">{agent.prenom} {agent.nom}</span>
-                            </div>
-                          </td>
-                          <td className="text-sm text-gray-500 dark:text-gray-400">{agent.email}</td>
-                          <td className="text-sm text-gray-500 dark:text-gray-400 hidden sm:table-cell">{agent.telephone || '-'}</td>
-                          <td>
-                            <span className="badge bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
-                              {getRoleLabel(agent.nom_role)}
-                            </span>
-                          </td>
+              );
+            }
+            return directionsWithUsers.map((direction) => {
+              const directionUsers = getUsersByDirection(direction.id_direction).filter(u => {
+                if (!searchTerm) return true;
+                const term = searchTerm.toLowerCase();
+                return (
+                  u.prenom?.toLowerCase().includes(term) ||
+                  u.nom?.toLowerCase().includes(term) ||
+                  u.email?.toLowerCase().includes(term) ||
+                  u.telephone?.toLowerCase().includes(term) ||
+                  getRoleLabel(u.nom_role)?.toLowerCase().includes(term)
+                );
+              });
+              return (
+                <div key={direction.id_direction} className="card overflow-hidden">
+                  <div className="bg-blue-50 dark:bg-blue-900/20 px-6 py-3 border-b border-blue-100 dark:border-blue-800 flex justify-between items-center">
+                    <h3 className="font-semibold text-blue-800 dark:text-blue-300">{direction.nom_direction}</h3>
+                    <span className="text-sm text-blue-600 dark:text-blue-400">{directionUsers.length} agent{directionUsers.length > 1 ? 's' : ''}</span>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="table">
+                      <thead>
+                        <tr>
+                          <th>Agent</th>
+                          <th>Email</th>
+                          <th className="hidden sm:table-cell">Téléphone</th>
+                          <th>Rôle</th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody>
+                        {directionUsers.map((agent) => (
+                          <tr key={agent.id_utilisateur} className="hover:bg-gray-50 dark:hover:bg-slate-700/50">
+                            <td>
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
+                                  <span className="text-blue-600 dark:text-blue-300 text-sm font-medium">{agent.prenom?.charAt(0)}{agent.nom?.charAt(0)}</span>
+                                </div>
+                                <span className="text-sm font-medium text-gray-900 dark:text-white">{agent.prenom} {agent.nom}</span>
+                              </div>
+                            </td>
+                            <td className="text-sm text-gray-500 dark:text-gray-400">{agent.email}</td>
+                            <td className="text-sm text-gray-500 dark:text-gray-400 hidden sm:table-cell">{agent.telephone || '-'}</td>
+                            <td>
+                              <span className="badge bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
+                                {getRoleLabel(agent.nom_role)}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-          {directions.filter(d => getUsersByDirection(d.id_direction).length > 0).length === 0 && (
-            <div className="card p-12 text-center">
-              <UserGroupIcon className="h-12 w-12 text-gray-300 dark:text-gray-600 mx-auto mb-3" />
-              <p className="text-gray-500 dark:text-gray-400">Aucun agent affecté à une direction</p>
-            </div>
-          )}
+              );
+            });
+          })()}
         </div>
       )}
 

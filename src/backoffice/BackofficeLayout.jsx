@@ -210,52 +210,122 @@ function BackofficeLayout() {
   // La navigation est déjà filtrée par permissions (voir adminSubItems/secondaryNavigation)
   const filteredSecondaryNavigation = secondaryNavigation;
 
+  // ---- Styles sidebar (comme le DU : bleu nuit, sans bordure, jaune sur l'actif) ----
+  const itemBase =
+    "group relative flex items-center gap-3 min-h-[2.75rem] py-1 pl-1.5 pr-3 rounded-[14px] text-sm transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ffc72c]";
+
+  const itemClass = (active) =>
+    `${itemBase} ${
+      active
+        ? "bg-white/15 text-white font-bold shadow-[inset_0_0_0_1px_rgba(255,255,255,0.22),0_6px_16px_rgba(5,12,40,0.3)]"
+        : "text-[#cfdcff] font-medium hover:bg-white/10 hover:text-white"
+    }`;
+
+  // Barre jaune à gauche (visible seulement sur l'actif)
+  const barClass = (active) =>
+    `absolute -left-1 top-1/2 -translate-y-1/2 w-[3px] rounded-full bg-[#ffc72c] transition-all duration-200 ${
+      active ? "h-6" : "h-0"
+    }`;
+
+  const tileClass = (active) =>
+    `grid place-items-center flex-shrink-0 h-9 w-9 rounded-[10px] transition-all duration-150 group-active:scale-95 ${
+      active
+        ? "bg-[#ffc72c] text-[#13214f] shadow-[0_2px_8px_rgba(255,199,44,0.35)]"
+        : "bg-white/[0.08] text-[#cfdcff] group-hover:bg-white/[0.16] group-hover:text-white"
+    }`;
+
+  const subItemClass = (active) =>
+    `group relative flex items-center gap-2.5 min-h-[2.4rem] py-1 pl-1.5 pr-3 rounded-xl text-[0.82rem] transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ffc72c] ${
+      active
+        ? "bg-white/15 text-white font-bold shadow-[inset_0_0_0_1px_rgba(255,255,255,0.22)]"
+        : "text-[#cfdcff] font-medium hover:bg-white/10 hover:text-white"
+    }`;
+
+  const subTileClass = (active) =>
+    `grid place-items-center flex-shrink-0 h-7 w-7 rounded-lg transition-colors duration-150 ${
+      active
+        ? "bg-[#ffc72c] text-[#13214f]"
+        : "bg-white/[0.08] text-[#cfdcff] group-hover:bg-white/[0.16] group-hover:text-white"
+    }`;
+
+  const labelClass =
+    "truncate transition-transform duration-150 group-hover:translate-x-0.5";
+
+  const sectionLabel =
+    "px-1 pb-1 text-[0.62rem] font-bold uppercase tracking-[0.14em] text-[#8fb0ff]";
+
+  // Bouton « Doléance téléphonique » : style à part (fond + bordure jaune)
+  const isAjoutActive = location.pathname === "/backoffice/ajouter-doleance";
+
+  const ajoutClass = `group flex items-center justify-center gap-2 min-h-[3rem] px-4 py-2.5 mt-4 rounded-[14px] border-2 border-[#ffc72c] text-sm font-bold transition-all duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-2 focus-visible:ring-offset-[#10307f] ${
+    isAjoutActive
+      ? "bg-[#ffc72c] text-[#13214f] shadow-[0_6px_16px_rgba(5,12,40,0.35)]"
+      : "bg-[#ffc72c]/15 text-white shadow-[0_4px_12px_rgba(5,12,40,0.25)] hover:bg-[#ffc72c] hover:text-[#13214f] hover:-translate-y-px hover:shadow-[0_8px_20px_rgba(255,199,44,0.3)] active:scale-[0.98]"
+  }`;
+
   return (
     <div className="min-h-screen bg-gray-50 dark:bg-slate-900">
       {/* Overlay pour mobile */}
       {sidebarOpen && (
         <div
-          className="fixed inset-0 bg-black/50 z-20 transition-opacity duration-300 lg:hidden"
+          className="fixed inset-0 bg-[#0a1a47]/60 z-20 transition-opacity duration-300 backdrop-blur-sm lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
       <aside
-        className={`fixed top-0 left-0 z-30 h-full w-72 lg:w-60 xl:w-64 2xl:w-72 shadow-xl transition-transform duration-300 ease-in-out flex flex-col ${
+        aria-label="Navigation principale"
+        className={`no-print fixed top-0 left-0 z-30 h-full w-72 lg:w-60 xl:w-64 2xl:w-72 isolate overflow-hidden flex flex-col
+          border-r border-white/10 shadow-[4px_0_24px_rgba(10,26,71,0.28)]
+          transition-transform duration-300 ease-in-out ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } lg:translate-x-0 ${
           darkMode
-            ? "bg-slate-900"
-            : "bg-gradient-to-b from-[#0B1A33] to-[#1A365D]"
+            ? "bg-[radial-gradient(120%_60%_at_0%_0%,rgba(96,165,250,0.2)_0%,transparent_55%),radial-gradient(100%_45%_at_100%_100%,rgba(255,199,44,0.08)_0%,transparent_60%),linear-gradient(180deg,#0f2a6b_0%,#0a1a47_55%,#070f2c_100%)]"
+            : "bg-[radial-gradient(120%_60%_at_0%_0%,rgba(96,165,250,0.3)_0%,transparent_55%),radial-gradient(100%_45%_at_100%_100%,rgba(255,199,44,0.12)_0%,transparent_60%),linear-gradient(180deg,#10307f_0%,#0f2a6b_55%,#0a1a47_100%)]"
         }`}
       >
+        {/* Texture de grille (plan) en filigrane */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0 -z-10"
+          style={{
+            backgroundImage:
+              "linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
+            backgroundSize: "28px 28px",
+            WebkitMaskImage: "linear-gradient(180deg, #000 0%, transparent 70%)",
+            maskImage: "linear-gradient(180deg, #000 0%, transparent 70%)",
+          }}
+        />
+
         {/* Logo */}
-        <div className="flex-shrink-0 z-10 flex items-center gap-3 p-3 border-b border-white/10 bg-opacity-95 backdrop-blur-sm">
-          {/* Logo */}
-          <div className="flex-shrink-0">
+        <div className="relative flex-shrink-0 flex items-center gap-3 px-4 pt-5 pb-4 border-b border-white/[0.14]">
+          {/* Filet jaune sous la marque */}
+          <span className="absolute left-4 -bottom-px h-0.5 w-11 rounded-full bg-[#ffc72c]" />
+
+          <span className="grid place-items-center flex-shrink-0 h-[70px] w-[60px] p-1.5 rounded-[14px] bg-white/10 border border-white/[0.22] backdrop-blur-sm shadow-[0_6px_16px_rgba(5,12,40,0.4),inset_0_1px_0_rgba(255,255,255,0.25)]">
             <img
               src={`${import.meta.env.BASE_URL}images/logo_CUA.svg`}
               alt="Logo CUA"
-              className="h-14 w-14 object-contain rounded-xl"
+              className="h-full w-full object-contain drop-shadow"
             />
-          </div>
+          </span>
 
           {/* Texte */}
-          <div className="flex-1 min-w-0">
-            <h1 className="text-white font-bold text-lg tracking-tight leading-tight">
-              CUA
+          <div className="flex-1 min-w-0 flex flex-col items-start gap-1">
+            <span className="text-[0.6rem] font-semibold uppercase tracking-[0.12em] text-[#8fb0ff] leading-tight">
+              Commune Urbaine d'Antananarivo
+            </span>
+            <h1 className="text-white font-bold text-xl leading-none tracking-[0.06em] font-serif uppercase">
+              Doléances
             </h1>
-            <p className="text-white/60 text-xs font-medium">
-              <span className="block truncate">Commune Urbaine</span>
-              <span className="block truncate">d'Antananarivo</span>
-            </p>
           </div>
 
           {/* Bouton fermeture (mobile) */}
           <button
             onClick={() => setSidebarOpen(false)}
-            className="lg:hidden text-white/60 hover:text-white transition-colors p-1 rounded-lg hover:bg-[#D4AF37] flex-shrink-0"
+            className="lg:hidden flex-shrink-0 grid place-items-center h-9 w-9 rounded-xl text-[#cfdcff] hover:text-white hover:bg-white/10 transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ffc72c]"
             aria-label="Fermer le menu"
           >
             <XMarkIcon className="h-5 w-5" />
@@ -263,34 +333,24 @@ function BackofficeLayout() {
         </div>
 
         {/* Navigation */}
-    <nav className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden p-3 pb-6">
+    <nav className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden overscroll-contain px-4 pt-3 pb-6 [scrollbar-width:thin] [scrollbar-color:rgba(255,255,255,0.22)_transparent]">
+  <p className={sectionLabel}>Menu</p>
   <div className="space-y-1">
     {navigation.map((item) => (
       <Link
         key={item.name}
         to={item.href}
         onClick={() => isMobile && setSidebarOpen(false)}
-        className={`relative flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group ${
-          isActive(item.href)
-            ? "bg-[#D4AF37] text-white shadow-md shadow-[#D4AF37]/20"
-            : "text-white/70 hover:bg-[#D4AF37]/20 hover:text-white hover:shadow-lg hover:shadow-[#D4AF37]/25"
-        }`}
+        aria-current={isActive(item.href) ? "page" : undefined}
+        className={itemClass(isActive(item.href))}
       >
-        {isActive(item.href) && (
-          <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 bg-white rounded-r-full" />
-        )}
+        <span className={barClass(isActive(item.href))} />
 
-        <item.icon
-          className={`h-5 w-5 mr-3 flex-shrink-0 transition-colors ${
-            isActive(item.href)
-              ? "text-white"
-              : "text-white/40 group-hover:text-white"
-          }`}
-        />
-
-        <span className="text-sm font-medium">
-          {item.name}
+        <span className={tileClass(isActive(item.href))}>
+          <item.icon className="h-5 w-5" />
         </span>
+
+        <span className={labelClass}>{item.name}</span>
       </Link>
     ))}
     </div>
@@ -300,21 +360,18 @@ function BackofficeLayout() {
     <Link
       to="/backoffice/ajouter-doleance"
       onClick={() => isMobile && setSidebarOpen(false)}
-      className={`flex items-center justify-center gap-2 px-4 py-3 rounded-xl font-bold text-sm shadow-lg transition-all duration-200 mt-3 ${
-        location.pathname === "/backoffice/ajouter-doleance"
-          ? "bg-white text-blue-600 shadow-white/20 scale-[1.02] dark:bg-slate-800 dark:text-blue-400"
-          : "bg-gradient-to-r from-blue-600 to-blue-700 text-white shadow-blue-600/30 hover:shadow-xl hover:shadow-blue-600/40 hover:scale-[1.02]"
-      }`}
+      aria-current={isAjoutActive ? "page" : undefined}
+      className={ajoutClass}
     >
-      <PlusCircleIcon className="h-5 w-5" />
-      Doléance téléphonique
+      <PlusCircleIcon className="h-5 w-5 flex-shrink-0" />
+      <span className="truncate">Doléance téléphonique</span>
     </Link>
   )}
 
   {/* Séparation */}
-  <div className="my-4 border-t border-white/10"></div>
+  <div className="my-4 border-t border-white/[0.14]"></div>
 
-
+  <p className={sectionLabel}>Gestion</p>
   <div className="space-y-1">
     {filteredSecondaryNavigation.map((item) =>
       item.subItems ? (
@@ -322,77 +379,45 @@ function BackofficeLayout() {
 
           <button
             onClick={() => toggleMenu(item.name)}
-            className={`relative w-full flex items-center justify-between px-3 py-2.5 rounded-lg transition-all duration-200 group ${
-              openMenus[item.name] || isSubMenuActive(item.subItems)
-                ? "bg-[#D4AF37] text-white shadow-md shadow-[#D4AF37]/20"
-                : "text-white/70 hover:bg-[#D4AF37]/20 hover:text-white hover:shadow-lg hover:shadow-[#D4AF37]/25"
+            aria-expanded={!!openMenus[item.name]}
+            className={`${itemClass(isSubMenuActive(item.subItems))} w-full justify-between text-left ${
+              openMenus[item.name] && !isSubMenuActive(item.subItems)
+                ? "!bg-white/10 !text-white"
+                : ""
             }`}
           >
+            <span className={barClass(isSubMenuActive(item.subItems))} />
 
-            {(openMenus[item.name] ||
-              isSubMenuActive(item.subItems)) && (
-              <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 bg-white rounded-r-full" />
-            )}
-
-
-            <div className="flex items-center">
-
-              <item.icon
-                className={`h-5 w-5 mr-3 flex-shrink-0 ${
-                  openMenus[item.name] ||
-                  isSubMenuActive(item.subItems)
-                    ? "text-white"
-                    : "text-white/40 group-hover:text-white"
-                }`}
-              />
-
-              <span className="text-sm font-medium">
-                {item.name}
+            <span className="flex items-center gap-3 min-w-0">
+              <span className={tileClass(isSubMenuActive(item.subItems))}>
+                <item.icon className="h-5 w-5" />
               </span>
-
-            </div>
-
+              <span className="truncate">{item.name}</span>
+            </span>
 
             <ChevronDownIcon
-              className={`h-4 w-4 transition-transform duration-200 ${
-                openMenus[item.name]
-                  ? "rotate-180"
-                  : ""
+              className={`h-4 w-4 flex-shrink-0 transition-transform duration-200 ${
+                openMenus[item.name] ? "rotate-180" : ""
               }`}
             />
-
           </button>
 
-
-
           {openMenus[item.name] && (
-            <div className="ml-4 space-y-1 border-l-2 border-white/10 pl-3">
+            <div className="ml-5 space-y-1 border-l-2 border-white/15 pl-3">
 
               {item.subItems.map((subItem) => (
                 <Link
                   key={subItem.name}
                   to={subItem.href}
                   onClick={() => isMobile && setSidebarOpen(false)}
-                  className={`relative flex items-center px-3 py-2 rounded-lg transition-all duration-200 ${
-                    isActive(subItem.href)
-                      ? "bg-[#D4AF37] text-white shadow-md shadow-[#D4AF37]/20"
-                      : "text-white/60 hover:bg-[#D4AF37]/20 hover:text-white hover:shadow-md hover:shadow-[#D4AF37]/20"
-                  }`}
+                  aria-current={isActive(subItem.href) ? "page" : undefined}
+                  className={subItemClass(isActive(subItem.href))}
                 >
-
-                  {isActive(subItem.href) && (
-                    <span className="absolute left-0 top-1/2 -translate-y-1/2 h-4 w-1 bg-white rounded-r-full" />
-                  )}
-
-
-                  <subItem.icon
-                    className="h-4 w-4 mr-3 flex-shrink-0"
-                  />
-
-                  <span className="text-sm">
-                    {subItem.name}
+                  <span className={subTileClass(isActive(subItem.href))}>
+                    <subItem.icon className="h-4 w-4" />
                   </span>
 
+                  <span className="truncate">{subItem.name}</span>
                 </Link>
               ))}
 
@@ -401,38 +426,22 @@ function BackofficeLayout() {
 
         </div>
 
-
       ) : (
 
         <Link
           key={item.name}
           to={item.href}
           onClick={() => isMobile && setSidebarOpen(false)}
-          className={`relative flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group ${
-            isActive(item.href)
-              ? "bg-[#D4AF37] text-white shadow-md shadow-[#D4AF37]/20"
-              : "text-white/70 hover:bg-[#D4AF37]/20 hover:text-white hover:shadow-lg hover:shadow-[#D4AF37]/25"
-          }`}
+          aria-current={isActive(item.href) ? "page" : undefined}
+          className={itemClass(isActive(item.href))}
         >
+          <span className={barClass(isActive(item.href))} />
 
-          {isActive(item.href) && (
-            <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 bg-white rounded-r-full" />
-          )}
-
-
-          <item.icon
-            className={`h-5 w-5 mr-3 flex-shrink-0 ${
-              isActive(item.href)
-                ? "text-white"
-                : "text-white/40 group-hover:text-white"
-            }`}
-          />
-
-
-          <span className="text-sm font-medium">
-            {item.name}
+          <span className={tileClass(isActive(item.href))}>
+            <item.icon className="h-5 w-5" />
           </span>
 
+          <span className={labelClass}>{item.name}</span>
         </Link>
 
       )
@@ -440,29 +449,18 @@ function BackofficeLayout() {
   </div>
 
   {/* Historique */}
-  <div className="mt-4">
+  <div className="mt-1">
     <Link
       to="/backoffice/historique"
       onClick={() => isMobile && setSidebarOpen(false)}
-      className={`relative w-full flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group ${
-        isActive("/backoffice/historique")
-          ? "bg-[#D4AF37] text-white shadow-md shadow-[#D4AF37]/20"
-          : "text-white/70 hover:bg-[#D4AF37]/20 hover:text-white hover:shadow-lg hover:shadow-[#D4AF37]/25"
-      }`}
+      aria-current={isActive("/backoffice/historique") ? "page" : undefined}
+      className={itemClass(isActive("/backoffice/historique"))}
     >
-      {isActive("/backoffice/historique") && (
-        <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 bg-white rounded-r-full" />
-      )}
-      <ClockIcon
-        className={`h-5 w-5 mr-3 flex-shrink-0 ${
-          isActive("/backoffice/historique")
-            ? "text-white"
-            : "text-white/40 group-hover:text-white"
-        }`}
-      />
-      <span className="text-sm font-medium">
-        Historiques
+      <span className={barClass(isActive("/backoffice/historique"))} />
+      <span className={tileClass(isActive("/backoffice/historique"))}>
+        <ClockIcon className="h-5 w-5" />
       </span>
+      <span className={labelClass}>Historiques</span>
     </Link>
   </div>
 
@@ -499,71 +497,46 @@ function BackofficeLayout() {
   )} */}
 
   {/* Paramètres */}
-  <div className="mt-4">
-
+  <div className="mt-1">
     <Link
       to="/backoffice/settings"
       onClick={() => isMobile && setSidebarOpen(false)}
-      className={`relative w-full flex items-center px-3 py-2.5 rounded-lg transition-all duration-200 group ${
-        isActive("/backoffice/settings")
-          ? "bg-[#D4AF37] text-white shadow-md shadow-[#D4AF37]/20"
-          : "text-white/70 hover:bg-[#D4AF37]/20 hover:text-white hover:shadow-lg hover:shadow-[#D4AF37]/25"
-      }`}
+      aria-current={isActive("/backoffice/settings") ? "page" : undefined}
+      className={itemClass(isActive("/backoffice/settings"))}
     >
-
-      {isActive("/backoffice/settings") && (
-        <span className="absolute left-0 top-1/2 -translate-y-1/2 h-5 w-1 bg-white rounded-r-full" />
-      )}
-
-
-      <Cog6ToothIcon
-        className={`h-5 w-5 mr-3 flex-shrink-0 ${
-          isActive("/backoffice/settings")
-            ? "text-white"
-            : "text-white/40 group-hover:text-white"
-        }`}
-      />
-
-
-      <span className="text-sm font-medium">
-        Paramètres
+      <span className={barClass(isActive("/backoffice/settings"))} />
+      <span className={tileClass(isActive("/backoffice/settings"))}>
+        <Cog6ToothIcon className="h-5 w-5" />
       </span>
-
+      <span className={labelClass}>Paramètres</span>
     </Link>
-
   </div>
-
-
 
     </nav>
 
         {/* Footer */}
         {/* Infos utilisateur */}
-        <div
-          className={`flex-shrink-0 z-10 p-4 border-t border-white/10 backdrop-blur-sm ${
-            darkMode ? "bg-slate-900" : "bg-[#0B1A33]/95"
-          }`}
-        >
-          <div className="flex items-center">
-            <div className="relative w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 shadow-md bg-white/10">
-              <span className="text-white text-sm font-medium">
+        <div className="flex-shrink-0 z-10 px-4 py-3 border-t border-white/[0.14]">
+          <div className="flex items-center gap-3 bg-white/[0.08] rounded-[14px] p-2.5">
+            <div className="relative w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 bg-[#ffc72c] shadow-[0_2px_8px_rgba(255,199,44,0.35)] ring-2 ring-white/50">
+              <span className="text-[#13214f] text-sm font-extrabold uppercase">
                 {user?.prenom?.charAt(0) || "U"}
                 {user?.nom?.charAt(0) || "?"}
               </span>
-              <span className={`absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 ${darkMode ? 'border-slate-900' : 'border-[#0B1A33]'} ${isCurrentUserOnline ? 'bg-green-500' : 'bg-gray-400 dark:bg-gray-500'}`} />
+              <span className={`absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full border-2 border-[#0f2a6b] ${isCurrentUserOnline ? 'bg-emerald-400' : 'bg-gray-400'}`} />
             </div>
 
-            <div className="ml-3 flex-1 min-w-0">
-              <p className="text-sm text-white font-medium truncate">
+            <div className="flex-1 min-w-0">
+              <p className="text-sm text-white font-semibold truncate">
                 {user?.prenom || "Utilisateur"} {user?.nom || ""}
               </p>
 
-              <p className="text-xs text-white/50 capitalize truncate">
+              <p className="text-xs text-[#a9bdf0] capitalize truncate">
                 {user?.role?.replace(/_/g, " ") || "Chargement..."}
               </p>
               <div className="flex items-center gap-1 mt-0.5">
-                <span className={`h-1.5 w-1.5 rounded-full ${isCurrentUserOnline ? 'bg-green-400 animate-pulse' : 'bg-gray-500 dark:bg-gray-400'}`} />
-                <span className={`text-[10px] ${isCurrentUserOnline ? 'text-green-400' : 'text-white/40'}`}>
+                <span className={`h-1.5 w-1.5 rounded-full ${isCurrentUserOnline ? 'bg-emerald-400 animate-pulse' : 'bg-gray-400'}`} />
+                <span className={`text-[10px] font-medium ${isCurrentUserOnline ? 'text-emerald-300' : 'text-[#a9bdf0]'}`}>
                   {isCurrentUserOnline ? 'En ligne' : 'Hors ligne'}
                 </span>
               </div>
