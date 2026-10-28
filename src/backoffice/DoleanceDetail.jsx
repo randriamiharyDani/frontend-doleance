@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import api from "../services/api";
 import toast from "react-hot-toast";
@@ -28,6 +29,207 @@ import {
   PrinterIcon,
   ArrowUturnLeftIcon,
 } from "@heroicons/react/24/outline";
+
+// ---- Réglages d'impression ----
+// Les 2 premières images restent sur la page principale ;
+// les images suivantes (3e, 4e, ...) vont sur une page d'annexe
+const MAX_INLINE_IMAGES = 2;
+// Si la description dépasse ce nombre de caractères, il n'y a plus assez de
+// place sur la page principale : toutes les images passent en annexe
+const MAX_TEXT_FOR_INLINE_IMAGES = 1500;
+// Nombre de photos par page d'annexe (grille 2 x 2)
+const IMAGES_PER_ANNEX_PAGE = 4;
+
+// CSS d'impression (autonome : ne dépend d'aucun autre fichier CSS)
+const PRINT_CSS = `
+@page {
+  size: A4;
+  margin: 12mm;
+}
+
+#print-root {
+  display: none;
+}
+
+@media print {
+  html, body {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  /* On masque tout le reste de l'application : pas de page vide */
+  body > *:not(#print-root) {
+    display: none !important;
+  }
+
+  #print-root {
+    display: block !important;
+    color: #111;
+    font-family: Arial, Helvetica, sans-serif;
+  }
+
+  /* Une page = un bloc de hauteur fixe, volontairement plus petit que la zone
+     imprimable (A4 = 273mm utiles, Letter = 255mm utiles) pour ne jamais déborder */
+  .pr-page {
+    box-sizing: border-box;
+    height: 245mm;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  /* Saut de page UNIQUEMENT avant les pages d'annexe (jamais après la dernière) */
+  .pr-page + .pr-page {
+    break-before: page;
+    page-break-before: always;
+  }
+
+  .pr-header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    border-bottom: 2px solid #1e3a8a;
+    padding-bottom: 8px;
+    flex: 0 0 auto;
+  }
+  .pr-header img { width: 40px; height: 40px; }
+  .pr-header h1 { margin: 0; font-size: 14px; font-weight: bold; }
+  .pr-header h2 { margin: 0; font-size: 12px; font-weight: normal; }
+  .pr-header .pr-header-text { text-align: center; }
+
+  .pr-title {
+    flex: 0 0 auto;
+    margin: 12px 0 10px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
+  }
+
+  .pr-table {
+    flex: 0 0 auto;
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+  .pr-table td {
+    border: 1px solid #d1d5db;
+    padding: 5px 8px;
+    vertical-align: top;
+  }
+  .pr-table td.pr-label {
+    width: 30%;
+    background: #f3f4f6;
+    font-weight: bold;
+  }
+
+  .pr-desc {
+    flex: 0 0 auto;
+    margin-top: 10px;
+  }
+  .pr-desc-label {
+    font-size: 12px;
+    font-weight: bold;
+    margin-bottom: 4px;
+  }
+  .pr-desc-value {
+    white-space: pre-wrap;
+    word-break: break-word;
+    line-height: 1.4;
+    text-align: justify;
+  }
+
+  /* Zone images : prend tout l'espace restant sur la page */
+  .pr-images {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: 150mm;
+    margin-top: 10px;
+    display: grid;
+    gap: 8px;
+  }
+
+  .pr-img-cell {
+    position: relative;
+    min-height: 0;
+    border: 1px solid #d1d5db;
+    padding: 2px;
+    overflow: hidden;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .pr-img-cell img {
+    position: absolute;
+    top: 2px; left: 2px; right: 2px; bottom: 2px;
+    width: calc(100% - 4px);
+    height: calc(100% - 4px);
+    object-fit: contain;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .pr-note {
+    flex: 0 0 auto;
+    margin-top: 6px;
+    text-align: center;
+    font-size: 10px;
+    font-style: italic;
+    color: #6b7280;
+  }
+
+  .pr-annex-title {
+    flex: 0 0 auto;
+    text-align: center;
+    font-size: 14px;
+    font-weight: bold;
+    border-bottom: 2px solid #1e3a8a;
+    padding-bottom: 6px;
+  }
+  .pr-annex-grid {
+    flex: 1 1 auto;
+    min-height: 0;
+    margin-top: 10px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+  }
+  .pr-figure {
+    margin: 0;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+  .pr-figure .pr-img-cell { flex: 1 1 auto; }
+  .pr-figure figcaption {
+    flex: 0 0 auto;
+    font-size: 10px;
+    text-align: center;
+    color: #6b7280;
+    margin-top: 2px;
+  }
+
+  .pr-footer {
+    flex: 0 0 auto;
+    margin-top: auto;
+    padding-top: 8px;
+    border-top: 1px solid #d1d5db;
+    text-align: center;
+    font-size: 11px;
+    font-weight: bold;
+  }
+  .pr-footer .pr-date {
+    margin-top: 2px;
+    text-align: right;
+    font-size: 10px;
+    font-weight: normal;
+    color: #6b7280;
+  }
+}
+`;
 
 function DoleanceDetail() {
   const { id } = useParams();
@@ -396,8 +598,38 @@ function DoleanceDetail() {
     (f) => f.url && /\.(jpe?g|png|gif|webp|bmp)$/i.test(f.nom_fichier || ""),
   );
 
+  // --- Logique d'impression ---
+  const textLength = (doleance.description || "").length;
+
+  // Page 1 : les 2 premières images (si le texte laisse assez de place)
+  // Page(s) suivante(s) : toutes les autres images
+  const textAllowsInline = textLength <= MAX_TEXT_FOR_INLINE_IMAGES;
+  const inlineImages = textAllowsInline
+    ? printImages.slice(0, MAX_INLINE_IMAGES)
+    : [];
+  const annexImages = printImages.slice(inlineImages.length);
+
+  // Pages d'annexe : groupes de 4 photos maximum
+  const annexPages = [];
+  for (let i = 0; i < annexImages.length; i += IMAGES_PER_ANNEX_PAGE) {
+    annexPages.push(annexImages.slice(i, i + IMAGES_PER_ANNEX_PAGE));
+  }
+
+  // Taille du texte adaptée à sa longueur
+  const descFontSize =
+    textLength > 1000 ? "10px" : textLength > 600 ? "11px" : "12px";
+
+  const printDate = new Date().toLocaleDateString("fr-FR", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
+
   return (
     <div>
+      {/* CSS d'impression embarqué */}
+      <style>{PRINT_CSS}</style>
+
       {/* Bouton retour */}
       <button
         onClick={() => navigate("/backoffice/doleances")}
@@ -978,7 +1210,7 @@ function DoleanceDetail() {
                     <img
                       src={selectedPiece.url}
                       alt={selectedPiece.nom_fichier}
-                      className="max-w-full max-h-96 mx-auto object-contain"
+                      className="max-w-full max-h-[70vh] mx-auto object-contain"
                     />
                   ) : selectedPiece.nom_fichier?.match(
                       /\.(mp4|mov|avi|mkv|webm)$/i,
@@ -986,7 +1218,13 @@ function DoleanceDetail() {
                     <video
                       src={selectedPiece.url}
                       controls
-                      className="max-w-full max-h-96 mx-auto"
+                      className="max-w-full max-h-[70vh] mx-auto"
+                    />
+                  ) : selectedPiece.nom_fichier?.match(/\.pdf$/i) ? (
+                    <iframe
+                      src={selectedPiece.url}
+                      title={selectedPiece.nom_fichier}
+                      className="w-full h-[70vh] border-0 rounded-lg"
                     />
                   ) : (
                     <div className="py-12">
@@ -1373,112 +1611,146 @@ function DoleanceDetail() {
         </div>
       )}
 
-      {/* ===== Layout d'impression ===== */}
-      <div className="print-only" id="print-area">
-        <div className="print-header">
-          <img
-            className="h-10 w-10"
-            src={`${import.meta.env.BASE_URL}images/logo_CUA.svg`}
-            alt="Logo CUA"
-          />
-          <h1>COMMUNE URBAINE D'ANTANANARIVO</h1>
-          <h2>DELEGATION SPECIALE</h2>
-        </div>
-
-        <div className="print-title">{doleance.titre}</div>
-
-        <table className="print-table">
-          <tbody>
-            <tr>
-              <td className="label">Référence</td>
-              <td className="value">{doleance.reference}</td>
-            </tr>
-            <tr>
-              <td className="label">Nom du plaignant</td>
-              <td className="value">
-                {doleance.citoyen_prenom} {doleance.citoyen_nom}
-              </td>
-            </tr>
-            {/* <tr>
-              <td className="label">Arrondissement</td>
-              <td className="value">{doleance.nom_arrondissement || '—'}</td>
-            </tr>
-            <tr>
-              <td className="label">Fokontany</td>
-              <td className="value">{doleance.nom_quartier || '—'}</td>
-            </tr> */}
-            <tr>
-              <td className="label">Adresse</td>
-              <td className="value">
-                {doleance.citoyen_adresse || doleance.lieu_exact || "—"}
-              </td>
-            </tr>
-            <tr>
-              <td className="label">Date de dépôt</td>
-              <td className="value">
-                {formatDateTime(doleance.date_creation)}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-
-        <div className="print-desc">
-          <div className="label">Description du problème</div>
-          <div className="value">{doleance.description || "—"}</div>
-
-          {printImages.length > 0 && (
-            <div
-              style={{
-                display: "grid",
-                gridTemplateColumns: `repeat(${Math.min(printImages.length, 3)}, 1fr)`,
-                gap: "8px",
-                marginTop: "12px",
-              }}
-            >
-              {printImages.map((img, index) => (
-                <div
-                  key={img.id_piece_jointe || img.id || index}
-                  style={{
-                    breakInside: "avoid",
-                    pageBreakInside: "avoid",
-                    border: "1px solid #d1d5db",
-                    padding: "2px",
-                    height: printImages.length === 1 ? "280px" : "170px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    overflow: "hidden",
-                  }}
-                >
-                  <img
-                    src={img.url}
-                    alt={img.nom_fichier}
-                    style={{
-                      maxWidth: "100%",
-                      maxHeight: "100%",
-                      objectFit: "contain",
-                      WebkitPrintColorAdjust: "exact",
-                      printColorAdjust: "exact",
-                    }}
-                  />
-                </div>
-              ))}
+      {/* ===== Layout d'impression (rendu dans <body> via un portail) ===== */}
+      {createPortal(
+        <div id="print-root">
+          {/* Page 1 : informations + description (+ 1 ou 2 images) */}
+          <div className="pr-page">
+            <div className="pr-header">
+              <img
+                src={`${import.meta.env.BASE_URL}images/logo_CUA.svg`}
+                alt="Logo CUA"
+              />
+              <div className="pr-header-text">
+                <h1>COMMUNE URBAINE D'ANTANANARIVO</h1>
+                <h2>DELEGATION SPECIALE</h2>
+              </div>
             </div>
-          )}
-        </div>
 
-        <div className="print-footer">
-          <p>FITARAINANA</p>
-        </div>
-        <div className="print-date">
-          Imprimé le{" "}
-          {new Date().toLocaleDateString("fr-FR", {
-            day: "2-digit",
-            month: "long",
-            year: "numeric",
-          })}
-        </div>
-      </div>
+            <div className="pr-title">{doleance.titre}</div>
+
+            <table className="pr-table">
+              <tbody>
+                <tr>
+                  <td className="pr-label">Référence</td>
+                  <td>{doleance.reference}</td>
+                </tr>
+                <tr>
+                  <td className="pr-label">Titre du problème</td>
+                  <td>{doleance.titre}</td>
+                </tr>
+                <tr>
+                  <td className="pr-label">Nom du plaignant</td>
+                  <td>
+                    {doleance.citoyen_prenom} {doleance.citoyen_nom}
+                  </td>
+                </tr>
+                <tr>
+                  <td className="pr-label">Adresse</td>
+                  <td>
+                    {doleance.citoyen_adresse || doleance.lieu_exact || "—"}
+                  </td>
+                </tr>
+                <tr>
+                  <td className="pr-label">Date de dépôt</td>
+                  <td>{formatDateTime(doleance.date_creation)}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <div className="pr-desc">
+              <div className="pr-desc-label">Description du problème</div>
+              <div className="pr-desc-value" style={{ fontSize: descFontSize }}>
+                {doleance.description || "—"}
+              </div>
+            </div>
+
+            {inlineImages.length > 0 && (
+              <div
+                className="pr-images"
+                style={{
+                  gridTemplateColumns: `repeat(${inlineImages.length}, minmax(0, 1fr))`,
+                  gridTemplateRows: "minmax(0, 1fr)",
+                }}
+              >
+                {inlineImages.map((img, index) => (
+                  <div
+                    className="pr-img-cell"
+                    key={img.id_piece_jointe || img.id || index}
+                  >
+                    <img src={img.url} alt={img.nom_fichier} />
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {annexImages.length > 0 && (
+              <div className="pr-note">
+                {inlineImages.length > 0
+                  ? `Suite des photos (${annexImages.length}) en page suivante`
+                  : `Photos jointes (${annexImages.length}) en page suivante`}
+              </div>
+            )}
+
+            <div className="pr-footer">
+              <p style={{ margin: 0 }}>FITARAINANA</p>
+              <div className="pr-date">Imprimé le {printDate}</div>
+            </div>
+          </div>
+
+          {/* Pages d'annexe : photos (4 par page) */}
+          {annexPages.map((pageImages, pageIndex) => (
+            <div className="pr-page" key={`annex-${pageIndex}`}>
+              <div className="pr-annex-title">
+                Photos jointes – {doleance.reference}
+                {annexPages.length > 1
+                  ? ` (page ${pageIndex + 1}/${annexPages.length})`
+                  : ""}
+              </div>
+
+              <div
+                className="pr-annex-grid"
+                style={{
+                  // 1 ou 2 photos : empilées en grand ; 3 ou 4 : grille 2 x 2
+                  gridTemplateColumns:
+                    pageImages.length <= 2
+                      ? "minmax(0, 1fr)"
+                      : "repeat(2, minmax(0, 1fr))",
+                  gridTemplateRows: `repeat(${
+                    pageImages.length <= 2
+                      ? pageImages.length
+                      : Math.ceil(pageImages.length / 2)
+                  }, minmax(0, 1fr))`,
+                }}
+              >
+                {pageImages.map((img, index) => (
+                  <figure
+                    className="pr-figure"
+                    key={img.id_piece_jointe || img.id || index}
+                  >
+                    <div className="pr-img-cell">
+                      <img src={img.url} alt={img.nom_fichier} />
+                    </div>
+                    <figcaption>
+                      Photo{" "}
+                      {inlineImages.length +
+                        pageIndex * IMAGES_PER_ANNEX_PAGE +
+                        index +
+                        1}
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+
+              <div className="pr-footer">
+                <p style={{ margin: 0 }}>FITARAINANA</p>
+                <div className="pr-date">Imprimé le {printDate}</div>
+              </div>
+            </div>
+          ))}
+        </div>,
+        document.body,
+      )}
     </div>
   );
 }
